@@ -116,3 +116,10 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - `npm run check`: passed with 124 tests, lint, both type scopes and production bundles.
 - All six desktop journeys pass, including the new recovery case; the artifact-only test is intentionally skipped in this ordinary desktop command. Linux package assembly and hardened packaged startup also pass after the fix.
 - Native CI publication remains pending explicit user approval after automatic review rejected the branch push. No remote publication or live ChatGPT inference has occurred.
+
+## External acceptance blockers
+
+- Revalidated the clean local branch after implementation commit `5023881`; a read-only remote query confirms `codex/project-setup-and-outline` has not been published.
+- The available execution environment is Linux x64. Current Windows/macOS execution evidence is absent; native CI requires the branch publication that automatic approval review rejected. Explicit publication approval has been requested and has not been received.
+- Real ChatGPT-plan inference, representative live outline review, and protected desktop keychain restoration remain unverified. The user-controlled live check has been requested; no result has been provided.
+- Local implementation and verification are complete at this checkpoint. These external conditions prevent claiming the full PRD achieved; the requirement scope is unchanged.
