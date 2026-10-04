@@ -89,4 +89,4 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 3. Run the current implementation’s desktop journeys and packaging on native Windows and macOS. The existing workflow is configured; configuration alone is not execution evidence.
 4. Verify protected OS credential restoration on an actual supported keychain environment. Headless Linux currently uses the disclosed session-only fallback; injected encryption tests establish adapter behavior only.
 
-The goal is incomplete until these requirements have evidence. Native CI publication awaits explicit user approval, and live account verification awaits user participation. Signed release installers, app-store distribution, final branding and additional document formats remain outside this milestone.
+The goal is incomplete until these requirements have evidence. The user has explicitly approved native CI branch publication; publication/results are being verified. Live account verification awaits user participation. Signed release installers, app-store distribution, final branding and additional document formats remain outside this milestone.

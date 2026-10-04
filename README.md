@@ -4,7 +4,7 @@ A desktop learning workspace targeting Windows, macOS, and Linux, built with Ele
 
 The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. Description-to-outline generation uses the Pi harness in a dedicated utility process, with validated saves, cancellation, and retryable save failures. Outlines can begin with a written topic, supported folder material, or both. Scoped text/Markdown reads, source coverage, and clarification are implemented; live/native acceptance remains in progress.
 
-Use **Connect ChatGPT** to connect an eligible account. Credentials use protected operating-system storage where available; otherwise the account panel explains that the connection lasts only for the app session. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
+Use **Connect ChatGPT** to connect an eligible account. During sign-in, **Copy sign-in link** lets you paste the link into your preferred browser if automatic browser opening does not work (for example, in WSL). Keep the app open while completing sign-in. Credentials use protected operating-system storage where available; otherwise the account panel explains that the connection lasts only for the app session. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 
 ![Learning Studio outline workspace](ref/research/assets/outline-workspace.png)
 

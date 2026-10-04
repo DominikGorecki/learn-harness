@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, safeStorage, session, shell } from 'electron'
+import { app, BrowserWindow, clipboard, protocol, safeStorage, session, shell } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { appEntry, appOrigin, developmentOrigin } from './security/policy'
@@ -74,6 +74,7 @@ if (!app.requestSingleInstanceLock()) {
         encrypt: value => safeStorage.encryptString(value),
         decrypt: value => safeStorage.decryptString(Buffer.from(value))
       }),
+      copyToClipboard: async value => { await clipboard.writeText(value) },
       openBrowser: async value => {
         const url = new URL(value)
         const allowed = new URL(providerEndpoints.authorize)

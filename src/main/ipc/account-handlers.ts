@@ -9,6 +9,7 @@ export function registerAccountHandlers(account: AccountService, currentWindow: 
     [accountChannels.connect]: () => account.connect(),
     [accountChannels.cancel]: () => account.cancel(),
     [accountChannels.reopen]: () => account.reopenBrowser(),
+    [accountChannels.copyLink]: () => account.copySignInLink(),
     [accountChannels.models]: () => account.refreshModels(),
     [accountChannels.disconnect]: () => account.disconnect()
   }

@@ -11,6 +11,7 @@ const learning: AccountApi & WorkspaceApi & GenerationApi = {
   connectAccount: () => ipcRenderer.invoke(accountChannels.connect),
   cancelAccountConnection: () => ipcRenderer.invoke(accountChannels.cancel),
   reopenAccountBrowser: () => ipcRenderer.invoke(accountChannels.reopen),
+  copyAccountSignInLink: () => ipcRenderer.invoke(accountChannels.copyLink),
   refreshModels: () => ipcRenderer.invoke(accountChannels.models),
   disconnectAccount: () => ipcRenderer.invoke(accountChannels.disconnect),
   onAccountChanged: listener => {

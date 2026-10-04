@@ -21,6 +21,7 @@ export class AccountService {
     provider: AccountProvider
     store: CredentialStore
     openBrowser(url: string): Promise<void>
+    copyToClipboard(url: string): Promise<void>
     now?: () => number
   }) {
     this.snapshot = {
@@ -80,7 +81,7 @@ export class AccountService {
             this.authorizationUrl = url
             this.update({ canReopenBrowser: true })
             try { await this.options.openBrowser(url) }
-            catch { this.update({ message: 'The browser could not open automatically. Choose Open browser to try again.' }) }
+            catch { if (this.connection === controller && !controller.signal.aborted) this.update({ message: 'The browser could not open automatically. Copy the sign-in link into your preferred browser, or try Open browser again.' }) }
           }
         })
         controller.signal.throwIfAborted()
@@ -123,7 +124,19 @@ export class AccountService {
   async reopenBrowser(): Promise<AccountSnapshot> {
     if (!this.connection || !this.authorizationUrl) throw new ApplicationError('UNAVAILABLE', 'Start a new ChatGPT connection first.')
     try { await this.options.openBrowser(this.authorizationUrl) }
-    catch { throw new ApplicationError('UNAVAILABLE', 'The browser could not be opened. Check your default browser and try again.') }
+    catch { throw new ApplicationError('UNAVAILABLE', 'The browser could not be opened. Copy the sign-in link into your preferred browser.') }
+    return this.get()
+  }
+
+  async copySignInLink(): Promise<AccountSnapshot> {
+    const connection = this.connection
+    const url = this.authorizationUrl
+    if (!connection || connection.signal.aborted || !url) throw new ApplicationError('UNAVAILABLE', 'Start a new ChatGPT connection first.')
+    try { await this.options.copyToClipboard(url) }
+    catch { throw new ApplicationError('UNAVAILABLE', 'The sign-in link could not be copied. Try copying again or choose Open browser.') }
+    if (this.connection === connection && !connection.signal.aborted && this.authorizationUrl === url) {
+      this.update({ message: 'Sign-in link copied. Paste it into your preferred browser and keep this window open.' })
+    }
     return this.get()
   }
 

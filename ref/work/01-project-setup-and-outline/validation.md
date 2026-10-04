@@ -120,6 +120,16 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 ## External acceptance blockers
 
 - Revalidated the clean local branch after implementation commit `5023881`; a read-only remote query confirms `codex/project-setup-and-outline` has not been published.
-- The available execution environment is Linux x64. Current Windows/macOS execution evidence is absent; native CI requires the branch publication that automatic approval review rejected. Explicit publication approval has been requested and has not been received.
+- The available execution environment is Linux x64. Current Windows/macOS execution evidence is absent; native CI requires the branch publication that automatic approval review rejected. The user has now explicitly approved branch publication; publication and native results are being verified.
 - Real ChatGPT-plan inference, representative live outline review, and protected desktop keychain restoration remain unverified. The user-controlled live check has been requested; no result has been provided.
 - Local implementation and verification are complete at this checkpoint. These external conditions prevent claiming the full PRD achieved; the requirement scope is unchanged.
+
+
+## Manual browser sign-in fallback
+
+- Added **Copy sign-in link** beside **Open browser** for a pending connection. Copying reuses the same authorization attempt and confirms the copy only after the OS clipboard write completes. Browser failures point to this recovery path.
+- The named main-process capability accepts no URL or clipboard payload, keeps authorization URLs out of renderer snapshots, reports sanitized clipboard errors, and rejects copying after cancellation or completion. Late clipboard completion cannot overwrite the connected account state.
+- `npm run check`: passed with 126 unit tests, lint, both type scopes and production bundles.
+- `xvfb-run -a npm run test:desktop`: seven journeys passed; the artifact-only test remains intentionally skipped. The new journey disables system-browser launching, copies the real pending fixture URL through IPC and the OS clipboard, follows that URL, and completes signed authorization/model discovery without another sign-in attempt.
+- Visually reviewed the manual-link account panel screenshot. This establishes local clipboard/protocol behavior; actual Windows-browser/WSL clipboard and loopback routing remain user-environment checks.
+- User explicitly approved publishing `codex/project-setup-and-outline` to the configured GitHub origin for native CI.

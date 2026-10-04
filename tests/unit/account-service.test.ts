@@ -22,11 +22,56 @@ function setup(initial: AccountCredential | null = null) {
     listModels: vi.fn(async () => [{ id: 'test-model', name: 'Test Model' }]), revoke: vi.fn(async () => {})
   }
   const openBrowser = vi.fn(async () => {})
-  const service = new AccountService({ provider, store, openBrowser, now: () => 1000 })
-  return { service, store, provider, openBrowser, stored: () => stored }
+  const copyToClipboard = vi.fn<(url: string) => Promise<void>>(async () => {})
+  const service = new AccountService({ provider, store, openBrowser, copyToClipboard, now: () => 1000 })
+  return { service, store, provider, openBrowser, copyToClipboard, stored: () => stored }
 }
 
 describe('account lifecycle', () => {
+  it('copies only the active authorization link and sanitizes clipboard failures', async () => {
+    const { service, provider, copyToClipboard } = setup()
+    const url = 'https://auth.openai.com/api/accounts/authorize?id_token_hint=private-identity'
+    vi.mocked(provider.signIn).mockImplementation(async ({ signal, onAuthorizationUrl }) => {
+      await onAuthorizationUrl(url)
+      return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(new ApplicationError('CANCELLED', 'Sign-in cancelled.')), { once: true }))
+    })
+    await expect(service.copySignInLink()).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+    expect(copyToClipboard).not.toHaveBeenCalled()
+    await service.connect()
+    await vi.waitFor(() => expect(service.get().canReopenBrowser).toBe(true))
+    copyToClipboard.mockRejectedValueOnce(new Error(url))
+    await expect(service.copySignInLink()).rejects.toMatchObject({ code: 'UNAVAILABLE', message: 'The sign-in link could not be copied. Try copying again or choose Open browser.' })
+    const snapshot = await service.copySignInLink()
+    expect(copyToClipboard).toHaveBeenLastCalledWith(url)
+    expect(snapshot.message).toContain('Sign-in link copied')
+    expect(JSON.stringify(snapshot)).not.toContain('private-identity')
+    expect(provider.signIn).toHaveBeenCalledOnce()
+    await service.cancel()
+    await expect(service.copySignInLink()).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+    expect(copyToClipboard).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not overwrite completed sign-in with late clipboard feedback', async () => {
+    const { service, provider, copyToClipboard } = setup()
+    let finishSignIn!: () => void
+    let finishCopy!: () => void
+    vi.mocked(provider.signIn).mockImplementation(async ({ onAuthorizationUrl }) => {
+      await onAuthorizationUrl('https://auth.openai.com/api/accounts/authorize')
+      await new Promise<void>(resolve => { finishSignIn = resolve })
+      return structuredClone(credential)
+    })
+    copyToClipboard.mockImplementation(() => new Promise<void>(resolve => { finishCopy = resolve }))
+    await service.connect()
+    await vi.waitFor(() => expect(finishSignIn).toBeTypeOf('function'))
+    const copying = service.copySignInLink()
+    finishSignIn()
+    await service.waitForConnection()
+    finishCopy()
+    expect(await copying).toMatchObject({ status: 'connected', message: null, canReopenBrowser: false })
+    await expect(service.copySignInLink()).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+    expect(copyToClipboard).toHaveBeenCalledOnce()
+  })
+
   it('restores a protected connection and its available models without leaking credentials', async () => {
     const { service } = setup(credential)
     await service.initialize()

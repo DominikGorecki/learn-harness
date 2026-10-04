@@ -16,7 +16,7 @@ Adapt the dedicated ChatGPT public-client flow in an application-owned main-proc
 
 Keep credentials in the application profile using Electron safeStorage where the OS offers protected encryption. Linux basic_text is not protected storage. Where protected storage is unavailable, keep credentials in memory and explain their session-only lifetime. Keep credentials out of renderer snapshots and project folders. Serialize renewal and account lifecycle actions; clear local credentials independently of the outcome of remote revocation.
 
-Expose named account capabilities through the authorized bridge and sanitized account-change events. Only an internally constructed authorization URL can open the system browser. Local protocol fixtures require an unpackaged app, an explicit isolated profile, and a loopback-only provider origin; packaged operation always uses official endpoints.
+Expose named account capabilities through the authorized bridge and sanitized account-change events. Only an internally constructed authorization URL can open the system browser. A named copy-sign-in-link action copies the active URL through the main process so the learner can paste it into a preferred browser; the URL stays out of renderer snapshots, and the bridge exposes no general clipboard access. Local protocol fixtures require an unpackaged app, an explicit isolated profile, and a loopback-only provider origin; packaged operation always uses official endpoints.
 
 ## Consequences
 

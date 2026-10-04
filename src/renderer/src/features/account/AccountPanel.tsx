@@ -32,6 +32,7 @@ export function AccountPanel({ open, onClose, account, locked = false }: { open:
     <div className="account-actions">
       {connecting ? <>
         {snapshot?.canReopenBrowser && <button className="account-primary" disabled={busy} onClick={() => void run(api => api.reopenAccountBrowser())}>Open browser</button>}
+        {snapshot?.canReopenBrowser && <button className="account-secondary" disabled={busy} onClick={() => void run(api => api.copyAccountSignInLink())}>Copy sign-in link</button>}
         <button className="account-secondary" disabled={busy} onClick={() => void run(api => api.cancelAccountConnection())}>Cancel sign-in</button>
       </> : connected ? <>
         <button className="account-primary" onClick={onClose}>Done</button>

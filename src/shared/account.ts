@@ -18,6 +18,7 @@ export interface AccountApi {
   connectAccount(): Promise<ApiResult<AccountSnapshot>>
   cancelAccountConnection(): Promise<ApiResult<AccountSnapshot>>
   reopenAccountBrowser(): Promise<ApiResult<AccountSnapshot>>
+  copyAccountSignInLink(): Promise<ApiResult<AccountSnapshot>>
   refreshModels(): Promise<ApiResult<AccountSnapshot>>
   disconnectAccount(): Promise<ApiResult<AccountSnapshot>>
   onAccountChanged(listener: (snapshot: AccountSnapshot) => void): () => void
@@ -25,5 +26,5 @@ export interface AccountApi {
 
 export const accountChannels = {
   get: 'account:get', connect: 'account:connect', cancel: 'account:cancel',
-  reopen: 'account:reopen', models: 'account:models', disconnect: 'account:disconnect', changed: 'account:changed'
+  reopen: 'account:reopen', copyLink: 'account:copy-link', models: 'account:models', disconnect: 'account:disconnect', changed: 'account:changed'
 } as const
