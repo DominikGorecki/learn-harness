@@ -1,6 +1,6 @@
 # Architecture patterns
 
-Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md) and [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md).
+Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), and [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md).
 
 ## Process and source ownership
 
@@ -13,6 +13,8 @@ The Node backend is hosted in main for this small slice. There is no Express ser
 Core imports shared contracts and defines repository/time/identity ports. Main imports core and implements privileged adapters. Renderer and preload import shared DTOs/API definitions but no core implementation. Shared imports no runtime/platform frameworks. ESLint protects these directions; separate TypeScript scopes keep browser source free from ambient Node types.
 
 Core service methods are synchronous because the current adapter is in memory. Preload calls return Promises. When introducing asynchronous storage or providers, change service methods and await handlers together; do not return a Promise inside a serialized result envelope.
+
+Account lifecycle lives in `src/main/auth`: application connection service, testable OAuth/provider and credential adapters, and loopback listener. Its asynchronous IPC uses `registerCapability`, which awaits the result before constructing its reply. Shared account snapshots contain no credentials. Pi Agent Core/Pi AI are pinned runtime dependencies for the educational harness; the generation worker is still pending.
 
 ## Growth boundary
 

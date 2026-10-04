@@ -1,6 +1,6 @@
 # Ticket: project-setup-and-outline.T01 — Connect ChatGPT plan access through the Pi foundation
 
-Status: Open
+Status: Implemented and locally validated; real-account inference remains the T06 gate
 
 ## Source
 
@@ -36,11 +36,11 @@ Pinned Pi Agent Core/Pi AI dependencies; application-specific PKCE login based o
 
 ## Acceptance criteria
 
-- [ ] The ordinary sign-in action opens an allowlisted application-owned authorization request in the system browser.
-- [ ] Only verified identity is accepted; inference eligibility reflects granted permission, independently of sign-in.
-- [ ] Connection restoration and model refresh use the saved registration/credential lifecycle and expose safe recovery states.
-- [ ] Account controls function in Electron without token copying or terminal setup; existing desktop gates pass.
-- [ ] Source/fixture verification is recorded separately from the real-account acceptance reserved for T06.
+- [x] The ordinary sign-in action opens an allowlisted application-owned authorization request in the system browser.
+- [x] Only verified identity is accepted; inference eligibility reflects granted permission, independently of sign-in.
+- [x] Connection restoration and model refresh use the saved registration/credential lifecycle and expose safe recovery states.
+- [x] Account controls function in Electron without token copying or terminal setup; existing desktop gates pass.
+- [x] Source/fixture verification is recorded separately from the real-account acceptance reserved for T06.
 
 ## Traceability
 
@@ -48,5 +48,4 @@ AUTH-01 through AUTH-08; MODEL-02; account portions of AC-01, AC-02, AC-04, AC-1
 
 ## Completion evidence
 
-Pending implementation. Keep this section current with commits, validation, and any external verification still required.
-
+Implemented the Pi-based application OAuth adapter, signed identity verification, credential store, account/model lifecycle, authorized IPC and events, and account panel. Added protocol, storage, concurrency, capability-isolation, and real Electron coverage. See [validation](validation.md) for exact gates. Real plan inference and native Windows/macOS execution remain explicitly open in T06.

@@ -19,7 +19,10 @@ test('real desktop bridge, learning flow, reload, and process restart', async ({
     expect(page.url()).toBe('learningapp://workspace/index.html')
     expect(await page.evaluate('typeof require')).toBe('undefined')
     expect(await page.evaluate('typeof process')).toBe('undefined')
-    expect(await page.evaluate('Object.keys(window.learning).sort()')).toEqual(['listCourses', 'listSessions', 'startSession', 'submitAnswer'])
+    expect(await page.evaluate('Object.keys(window.learning).sort()')).toEqual([
+      'cancelAccountConnection', 'connectAccount', 'disconnectAccount', 'getAccount', 'listCourses', 'listSessions',
+      'onAccountChanged', 'refreshModels', 'reopenAccountBrowser', 'startSession', 'submitAnswer'
+    ])
     const invalid = await page.evaluate(async () => {
       const api = (globalThis as unknown as { learning: LearningApi }).learning
       return api.startSession({ courseId: 'typescript', goal: 123 } as unknown as StartSessionRequest)

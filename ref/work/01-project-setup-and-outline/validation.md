@@ -14,7 +14,7 @@
 
 | Ticket | Status | Evidence |
 | --- | --- | --- |
-| T01 | Open | Account and Pi integration pending |
+| T01 | Locally validated | Signed OAuth fixture, credential/model lifecycle, account IPC and desktop panel |
 | T02 | Open | Persistent project workspace pending |
 | T03 | Open | Intent-to-outline generation pending |
 | T04 | Open | Material understanding pending |
@@ -25,3 +25,12 @@
 
 Pending implementation. Audit every PRD requirement and AC-01 through AC-14 against actual code, tests, runtime behavior, screenshots, saved artifacts, and live/native evidence before closing the goal.
 
+## T01 — ChatGPT account foundation
+
+- Pinned Pi AI/Pi Agent Core 1.0.2 and JOSE 6.2.12; npm reported zero known dependency vulnerabilities at installation.
+- Implemented Learning Studio registration, issued-client reuse, PKCE, a loopback callback, JWKS signature/issuer/audience/expiry/nonce verification, separate plan permission, renewal, model discovery, and sign-out.
+- Credentials use OS protected storage where supported, otherwise explicit session-only storage. This Linux automation environment uses the disclosed session-only mode; protected persistence is exercised through the encryption port in adapter tests.
+- `npm run check`: passed with 92 tests, lint, both type scopes, and production bundles.
+- Real Electron account fixture journey verifies signed OAuth, model discovery, safe snapshots, sign-out, and dialog focus restoration. The existing demo journey also passes.
+- Visually inspected `test-results/account-account-panel-comp-371b6--signs-out-through-real-IPC/account-protocol-fixture.png`: account panel follows the neutral design direction. The background demo is intentionally replaced by T02.
+- This is a local protocol fixture, not actual OpenAI authorization. Live plan usage/inference and Windows/macOS native execution remain outstanding.

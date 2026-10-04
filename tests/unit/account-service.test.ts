@@ -1,0 +1,146 @@
+import { describe, expect, it, vi } from 'vitest'
+import { AccountService } from '../../src/main/auth/account-service'
+import { ApplicationError } from '../../src/shared/contracts'
+import { planScope } from '../../src/main/auth/types'
+import type { AccountCredential, AccountProvider, CredentialStore } from '../../src/main/auth/types'
+
+const credential: AccountCredential = {
+  version: 1, clientId: 'oaiapp_test', subject: 'learner', name: 'Test Learner', email: 'learner@example.test',
+  idToken: 'private-identity', accessToken: 'private-access', refreshToken: 'private-refresh', expiresAt: 10_000_000, scopes: [planScope]
+}
+
+function setup(initial: AccountCredential | null = null) {
+  let stored = initial ? structuredClone(initial) : null
+  const store: CredentialStore = {
+    persistence: 'protected', read: vi.fn(async () => structuredClone(stored)),
+    write: vi.fn(async value => { stored = structuredClone(value) }), clear: vi.fn(async () => { stored = null }),
+    hostId: vi.fn(async () => 'urn:uuid:00000000-0000-4000-8000-000000000000')
+  }
+  const provider: AccountProvider = {
+    signIn: vi.fn(async ({ onAuthorizationUrl }) => { await onAuthorizationUrl('https://auth.openai.com/api/accounts/authorize'); return structuredClone(credential) }),
+    renew: vi.fn(async value => ({ ...value, expiresAt: 20_000_000, accessToken: 'renewed-private' })),
+    listModels: vi.fn(async () => [{ id: 'test-model', name: 'Test Model' }]), revoke: vi.fn(async () => {})
+  }
+  const openBrowser = vi.fn(async () => {})
+  const service = new AccountService({ provider, store, openBrowser, now: () => 1000 })
+  return { service, store, provider, openBrowser, stored: () => stored }
+}
+
+describe('account lifecycle', () => {
+  it('restores a protected connection and its available models without leaking credentials', async () => {
+    const { service } = setup(credential)
+    await service.initialize()
+    expect(service.get()).toMatchObject({ status: 'connected', name: 'Test Learner', modelsStatus: 'ready', models: [{ id: 'test-model' }] })
+    expect(JSON.stringify(service.get())).not.toContain('private')
+    const snapshot = service.get(); snapshot.models.length = 0
+    expect(service.get().models).toHaveLength(1)
+  })
+
+  it('shows signed-in identity without claiming plan permission', async () => {
+    const { service, provider } = setup({ ...credential, scopes: ['openid'], accessToken: null })
+    await service.initialize()
+    expect(service.get().status).toBe('permission-required')
+    expect(provider.listModels).not.toHaveBeenCalled()
+    await expect(service.authorizeModel('test-model')).rejects.toMatchObject({ code: 'PLAN_PERMISSION_REQUIRED' })
+  })
+
+  it('connects through the browser and persists only after sign-in succeeds', async () => {
+    const { service, store, openBrowser } = setup()
+    const changes: string[] = []
+    const stop = service.subscribe(snapshot => changes.push(snapshot.status))
+    await service.connect(); await service.waitForConnection()
+    expect(openBrowser).toHaveBeenCalledOnce()
+    expect(store.write).toHaveBeenCalledOnce()
+    expect(changes).toContain('connecting')
+    expect(service.get().status).toBe('connected')
+    expect(service.get().canReopenBrowser).toBe(false)
+    stop()
+  })
+
+  it('cancels a pending login while preserving a previously usable account', async () => {
+    const { service, provider, stored } = setup(credential)
+    await service.initialize()
+    vi.mocked(provider.signIn).mockImplementation(async ({ signal, onAuthorizationUrl }) => {
+      await onAuthorizationUrl('https://auth.openai.com/api/accounts/authorize')
+      if (signal.aborted) throw new ApplicationError('CANCELLED', 'Sign-in cancelled.')
+      return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(new ApplicationError('CANCELLED', 'Sign-in cancelled.')), { once: true }))
+    })
+    await service.connect()
+    await vi.waitFor(() => expect(service.get().canReopenBrowser).toBe(true))
+    await service.cancel()
+    expect(service.get().status).toBe('connected')
+    expect(stored()?.accessToken).toBe(credential.accessToken)
+    expect(service.get().message).toBe('Sign-in cancelled.')
+  })
+
+  it('serializes concurrent renewal and model refresh', async () => {
+    const { service, provider } = setup({ ...credential, expiresAt: 1 })
+    await service.initialize()
+    const results = await Promise.all([service.authorizeModel('test-model'), service.authorizeModel('test-model')])
+    expect(provider.renew).toHaveBeenCalledOnce()
+    expect(results.every(value => value.accessToken === 'renewed-private')).toBe(true)
+  })
+
+  it('reports revoked refresh credentials as reconnect-required', async () => {
+    const { service, provider } = setup({ ...credential, expiresAt: 1 })
+    vi.mocked(provider.renew).mockRejectedValue(new ApplicationError('AUTH_REQUIRED', 'Please reconnect.'))
+    await service.initialize()
+    expect(service.get()).toMatchObject({ status: 'reconnect-required', modelsStatus: 'failed' })
+  })
+
+  it('requires a current available model and never substitutes another one', async () => {
+    const { service } = setup(credential)
+    await service.initialize()
+    await expect(service.authorizeModel('missing')).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+  })
+
+  it('clears local credentials even if provider revocation cannot be reached', async () => {
+    const { service, provider, stored } = setup(credential)
+    await service.initialize()
+    vi.mocked(provider.revoke).mockRejectedValue(new Error('secret provider response'))
+    await service.disconnect()
+    expect(stored()).toBeNull()
+    expect(service.get()).toMatchObject({ status: 'disconnected', name: null, models: [] })
+    expect(service.get().message).toContain('Signed out here')
+    expect(JSON.stringify(service.get())).not.toContain('secret')
+    await expect(service.authorizeModel('test-model')).rejects.toMatchObject({ code: 'AUTH_REQUIRED' })
+  })
+
+  it('blocks account replacement while an outline owns the connection', async () => {
+    const { service } = setup(credential)
+    await service.initialize(); service.setInferenceBusy(true)
+    await expect(service.connect()).rejects.toMatchObject({ code: 'BUSY' })
+    await expect(service.disconnect()).rejects.toMatchObject({ code: 'BUSY' })
+  })
+
+  it('keeps provider errors safe and exposes retryable model failure', async () => {
+    const { service, provider } = setup(credential)
+    vi.mocked(provider.listModels).mockRejectedValue(new Error('access_token=private-key'))
+    await service.initialize()
+    expect(service.get().modelsStatus).toBe('failed')
+    expect(JSON.stringify(service.get())).not.toContain('private-key')
+    vi.mocked(provider.listModels).mockResolvedValue([{ id: 'test-model', name: 'Test Model' }])
+    await service.refreshModels()
+    expect(service.get().modelsStatus).toBe('ready')
+  })
+
+  it('does not let a concurrent connection or inference race with sign-out', async () => {
+    const { service, provider } = setup(credential)
+    await service.initialize()
+    let finish!: () => void
+    vi.mocked(provider.revoke).mockImplementation(() => new Promise<void>(resolve => { finish = resolve }))
+    const signingOut = service.disconnect()
+    await vi.waitFor(() => expect(provider.revoke).toHaveBeenCalled())
+    await expect(service.connect()).rejects.toMatchObject({ code: 'BUSY' })
+    await expect(service.authorizeModel('test-model')).rejects.toMatchObject({ code: 'BUSY' })
+    finish(); await signingOut
+    expect(service.get().status).toBe('disconnected')
+  })
+
+  it('exposes ineligible account access as a distinct recoverable state', async () => {
+    const { service, provider } = setup()
+    vi.mocked(provider.signIn).mockRejectedValue(new ApplicationError('ACCESS_RESTRICTED', 'Access unavailable.'))
+    await service.connect(); await service.waitForConnection()
+    expect(service.get().status).toBe('restricted')
+  })
+})

@@ -1,0 +1,33 @@
+.account-trigger { display: inline-flex; align-items: center; gap: 8px; max-width: 220px; min-height: 34px; padding: 6px 11px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fff; color: #393939; font: 500 13px/1.4 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; cursor: pointer; }
+.account-trigger:hover { background: #f5f5f5; }
+.account-trigger span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-dialog { width: min(460px, calc(100vw - 40px)); max-height: calc(100dvh - 48px); margin: auto; padding: 28px; overflow: auto; border: 1px solid #e5e5e5; border-radius: 16px; box-shadow: 0 24px 80px #0002; background: #fff; color: #171717; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.account-dialog::backdrop { background: #17171740; backdrop-filter: blur(3px); }
+.account-dialog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.account-kicker { font-size: 13px; font-weight: 500; color: #626262; }
+.account-close { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 6px; background: transparent; color: #626262; font: 24px/1 sans-serif; cursor: pointer; }
+.account-close:hover { background: #f5f5f5; }
+.account-emblem { display: grid; place-items: center; width: 44px; height: 44px; margin-bottom: 18px; border-radius: 12px; background: #f5f5f5; color: #242424; font-size: 26px; }
+.account-dialog h2 { margin: 0 0 12px; color: #171717; font: 600 25px/1.25 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; letter-spacing: -.7px; }
+.account-description { margin: 0 0 22px; color: #626262; font-size: 14px; line-height: 1.65; }
+.account-identity { display: flex; align-items: center; gap: 10px; padding: 14px 0; border-top: 1px solid #e5e5e5; border-bottom: 1px solid #e5e5e5; }
+.account-identity > div { flex: 1; min-width: 0; }
+.account-identity strong, .account-identity div span { display: block; overflow-wrap: anywhere; font-size: 13px; line-height: 1.5; }
+.account-identity div span { color: #626262; }
+.account-avatar { display: grid; place-items: center; flex: 0 0 32px; height: 32px; border-radius: 50%; background: #f0f0f0; font-size: 13px; font-weight: 600; }
+.account-indicator { color: #626262; font-size: 12px; }
+.account-indicator.is-connected { color: #166534; }
+.account-feedback { margin: 16px 0; padding: 12px; border-radius: 8px; background: #f5f5f5; color: #424242; font-size: 13px; line-height: 1.6; }
+.account-feedback.is-error { color: #b91c1c; background: #fff5f5; }
+.account-model-count { margin: 16px 0; color: #626262; font-size: 13px; }
+.account-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 18px; }
+.account-primary, .account-secondary { min-height: 40px; padding: 10px 16px; border: 1px solid transparent; border-radius: 8px; font: 500 14px/1.4 inherit; cursor: pointer; transition: background 120ms ease; }
+.account-primary { flex: 1; background: #171717; color: #fff; }
+.account-primary:hover { background: #353535; }
+.account-secondary { background: #fff; color: #393939; border-color: #d0d0d0; }
+.account-secondary:hover { background: #f5f5f5; }
+.account-primary:disabled, .account-secondary:disabled, .account-signout:disabled { opacity: .5; cursor: default; }
+.account-footnote { margin: 12px 0 0; color: #626262; font-size: 12px; line-height: 1.6; }
+.account-signout { display: block; margin: 22px 0 0; padding: 4px 0; border: 0; background: transparent; color: #626262; font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.account-dialog button:focus-visible, .account-trigger:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .account-dialog * { transition: none; } }

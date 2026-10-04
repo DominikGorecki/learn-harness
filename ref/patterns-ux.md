@@ -30,7 +30,7 @@ Compact context controls contain only decisions that affect the action. The draf
 | Main input | Optional goal attached to a selected demo lesson | Topic/intent input for project outlines; show which material informs the request. |
 | Activity | Static lesson, one question, deterministic feedback | Explain the activity, ask for useful learner work, and keep feedback connected to that work. |
 | Results | Demo question completion | A readable outline with ordered lessons, objectives, and module plans; selected-item details through disclosure. |
-| Account/model | Unavailable | Show supported connection and model states as defined by PRD 01; browsing saved content remains usable without inference access. |
+| Account/model | ChatGPT connection, permission/recovery states, and account model discovery | Project model selection is next; browsing saved content must remain usable without inference access. |
 | Saved project state | Unavailable; sessions reset on quit | Distinguish generation from a confirmed `.edu` save and preserve the last saved outline during regeneration. |
 
 The current demo must continue to identify sample content and session-only progress. A documented target does not justify placeholder connected states, dummy saved indicators, inactive future toolbars, or a simulated tutor presented as working AI.

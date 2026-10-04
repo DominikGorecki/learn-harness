@@ -1,4 +1,4 @@
-import { app, BrowserWindow, protocol, session } from 'electron'
+import { app, BrowserWindow, protocol, safeStorage, session, shell } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
 import { createLearningService } from '../core/learning/service'
@@ -6,6 +6,11 @@ import { createMemorySessionRepository } from './adapters/memory-session-reposit
 import { registerLearningHandlers } from './ipc/handlers'
 import { appEntry, appOrigin, developmentOrigin } from './security/policy'
 import { registerRendererProtocol } from './security/protocol'
+import { AccountService } from './auth/account-service'
+import { createChatGPTProvider } from './auth/chatgpt-provider'
+import { createCredentialStore } from './auth/credential-store'
+import { registerAccountHandlers } from './ipc/account-handlers'
+import { providerEnvironment } from './auth/provider-environment'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -17,6 +22,7 @@ if (!app.isPackaged && process.env.EDU_HARNESS_TEST_DATA_DIR) {
 }
 
 let mainWindow: BrowserWindow | null = null
+let account: AccountService | null = null
 const developmentUrl = !app.isPackaged ? process.env.ELECTRON_RENDERER_URL : undefined
 if (developmentUrl && new URL(developmentUrl).origin !== developmentOrigin) {
   throw new Error('The development renderer must use the configured loopback origin.')
@@ -58,7 +64,25 @@ if (!app.requestSingleInstanceLock()) {
       sessions: createMemorySessionRepository(), createId: randomUUID, now: () => new Date().toISOString()
     })
     registerLearningHandlers(learning, () => mainWindow, expectedOrigin)
+    const providerEndpoints = providerEnvironment({ packaged: app.isPackaged,
+      testProfile: process.env.EDU_HARNESS_TEST_DATA_DIR, fixtureOrigin: process.env.EDU_HARNESS_TEST_PROVIDER_URL })
+    account = new AccountService({
+      provider: createChatGPTProvider({ endpoints: providerEndpoints }),
+      store: createCredentialStore(join(app.getPath('userData'), 'connection'), {
+        available: () => safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'),
+        encrypt: value => safeStorage.encryptString(value),
+        decrypt: value => safeStorage.decryptString(Buffer.from(value))
+      }),
+      openBrowser: async value => {
+        const url = new URL(value)
+        const allowed = new URL(providerEndpoints.authorize)
+        if (url.origin !== allowed.origin || url.pathname !== allowed.pathname || url.username || url.password) throw new Error('Invalid authorization destination')
+        await shell.openExternal(url.toString())
+      }
+    })
+    registerAccountHandlers(account, () => mainWindow, expectedOrigin)
     await createWindow()
+    void account.initialize()
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) void createWindow().catch(() => app.quit())
     })
@@ -67,4 +91,5 @@ if (!app.requestSingleInstanceLock()) {
     app.quit()
   })
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+  app.on('before-quit', () => { account?.dispose() })
 }

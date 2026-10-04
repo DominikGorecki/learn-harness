@@ -2,7 +2,9 @@
 
 A basic desktop learning workspace for Windows, macOS, and Linux, built with Electron, React, and TypeScript. The Node.js backend runs inside Electron main. The interface has a sidebar, a central learning session, and a context panel inspired by task-oriented desktop workspaces.
 
-The working slice includes three demo lessons, goal-labelled sessions, one practice question per lesson, deterministic feedback, and navigation between sessions. Progress is held in memory and resets when the application quits. There is no AI provider, filesystem import, account, or cloud service yet.
+The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. It also retains three demo lessons with deterministic practice feedback; demo progress resets when the application quits. Project folders and AI-generated outlines are being implemented under PRD 01.
+
+Use **Connect ChatGPT** to connect an eligible account. Credentials use protected operating-system storage where available; otherwise the account panel explains that the connection lasts only for the app session. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 
 ![Learning Studio workspace](ref/research/assets/workspace.png)
 

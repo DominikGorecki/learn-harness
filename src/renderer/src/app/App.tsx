@@ -4,8 +4,12 @@ import { Mark } from '../components/Mark'
 import { StartView } from '../features/learning/StartView'
 import { SessionView } from '../features/learning/SessionView'
 import { errorMessage, request } from '../lib/learning-client'
+import { AccountPanel } from '../features/account/AccountPanel'
+import { useAccount } from '../features/account/useAccount'
 
 export function App() {
+  const account = useAccount()
+  const [accountOpen, setAccountOpen] = useState(false)
   const [courses, setCourses] = useState<Course[]>([])
   const [sessions, setSessions] = useState<LearningSession[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -57,7 +61,8 @@ export function App() {
       <div className="sidebar-bottom"><span className="local-dot" aria-hidden="true" /><span>Local demo workspace</span><small>Progress lasts for this app session.</small></div>
     </aside>
     <div className="workbench">
-      <header className="workspace-header"><span>Workspace <span className="breadcrumb-divider">/</span> <strong>{active?.courseTitle ?? 'New session'}</strong></span><span className="demo-label">DEMO</span></header>
+      <header className="workspace-header"><span>Workspace <span className="breadcrumb-divider">/</span> <strong>{active?.courseTitle ?? 'New session'}</strong></span>
+        <button className="account-trigger" onClick={() => setAccountOpen(true)} aria-label="Account settings"><span>{account.snapshot?.name ?? 'Connect ChatGPT'}</span></button></header>
       <div className="workspace-columns">
         <main id="workspace" className="workspace" tabIndex={-1} aria-busy={loading || busy}>
           {error && <div className="error-banner" role="alert"><p>{error}</p>
@@ -82,7 +87,8 @@ export function App() {
           <div className="context-note"><span aria-hidden="true">✳</span><p>These are sample lessons. A correct answer is a checkpoint, not a measure of mastery.</p></div>
         </aside>
       </div>
-      <footer className="status-bar"><span>Demo content · No AI provider connected</span><span>Progress resets when you quit</span></footer>
+      <footer className="status-bar"><span>{account.snapshot?.status === 'connected' ? 'ChatGPT connected · Demo lessons' : 'Demo lessons · Connect ChatGPT from your account'}</span><span>Demo progress resets when you quit</span></footer>
     </div>
+    <AccountPanel open={accountOpen} onClose={() => setAccountOpen(false)} account={account} />
   </div>
 }

@@ -24,6 +24,6 @@ The current demo uses a small global mutation guard. When project-specific async
 
 ## Current implementation and migration evidence
 
-The demo currently has warm surfaces, terracotta actions, Georgia headings, demo session navigation, and a fixed explanatory context panel that hides in narrower windows. Those observations describe existing code, while ADR-0007 and the design/UX files govern future changes. Account/model selection, folder-based projects, generation, persistence, theme settings, command menus, and new shortcuts are not yet implemented.
+The demo currently has warm surfaces, terracotta actions, Georgia headings, demo session navigation, and a fixed explanatory context panel that hides in narrower windows. The new account panel uses the adopted neutral direction and real account state. ADR-0007 and the design/UX files govern further changes. Project model selection, folder-based projects, generation, educational persistence, theme settings, command menus, and new shortcuts are not yet implemented.
 
 For a UI implementation, exercise the real bridge/backend journey and review screenshots, focus, scroll, zoom, long content, reduced motion, and target OS appearance. Keep current capability labels truthful until backend behavior exists. The documentation-only adoption does not establish screen compliance or accessibility certification.

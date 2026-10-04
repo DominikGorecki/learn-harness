@@ -1,10 +1,12 @@
 # IPC and security patterns
 
-Governed by [ADR-0002](ADRs/ADR-0002-sandboxed-capability-ipc.md).
+Governed by [ADR-0002](ADRs/ADR-0002-sandboxed-capability-ipc.md) and [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md).
 
 ## Capability contract
 
 `src/shared/contracts.ts` is the transport contract. Expose named methods on `window.learning`, currently `listCourses`, `listSessions`, `startSession`, and `submitAnswer`. Do not expose raw `ipcRenderer`, arbitrary channel names, filesystem paths, subprocess APIs, environment variables, or credentials.
+
+`src/shared/account.ts` adds named account get/connect/cancel/reopen/models/disconnect capabilities and `onAccountChanged`. The subscription strips Electron event objects and returns an unsubscribe function. Account mutations accept no caller-supplied URLs or credentials; even unexpected payloads to no-input actions are rejected. Main sends sanitized snapshots only to the owning window.
 
 Requests/results are structured-clone-compatible DTOs. Public replies use `ApiResult<T>` with bounded error codes and safe messages. Expected application errors retain their code; unexpected failures return a generic INTERNAL message without serialized stack traces or sensitive logs.
 
@@ -14,10 +16,10 @@ Each main handler verifies the live owning window, exact sender webContents, the
 
 ## Renderer restrictions
 
-Keep `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false`, `webSecurity: true`, and `webviewTag: false`. Deny renderer navigation, redirects, popups, embedded webviews, and browser permissions in the app's dedicated session. No external link opening capability is present.
+Keep `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false`, `webSecurity: true`, and `webviewTag: false`. Deny renderer navigation, redirects, popups, embedded webviews, and browser permissions in the app's dedicated session. The account service may open its internally constructed, origin/path-allowlisted authorization URL in the system browser. No generic external-link capability is exposed.
 
 Built HTML/assets are served through a registered secure standard custom protocol. The handler allows GET requests only and a small fixed asset-path shape under the built renderer directory. It does not turn renderer-provided paths into general filesystem access. Production CSP disallows inline scripts/styles, network connections, frames, objects, and form submission. Dev CSP permits Vite refresh scripts/styles and its exact loopback websocket. Packaged apps ignore the development renderer URL.
 
 ## Adding capabilities
 
-Extend shared DTOs, runtime validation, and API types first; add one preload wrapper and one authorized main handler; cover the rejected inputs and real IPC journey. Keep renderer text as React text. Before adding Markdown/HTML, imports, external navigation, or model-produced actions, define their trust boundary explicitly. Streaming/event APIs are deferred; when added, strip Electron event objects and return unsubscribe functions.
+Extend shared DTOs, runtime validation, and API types first; add one preload wrapper and one authorized main handler; cover the rejected inputs and real IPC journey. Keep renderer text as React text. Before adding Markdown/HTML, imports, external navigation, or model-produced actions, define their trust boundary explicitly. All event subscriptions must strip Electron event objects and return unsubscribe functions.
