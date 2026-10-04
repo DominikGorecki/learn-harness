@@ -1,7 +1,7 @@
 # PRD 01: Project setup and AI-generated learning outlines
 
 Date: 2026-10-04  
-Status: Implementation locally validated; live-provider and native-platform acceptance still required.
+Status: Implementation and native automated journeys/packaging validated; live-provider and manual account acceptance still required.
 
 Product context: [Education Harness overview](../../docs/overview.md).
 

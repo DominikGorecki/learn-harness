@@ -1,5 +1,7 @@
 # Skeleton validation
 
+This is the historical skeleton checkpoint. Current project/account/outline implementation and native CI evidence are recorded in the [PRD 01 validation log](../work/01-project-setup-and-outline/validation.md) and [acceptance audit](../work/01-project-setup-and-outline/acceptance.md).
+
 - Environment: Linux x64 under WSL2, Node 24.11.1, Electron 44.5.1.
 - Date: 2026-10-04.
 - Scope: the implemented local skeleton, not a signed public release.

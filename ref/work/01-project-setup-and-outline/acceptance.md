@@ -1,7 +1,7 @@
 # PRD 01 acceptance audit
 
 Date: 2026-10-04
-Status: Local implementation and Linux verification complete; live-provider and native Windows/macOS gates remain open.
+Status: Implementation and native automated journeys/packaging verified on Windows, macOS and Linux; live-provider and manual account checks remain open.
 
 This audit does not treat deterministic protocol fixtures as real ChatGPT inference or as evidence of curriculum quality. The [PRD](../../prds/01-project-setup-and-outline.md) remains the acceptance authority. The [validation log](validation.md) records check history and granular implementation checkpoints.
 
@@ -16,7 +16,7 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 
 ## Functional requirements
 
-| Requirement | Local evidence | Remaining qualification |
+| Requirement | Implementation and automated evidence | Remaining qualification |
 | --- | --- | --- |
 | AUTH-01 | Browser OAuth/PKCE, signed identity, own app registration; account desktop journey. | Real browser/account authorization pending. |
 | AUTH-02 | Identity and plan permission are separate; account/provider tests cover declined permission and recovery. | Live permission behavior pending. |
@@ -27,9 +27,9 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 | AUTH-07 | Private credential port/profile storage, secret-free snapshots, strict portable metadata, source exclusions. | No known local gap. |
 | AUTH-08 | Real Pi HTTP/SSE and utility process are exercised with a signed local fixture. | OPEN: actual successful ChatGPT-plan outline required. |
 | PROJ-01 | Dashboard rows show name, location and outline state; project desktop journey. | No known local gap. |
-| PROJ-02 | Native folder chooser in main; empty folder and cancellation desktop checks. | Windows/macOS native chooser behavior pending. |
+| PROJ-02 | Native folder chooser in main; empty folder and cancellation desktop checks. | Dialog selection/cancellation is automated at the Electron boundary; manual OS chooser interaction remains to inspect. |
 | PROJ-03 | Opening reads metadata only; desktop checks no .edu creation and no inference. | No known local gap. |
-| PROJ-04 | Canonical-path deduplication and profile registry; two-project restart desktop check. | Native path semantics remain part of AC-14. |
+| PROJ-04 | Canonical-path deduplication and profile registry; two-project restart desktop check. | Canonical path and relinking tests pass on all three native runners. |
 | PROJ-05 | Dashboard return, single-run guard, explicit stay/cancel navigation; core and desktop recovery checks. | No known local gap. |
 | PROJ-06 | Missing/unreadable snapshots, lost/replaced metadata identity checks, retry and native relink; storage/core/project desktop tests. | No known local gap. |
 | PROJ-07 | Offline long-outline reading and corrupt-state preservation; reading desktop journey. | No known local gap. |
@@ -65,28 +65,28 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 
 ## Acceptance scenarios
 
-| Scenario | Local evidence | Remaining qualification |
+| Scenario | Implementation and automated evidence | Remaining qualification |
 | --- | --- | --- |
 | AC-01 | Local signed OAuth + actual Pi utility HTTP/SSE journey passes. | OPEN: real eligible account and plan-backed inference. |
 | AC-02 | Account/provider tests plus desktop cancellation, sign-out, draft preservation and usage recovery. | Live account confirmation pending. |
-| AC-03 | Native chooser, cancellation, deduplication, no inference and no initialization-on-open pass. | Other native OS runs pending. |
-| AC-04 | Two independent preferences survive restart; fixture requests use selected model; missing choice recovery passes. | Live account and other OS runs pending. |
+| AC-03 | Native chooser, cancellation, deduplication, no inference and no initialization-on-open pass. | Automated journeys pass on Windows, macOS and Linux. |
+| AC-04 | Two independent preferences survive restart; fixture requests use selected model; missing choice recovery passes. | Native journeys pass; live account verification remains pending. |
 | AC-05 | Short/detailed input plumbing and preserved oversized draft pass; whitespace prevented. | Real short and applied-topic output review pending. |
 | AC-06 | Nested notes-only Pi read/submit/save journey and coverage pass. | Real missing-foundations quality review pending. |
 | AC-07 | Direction transmitted; ambiguous and unsupported recovery, partial coverage and source limits tested. | Real conflicting-material interpretation pending. |
 | AC-08 | Complete validated content contract and readable module disclosures pass. | Real pedagogical usefulness review pending. |
-| AC-09 | Portable atomic storage, restart/offline reading, unchanged original files and secret-free account snapshots pass. | Other native OS runs pending. |
+| AC-09 | Portable atomic storage, restart/offline reading, unchanged original files and secret-free account snapshots pass. | Automated journeys pass on Windows, macOS and Linux. |
 | AC-10 | Interrupted streams, usage failure, cancellation, worker crash, preserved previous output, save retry and conflict recovery pass. | Live provider failure observation pending. |
-| AC-11 | Read-only Linux inspection, missing/moved/corrupt/future-schema preservation and project/run ownership pass. | Native Windows/macOS filesystem behavior pending. |
-| AC-12 | Keyboard submission/disclosure/dialog focus, IME guard, narrow navigation, long documents, 200% zoom and reduced motion pass. | Native OS keyboard/window checks pending. |
-| AC-13 | Main states visually inspected in real Electron captures; README has labelled fixture screenshots. | No known local visual gap; native appearance still pending. |
-| AC-14 | Linux desktop journeys and hardened packaged startup exercised. Existing CI defines native Windows/macOS/Linux jobs. | OPEN: current implementation must run on Windows and macOS. |
+| AC-11 | Read-only Linux inspection, missing/moved/corrupt/future-schema preservation and project/run ownership pass. | Native preservation/recovery checks pass; Windows ACL-based read-only behavior still needs manual verification. |
+| AC-12 | Keyboard submission/disclosure/dialog focus, IME guard, narrow navigation, long documents, 200% zoom and reduced motion pass. | Native keyboard, content-size, zoom and navigation checks pass on all three runners. |
+| AC-13 | Main states visually inspected in real Electron captures; README has labelled fixture screenshots. | Linux, macOS and Windows account/workspace/zoom captures reviewed; no blocking presentation issue found. |
+| AC-14 | Seven desktop journeys, native unsigned packaging and packaged Pi runtime pass on Windows, macOS and Linux; hardened packaged startup additionally exercised on Linux. | Live provider coverage remains separate; signing and installer acceptance are release work. |
 
 ## Remaining verification
 
 1. Complete user-controlled ChatGPT browser authorization and generate a saved outline with the selected available model and included plan allowance. Never supply or copy tokens into project files or this audit.
 2. Review representative real outputs: a broad phrase, a detailed applied goal, incomplete notes requiring foundations, and conflicting notes plus explicit direction. Inspect coherence, ordering, scope, additions, source grounding and concrete module tasks.
-3. Run the current implementation’s desktop journeys and packaging on native Windows and macOS. The existing workflow is configured; configuration alone is not execution evidence.
+3. Complete manual OS folder-chooser inspection and Windows ACL-based read-only recovery checks. Automated native desktop journeys and packaging have run successfully; see the validation log for commit/run evidence.
 4. Verify protected OS credential restoration on an actual supported keychain environment. Headless Linux currently uses the disclosed session-only fallback; injected encryption tests establish adapter behavior only.
 
-The goal is incomplete until these requirements have evidence. The user has explicitly approved native CI branch publication; publication/results are being verified. Live account verification awaits user participation. Signed release installers, app-store distribution, final branding and additional document formats remain outside this milestone.
+The goal is incomplete until these requirements have evidence. The approved branch is published, and native automated runs have passed. Live account verification awaits user participation. Signed release installers, app-store distribution, final branding and additional document formats remain outside this milestone.

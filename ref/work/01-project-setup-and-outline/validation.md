@@ -117,7 +117,7 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - All six desktop journeys pass, including the new recovery case; the artifact-only test is intentionally skipped in this ordinary desktop command. Linux package assembly and hardened packaged startup also pass after the fix.
 - Native CI publication remains pending explicit user approval after automatic review rejected the branch push. No remote publication or live ChatGPT inference has occurred.
 
-## External acceptance blockers
+## Earlier external acceptance blockers (superseded by native CI below)
 
 - Revalidated the clean local branch after implementation commit `5023881`; a read-only remote query confirms `codex/project-setup-and-outline` has not been published.
 - The available execution environment is Linux x64. Current Windows/macOS execution evidence is absent; native CI requires the branch publication that automatic approval review rejected. The user has now explicitly approved branch publication; publication and native results are being verified.
@@ -158,3 +158,12 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - The next native run passed the corrected responsive journeys on Windows, then exposed an intermittent Linux recovery-test failure before its first inference request. `selectOption` had returned while the asynchronous model preference save still disabled the form, allowing the following keyboard submission to arrive too early.
 - The recovery fixture now waits for the create action to become enabled before exercising both IME suppression and keyboard submission. No production guards or test assertions were removed.
 - `npm run check` passes with 126 tests. The focused real Electron recovery journey passes through `xvfb-run -a npm run test:desktop -- tests/desktop/recovery.spec.ts`.
+
+## Native acceptance checkpoint
+
+- [Run 37228974576, attempt 2](https://github.com/DominikGorecki/learn-harness/actions/runs/37228974576), for implementation/test commit `ca25b74723fbc11d5852b328aa286edfce02474c`, is **successful on Windows, macOS and Linux**. Each job completed source checks, all seven ordinary desktop journeys, native unsigned packaging (NSIS/DMG/AppImage), and the separate packaged ASAR Pi worker check. The artifact-only test is intentionally skipped in ordinary desktop runs and then executed after packaging.
+- Windows needed one unchanged job retry after its first attempt exceeded the 10-second PowerShell discovery window in a developer-tool test. The retry passed source, desktop, packaging and packaged-runtime gates. This transient runner sensitivity is recorded rather than hidden by a blanket retry policy or weaker assertions.
+- Reviewed native macOS and Windows artifact screenshots for the manual sign-in panel, project workspace and long-outline 200% zoom state, in addition to the local Linux captures. Native artifacts remain attached to their workflow runs.
+- The user-approved branch is published. Manual copied-link sign-in is covered through the actual clipboard and signed protocol fixture on all three operating systems. Actual WSL/Windows browser routing and live ChatGPT consent/inference still require the learner's environment and account.
+- Updated the PRD status, acceptance audit, T06 ticket and README to reflect actual native execution. Remaining gates are live-plan inference and representative output review, protected OS credential restoration, and manual chooser/Windows-permission checks. The full PRD goal remains incomplete.
+- Final documentation-only updates passed `git diff --check` and focused local Markdown link validation (zero missing targets). They do not change the tested application or test sources.
