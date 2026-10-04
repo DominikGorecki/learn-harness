@@ -3,6 +3,8 @@ export const learningPrompt = `You design a thoughtful, complete learning outlin
 The learner wants understanding, not a pile of readings. Their topic can be a short phrase or a detailed brief.
 Expand missing foundations and bridge prerequisite gaps automatically. Keep their intended subject and constraints central.
 Make reasonable level/scope assumptions explicit instead of making the learner answer a questionnaire.
+Sophisticated source material does not establish the learner's proficiency. Unless they state otherwise,
+include the foundations needed to approach it and make your assumed starting level visible.
 Choose a useful scale, usually 5–10 lessons; do not pad a narrow topic or claim exhaustive coverage of an enormous field.
 Order lessons so earlier work supports later work. Recommend an existing starting lesson.
 Write a clear subject definition/overview, scope, intended level, meaningful outcomes, assumptions, and a list of helpful additions with reasons.

@@ -19,11 +19,11 @@
 | T03 | Locally validated | Actual Pi transport and utility-process desktop journey, saved outline, cancellation/recovery |
 | T04 | Locally validated | Bounded text/Markdown snapshot, actual Pi material tools, source evidence, desktop clarification |
 | T05 | Locally validated | Six Electron journeys, real storage failure/retry, worker crash, model/usage/conflict recovery and zoom |
-| T06 | Open | Full acceptance and native/live evidence pending |
+| T06 | In progress | All 58 IDs audited; Linux checks/package/ASAR runtime pass; native/live gates remain open |
 
 ## Completion audit
 
-Pending implementation. Audit every PRD requirement and AC-01 through AC-14 against actual code, tests, runtime behavior, screenshots, saved artifacts, and live/native evidence before closing the goal.
+See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped. Local Linux evidence is complete. Real plan inference, semantic output review, native Windows/macOS execution and protected OS keychain restart remain explicit open gates.
 
 ## T01 — ChatGPT account foundation
 
@@ -94,3 +94,16 @@ Pending implementation. Audit every PRD requirement and AC-01 through AC-14 agai
 - Six real Electron journeys pass. Recovery adds actual filesystem-induced save failure and restoration, storage-only retry, unavailable model preference retention, allowance errors, account-cancel draft preservation, IME-safe submission, deliberate worker termination, stay/cancel navigation, and confirmed external-edit recovery.
 - Reading coverage includes 20 lessons with long titles/text, offline saved models/outlines, 600px windows at 200% zoom, reduced motion, read-only inspection on this Linux host, and corrupt-state preservation. Windows permission semantics remain a native-platform acceptance concern.
 - Visually reviewed pending generation, generated-but-unsaved, and long-outline high-zoom captures. Screenshots show real application state with deterministic local provider content.
+
+## T06 — local acceptance audit and packaged runtime
+
+- Mapped all 44 functional requirements and 14 acceptance scenarios in `acceptance.md`; automated ID comparison found 58/58 represented. Local Markdown links across README, AGENTS, docs and ref resolve.
+- Final local source gate: `npm run check` passes with 122 tests, lint, both type scopes and production bundles. All six main Electron journeys pass; the artifact-only worker test is deliberately skipped in ordinary desktop runs and enabled through `npm run test:packaged` after packaging.
+- Linux x64 package assembly passes with the local Electron distribution override documented under T03. The ordinary default-cache packaging path remains constrained by this environment’s read-only home cache.
+- Actual hardened packaged app launched in an isolated XDG profile under Xvfb. It rendered the empty workspace while RunAsNode, Node options, development-renderer and fixture/profile overrides were supplied and ignored. No production fuse or sandbox setting was weakened. The owned process group and temporary profile were cleaned up. Screenshot reviewed and retained at `ref/research/assets/packaged-linux-workspace.png`.
+- Read the binary fuse wire: RunAsNode, Node options, Node CLI inspection and extra file-protocol privileges are disabled; ASAR-only loading and integrity validation are enabled.
+- `xvfb-run -a npm run test:packaged` passes: the actual packaged ASAR worker loads Pi dependencies, performs list/read/submit HTTP/SSE against the local fixture, and returns verified source coverage. A development host supplies automation; this is distinct from the hardened-app startup check above.
+- `npm audit --omit=dev --audit-level=high`: zero reported vulnerabilities.
+- Audit improvements: the composer always discloses possible folder-material transmission, including files added after initial opening; the learning prompt explicitly avoids treating sophisticated material as evidence of learner proficiency.
+- Native CI now retains desktop captures even on success and checks the packaged worker after target-OS packaging. Actual current Windows/macOS runs are still required.
+- Requested user-controlled live sign-in/inference feedback asynchronously. No real credentials were accessed or fabricated, and no live provider success is claimed.

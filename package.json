@@ -21,6 +21,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
     "test": "vitest run",
     "test:desktop": "npm run build && playwright test",
+    "test:packaged": "node scripts/check-packaged.ts",
     "build": "npm run typecheck && electron-vite build",
     "check": "npm run lint && npm run test && npm run build",
     "package": "npm run build && electron-builder --dir --publish never",

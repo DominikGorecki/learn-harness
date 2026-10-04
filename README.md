@@ -1,6 +1,6 @@
 # Learning Studio
 
-A basic desktop learning workspace for Windows, macOS, and Linux, built with Electron, React, and TypeScript. The Node.js backend runs inside Electron main. The interface pairs compact project navigation with a spacious workspace inspired by Codex.
+A desktop learning workspace targeting Windows, macOS, and Linux, built with Electron, React, and TypeScript. Project and account services run in Electron main; bounded Pi generation runs in a utility process. The interface pairs compact project navigation with a spacious workspace inspired by Codex.
 
 The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. Description-to-outline generation uses the Pi harness in a dedicated utility process, with validated saves, cancellation, and retryable save failures. Outlines can begin with a written topic, supported folder material, or both. Scoped text/Markdown reads, source coverage, and clarification are implemented; live/native acceptance remains in progress.
 
@@ -12,7 +12,7 @@ Screenshot uses deterministic test-provider content to demonstrate the interface
 
 ## Product direction
 
-The [product overview](docs/overview.md) describes the education harness and its Socratic learning approach. The [first milestone PRD](ref/prds/01-project-setup-and-outline.md) defines functional ChatGPT plan access, folder-based projects, model selection, and saved AI-generated outlines. These documents describe planned behavior; the working slice above remains the current implementation.
+The [product overview](docs/overview.md) describes the education harness and its Socratic learning approach. The [first milestone PRD](ref/prds/01-project-setup-and-outline.md) defines functional ChatGPT plan access, folder-based projects, model selection, and saved AI-generated outlines. The [acceptance audit](ref/work/01-project-setup-and-outline/acceptance.md) maps these requirements to code, tests, and remaining live/native checks.
 
 Future UI changes follow the Codex-inspired [design system](ref/patterns-design-system.md) and [UX patterns](ref/patterns-ux.md), supported by [current official-reference research](ref/research/codex-desktop-ui.md). The workspace now implements this direction; full milestone evidence is tracked in the [implementation validation record](ref/work/01-project-setup-and-outline/validation.md).
 
@@ -50,6 +50,7 @@ npm run check          # lint, focused tests, both type scopes, production build
 npm run test:desktop   # build and exercise the real Electron application
 npm start             # open the most recent production build
 npm run package       # build an unpacked app for the current OS in dist/
+npm run test:packaged # exercise the packaged Pi worker after packaging
 ```
 
 On headless Linux, run desktop tests with `xvfb-run -a npm run test:desktop`; Electron's normal desktop system libraries are required. No browser download is needed for this smoke test because Playwright drives Electron's bundled Chromium.
@@ -116,6 +117,6 @@ npm run dist:linux     # Linux AppImage
 
 These commands never publish. The included GitHub Actions workflow checks and packages on native Windows/macOS/Linux runners, uploading unsigned build artifacts. It is a CI baseline, not a public release pipeline. Final app identity/icons, Windows signing, macOS signing/notarization, architecture coverage, installer acceptance, and update policy remain release work.
 
-## Extend the skeleton
+## Extend the workspace
 
 Add learning behavior to core, define a serializable request/result in shared, expose one preload method, authorize/validate it in main, then implement its renderer state. Async ports separate workspace behavior from project files and the profile registry. Add AI access through a privileged adapter with explicit submission and bounded lifecycle. Expensive parsing, indexing, or inference belongs in workers/utility processes rather than blocking Electron main.

@@ -12,7 +12,7 @@ Build a personal learning workspace for Windows, macOS, and Linux where AI helps
 
 The education harness gives each learning journey a persistent home. A project brings together its purpose, outline, source material, lessons, activities, and the learner's evolving explanations. Someone returning after a week should be able to understand where they left off and what would be useful to do next.
 
-The experience should feel like a focused desktop learning workspace inspired by the current Codex desktop experience. Follow the [design system](../ref/patterns-design-system.md) for neutral surfaces, readable system typography, and restrained visual hierarchy, and [UX patterns](../ref/patterns-ux.md) for project navigation, learner input, progress, and recovery. Make the current task obvious and expose additional complexity when it serves the activity. These adopted standards guide future UI work; the current demo retains its original appearance.
+The experience should feel like a focused desktop learning workspace inspired by the current Codex desktop experience. Follow the [design system](../ref/patterns-design-system.md) for neutral surfaces, readable system typography, and restrained visual hierarchy, and [UX patterns](../ref/patterns-ux.md) for project navigation, learner input, progress, and recovery. Make the current task obvious and expose additional complexity when it serves the activity. The project workspace now implements this direction. The [implementation validation record](../ref/work/01-project-setup-and-outline/validation.md) separates completed local behavior from outstanding live-provider and native-platform acceptance.
 
 ## Learner and product principles
 

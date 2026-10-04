@@ -12,10 +12,10 @@ Linux's `desktopName` package metadata and `syncDesktopName: true` keep its desk
 
 ## Hardening and native runners
 
-Packaged binaries disable RunAsNode, Node options, Node CLI inspection, and file-protocol extra privileges. ASAR-only loading and integrity validation are configured; integrity enforcement support varies by platform. Development Electron is left inspectable for tests. Do not disable packaged fuses to drive experimental test tooling.
+Packaged binaries disable RunAsNode, Node options, Node CLI inspection, and file-protocol extra privileges. ASAR-only loading and integrity validation are configured; integrity enforcement support varies by platform. Development Electron is left inspectable for tests. Do not disable packaged fuses to drive experimental test tooling. `test:packaged` runs the artifact’s worker from ASAR through a development host, while actual hardened startup is checked separately. This distinction keeps testability from weakening the shipped binary.
 
 Use target OS runners for reliable native-module compatibility and platform packaging. macOS signing/notarization needs macOS. The CI matrix produces unsigned artifacts; a green run is not a signed public release. Before native modules are introduced, revisit `npmRebuild: false` and set up target Electron ABI rebuilds.
 
 ## Release work still required
 
-Obtain/configure signing through CI secrets, notarize macOS builds, exercise installers/uninstallers on actual platforms, and test upgrade/data migration behavior after persistence exists. Choose an update provider/channel and verify signed update delivery before wiring `electron-updater`. No automatic updates, credentials, publishing, or external distribution have been enabled in this scaffold.
+Obtain/configure signing through CI secrets, notarize macOS builds, exercise installers/uninstallers on actual platforms, and test upgrade/data migration behavior after persistence exists. Choose an update provider/channel and verify signed update delivery before wiring `electron-updater`. No automatic updates, publishing, or external distribution have been enabled. Account credentials are managed separately by the application under ADR-0008; signing/notarization credentials are not configured.

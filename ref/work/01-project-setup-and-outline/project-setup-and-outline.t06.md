@@ -1,6 +1,6 @@
 # Ticket: project-setup-and-outline.T06 — Verify the complete product and document actual acceptance
 
-Status: Open
+Status: Local validation complete; live/provider and native-platform gates open
 
 ## Source
 
@@ -37,7 +37,7 @@ Requirement-by-requirement audit; complete Linux desktop run; real eligible acco
 
 ## Acceptance criteria
 
-- [ ] Each PRD requirement maps to inspected evidence or an explicitly unresolved blocker; none is silently dropped.
+- [x] Each PRD requirement maps to inspected evidence or an explicitly unresolved blocker; none is silently dropped.
 - [ ] Real plan access and inference are demonstrated; browser sign-in or fixtures alone are insufficient.
 - [ ] Target-platform claims match actual native execution evidence.
 - [ ] Actual UI screenshots meet the design/UX requirements and output quality has been reviewed.
@@ -49,4 +49,4 @@ All PRD requirements; AC-01 through AC-14 cumulatively.
 
 ## Completion evidence
 
-Pending implementation. Keep this section current with commits, validation, and any external verification still required.
+The [acceptance audit](acceptance.md) maps all 58 functional/scenario IDs. Linux checks, six desktop journeys, package assembly, hardened startup and the actual ASAR Pi worker pass locally. The [validation record](validation.md) distinguishes these results from pending user-controlled plan inference, real output-quality review, protected native keychain restart and Windows/macOS execution. This ticket and the goal remain open.

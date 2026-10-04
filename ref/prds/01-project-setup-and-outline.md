@@ -1,7 +1,8 @@
 # PRD 01: Project setup and AI-generated learning outlines
 
 Date: 2026-10-04  
-Status: Draft requirements for the first functional milestone; not implemented.  
+Status: Implementation locally validated; live-provider and native-platform acceptance still required.
+
 Product context: [Education Harness overview](../../docs/overview.md).
 
 ## Outcome
@@ -18,7 +19,7 @@ The historical baseline is recorded in [ADR-0003](../ADRs/ADR-0003-core-learning
 
 The next useful product step is a real learning-project foundation. Someone with a folder of notes should be able to obtain a coherent learning path. Someone starting with a topic name should obtain an equally usable structure without first completing a detailed questionnaire.
 
-This document describes future product behavior. Existing accepted ADRs and patterns continue to describe the implemented skeleton until implementation work explicitly revises them.
+This document defines the product requirements. Current ADRs and patterns describe the implemented workspace; the [acceptance audit](../work/01-project-setup-and-outline/acceptance.md) records evidence and remaining gates.
 
 ## Audience and jobs
 
