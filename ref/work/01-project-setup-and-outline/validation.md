@@ -51,3 +51,12 @@ Pending implementation. Audit every PRD requirement and AC-01 through AC-14 agai
 - Current workspace screenshot is retained at `ref/research/assets/project-workspace.png`. Provider/profile names in this image belong to a local test fixture.
 - `npm run check`: 82 current tests pass, lint, type scopes, and production build. The count decreased because 29 retired demo-specific tests were removed; the project/backend/security/account tests remain.
 - Full milestone generation, live ChatGPT inference, and native Windows/macOS verification remain pending.
+
+## T03 — Pi engine increment
+
+- Added the educational prompt grounded in `docs/socratic-learning.md`, bounded tool schemas, independent outline validation, and actual Pi Agent Core/Pi AI Responses transport.
+- Requests use the selected model and explicit delegated token; whitelist plan-supported fields, group tools under the learning namespace, and send developer instructions. API-key credentials and arbitrary remote endpoints are rejected.
+- A successful terminal event is required before tool effects. Incomplete/missing/failed streams cannot produce accepted results. Requests, responses, turns, and elapsed time are bounded; no automatic provider retries or coding tools are enabled.
+- `npm run check`: passed with 103 tests, lint, both type scopes, and build. Twenty-one additional tests exercise real HTTP/SSE through Pi, argument repair, source fabrication rejection, clarification, cancellation, timeout, error classification, and malformed outlines.
+- This engine is not yet exposed by the desktop; utility-process ownership, generation IPC, and UI follow in the next T03 increment. Local streamed fixtures are not live ChatGPT inference evidence.
+- Protocol reference checked 2026-10-04: [models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference) and [preview limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations).
