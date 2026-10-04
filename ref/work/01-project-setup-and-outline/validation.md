@@ -1,0 +1,27 @@
+# Implementation validation
+
+## Baseline — 2026-10-04
+
+- Product/design baseline commit: `0922282`.
+- Implementation spec commit: `a326463`.
+- `npm run check`: passed; 55 tests, lint, both type scopes, production build.
+- `xvfb-run -a npm run test:desktop`: passed; one real Electron demo journey on Linux.
+- Pi 1.0.2 published packages inspected in a temporary research directory; no dependency is installed in the app yet.
+- Live ChatGPT plan sign-in/inference: not exercised.
+- Windows/macOS native execution: not exercised.
+
+## Ticket evidence
+
+| Ticket | Status | Evidence |
+| --- | --- | --- |
+| T01 | Open | Account and Pi integration pending |
+| T02 | Open | Persistent project workspace pending |
+| T03 | Open | Intent-to-outline generation pending |
+| T04 | Open | Material understanding pending |
+| T05 | Open | Integrated recovery and interaction review pending |
+| T06 | Open | Full acceptance and native/live evidence pending |
+
+## Completion audit
+
+Pending implementation. Audit every PRD requirement and AC-01 through AC-14 against actual code, tests, runtime behavior, screenshots, saved artifacts, and live/native evidence before closing the goal.
+
