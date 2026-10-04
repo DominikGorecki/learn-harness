@@ -6,6 +6,12 @@ The working slice includes three demo lessons, goal-labelled sessions, one pract
 
 ![Learning Studio workspace](ref/research/assets/workspace.png)
 
+## Product direction
+
+The [product overview](docs/overview.md) describes the education harness and its Socratic learning approach. The [first milestone PRD](ref/prds/01-project-setup-and-outline.md) defines functional ChatGPT plan access, folder-based projects, model selection, and saved AI-generated outlines. These documents describe planned behavior; the working slice above remains the current implementation.
+
+Future UI changes follow the Codex-inspired [design system](ref/patterns-design-system.md) and [UX patterns](ref/patterns-ux.md), supported by [current official-reference research](ref/research/codex-desktop-ui.md). This documentation update adopts the direction; the screenshot and running demo still show the initial appearance.
+
 ## Run locally
 
 Use Node.js 24+ and npm. Node is a development requirement; a packaged app contains its own runtime.

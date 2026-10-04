@@ -49,7 +49,7 @@ These conventions govern documentation, not the application source layout. Sourc
 
 ## Smallest useful implementation
 
-Visual thesis: a warm neutral workspace with generous central spacing, quiet side panels, and one terracotta action color. Content plan: course navigation, a goal composer, a reading/practice session, and contextual guidance. Interaction thesis: a short workspace entrance, clear hover/focus transitions, and a brief feedback reveal; respect reduced motion.
+Initial skeleton visual thesis: a warm neutral workspace with generous central spacing, quiet side panels, and one terracotta action color. Content plan: course navigation, a goal composer, a reading/practice session, and contextual guidance. Interaction thesis: a short workspace entrance, clear hover/focus transitions, and a brief feedback reveal; respect reduced motion. This records the first implemented appearance. The later [Codex UI research](codex-desktop-ui.md) and [ADR-0007](../ADRs/ADR-0007-codex-inspired-design-and-ux.md) establish the adopted direction for future UI changes.
 
 1. Display three static demo courses in a workbench shell.
 2. Start a goal-labelled session through real preload/IPC/Node services.

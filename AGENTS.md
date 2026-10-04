@@ -14,7 +14,9 @@ This is a TypeScript Electron application with a React learning workspace and a 
 | Process ownership, source layout, backend services | [Architecture](ref/patterns-architecture.md) |
 | Preload, IPC, schemas, protocols, permissions | [IPC and security](ref/patterns-ipc-security.md) |
 | Courses, sessions, feedback, persistence | [Learning and data](ref/patterns-learning-data.md) |
-| Components, navigation, accessibility, request state | [Renderer](ref/patterns-renderer.md) |
+| Visual composition, typography, color/spacing tokens, component states | [Design system](ref/patterns-design-system.md) |
+| Learner journeys, navigation, input, recovery, keyboard/focus | [UX](ref/patterns-ux.md) |
+| React components, renderer state, bridge results, safe rendering | [Renderer](ref/patterns-renderer.md) |
 | Commands, tests, lint, CI | [Development and testing](ref/patterns-development-testing.md) |
 | Installers, fuses, signing, release | [Distribution](ref/patterns-distribution.md) |
 | Adding or revising project guidance | [Documentation](ref/patterns-documentation.md) |
@@ -22,6 +24,8 @@ This is a TypeScript Electron application with a React learning workspace and a 
 ## Authority
 
 Explicit user instructions and accepted task scope come first. Accepted ADRs govern durable decisions; focused patterns state current rules; maintained docs describe current contracts; code/tests show behavior. Research explains evidence and alternatives rather than silently overriding an accepted decision. Report contradictions and update the relevant guidance when resolving them.
+
+Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007. The Codex-inspired visual standard is adopted guidance; today's demo has not been migrated. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
 
 ## Essential boundaries
 
