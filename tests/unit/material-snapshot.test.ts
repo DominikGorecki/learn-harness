@@ -1,11 +1,11 @@
-import { chmod, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, mkdtemp, realpath, readFile, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { collectMaterials, materialLimits } from '../../src/main/generation/material-snapshot'
 
 const roots: string[] = []
-async function root() { const value = await mkdtemp(join(tmpdir(), 'edu-materials-')); roots.push(value); return value }
+async function root() { const value = await realpath(await mkdtemp(join(tmpdir(), 'edu-materials-'))); roots.push(value); return value }
 afterEach(async () => { await Promise.all(roots.splice(0).map(path => rm(path, { recursive: true, force: true }))) })
 const signal = () => new AbortController().signal
 describe('bounded material snapshots', () => {

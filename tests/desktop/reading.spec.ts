@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { ElectronApplication } from '@playwright/test'
-import { chmod, mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, mkdtemp, realpath, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
@@ -8,7 +8,7 @@ import { learningOutline } from '../fixtures/learning-outline'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
 test('long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved', async ({ playwright }, testInfo) => {
-  const root = await mkdtemp(join(tmpdir(), 'edu-reading-desktop-'))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-reading-desktop-')))
   const folder = join(root, 'A subject with a long descriptive folder name'), corrupt = join(root, 'Corrupt project')
   await mkdir(folder); await mkdir(corrupt); await mkdir(join(corrupt, '.edu'))
   const invalid = '{preserve this invalid content'

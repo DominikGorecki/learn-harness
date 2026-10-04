@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
@@ -8,7 +8,7 @@ import type { ProjectDocument } from '../../src/shared/workspace'
 
 test('Pi utility process creates, validates, saves and reopens an outline; cancellation preserves prior work', async ({ playwright }, testInfo) => {
   const fixture = await startChatGPTFixture()
-  const root = await mkdtemp(join(tmpdir(), 'edu-outline-desktop-'))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-outline-desktop-')))
   const folder = join(root, 'My learning')
   await mkdir(folder)
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>

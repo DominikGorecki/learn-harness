@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 
 test('real folders, project preferences, restart, relink, and responsive navigation', async ({ playwright }, testInfo) => {
   const fixture = await startChatGPTFixture()
-  const root = await mkdtemp(join(tmpdir(), 'edu-project-desktop-'))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-project-desktop-')))
   const profile = join(root, 'profile')
   const first = join(root, 'Bayesian reasoning')
   const second = join(root, 'Urban ecology')

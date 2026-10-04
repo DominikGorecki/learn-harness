@@ -139,3 +139,10 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - Published the approved branch at `05fc6b4`; [run 37228181858](https://github.com/DominikGorecki/learn-harness/actions/runs/37228181858) started on all three native operating systems.
 - The first run exposed an incomplete lockfile: npm 11.19 required the missing optional `undici@7.30.0` entry. Added the npm-generated entry without changing any existing dependency version.
 - A fresh isolated install with npm 11.19 now passes (`npm ci`, including Electron binary installation and the application postinstall). The local sandbox needed `electron_config_cache=/tmp/edu-harness-electron-cache` because its home cache is read-only. Audit reported zero vulnerabilities. Native execution results remain pending the repaired branch run.
+
+## Native test-fixture and Windows cleanup corrections
+
+- [Run 37228302785](https://github.com/DominikGorecki/learn-harness/actions/runs/37228302785) passed the full Linux job, including desktop journeys, AppImage packaging and packaged Pi worker verification.
+- macOS temporary directories use `/var` aliases and Windows uses short user-directory paths. Some tests incorrectly passed these aliases directly to adapters that require the canonical root supplied by the workspace service. Temporary project fixtures now resolve `realpath` first; application path and symlink protections remain intact.
+- Windows also exposed a real `kill-dev` no-op failure: `Get-NetTCPConnection -LocalPort` returned a lookup error after successful shutdown. Discovery now enumerates connections with error reporting enabled and filters afterward, allowing a free port to return an empty list while preserving actual discovery failures.
+- `npm run check`: 126 tests, lint, types and production bundles passed after the corrections. `xvfb-run -a npm run test:desktop`: seven passed, with the artifact-only test intentionally skipped. Windows/macOS re-execution is still required.

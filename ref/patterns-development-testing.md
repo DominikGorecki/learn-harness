@@ -25,7 +25,7 @@ The script never signals PID 0/1, itself, or its ancestors. It rechecks PID/star
 - `npm run package`: current-OS unpacked application and hardened packaging configuration.
 - `npm run test:packaged`: explicitly exercise the current artifact’s ASAR worker and runtime dependencies through a development Electron host. Run after packaging, with Xvfb on headless Linux. This does not disable packaged fuses or substitute for hardened-app startup verification.
 
-`npm run check` combines lint/tests/build. Extend tests for meaningful behavior and trust boundaries, not every presentation detail. Use isolated temporary profiles in desktop tests, clean up the owned process/profile, and collect screenshots. No standalone Playwright browser installation is required for Electron automation.
+`npm run check` combines lint/tests/build. Extend tests for meaningful behavior and trust boundaries, not every presentation detail. Use isolated temporary profiles in desktop tests, clean up the owned process/profile, and collect screenshots. Resolve temporary project roots with `realpath` before calling storage/worker adapters, matching the workspace service contract; macOS temporary directories and Windows short paths can otherwise produce aliases. No standalone Playwright browser installation is required for Electron automation.
 
 ## Environment and CI
 

@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, realpath, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,7 +9,7 @@ import { parseBriefRequest, parseModelRequest, parseProjectRequest, maximumBrief
 
 const roots: string[] = []
 async function setup() {
-  const root = await mkdtemp(join(tmpdir(), 'edu-workspace-')); roots.push(root)
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-workspace-'))); roots.push(root)
   const first = join(root, 'first'), second = join(root, 'second')
   await mkdir(first); await mkdir(second)
   let counter = 0

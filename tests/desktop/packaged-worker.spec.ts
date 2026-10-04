@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
@@ -10,7 +10,7 @@ test('packaged ASAR worker loads its Pi dependencies and reads only scoped mater
   const asar = process.env.EDU_PACKAGED_WORKER_ASAR
   test.skip(!asar, 'Run npm run test:packaged after packaging to test the current artifact explicitly.')
   const fixture = await startChatGPTFixture({ inferenceMode: 'materials' })
-  const root = await mkdtemp(join(tmpdir(), 'edu-asar-worker-'))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-asar-worker-')))
   const project = join(root, 'project'); await mkdir(project)
   await writeFile(join(project, 'notes.md'), '# Bayesian reasoning\nPriors and evidence.')
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>

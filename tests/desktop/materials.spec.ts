@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
@@ -8,7 +8,7 @@ import type { ProjectDocument } from '../../src/shared/workspace'
 
 test('folder-only learning, verified source coverage, ambiguity and unsupported recovery', async ({ playwright }, testInfo) => {
   const fixture = await startChatGPTFixture({ inferenceMode: 'materials' })
-  const root = await mkdtemp(join(tmpdir(), 'edu-material-desktop-'))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-material-desktop-')))
   const folder = join(root, 'Notes'), ambiguous = join(root, 'Mixed notes'), unsupported = join(root, 'Slides')
   await mkdir(folder); await mkdir(join(folder, 'chapters')); await mkdir(ambiguous); await mkdir(unsupported)
   const source = '# Bayesian reasoning\nPriors, evidence, and updating beliefs.\n'

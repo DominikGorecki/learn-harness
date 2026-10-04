@@ -25,8 +25,10 @@ export function parsePids(output: string): number[] {
 export async function listenerPids(port: number): Promise<number[]> {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Port must be between 1 and 65535.')
   if (process.platform === 'win32') {
+    // Filtering after discovery gives an empty result for a free port, whereas
+    // Get-NetTCPConnection's -LocalPort filter reports a CIM lookup error.
     return parsePids(await command('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command',
-      `Get-NetTCPConnection -State Listen -LocalPort ${port} -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess | Sort-Object -Unique`
+      `Get-NetTCPConnection -ErrorAction Stop | Where-Object { $_.State -eq 'Listen' -and $_.LocalPort -eq ${port} } | Select-Object -ExpandProperty OwningProcess | Sort-Object -Unique`
     ]))
   }
   if (process.platform === 'linux') {

@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readFile, readdir, rename, rm, symlink, writeFile } from 'node:fs/promises'
+import { mkdtemp, realpath, mkdir, readFile, readdir, rename, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -7,7 +7,7 @@ import { createProjectRegistry } from '../../src/main/storage/project-registry'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
 const roots: string[] = []
-async function root() { const path = await mkdtemp(join(tmpdir(), 'edu-project-')); roots.push(path); return path }
+async function root() { const path = await realpath(await mkdtemp(join(tmpdir(), 'edu-project-'))); roots.push(path); return path }
 afterEach(async () => { await Promise.all(roots.splice(0).map(path => rm(path, { recursive: true, force: true }))) })
 const document: ProjectDocument = { version: 1, projectId: 'project-one', revision: 1, name: 'Bayesian reasoning',
   createdAt: '2026-10-04T12:00:00Z', updatedAt: '2026-10-04T12:00:00Z', selectedModel: { id: 'learning-model', name: 'Learning model' }, brief: 'Bayesian reasoning', outline: null }
