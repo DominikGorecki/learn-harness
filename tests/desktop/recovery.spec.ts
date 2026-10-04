@@ -38,6 +38,9 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await expect(page.getByRole('heading', { name: 'Connected to ChatGPT' })).toBeVisible()
     await page.keyboard.press('Escape')
     await page.getByLabel('Project model').selectOption('fixture-model-fast')
+    // selectOption waits for the DOM change, not the asynchronous preference save.
+    // Keyboard events sent while that mutation disables the form are ignored.
+    await expect(page.getByRole('button', { name: 'Create outline', exact: true })).toBeEnabled()
     // IME composition must not submit the learner's partially composed text.
     await page.getByRole('textbox').dispatchEvent('keydown', { key: 'Enter', ctrlKey: true, isComposing: true })
     expect(fixture.inferenceRequests).toHaveLength(0)

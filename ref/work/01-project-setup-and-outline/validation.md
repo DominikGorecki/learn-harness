@@ -152,3 +152,9 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - [Run 37228487262](https://github.com/DominikGorecki/learn-harness/actions/runs/37228487262) passed the complete Linux and macOS jobs, including unsigned packaging and packaged Pi runtime verification. Windows source checks and five desktop journeys passed, including copied-link authorization.
 - Two Windows desktop assertions incorrectly expected a 600px outer window to provide 600px of content. Windows borders left 584px (292 CSS pixels at 200% zoom). Responsive tests now use `setContentSize`, preserving the exact 300px zoomed-content assertion and all overflow/accessibility checks across native window frames.
 - Local `npm run check` passes (126 tests, lint, types and build); `xvfb-run -a npm run test:desktop` passes seven journeys, with the artifact-only test intentionally skipped.
+
+## Recovery keyboard synchronization
+
+- The next native run passed the corrected responsive journeys on Windows, then exposed an intermittent Linux recovery-test failure before its first inference request. `selectOption` had returned while the asynchronous model preference save still disabled the form, allowing the following keyboard submission to arrive too early.
+- The recovery fixture now waits for the create action to become enabled before exercising both IME suppression and keyboard submission. No production guards or test assertions were removed.
+- `npm run check` passes with 126 tests. The focused real Electron recovery journey passes through `xvfb-run -a npm run test:desktop -- tests/desktop/recovery.spec.ts`.
