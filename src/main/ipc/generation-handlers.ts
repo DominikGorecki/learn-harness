@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 import type { GenerationService } from '../../core/generation/service'
-import { generationChannels, parseRunRequest, parseStartOutline } from '../../shared/generation'
+import { generationChannels, parseRunRequest, parseSaveOutline, parseStartOutline } from '../../shared/generation'
 import { noPayload, registerCapability } from './capability'
 
 export function registerGenerationHandlers(service: GenerationService, currentWindow: () => BrowserWindow | null, expectedOrigin: string): () => void {
@@ -8,7 +8,7 @@ export function registerGenerationHandlers(service: GenerationService, currentWi
   handle(generationChannels.get, payload => { noPayload(payload); return service.get() })
   handle(generationChannels.start, payload => service.start(parseStartOutline(payload)))
   handle(generationChannels.cancel, payload => service.cancel(parseRunRequest(payload)))
-  handle(generationChannels.save, payload => service.retrySave(parseRunRequest(payload)))
+  handle(generationChannels.save, payload => service.retrySave(parseSaveOutline(payload)))
   return service.subscribe(snapshot => {
     const window = currentWindow()
     if (window && !window.isDestroyed() && !window.webContents.isDestroyed()) window.webContents.send(generationChannels.changed, snapshot)

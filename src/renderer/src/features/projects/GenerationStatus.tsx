@@ -17,6 +17,6 @@ export function GenerationStatus({ run, onCancel, onSave, onConnect }: { run: Ou
       {needsAccount && <button className="quiet-button" onClick={onConnect}>Review ChatGPT connection<Icon name="arrow" size={14} /></button>}
     </div>
     {busy && run.status !== 'saving' && <button className="quiet-button" onClick={onCancel}>Cancel</button>}
-    {run.status === 'unsaved' && <button className="button secondary" onClick={onSave}>Retry save</button>}
+    {run.status === 'unsaved' && <button className="button secondary" onClick={onSave}>{run.errorCode === 'CONFLICT' ? 'Review save conflict' : 'Retry save'}</button>}
   </div>
 }

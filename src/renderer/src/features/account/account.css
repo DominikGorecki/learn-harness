@@ -29,5 +29,9 @@
 .account-primary:disabled, .account-secondary:disabled, .account-signout:disabled { opacity: .5; cursor: default; }
 .account-footnote { margin: 12px 0 0; color: #626262; font-size: 12px; line-height: 1.6; }
 .account-signout { display: block; margin: 22px 0 0; padding: 4px 0; border: 0; background: transparent; color: #626262; font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.account-shortcuts { margin-top: 20px; color: #626262; font-size: 12px; }
+.account-shortcuts summary { cursor: pointer; }
+.account-shortcuts dl { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; margin: 14px 0 0; }
+.account-shortcuts dd { margin: 0; }
 .account-dialog button:focus-visible, .account-trigger:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .account-dialog * { transition: none; } }

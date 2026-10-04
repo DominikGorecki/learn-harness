@@ -5,7 +5,7 @@ export function OutlineView({ saved, unsaved = false }: { saved: SavedOutline; u
   const outline = saved.document
   const sources = saved.coverage.files.filter(file => file.status === 'read')
   return <article className="outline-view workspace-enter" aria-labelledby="outline-heading">
-    <header className="outline-introduction"><div className="outline-meta"><span className="eyebrow">Your learning outline</span><span className="saved-indicator"><Icon name={unsaved ? 'info' : 'check'} size={14} />{unsaved ? 'Not saved yet' : 'Saved'}</span></div>
+    <header className="outline-introduction"><div className="outline-meta"><span className="eyebrow">Your learning outline</span><span className={'saved-indicator ' + (unsaved ? 'pending' : '')}><Icon name={unsaved ? 'info' : 'check'} size={14} />{unsaved ? 'Not saved yet' : 'Saved'}</span></div>
       <h1 id="outline-heading" tabIndex={-1}>{outline.title}</h1><p className="outline-overview">{outline.overview}</p>
       <div className="outline-facts"><span>{outline.lessons.length} {outline.lessons.length === 1 ? 'lesson' : 'lessons'}</span><span>{outline.level}</span></div>
     </header>

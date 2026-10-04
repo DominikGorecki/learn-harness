@@ -1,6 +1,6 @@
 import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
-import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, StartOutlineRequest } from '../../shared/generation'
+import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, SaveOutlineRequest, StartOutlineRequest } from '../../shared/generation'
 import { parseSavedOutline } from '../../shared/workspace'
 import { parseCoverage } from '../../shared/outline'
 import { boundedText } from '../../shared/validation'
@@ -83,21 +83,22 @@ export class GenerationService {
     if (!run || run.id !== request.runId) throw new ApplicationError('NOT_FOUND', 'This outline request is no longer current.')
     return run
   }
-  cancel(request: RunRequest): GenerationSnapshot {
+  async cancel(request: RunRequest): Promise<GenerationSnapshot> {
     const run = this.find(request)
     if (run.status === 'saving') throw new ApplicationError('BUSY', 'The outline is being saved. Wait for the save to finish.')
-    if (this.active?.id === run.id) this.active.controller.abort()
+    if (this.active?.id === run.id) { this.active.controller.abort(); await this.task }
     return this.get()
   }
-  async retrySave(request: RunRequest): Promise<GenerationSnapshot> {
+  async retrySave(request: SaveOutlineRequest): Promise<GenerationSnapshot> {
     if (this.active) throw new ApplicationError('BUSY', 'Wait for the current outline operation to finish.')
     const run = this.find(request)
     const context = this.contexts.get(run.projectId)
     if (run.status !== 'unsaved' || !run.result || !context) throw new ApplicationError('UNAVAILABLE', 'There is no unsaved outline to retry.')
+    if (request.replaceChanged && run.errorCode !== 'CONFLICT') throw new ApplicationError('INVALID_INPUT', 'Only a detected save conflict can use replacement recovery.')
     this.active = { id: run.id, controller: new AbortController() }
     this.update(run, { status: 'saving', message: 'Saving your outline…', errorCode: null })
     try {
-      await this.options.workspace.saveOutline(run.projectId, run.result, context.digest)
+      await this.options.workspace.saveOutline(run.projectId, run.result, context.digest, request.replaceChanged)
       this.update(run, { status: 'saved', message: 'Outline saved to your project.' })
     } catch (error) { this.saveFailure(run, error) }
     finally { this.active = null; this.emit() }

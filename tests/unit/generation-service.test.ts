@@ -55,9 +55,10 @@ describe('generation ownership and durable outcomes', () => {
     const pending = deferred<OutlineEngineResult>(), started = deferred<void>()
     const { service, request, workspace } = await setup(async () => { started.resolve(); return pending.promise })
     const state = service.start(request); await started.promise
-    service.cancel({ projectId: request.projectId, runId: state.activeRunId! })
+    const cancelled = service.cancel({ projectId: request.projectId, runId: state.activeRunId! })
     pending.resolve({ kind: 'outline', document: learningOutline() })
     await service.waitForIdle()
+    await cancelled
     expect(service.get().runs[0]?.status).toBe('cancelled')
     expect(workspace.get().activeProject?.outline).toBeNull()
     await expect(workspace.saveBrief(request.projectId, 'Still editable')).resolves.toBeDefined()
@@ -81,15 +82,20 @@ describe('generation ownership and durable outcomes', () => {
   })
   it('preserves an external metadata edit even after navigation refreshes the workspace cache', async () => {
     const pending = deferred<OutlineEngineResult>(), started = deferred<void>()
-    const { service, request, workspace, path } = await setup(async () => { started.resolve(); return pending.promise })
+    const { service, request, workspace, path, generator } = await setup(async () => { started.resolve(); return pending.promise })
     service.start(request); await started.promise
     const file = join(path, '.edu/project.json')
-    const external = JSON.stringify({ ...JSON.parse(await readFile(file, 'utf8')), brief: 'An external change' })
+    const external = JSON.stringify({ ...JSON.parse(await readFile(file, 'utf8')), brief: 'An external change', selectedModel: { id: 'external-model', name: 'Externally selected model' } })
     await writeFile(file, external)
     await workspace.select(request.projectId)
     pending.resolve({ kind: 'outline', document: learningOutline() }); await service.waitForIdle()
     expect(service.get().runs[0]).toMatchObject({ status: 'unsaved', errorCode: 'CONFLICT' })
     expect(await readFile(file, 'utf8')).toBe(external)
+    await service.retrySave({ projectId: request.projectId, runId: service.get().runs[0]!.id, replaceChanged: true })
+    expect(service.get().runs[0]?.status).toBe('saved')
+    expect(workspace.get().activeProject?.selectedModel?.id).toBe('external-model')
+    expect(workspace.get().activeProject?.outline?.model.id).toBe('model-one')
+    expect(generator).toHaveBeenCalledTimes(1)
   })
   it('requires explicit replacement and keeps a previous outline on provider failure', async () => {
     const { service, request, generator, workspace, onAccountFailure } = await setup()
@@ -119,6 +125,18 @@ describe('generation ownership and durable outcomes', () => {
     const { service, request } = await setup()
     service.start({ ...request, brief: '' }); await service.waitForIdle()
     expect(service.get().runs[0]?.errorCode).toBe('INVALID_INPUT')
-    expect(() => service.cancel({ projectId: request.projectId, runId: 'stale' })).toThrow(/no longer/)
+    await expect(service.cancel({ projectId: request.projectId, runId: 'stale' })).rejects.toThrow(/no longer/)
+  })
+  it('finishes a started atomic save instead of falsely claiming it was cancelled', async () => {
+    const { service, storage, request } = await setup()
+    const writing = deferred<void>(), release = deferred<void>(), save = storage.save.bind(storage)
+    vi.spyOn(storage, 'save').mockImplementation(async (...args) => {
+      if (args[1].outline) { writing.resolve(); await release.promise }
+      return save(...args)
+    })
+    service.start(request); await writing.promise
+    await expect(service.cancel({ projectId: request.projectId, runId: service.get().runs[0]!.id })).rejects.toMatchObject({ code: 'BUSY' })
+    release.resolve(); await service.waitForIdle()
+    expect(service.get().runs[0]?.status).toBe('saved')
   })
 })

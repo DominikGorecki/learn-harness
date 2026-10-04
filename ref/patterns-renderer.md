@@ -12,7 +12,7 @@ UI reads `window.learning` through typed result handling. Backend snapshots own 
 
 ## Design implementation
 
-Implement visual values through semantic CSS variables from the design system. Keep feature components responsible for content and state; reusable controls share hover, selected, focus, pending, and unavailable behavior. New theme handling must resolve to semantic tokens and preserve readable contrast. No new UI dependency or component library is mandated by the documentation update.
+Implement visual values through semantic CSS variables from the design system. Keep feature components responsible for content and state; reusable controls share hover, selected, focus, pending, and unavailable behavior. New theme handling must resolve to semantic tokens and preserve readable contrast. Use native dialogs for account, navigation, replacement, and conflict choices, with focus restoration and guarded keyboard commands.
 
 Use real buttons, labelled fields/radio groups, headings, and disclosure controls. Implement the UX focus/scroll contract with refs and scoped handlers. Restore focus after overlays, associate validation messages with inputs, and announce async status without grabbing focus. Observe reduced motion; scope keyboard commands so input editing and input-method composition remain intact.
 
@@ -20,7 +20,7 @@ Render goals/material/model text as text; do not introduce `dangerouslySetInnerH
 
 ## Asynchronous state
 
-The workspace serializes short metadata operations and keeps drafts by project handle. Event revisions prevent a late initial query or API response from replacing newer published state. Key longer generation requests/results to their owning project and operation. Disable conflicting mutations while keeping unrelated navigation usable. Ignore stale results after view cleanup, and unsubscribe from any future event bridge. Do not simulate saving, cancellation, or provider availability in React.
+The workspace serializes short metadata operations and keeps drafts by project handle. Event revisions prevent a late initial query or API response from replacing newer published state. Key longer generation requests/results to their owning project and operation. Disable conflicting mutations; navigation during generation offers an explicit stay/cancel choice. Ignore stale results after view cleanup, and unsubscribe from any future event bridge. Do not simulate saving, cancellation, or provider availability in React.
 
 ## Current implementation and migration evidence
 

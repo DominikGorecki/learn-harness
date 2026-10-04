@@ -18,7 +18,7 @@ Give each state one clear primary action. Labels say what the learner will do: *
 
 A topic phrase is enough to begin the proposed outline flow. Keep additional goals/context optional where the PRD allows them. Show a large, labelled input in an empty workspace; an existing outline or activity becomes the visual focus once available. Do not force a setup questionnaire before the first useful result.
 
-Keep drafts until an action succeeds, and keep them with their owning workspace when changing views. Use normal multiline editing: Enter inserts a newline; an explicit submit button performs the action. When a submission shortcut is implemented, Cmd+Enter on macOS or Ctrl+Enter on Windows/Linux submits, except during input-method composition. Show its hint where it can be discovered.
+Keep drafts until an action succeeds, and keep them with their owning workspace when changing views. Preserve oversized pasted text and explain submission limits without truncating the draft. Use normal multiline editing: Enter inserts a newline; an explicit submit button performs the action. When a submission shortcut is implemented, Cmd+Enter on macOS or Ctrl+Enter on Windows/Linux submits, except during input-method composition. Show its hint where it can be discovered.
 
 Compact context controls contain only decisions that affect the action. The draft milestone's visible model choice matters to inference; provider endpoints, token fields, Pi configuration, and tool logs do not belong in the ordinary learning journey.
 
@@ -44,14 +44,14 @@ Keep the learner's context visible during work. Progress text names a real opera
 | Loading/opening | Identify the workspace being opened; keep the shell stable; offer retry on failure. |
 | Empty | Explain what can be done here and show one starting action. Preserve useful navigation. |
 | Ready | Show the current material/input and the action that will advance the task. |
-| Running | Show honest progress near the task; preserve input and existing content; prevent duplicate submission. Allow unrelated navigation where backend ownership supports it. |
+| Running | Show honest progress near the task; preserve input and existing content; prevent duplicate submission. Offer Stay here or Cancel and switch before leaving an active generation run. |
 | Needs input/connection | State the missing decision or permission and provide the relevant action without discarding work. |
 | Cancelled | Stop the supported operation, retain useful drafts/prior results, and make restarting explicit. |
 | Failed | Explain the failure in plain language near the affected surface; give a useful retry or recovery action. |
 | Generated but unsaved | Keep the new result visible, identify its unsaved state, and offer save retry without repeating inference. |
 | Saved/completed | Confirm the specific result. Persisted means backend-confirmed save; question completion is a local activity checkpoint. |
 
-Show **Cancel** only for an operation that can actually be cancelled. Closing a panel dismisses that panel; cancelling work affects its operation. Preserve the last successful outline and relevant drafts on cancellation/failure. A failed save should not consume another inference request just to retry storage.
+Show **Cancel** only for an operation that can actually be cancelled. Closing a panel dismisses that panel; cancelling work affects its operation. Preserve the last successful outline and relevant drafts on cancellation/failure. A failed save should not consume another inference request just to retry storage. Under [ADR-0012](ADRs/ADR-0012-generation-recovery-and-navigation.md), detected external-edit conflicts require explicit replacement confirmation and a fresh project-identity check. Keep the unsaved result readable even if the project folder becomes unavailable.
 
 Replacing or deleting durable learner work requires a clear statement of the affected content and the meaningful choice or recovery path defined for that feature. Routine navigation and disclosure stay immediate. Important failures remain visible until resolved; short confirmations may be transient. Do not expose stacks, provider internals, or credentials in learner messages.
 

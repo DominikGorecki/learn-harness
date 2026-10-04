@@ -22,6 +22,7 @@ export interface ProviderFixtureOptions {
   subject?: string
   failModels?: number
   failRefresh?: boolean
+  hideFastModel?: boolean
   inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
 
@@ -31,6 +32,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   const authorizations: URL[] = []
   const tokens: URLSearchParams[] = []
   const inferenceRequests: Record<string, unknown>[] = []
+  const pendingInference: ServerResponse[] = []
   const codes = new Map<string, { nonce: string; challenge: string; clientId: string }>()
   let baseUrl = ''
   let modelsRequested = 0
@@ -93,7 +95,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
         if (!request.headers.authorization?.startsWith('Bearer fixture-')) { json(response, 401, { error: 'invalid_token' }); return }
         json(response, 200, { models: [
           { slug: 'fixture-model', display_name: 'Learning model', visibility: 'list' },
-          { slug: 'fixture-model-fast', display_name: 'Learning model · Fast', visibility: 'list' },
+          ...(!options.hideFastModel ? [{ slug: 'fixture-model-fast', display_name: 'Learning model · Fast', visibility: 'list' }] : []),
           { slug: 'hidden-model', display_name: 'Hidden', visibility: 'hidden' }
         ] }); return
       }
@@ -102,7 +104,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
         if (!request.headers.authorization?.startsWith('Bearer fixture-')) { json(response, 401, { error: 'invalid_token' }); return }
         const payload = JSON.parse(await body(request)) as Record<string, unknown>
         inferenceRequests.push(payload)
-        if (options.inferenceMode === 'hold') { response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
+        if (options.inferenceMode === 'hold') { pendingInference.push(response); response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
         if (options.inferenceMode === 'clarify') {
           writeToolResponse(response, { name: 'request_learning_details', args: { question: 'Which subject would you like to explore?', reason: 'The material does not point to one subject yet.' } }); return
         }
@@ -137,6 +139,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   }
   return {
     baseUrl, endpoints, authorizations, tokens, inferenceRequests, options,
+    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) writeToolResponse(response, { args: learningOutline() }) },
     modelsRequested: () => modelsRequested, revoked: () => revoked,
     close: () => new Promise<void>((resolve, reject) => { server.closeAllConnections(); server.close(error => error ? reject(error) : resolve()) })
   }

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { AccountController } from './useAccount'
 import './account.css'
 
-export function AccountPanel({ open, onClose, account }: { open: boolean; onClose(): void; account: AccountController }) {
+export function AccountPanel({ open, onClose, account, locked = false }: { open: boolean; onClose(): void; account: AccountController; locked?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const { snapshot, busy, error, run } = account
   const status = snapshot?.status ?? 'disconnected'
@@ -26,6 +26,7 @@ export function AccountPanel({ open, onClose, account }: { open: boolean; onClos
     </div>}
     {snapshot?.message && <p className="account-feedback" role="status">{snapshot.message}</p>}
     {error && <p className="account-feedback is-error" role="alert">{error}</p>}
+    {locked && <p className="account-feedback" role="status">Finish or cancel your outline before changing this connection.</p>}
     {connected && <p className="account-model-count" role="status">{snapshot?.modelsStatus === 'loading' ? 'Finding your available models…' :
       snapshot?.modelsStatus === 'ready' ? `${snapshot.models.length} ${snapshot.models.length === 1 ? 'model' : 'models'} available for your projects` : 'Model availability needs a refresh.'}</p>}
     <div className="account-actions">
@@ -35,12 +36,13 @@ export function AccountPanel({ open, onClose, account }: { open: boolean; onClos
       </> : connected ? <>
         <button className="account-primary" onClick={onClose}>Done</button>
         <button className="account-secondary" disabled={busy} onClick={() => void run(api => api.refreshModels())}>Refresh models</button>
-      </> : <button className="account-primary" disabled={busy || !snapshot} onClick={() => void run(api => api.connectAccount())}>
+      </> : <><button className="account-primary" disabled={busy || !snapshot || locked} onClick={() => void run(api => api.connectAccount())}>
         {busy ? 'Connecting…' : status === 'permission-required' ? 'Enable ChatGPT plan usage' : status === 'reconnect-required' ? 'Reconnect ChatGPT' : 'Continue with ChatGPT'}
-      </button>}
+      </button>{snapshot?.name && ['usage-limited', 'restricted'].includes(status) && <button className="account-secondary" disabled={busy || locked} onClick={() => void run(api => api.refreshModels())}>Check availability</button>}</>}
     </div>
     <p className="account-footnote">AI activity counts toward your existing plan limits. Your ChatGPT conversations and memories stay private.</p>
     {snapshot?.persistence === 'session' && <p className="account-footnote">Protected storage is unavailable on this device. Your connection lasts until you quit the app.</p>}
-    {snapshot?.name && !connecting && <button className="account-signout" disabled={busy} onClick={() => void run(api => api.disconnectAccount())}>Sign out of this app</button>}
+    <details className="account-shortcuts"><summary>Keyboard shortcuts</summary><dl><dt>Open project</dt><dd>⌘ / Ctrl + O</dd><dt>Toggle navigation</dt><dd>⌘ / Ctrl + B</dd><dt>Create outline</dt><dd>⌘ / Ctrl + Enter</dd></dl></details>
+    {snapshot?.name && !connecting && <button className="account-signout" disabled={busy || locked} onClick={() => void run(api => api.disconnectAccount())}>Sign out of this app</button>}
   </dialog>
 }

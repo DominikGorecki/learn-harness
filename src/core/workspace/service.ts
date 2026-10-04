@@ -170,9 +170,16 @@ export class WorkspaceService {
     })
   }
   releaseOutline(id: string): void { this.generationLocks.delete(id) }
-  saveOutline(id: string, value: SavedOutline, digest: string | null): Promise<WorkspaceSnapshot> {
+  saveOutline(id: string, value: SavedOutline, digest: string | null, replaceChanged = false): Promise<WorkspaceSnapshot> {
     return this.serial(async () => {
       const outline = parseSavedOutline(value)
+      if (replaceChanged) {
+        const entry = this.entry(id)
+        const latest = await this.options.storage.load(entry.path)
+        if (!entry.projectId || latest.document?.projectId !== entry.projectId) throw new ApplicationError('CONFLICT', 'The original project identity is missing or changed. Locate the original project before saving.')
+        this.loaded.set(id, latest)
+        digest = latest.digest
+      }
       const loaded = this.loaded.get(id)
       if (!loaded || loaded.digest !== digest) throw new ApplicationError('CONFLICT', 'The project changed while the outline was being created. Your new outline is still available here.')
       return this.updateDocument(id, document => ({ ...document, name: outline.document.title, brief: outline.brief, outline }))

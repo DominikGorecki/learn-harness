@@ -4,7 +4,7 @@ let responseNumber = 0
 export function writeToolResponse(response: ServerResponse, options: {
   name?: string; args: unknown; terminal?: 'completed' | 'incomplete' | 'failed' | 'missing'; code?: string; namespace?: string
 }) {
-  response.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' })
+  if (!response.headersSent) response.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' })
   const event = (type: string, data: Record<string, unknown>) => response.write(`event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`)
   const number = ++responseNumber
   const item = { type: 'function_call', id: `fc_fixture_${number}`, call_id: `call_fixture_${number}`, name: options.name ?? 'submit_outline',

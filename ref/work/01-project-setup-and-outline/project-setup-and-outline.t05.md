@@ -1,6 +1,6 @@
 # Ticket: project-setup-and-outline.T05 — Complete recovery, regeneration, and responsive interaction
 
-Status: Open
+Status: Implemented and locally validated
 
 ## Source
 
@@ -36,11 +36,11 @@ Regeneration replacement semantics; generated-but-unsaved retention and retry; a
 
 ## Acceptance criteria
 
-- [ ] Every PRD recovery situation has a tested state and useful action that preserves learner work.
-- [ ] Regeneration changes the saved result only after a complete valid replacement is saved.
-- [ ] A result can never be committed to a different project or under a silently substituted model.
-- [ ] The full supported journey is keyboard-accessible, responsive, and visually calm.
-- [ ] No UI control implies an unimplemented capability.
+- [x] Every PRD recovery situation has a tested state and useful action that preserves learner work.
+- [x] Regeneration changes the saved result only after a complete valid replacement is saved.
+- [x] A result can never be committed to a different project or under a silently substituted model.
+- [x] The full supported journey is keyboard-accessible, responsive, and visually calm.
+- [x] No UI control implies an unimplemented capability.
 
 ## Traceability
 
@@ -48,4 +48,4 @@ AUTH-04 through AUTH-06; PROJ-05 through PROJ-07; MODEL-05 through MODEL-07; OUT
 
 ## Completion evidence
 
-Pending implementation. Keep this section current with commits, validation, and any external verification still required.
+Closed the PRD navigation-choice gap, implemented confirmed save-conflict recovery, retained unsaved output across unavailable-project navigation, and polished account recovery, long headers, oversized input, keyboard help, focus, and status announcements. Six real Electron journeys cover the full supported local flow. See [validation](validation.md); live/native acceptance remains T06.

@@ -17,11 +17,11 @@ export function useGeneration() {
     return () => { disposed = true; stop() }
   }, [])
   const run = useCallback(async (action: (api: GenerationApi) => Promise<ApiResult<GenerationSnapshot>>) => {
-    if (pending.current) return
+    if (pending.current) return null
     pending.current = true; setError(null)
     const initial = revision.current
-    try { const value = await request(action(window.learning)); if (revision.current === initial) setSnapshot(value) }
-    catch (error) { setError(errorMessage(error)) }
+    try { const value = await request(action(window.learning)); if (revision.current === initial) setSnapshot(value); return value }
+    catch (error) { setError(errorMessage(error)); return null }
     finally { pending.current = false }
   }, [])
   return { snapshot, error, run, clearError: () => setError(null) }

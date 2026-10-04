@@ -18,7 +18,7 @@
 | T02 | Locally validated | Atomic project storage, native folder IPC, responsive workspace, restart/relink desktop journey |
 | T03 | Locally validated | Actual Pi transport and utility-process desktop journey, saved outline, cancellation/recovery |
 | T04 | Locally validated | Bounded text/Markdown snapshot, actual Pi material tools, source evidence, desktop clarification |
-| T05 | Open | Integrated recovery and interaction review pending |
+| T05 | Locally validated | Six Electron journeys, real storage failure/retry, worker crash, model/usage/conflict recovery and zoom |
 | T06 | Open | Full acceptance and native/live evidence pending |
 
 ## Completion audit
@@ -83,3 +83,14 @@ Pending implementation. Audit every PRD requirement and AC-01 through AC-14 agai
 - `npm run check`: passed with 121 tests, lint, type scopes, and production build. Material tests include nested text, exclusions, symlinks, unsupported/binary/oversize data, unreadable file permissions, traversal limits, cancelled scans, rejected path escapes, and actual-read citations.
 - Four real Electron journeys pass, including folder-only generation through actual Pi list/read/submit calls, coverage rendering, clarification followed by explicit direction, and unsupported-only recovery with no inference request. Automated fixture output does not prove live curriculum quality or semantic topic inference.
 - Reviewed material setup, coverage and unsupported recovery screenshots. Snapshot capture disables finite animations so evidence represents the settled interface. The clarification state now requires input and updates its label/instructions accordingly.
+
+## T05 — recovery and interaction review
+
+- Aligned navigation with the PRD: Stay here or Cancel and switch; await cancellation settlement. Saving completes atomically and cannot be falsely reported as cancelled.
+- Kept unsaved generated output visible across unavailable-project reopening. Ordinary save retry consumes no inference. External metadata conflicts require explicit review/confirmation, reload validated state, verify portable identity, and preserve current unrelated model preference.
+- Added account locking during generation, availability rechecks, discoverable keyboard shortcuts, duplicate-title folder labels, accessible completion announcements, and bounded header layout at high zoom.
+- Oversized pasted descriptions remain intact in the field; a linked validation message explains the 32,000-character submission limit instead of silently truncating input.
+- `npm run check`: passed with 122 tests, lint, both type scopes, and production builds. Core tests cover atomic-save cancellation rejection and confirmed conflict recovery without another provider call.
+- Six real Electron journeys pass. Recovery adds actual filesystem-induced save failure and restoration, storage-only retry, unavailable model preference retention, allowance errors, account-cancel draft preservation, IME-safe submission, deliberate worker termination, stay/cancel navigation, and confirmed external-edit recovery.
+- Reading coverage includes 20 lessons with long titles/text, offline saved models/outlines, 600px windows at 200% zoom, reduced motion, read-only inspection on this Linux host, and corrupt-state preservation. Windows permission semantics remain a native-platform acceptance concern.
+- Visually reviewed pending generation, generated-but-unsaved, and long-outline high-zoom captures. Screenshots show real application state with deterministic local provider content.
