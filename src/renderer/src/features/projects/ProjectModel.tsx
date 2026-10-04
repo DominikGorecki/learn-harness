@@ -13,7 +13,7 @@ export function ProjectModel({ project, account, busy, onChange, onConnect }: {
   if (!current && !ready) return <button type="button" className="quiet-button model-connect" onClick={onConnect}><Icon name="spark" size={16} />Connect ChatGPT</button>
   return <div className="model-control">
     <Icon name="spark" size={16} />
-    <select aria-label="Project model" value={selected} disabled={!ready || busy || !project.writable}
+    <select aria-label="Project model" value={selected} disabled={!ready || busy || account?.modelTestStatus === 'testing' || !project.writable}
       onChange={event => onChange(event.target.value)} aria-describedby={unavailable ? 'model-unavailable' : undefined}>
       {current && !models.some(model => model.id === current.id) && <option value={current.id}>{current.name}{unavailable ? ' (unavailable)' : ' (saved)'}</option>}
       {models.map(model => <option key={model.id} value={model.id}>{model.name}</option>)}

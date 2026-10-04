@@ -23,7 +23,7 @@ test('account panel restores and renews its connection after restart and signs o
     await expect(page.getByRole('dialog')).toBeVisible()
     await page.getByRole('button', { name: 'Continue with ChatGPT' }).click()
     await expect(page.getByRole('heading', { name: 'Connected to ChatGPT' })).toBeVisible()
-    await expect(page.getByText('2 models available for your projects')).toBeVisible()
+    await expect(page.getByText('4 model choices for your projects')).toBeVisible()
     expect(fixture.authorizations).toHaveLength(1)
     expect(fixture.modelsRequested()).toBe(1)
     const state = await page.evaluate(async () => (globalThis as unknown as { learning: AccountApi }).learning.getAccount())
@@ -47,7 +47,7 @@ test('account panel restores and renews its connection after restart and signs o
     page = await desktop.firstWindow()
     await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('heading', { name: 'Connected to ChatGPT' })).toBeVisible()
-    await expect(page.getByText('2 models available for your projects')).toBeVisible()
+    await expect(page.getByText('4 model choices for your projects')).toBeVisible()
     expect(fixture.authorizations).toHaveLength(1)
     expect(fixture.tokens.filter(value => value.get('grant_type') === 'refresh_token')).toHaveLength(1)
     expect(fixture.modelsRequested()).toBe(2)
@@ -102,7 +102,7 @@ test('manual sign-in link completes OAuth when the system browser cannot open', 
     // and signed token/model exchange complete through the running app.
     await desktop.evaluate(async ({ clipboard }) => { await fetch(await clipboard.readText()); await clipboard.clear() })
     await expect(page.getByRole('heading', { name: 'Connected to ChatGPT' })).toBeVisible()
-    await expect(page.getByText('2 models available for your projects')).toBeVisible()
+    await expect(page.getByText('4 model choices for your projects')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Copy sign-in link' })).toHaveCount(0)
     expect(fixture.authorizations).toHaveLength(1)
   } finally {

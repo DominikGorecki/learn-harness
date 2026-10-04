@@ -161,7 +161,7 @@ export function App() {
   const currentModelUnavailable = Boolean(project?.selectedModel && account.snapshot?.modelsStatus === 'ready' && !account.snapshot.models.some(model => model.id === modelId))
   const createOutline = (replace = false) => {
     if (!project || workspace.busy || anyGenerationBusy) return
-    if (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId) { openAccount(); return }
+    if (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || account.snapshot.modelTestStatus === 'testing') { openAccount(); return }
     if ((project.outline || outlineRun?.status === 'unsaved') && !replace) { setConfirmReplace(true); return }
     setConfirmReplace(false)
     void generation.run(api => api.createOutline({ projectId: project.id, brief: draft, modelId, replace }))
@@ -228,7 +228,7 @@ export function App() {
               <Icon name={isRefining ? 'close' : 'refresh'} size={14} />{isRefining ? 'Back to outline' : 'Refine learning direction'}</button></div>}
             {(!displayedOutline || isRefining) && <ProjectSetup project={project} account={account.snapshot} draft={draft} busy={workspace.busy || generationBusy} refining={Boolean(project.outline)}
               needsDetails={outlineRun?.status === 'needs-details'}
-              canCreate={project.writable && (Boolean(draft.trim()) || (project.sourceHint === 'files' && outlineRun?.status !== 'needs-details')) && !anyGenerationBusy && !currentModelUnavailable}
+              canCreate={project.writable && (Boolean(draft.trim()) || (project.sourceHint === 'files' && outlineRun?.status !== 'needs-details')) && !anyGenerationBusy && !currentModelUnavailable && account.snapshot?.modelTestStatus !== 'testing'}
               onDraft={value => setDrafts(previous => ({ ...previous, [project.id]: value }))}
               onCreate={() => createOutline()}
               onSave={() => void run(api => api.saveProjectBrief({ projectId: project.id, brief: draft }))}

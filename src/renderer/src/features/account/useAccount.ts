@@ -34,7 +34,11 @@ export function useAccount() {
     catch (error) { setError(errorMessage(error)) }
     finally { busyRef.current = false; setBusy(false) }
   }, [])
-  return { snapshot, error, busy, run }
+  const cancelModelTest = useCallback(async () => {
+    try { await request(window.learning.cancelModelTest()) }
+    catch (error) { setError(errorMessage(error)) }
+  }, [])
+  return { snapshot, error, busy, run, cancelModelTest }
 }
 
 export type AccountController = ReturnType<typeof useAccount>

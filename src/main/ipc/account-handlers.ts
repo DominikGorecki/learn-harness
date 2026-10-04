@@ -11,6 +11,9 @@ export function registerAccountHandlers(account: AccountService, currentWindow: 
     [accountChannels.reopen]: () => account.reopenBrowser(),
     [accountChannels.copyLink]: () => account.copySignInLink(),
     [accountChannels.models]: () => account.refreshModels(),
+    [accountChannels.testSol]: () => account.testSolModel(),
+    [accountChannels.testLuna]: () => account.testLunaModel(),
+    [accountChannels.cancelTest]: () => account.cancelModelTest(),
     [accountChannels.disconnect]: () => account.disconnect()
   }
   for (const [channel, action] of Object.entries(actions)) {

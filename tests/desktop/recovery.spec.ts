@@ -74,7 +74,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     fixture.options.hideFastModel = true
     await page.getByRole('button', { name: 'Account settings' }).click()
     await page.getByRole('button', { name: 'Refresh models' }).click()
-    await expect(page.getByText('1 model available for your projects')).toBeVisible()
+    await expect(page.getByText('3 model choices for your projects')).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(page.getByText('Your saved model is unavailable. Choose another project model to create an outline.', { exact: true })).toBeVisible()
     await expect(page.getByLabel('Project model')).toHaveValue('fixture-model-fast')

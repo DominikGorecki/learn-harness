@@ -23,6 +23,7 @@ export interface ProviderFixtureOptions {
   failModels?: number
   failRefresh?: boolean
   hideFastModel?: boolean
+  modelTestMode?: 'completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
   inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
 
@@ -104,6 +105,17 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
         if (!request.headers.authorization?.startsWith('Bearer fixture-')) { json(response, 401, { error: 'invalid_token' }); return }
         const payload = JSON.parse(await body(request)) as Record<string, unknown>
         inferenceRequests.push(payload)
+        if ((payload.model === 'gpt-6.1-sol' || payload.model === 'gpt-6-luna') && !payload.tools) {
+          response.writeHead(200, { 'content-type': 'text/event-stream' })
+          if (options.modelTestMode === 'hold') { pendingInference.push(response); response.write(': waiting\n\n'); return }
+          const terminal = options.modelTestMode === 'failed' ? 'failed' : options.modelTestMode === 'incomplete' ? 'incomplete' : 'completed'
+          if (options.modelTestMode !== 'missing') response.write(`data: ${JSON.stringify({ type: `response.${terminal}`, response: {
+            status: terminal, model: options.modelTestMode === 'wrong-model' ? 'fixture-model' : payload.model,
+            output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'OK' }] }],
+            ...(terminal === 'failed' ? { error: { code: 'model_not_found', message: 'RAW SECRET PROVIDER ERROR' } } : {})
+          } })}\n\n`)
+          response.end(); return
+        }
         if (options.inferenceMode === 'hold') { pendingInference.push(response); response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
         if (options.inferenceMode === 'clarify') {
           writeToolResponse(response, { name: 'request_learning_details', args: { question: 'Which subject would you like to explore?', reason: 'The material does not point to one subject yet.' } }); return

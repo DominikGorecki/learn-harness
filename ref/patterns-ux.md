@@ -65,6 +65,8 @@ Keep outputs readable as working documents. Use lesson rows and expandable modul
 
 In future Socratic sessions, orient the learner to the activity and ask one useful question at a time. Keep their explanation, prediction, or revised model easy to find beside the feedback that addresses it. Show a clear stopping point and a useful way to return. The module repertoire remains in [Socratic learning](../docs/socratic-learning.md); this UI update does not select an assessment algorithm or infer mastery from a badge.
 
+The optional account model tests under [ADR-0015](ADRs/ADR-0015-explicit-model-access-verification.md) and [ADR-0016](ADRs/ADR-0016-requested-extra-model-choices.md) explain allowance use before the action and show testing, verified, failed or cancelled feedback. Show independent Sol/Luna verification buttons; provide Cancel model test during the request. Dismissing settings does not cancel it. Disable competing inference and connection changes. Count model choices rather than asserting access, and identify Sol/Luna as extras. These choices survive refresh/restart independently of verification badges; other missing saved choices retain their existing recovery behavior.
+
 ## Keyboard, focus, and scrolling
 
 Every supported action is reachable by keyboard. Tab follows the visible reading/action order; focus is clearly visible. Native text selection, editing, copy, and undo remain available in inputs. Icon buttons have accessible names and tooltips; active navigation uses an appropriate selected/current state.

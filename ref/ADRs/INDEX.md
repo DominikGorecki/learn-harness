@@ -25,4 +25,8 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0014](ADR-0014-durable-account-connection.md) | Accepted | Durable profile credentials with OS encryption or disclosed private-file fallback | Changing account persistence, restoration, file migration or sign-out storage |
 
+| [ADR-0015](ADR-0015-explicit-model-access-verification.md) | Accepted | Explicit GPT-6.1 Sol inference test and connection-session verification | Changing model diagnostics, availability evidence or verified choices |
+
+| [ADR-0016](ADR-0016-requested-extra-model-choices.md) | Accepted | Persistent Sol/Luna picker supplements with independent optional diagnostics | Changing extra model choices, independent proof or diagnostic target ownership |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

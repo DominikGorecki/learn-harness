@@ -13,6 +13,9 @@ const learning: AccountApi & WorkspaceApi & GenerationApi = {
   reopenAccountBrowser: () => ipcRenderer.invoke(accountChannels.reopen),
   copyAccountSignInLink: () => ipcRenderer.invoke(accountChannels.copyLink),
   refreshModels: () => ipcRenderer.invoke(accountChannels.models),
+  testSolModel: () => ipcRenderer.invoke(accountChannels.testSol),
+  testLunaModel: () => ipcRenderer.invoke(accountChannels.testLuna),
+  cancelModelTest: () => ipcRenderer.invoke(accountChannels.cancelTest),
   disconnectAccount: () => ipcRenderer.invoke(accountChannels.disconnect),
   onAccountChanged: listener => {
     const receive = (_event: unknown, snapshot: AccountSnapshot) => listener(snapshot)

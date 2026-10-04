@@ -33,5 +33,7 @@ export interface AccountProvider {
   }): Promise<AccountCredential>
   renew(credential: AccountCredential, signal: AbortSignal): Promise<AccountCredential>
   listModels(credential: AccountCredential, signal: AbortSignal): Promise<ModelChoice[]>
+  testSolModel(credential: AccountCredential, signal: AbortSignal): Promise<void>
+  testLunaModel(credential: AccountCredential, signal: AbortSignal): Promise<void>
   revoke(credential: AccountCredential, signal: AbortSignal): Promise<void>
 }
