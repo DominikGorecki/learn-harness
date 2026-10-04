@@ -31,7 +31,7 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 | PROJ-03 | Opening reads metadata only; desktop checks no .edu creation and no inference. | No known local gap. |
 | PROJ-04 | Canonical-path deduplication and profile registry; two-project restart desktop check. | Native path semantics remain part of AC-14. |
 | PROJ-05 | Dashboard return, single-run guard, explicit stay/cancel navigation; core and desktop recovery checks. | No known local gap. |
-| PROJ-06 | Missing/unreadable snapshots, retry and native relink; storage/core/project desktop tests. | No known local gap. |
+| PROJ-06 | Missing/unreadable snapshots, lost/replaced metadata identity checks, retry and native relink; storage/core/project desktop tests. | No known local gap. |
 | PROJ-07 | Offline long-outline reading and corrupt-state preservation; reading desktop journey. | No known local gap. |
 | PROJ-08 | Atomic versioned .edu/project.json and separate profile registry; storage tests. | No known local gap. |
 | MODEL-01 | Composer/header native select displays current or saved model; project/outline desktop journeys. | No known local gap. |

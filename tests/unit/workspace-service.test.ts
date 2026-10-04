@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdtemp, mkdir, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -80,6 +80,29 @@ describe('workspace use cases', () => {
     await service.saveBrief(one, 'A background goal')
     expect(service.get().activeProject?.id).toBe(two)
     expect((await service.select(one)).activeProject?.brief).toBe('A background goal')
+  })
+  it.each(['missing', 'different'] as const)('preserves a known project identity when its metadata becomes %s', async mode => {
+    const { service, create, first } = await setup()
+    const id = (await service.open(first)).activeProject!.id
+    await service.saveBrief(id, 'The original learning goal')
+    const originalId = service.get().activeProject!.projectId
+    const file = join(first, '.edu/project.json')
+    const original = await readFile(file, 'utf8')
+    const replacement = JSON.stringify({ ...JSON.parse(original), projectId: 'another-project', brief: 'Another learner project' })
+    if (mode === 'missing') await rm(file)
+    else await writeFile(file, replacement)
+    const state = await service.select(id)
+    expect(state.activeProject).toMatchObject({ availability: 'unreadable', writable: false, projectId: originalId })
+    await expect(service.setModel(id, 'model-one')).rejects.toMatchObject({ code: 'CONFLICT' })
+    await expect(service.saveBrief(id, 'Must not overwrite')).rejects.toMatchObject({ code: 'CONFLICT' })
+    await expect(service.prepareOutline(id, 'model-one', 'Must not generate here', true)).rejects.toMatchObject({ code: 'CONFLICT' })
+    // A restart has no loaded-project cache, but still knows the portable identity.
+    const restarted = create(); await restarted.initialize()
+    await expect(restarted.prepareOutline(id, 'model-one', 'Must not adopt a replacement', true)).rejects.toMatchObject({ code: 'CONFLICT' })
+    if (mode === 'missing') await expect(readFile(file, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
+    else expect(await readFile(file, 'utf8')).toBe(replacement)
+    await writeFile(file, original)
+    expect((await service.select(id)).activeProject).toMatchObject({ availability: 'available', projectId: originalId, brief: 'The original learning goal' })
   })
 })
 

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { ElectronApplication } from '@playwright/test'
-import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { chmod, mkdir, mkdtemp, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
@@ -57,6 +57,16 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
       await expect(page.getByRole('button', { name: 'Create new outline', exact: true })).toBeDisabled()
       await chmod(folder, 0o700); await chmod(join(folder, '.edu'), 0o700)
     }
+    const metadata = join(folder, '.edu/project.json')
+    await rename(metadata, metadata + '.backup')
+    await choose(folder)
+    await page.getByRole('button', { name: 'Open project', exact: false }).click()
+    await expect(page.getByRole('heading', { name: 'This project needs attention.' })).toBeVisible()
+    await expect(page.getByText('The saved learning project is missing from this folder. Restore its .edu state or locate the original project.', { exact: true })).toBeVisible()
+    await expect(readFile(metadata, 'utf8')).rejects.toMatchObject({ code: 'ENOENT' })
+    await rename(metadata + '.backup', metadata)
+    await page.getByRole('button', { name: 'Try again', exact: true }).click()
+    await expect(page.getByRole('heading', { name: outline.title, exact: true })).toBeVisible()
     await choose(corrupt)
     await page.getByRole('button', { name: 'Open project', exact: false }).click()
     await expect(page.getByRole('heading', { name: 'This project needs attention.' })).toBeVisible()

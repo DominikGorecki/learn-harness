@@ -46,6 +46,11 @@ export class WorkspaceService {
     if (!entry) throw new ApplicationError('NOT_FOUND', 'Open this project folder before using it.')
     return entry
   }
+  private assertIdentity(entry: RegisteredProject, loaded: LoadedProject): void {
+    if (!entry.projectId) return
+    if (!loaded.document) throw new ApplicationError('CONFLICT', 'The saved learning project is missing from this folder. Restore its .edu state or locate the original project.')
+    if (loaded.document.projectId !== entry.projectId) throw new ApplicationError('CONFLICT', 'This location contains a different learning project. Locate the original folder to reconnect it.')
+  }
   private async remember(entry: RegisteredProject): Promise<void> {
     const next = [entry, ...this.entries.filter(value => value.id !== entry.id)]
     await this.options.registry.write(next)
@@ -63,9 +68,7 @@ export class WorkspaceService {
     let issue: ApplicationError | undefined
     try {
       loaded = await this.options.storage.load(entry.path)
-      if (entry.projectId && loaded.document && entry.projectId !== loaded.document.projectId) {
-        throw new ApplicationError('CONFLICT', 'This location contains a different learning project. Locate the original folder to reconnect it.')
-      }
+      this.assertIdentity(entry, loaded)
     } catch (error) { issue = error instanceof ApplicationError ? error : new ApplicationError('STORAGE', 'The project could not be opened.') }
     if (issue || !loaded) {
       const availability = issue?.code === 'NOT_FOUND' ? 'missing' : 'unreadable'
@@ -118,6 +121,7 @@ export class WorkspaceService {
   private async updateDocument(id: string, update: (document: ProjectDocument) => ProjectDocument): Promise<WorkspaceSnapshot> {
     const entry = this.entry(id)
     const loaded = this.loaded.get(id) ?? await this.options.storage.load(entry.path)
+    this.assertIdentity(entry, loaded)
     if (!loaded.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Check its folder permissions before saving.')
     const now = this.options.now()
     const previous = loaded.document
@@ -156,6 +160,7 @@ export class WorkspaceService {
       this.mutable(id)
       const entry = this.entry(id)
       const loaded = await this.options.storage.load(entry.path)
+      this.assertIdentity(entry, loaded)
       if (!loaded.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Choose a writable folder before creating an outline.')
       if (!brief.trim() && loaded.sourceHint === 'empty') throw new ApplicationError('INVALID_INPUT', 'Add a topic or a question to start your outline.')
       const cached = this.loaded.get(id)

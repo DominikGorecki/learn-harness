@@ -107,3 +107,12 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - Audit improvements: the composer always discloses possible folder-material transmission, including files added after initial opening; the learning prompt explicitly avoids treating sophisticated material as evidence of learner proficiency.
 - Native CI now retains desktop captures even on success and checks the packaged worker after target-OS packaging. Actual current Windows/macOS runs are still required.
 - Requested user-controlled live sign-in/inference feedback asynchronously. No real credentials were accessed or fabricated, and no live provider success is claimed.
+
+## T06 — known-project identity regression fix
+
+- A focused follow-up audit reproduced two failures: missing metadata for an initialized project appeared as a fresh writable project, and a preference mutation after a detected identity mismatch could adopt another project’s metadata.
+- Centralized known-identity validation across activation, metadata mutation and generation preparation. Missing or different project identities now require recovery. This also protects operations after restart when no loaded-project cache exists.
+- Two regression tests failed before the fix and pass afterward; they verify byte preservation and successful recovery after restoring the original metadata. The real desktop reading journey additionally checks missing-metadata recovery without initialization.
+- `npm run check`: passed with 124 tests, lint, both type scopes and production bundles.
+- All six desktop journeys pass, including the new recovery case; the artifact-only test is intentionally skipped in this ordinary desktop command. Linux package assembly and hardened packaged startup also pass after the fix.
+- Native CI publication remains pending explicit user approval after automatic review rejected the branch push. No remote publication or live ChatGPT inference has occurred.

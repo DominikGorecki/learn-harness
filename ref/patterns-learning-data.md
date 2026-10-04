@@ -10,7 +10,7 @@ Governed by [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.m
 
 ## Storage and recovery
 
-The project document is canonical. A profile registry tracks recent locations independently. Main rejects symlinked metadata, unsupported schemas, changed roots, oversize documents, and detected external edits. Failed replacement leaves previous bytes intact. Corrupt/unknown state is preserved; never silently initialize over it. Save-conflict recovery under [ADR-0012](ADRs/ADR-0012-generation-recovery-and-navigation.md) requires explicit confirmation, fresh validated state, and matching portable identity. Relinking verifies known portable identity.
+The project document is canonical. A profile registry tracks recent locations independently. Main rejects symlinked metadata, unsupported schemas, changed roots, oversize documents, and detected external edits. Failed replacement leaves previous bytes intact. Corrupt/unknown state is preserved; never silently initialize over it. Save-conflict recovery under [ADR-0012](ADRs/ADR-0012-generation-recovery-and-navigation.md) requires explicit confirmation, fresh validated state, and matching portable identity. Opening, preference/brief writes, generation preparation, and relinking all verify known portable identity. Missing metadata for an already initialized project is a recovery state, never permission to initialize a replacement.
 
 Core serializes metadata operations and attributes results to their project. Renderer holds unsaved drafts by project handle. A result for another project cannot replace the active workspace. Registry failure after a project save is reported separately and does not falsely label the project save as failed.
 
