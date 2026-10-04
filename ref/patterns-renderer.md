@@ -24,6 +24,6 @@ The workspace serializes short metadata operations and keeps drafts by project h
 
 ## Current implementation and migration evidence
 
-The workspace uses neutral surfaces, system typography, project rows, a large goal composer, native account/navigation dialogs, and real per-project model preferences. The sidebar collapses below 880 CSS pixels; Open project and toggle-navigation shortcuts are implemented. Generation, theme settings, and command menus remain pending. ADR-0009 retires the demo and defines portable state.
+The workspace uses neutral surfaces, system typography, project rows, a large goal composer, native account/navigation dialogs, and real per-project model preferences. The sidebar collapses below 880 CSS pixels; Open project and toggle-navigation shortcuts are implemented. Generation, cancellation, clarification, readable results, confirmed replacement, and save retry are implemented. Theme settings and command menus remain outside this milestone. ADR-0009 retires the demo and defines portable state.
 
 For a UI implementation, exercise the real bridge/backend journey and review screenshots, focus, scroll, zoom, long content, reduced motion, and target OS appearance. Keep current capability labels truthful until backend behavior exists. The documentation-only adoption does not establish screen compliance or accessibility certification.

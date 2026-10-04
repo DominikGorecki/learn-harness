@@ -14,7 +14,7 @@ Core imports shared contracts and defines repository/time/identity ports. Main i
 
 `WorkspaceService` is asynchronous and serializes project mutations. Main implements project storage and registry ports; handlers await service results before constructing serialized reply envelopes. The old in-memory demo service has been retired under ADR-0009.
 
-Account lifecycle lives in `src/main/auth`: application connection service, testable OAuth/provider and credential adapters, and loopback listener. Its asynchronous IPC uses `registerCapability`, which awaits the result before constructing its reply. Shared account snapshots contain no credentials. Pi Agent Core/Pi AI are pinned runtime dependencies for the educational harness; the generation worker is still pending.
+Account lifecycle lives in `src/main/auth`: application connection service, testable OAuth/provider and credential adapters, and loopback listener. Its asynchronous IPC uses `registerCapability`, which awaits the result before constructing its reply. Shared account snapshots contain no credentials. Pi Agent Core/Pi AI are pinned runtime dependencies for the educational harness; generation runs in a dedicated Electron utility process under [ADR-0010](ADRs/ADR-0010-bounded-pi-outline-generation.md). Core `GenerationService` owns project/run state and a worker port; main owns authorization and worker startup/termination.
 
 ## Growth boundary
 

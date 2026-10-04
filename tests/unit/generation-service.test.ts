@@ -1,0 +1,123 @@
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { GenerationService } from '../../src/core/generation/service'
+import { WorkspaceService } from '../../src/core/workspace/service'
+import { createProjectStorage } from '../../src/main/storage/project-storage'
+import { createProjectRegistry } from '../../src/main/storage/project-registry'
+import { ApplicationError } from '../../src/shared/contracts'
+import { parseRunRequest, parseStartOutline } from '../../src/shared/generation'
+import type { OutlineEngineResult } from '../../src/shared/generation'
+import { learningOutline } from '../fixtures/learning-outline'
+
+const roots: string[] = []
+afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
+function deferred<T>() { let resolve!: (value: T) => void; const promise = new Promise<T>(done => { resolve = done }); return { promise, resolve } }
+async function setup(generate: ConstructorParameters<typeof GenerationService>[0]['generate'] = async () => ({ kind: 'outline', document: learningOutline() })) {
+  const root = await mkdtemp(join(tmpdir(), 'edu-generation-')); roots.push(root)
+  const path = join(root, 'project'); await mkdir(path)
+  const storage = createProjectStorage()
+  let id = 0
+  const workspace = new WorkspaceService({ storage, registry: createProjectRegistry(join(root, 'profile')), models: () => [{ id: 'model-one', name: 'One' }], createId: () => `id-${++id}`, now: () => new Date().toISOString() })
+  await workspace.initialize()
+  const projectId = (await workspace.open(path)).activeProject!.id
+  const onBusy = vi.fn(), onAccountFailure = vi.fn(), generator = vi.fn(generate)
+  const service = new GenerationService({ workspace, createId: () => `run-${++id}`, now: () => new Date().toISOString(), onBusy, onAccountFailure, generate: generator })
+  const request = { projectId, brief: 'Bayesian reasoning', modelId: 'model-one', replace: false }
+  return { root, path, workspace, service, storage, request, generator, onBusy, onAccountFailure }
+}
+describe('generation ownership and durable outcomes', () => {
+  it('saves the complete result with the originating model, brief and time', async () => {
+    const { service, request, workspace, onBusy } = await setup()
+    expect(service.start(request).activeRunId).toBeTruthy()
+    await service.waitForIdle()
+    expect(service.get()).toMatchObject({ activeRunId: null, runs: [{ status: 'saved', projectId: request.projectId, result: { model: { id: request.modelId }, brief: request.brief } }] })
+    expect(workspace.get().activeProject?.outline?.document).toEqual(learningOutline())
+    expect(onBusy.mock.calls).toEqual([[true], [false]])
+  })
+  it('rejects duplicate starts and conflicting settings, but supports navigation to another project', async () => {
+    const pending = deferred<OutlineEngineResult>(), started = deferred<void>()
+    const { service, request, workspace, root } = await setup(async () => { started.resolve(); return pending.promise })
+    service.start(request)
+    expect(() => service.start(request)).toThrow(/already/)
+    await started.promise
+    await expect(workspace.setModel(request.projectId, 'model-one')).rejects.toMatchObject({ code: 'BUSY' })
+    await expect(workspace.saveBrief(request.projectId, 'replacement')).rejects.toMatchObject({ code: 'BUSY' })
+    const otherPath = join(root, 'other'); await mkdir(otherPath)
+    const other = (await workspace.open(otherPath)).activeProject!.id
+    pending.resolve({ kind: 'outline', document: learningOutline() })
+    await service.waitForIdle()
+    expect(workspace.get().activeProject?.id).toBe(other)
+    expect((await workspace.select(request.projectId)).activeProject?.outline?.document.title).toBe('Bayesian reasoning')
+  })
+  it('cancels a pending run and cannot accept a late completed result', async () => {
+    const pending = deferred<OutlineEngineResult>(), started = deferred<void>()
+    const { service, request, workspace } = await setup(async () => { started.resolve(); return pending.promise })
+    const state = service.start(request); await started.promise
+    service.cancel({ projectId: request.projectId, runId: state.activeRunId! })
+    pending.resolve({ kind: 'outline', document: learningOutline() })
+    await service.waitForIdle()
+    expect(service.get().runs[0]?.status).toBe('cancelled')
+    expect(workspace.get().activeProject?.outline).toBeNull()
+    await expect(workspace.saveBrief(request.projectId, 'Still editable')).resolves.toBeDefined()
+  })
+  it('retains an unsaved result and retries storage without consuming inference again', async () => {
+    const { service, storage, generator, request, workspace } = await setup()
+    const save = storage.save.bind(storage)
+    let fail = true
+    vi.spyOn(storage, 'save').mockImplementation(async (...args) => {
+      if (fail && args[1].outline) throw new ApplicationError('STORAGE', 'The disk is full.')
+      return save(...args)
+    })
+    service.start(request); await service.waitForIdle()
+    const run = service.get().runs[0]!
+    expect(run).toMatchObject({ status: 'unsaved', result: { document: learningOutline() } })
+    expect(workspace.get().activeProject?.outline).toBeNull()
+    fail = false
+    await service.retrySave({ projectId: request.projectId, runId: run.id })
+    expect(service.get().runs[0]?.status).toBe('saved')
+    expect(generator).toHaveBeenCalledTimes(1)
+  })
+  it('preserves an external metadata edit even after navigation refreshes the workspace cache', async () => {
+    const pending = deferred<OutlineEngineResult>(), started = deferred<void>()
+    const { service, request, workspace, path } = await setup(async () => { started.resolve(); return pending.promise })
+    service.start(request); await started.promise
+    const file = join(path, '.edu/project.json')
+    const external = JSON.stringify({ ...JSON.parse(await readFile(file, 'utf8')), brief: 'An external change' })
+    await writeFile(file, external)
+    await workspace.select(request.projectId)
+    pending.resolve({ kind: 'outline', document: learningOutline() }); await service.waitForIdle()
+    expect(service.get().runs[0]).toMatchObject({ status: 'unsaved', errorCode: 'CONFLICT' })
+    expect(await readFile(file, 'utf8')).toBe(external)
+  })
+  it('requires explicit replacement and keeps a previous outline on provider failure', async () => {
+    const { service, request, generator, workspace, onAccountFailure } = await setup()
+    service.start(request); await service.waitForIdle()
+    const original = workspace.get().activeProject!.outline
+    service.start(request); await service.waitForIdle()
+    expect(service.get().runs[0]?.errorCode).toBe('CONFLICT')
+    expect(generator).toHaveBeenCalledTimes(1)
+    generator.mockRejectedValueOnce(new ApplicationError('USAGE_LIMIT', 'Your included usage is unavailable.'))
+    service.start({ ...request, replace: true }); await service.waitForIdle()
+    expect(workspace.get().activeProject?.outline).toEqual(original)
+    expect(onAccountFailure).toHaveBeenCalledTimes(1)
+  })
+  it('returns clarification and independently rejects malformed worker results', async () => {
+    const { service, generator, request, workspace } = await setup(async () => ({ kind: 'needs-details', question: 'Which subject?', reason: 'The subject is unclear.' }))
+    service.start(request); await service.waitForIdle()
+    expect(service.get().runs[0]).toMatchObject({ status: 'needs-details', question: 'Which subject?' })
+    const invalid = learningOutline(); invalid.lessons = []
+    generator.mockResolvedValueOnce({ kind: 'outline', document: invalid })
+    service.start(request); await service.waitForIdle()
+    expect(service.get().runs[0]?.status).toBe('failed')
+    expect(workspace.get().activeProject?.outline).toBeNull()
+  })
+  it('rejects forged capabilities, empty input and stale operation handles', async () => {
+    expect(() => parseStartOutline({ projectId: 'a', modelId: 'b', brief: 'Learn', replace: false, path: '/other' })).toThrow()
+    expect(() => parseRunRequest({ projectId: 'a', runId: '../other' })).toThrow()
+    const { service, request } = await setup()
+    expect(() => service.start({ ...request, brief: '' })).toThrow(/topic/)
+    expect(() => service.cancel({ projectId: request.projectId, runId: 'stale' })).toThrow(/no longer/)
+  })
+})

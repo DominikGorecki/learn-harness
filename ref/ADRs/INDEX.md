@@ -15,4 +15,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0009](ADR-0009-portable-project-workspace.md) | Accepted | Portable project metadata, native folder workspace, and retirement of demo runtime | Changing project persistence, identity, recovery, or workspace ownership |
 
+| [ADR-0010](ADR-0010-bounded-pi-outline-generation.md) | Accepted | Bounded Pi generation, utility isolation, project-owned results and save recovery | Changing generation, worker lifecycle, inference transport, or result acceptance |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

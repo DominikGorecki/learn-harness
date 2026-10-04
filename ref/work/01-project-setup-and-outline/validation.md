@@ -16,7 +16,7 @@
 | --- | --- | --- |
 | T01 | Locally validated | Signed OAuth fixture, credential/model lifecycle, account IPC and desktop panel |
 | T02 | Locally validated | Atomic project storage, native folder IPC, responsive workspace, restart/relink desktop journey |
-| T03 | Open | Intent-to-outline generation pending |
+| T03 | Locally validated | Actual Pi transport and utility-process desktop journey, saved outline, cancellation/recovery |
 | T04 | Open | Material understanding pending |
 | T05 | Open | Integrated recovery and interaction review pending |
 | T06 | Open | Full acceptance and native/live evidence pending |
@@ -60,3 +60,17 @@ Pending implementation. Audit every PRD requirement and AC-01 through AC-14 agai
 - `npm run check`: passed with 103 tests, lint, both type scopes, and build. Twenty-one additional tests exercise real HTTP/SSE through Pi, argument repair, source fabrication rejection, clarification, cancellation, timeout, error classification, and malformed outlines.
 - This engine is not yet exposed by the desktop; utility-process ownership, generation IPC, and UI follow in the next T03 increment. Local streamed fixtures are not live ChatGPT inference evidence.
 - Protocol reference checked 2026-10-04: [models and inference](https://developers.openai.com/siwc/token-sharing-open-source/models-and-inference) and [preview limitations](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations).
+
+## T03 — worker and desktop increment
+
+- Added the dedicated Pi utility entry, explicit environment, private credential port, timeout/exit ownership, and process termination on cancellation or settlement.
+- Core generation ownership prevents duplicate runs and conflicting settings while allowing navigation. Results retain project/model/brief identity; external-edit conflicts and failed saves preserve generated work for storage-only retry.
+- UI now creates an outline from the large composer, preserves input during account recovery, displays real phases/clarification, reads lesson/module plans, confirms replacement, and retains the previous saved result on cancellation.
+- `npm run check`: passed with 111 tests, lint, type scopes, and production bundles including the utility entry. Eight new ownership tests cover navigation races, late results, replacement, external edits, save retry, and independent result validation.
+- All three real Electron journeys pass on Linux: account, project workspace, and actual Pi utility generation via local signed HTTP/SSE. The generation journey verifies selected model, complete `.edu` save, module disclosure, cancellation and worker cleanup, and restart reopening without another inference request.
+- Visually inspected the lesson/module document in the running desktop. Refine action overlap discovered by the desktop test was corrected.
+- These are local fixture results. Live provider usage and native Windows/macOS execution are not claimed.
+
+- Linux x64 unpacked packaging passed using the installed Electron distribution: `ELECTRON_BUILDER_CACHE=/tmp/edu-harness-builder-cache npx electron-builder --dir --publish never -c.electronDist=node_modules/electron/dist`. The ordinary package command reached packaging but could not write the environment’s read-only default Electron download cache. The local-distribution override avoids that environment constraint without changing app configuration.
+- Inspected `app.asar`: main, outline worker, Pi Agent Core, and Pi Responses adapter are included; Electron fuses were applied. This establishes package assembly, not live inference or installer acceptance.
+- Retained a visually reviewed outline screenshot at `ref/research/assets/outline-workspace.png`, explicitly labelled as test-provider content in README.

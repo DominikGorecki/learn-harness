@@ -3,8 +3,10 @@ import { accountChannels } from '../shared/account'
 import type { AccountApi, AccountSnapshot } from '../shared/account'
 import { workspaceChannels } from '../shared/workspace'
 import type { WorkspaceApi, WorkspaceSnapshot } from '../shared/workspace'
+import { generationChannels } from '../shared/generation'
+import type { GenerationApi, GenerationSnapshot } from '../shared/generation'
 
-const learning: AccountApi & WorkspaceApi = {
+const learning: AccountApi & WorkspaceApi & GenerationApi = {
   getAccount: () => ipcRenderer.invoke(accountChannels.get),
   connectAccount: () => ipcRenderer.invoke(accountChannels.connect),
   cancelAccountConnection: () => ipcRenderer.invoke(accountChannels.cancel),
@@ -23,6 +25,15 @@ const learning: AccountApi & WorkspaceApi = {
   showDashboard: () => ipcRenderer.invoke(workspaceChannels.dashboard),
   setProjectModel: request => ipcRenderer.invoke(workspaceChannels.model, request),
   saveProjectBrief: request => ipcRenderer.invoke(workspaceChannels.brief, request),
+  getGeneration: () => ipcRenderer.invoke(generationChannels.get),
+  createOutline: request => ipcRenderer.invoke(generationChannels.start, request),
+  cancelOutline: request => ipcRenderer.invoke(generationChannels.cancel, request),
+  retryOutlineSave: request => ipcRenderer.invoke(generationChannels.save, request),
+  onGenerationChanged: listener => {
+    const receive = (_event: unknown, snapshot: GenerationSnapshot) => listener(snapshot)
+    ipcRenderer.on(generationChannels.changed, receive)
+    return () => { ipcRenderer.removeListener(generationChannels.changed, receive) }
+  },
   onWorkspaceChanged: listener => {
     const receive = (_event: unknown, snapshot: WorkspaceSnapshot) => listener(snapshot)
     ipcRenderer.on(workspaceChannels.changed, receive)

@@ -12,6 +12,9 @@ import { WorkspaceService } from '../core/workspace/service'
 import { createProjectRegistry } from './storage/project-registry'
 import { createProjectStorage } from './storage/project-storage'
 import { registerWorkspaceHandlers } from './ipc/workspace-handlers'
+import { GenerationService } from '../core/generation/service'
+import { registerGenerationHandlers } from './ipc/generation-handlers'
+import { runOutlineWorker } from './generation/worker-client'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -24,6 +27,7 @@ if (!app.isPackaged && process.env.EDU_HARNESS_TEST_DATA_DIR) {
 
 let mainWindow: BrowserWindow | null = null
 let account: AccountService | null = null
+let generation: GenerationService | null = null
 const developmentUrl = !app.isPackaged ? process.env.ELECTRON_RENDERER_URL : undefined
 if (developmentUrl && new URL(developmentUrl).origin !== developmentOrigin) {
   throw new Error('The development renderer must use the configured loopback origin.')
@@ -85,6 +89,16 @@ if (!app.requestSingleInstanceLock()) {
     })
     await workspace.initialize()
     registerWorkspaceHandlers(workspace, () => mainWindow, expectedOrigin)
+    generation = new GenerationService({
+      workspace, createId: randomUUID, now: () => new Date().toISOString(),
+      onBusy: busy => account!.setInferenceBusy(busy), onAccountFailure: error => account!.recordFailure(error),
+      generate: async (input, signal, onPhase) => {
+        const authorized = await account!.authorizeModel(input.model.id)
+        signal.throwIfAborted()
+        return runOutlineWorker({ model: authorized.model, accessToken: authorized.accessToken, baseUrl: providerEndpoints.resource, brief: input.brief }, { signal, onPhase })
+      }
+    })
+    registerGenerationHandlers(generation, () => mainWindow, expectedOrigin)
     await createWindow()
     void account.initialize()
     app.on('activate', () => {
@@ -95,5 +109,5 @@ if (!app.requestSingleInstanceLock()) {
     app.quit()
   })
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
-  app.on('before-quit', () => { account?.dispose() })
+  app.on('before-quit', () => { generation?.dispose(); account?.dispose() })
 }

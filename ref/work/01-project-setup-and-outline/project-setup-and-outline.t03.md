@@ -1,6 +1,6 @@
 # Ticket: project-setup-and-outline.T03 — Generate and save a complete outline from learning intent
 
-Status: Open
+Status: Implemented and locally validated
 
 ## Source
 
@@ -36,11 +36,11 @@ Learning outline contract and normalization; learning prompt; isolated Pi genera
 
 ## Acceptance criteria
 
-- [ ] A short topic or substantial brief drives the real Pi agent path and produces every required outline level.
-- [ ] The selected account/project model is used without billing fallback or unsupported request controls.
-- [ ] Only a complete validated result is marked saved after persistence; reopening spends no inference allowance.
-- [ ] Cancellation terminates owned work and retains the prior outline and draft.
-- [ ] The completed outline reads as an inviting learning document and exposes useful detail progressively.
+- [x] A short topic or substantial brief drives the real Pi agent path and produces every required outline level.
+- [x] The selected account/project model is used without billing fallback or unsupported request controls.
+- [x] Only a complete validated result is marked saved after persistence; reopening spends no inference allowance.
+- [x] Cancellation terminates owned work and retains the prior outline and draft.
+- [x] The completed outline reads as an inviting learning document and exposes useful detail progressively.
 
 ## Traceability
 
@@ -48,4 +48,4 @@ OUTLINE-01, OUTLINE-03 through OUTLINE-08, OUTLINE-11; INPUT-01, INPUT-02, INPUT
 
 ## Completion evidence
 
-Pending implementation. Keep this section current with commits, validation, and any external verification still required.
+Engine checkpoint: `6bfc250`. Real Pi transport, utility-process ownership, project-correlated state, cancellation, atomic persistence, independent validation, readable outlines, explicit replacement, and save retry are implemented. The real Electron signed-provider fixture exercises a short topic through save/reopen and regeneration cancellation. See [validation](validation.md). Live plan inference remains a T06 gate.

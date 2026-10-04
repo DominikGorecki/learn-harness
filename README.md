@@ -2,11 +2,13 @@
 
 A basic desktop learning workspace for Windows, macOS, and Linux, built with Electron, React, and TypeScript. The Node.js backend runs inside Electron main. The interface pairs compact project navigation with a spacious workspace inspired by Codex.
 
-The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. AI-generated outlines are the next slice under PRD 01.
+The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. Description-to-outline generation uses the Pi harness in a dedicated utility process, with validated saves, cancellation, and retryable save failures. Folder-material understanding is the next slice under PRD 01.
 
 Use **Connect ChatGPT** to connect an eligible account. Credentials use protected operating-system storage where available; otherwise the account panel explains that the connection lasts only for the app session. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 
-![Learning Studio project workspace](ref/research/assets/project-workspace.png)
+![Learning Studio outline workspace](ref/research/assets/outline-workspace.png)
+
+Screenshot uses deterministic test-provider content to demonstrate the interface.
 
 ## Product direction
 
@@ -71,6 +73,7 @@ src/
       features/account/  Account connection panel
       lib/              Typed bridge result handling
   core/workspace/       Platform-independent project service and storage ports
+  core/generation/      Run ownership, result acceptance, save recovery
   shared/               DTOs, channels, errors, runtime request parsers
 tests/
   unit/                 Core behavior and boundary policy
@@ -94,6 +97,9 @@ flowchart LR
   Main --> Service[Workspace service]
   Service --> Repository[Project files and profile registry]
   Main --> Account[Protected account service]
+  Main --> Generation[Generation service]
+  Generation --> Worker[Pi utility process]
+  Worker --> ChatGPT[ChatGPT plan Responses]
 ```
 
 Use [AGENTS.md](AGENTS.md) for progressive discovery, [patterns](ref/patterns.md) for current rules, [ADRs](ref/ADRs/INDEX.md) for rationale, and the [research brief](ref/research/electron-learning-app.md) for primary sources and alternatives. The [validation record](ref/research/validation.md) distinguishes actual local results from configured platform targets.

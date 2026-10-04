@@ -5,6 +5,8 @@ import type { AddressInfo } from 'node:net'
 import { exportJWK, generateKeyPair, SignJWT } from 'jose'
 import { planScope } from '../../src/main/auth/types'
 import type { ChatGPTEndpoints } from '../../src/main/auth/chatgpt-provider'
+import { learningOutline } from './learning-outline'
+import { writeToolResponse } from './responses-stream'
 
 const keyPair = generateKeyPair('RS256')
 const wrongKeyPair = generateKeyPair('RS256')
@@ -20,6 +22,7 @@ export interface ProviderFixtureOptions {
   subject?: string
   failModels?: number
   failRefresh?: boolean
+  inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify'
 }
 
 export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) {
@@ -27,6 +30,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   const jwk = { ...await exportJWK(keys.publicKey), kid: 'test-key', alg: 'RS256', use: 'sig' }
   const authorizations: URL[] = []
   const tokens: URLSearchParams[] = []
+  const inferenceRequests: Record<string, unknown>[] = []
   const codes = new Map<string, { nonce: string; challenge: string; clientId: string }>()
   let baseUrl = ''
   let modelsRequested = 0
@@ -94,6 +98,16 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
         ] }); return
       }
       if (url.pathname === '/revoke') { revoked++; response.writeHead(200); response.end(); return }
+      if (url.pathname === '/v1/responses') {
+        if (!request.headers.authorization?.startsWith('Bearer fixture-')) { json(response, 401, { error: 'invalid_token' }); return }
+        inferenceRequests.push(JSON.parse(await body(request)) as Record<string, unknown>)
+        if (options.inferenceMode === 'hold') { response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
+        if (options.inferenceMode === 'clarify') {
+          writeToolResponse(response, { name: 'request_learning_details', args: { question: 'Which subject would you like to explore?', reason: 'The material does not point to one subject yet.' } }); return
+        }
+        writeToolResponse(response, { args: learningOutline(), terminal: options.inferenceMode === 'incomplete' ? 'incomplete' : options.inferenceMode === 'usage-limit' ? 'failed' : 'completed' })
+        return
+      }
       json(response, 404, { error: 'not_found' })
     })().catch(() => { if (!response.headersSent) json(response, 500, { error: 'fixture_error' }); else response.end() })
   })
@@ -104,7 +118,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
     jwks: `${baseUrl}/.well-known/jwks.json`, models: `${baseUrl}/models`, resource: `${baseUrl}/v1`
   }
   return {
-    baseUrl, endpoints, authorizations, tokens, options,
+    baseUrl, endpoints, authorizations, tokens, inferenceRequests, options,
     modelsRequested: () => modelsRequested, revoked: () => revoked,
     close: () => new Promise<void>((resolve, reject) => { server.closeAllConnections(); server.close(error => error ? reject(error) : resolve()) })
   }

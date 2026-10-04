@@ -1,6 +1,7 @@
 import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
-import type { ProjectDocument, ProjectSnapshot, ProjectSummary, WorkspaceSnapshot } from '../../shared/workspace'
+import { parseSavedOutline } from '../../shared/workspace'
+import type { ProjectDocument, ProjectSnapshot, ProjectSummary, SavedOutline, WorkspaceSnapshot } from '../../shared/workspace'
 import type { LoadedProject, ProjectRegistry, ProjectStorage, RegisteredProject } from './ports'
 
 export class WorkspaceService {
@@ -11,6 +12,7 @@ export class WorkspaceService {
   private issue: string | null = null
   private queue: Promise<unknown> = Promise.resolve()
   private listeners = new Set<(snapshot: WorkspaceSnapshot) => void>()
+  private generationLocks = new Set<string>()
 
   constructor(private readonly options: {
     registry: ProjectRegistry; storage: ProjectStorage; models(): ModelChoice[]; createId(): string; now(): string
@@ -102,6 +104,7 @@ export class WorkspaceService {
   }
   locate(id: string, path: string): Promise<WorkspaceSnapshot> {
     return this.serial(async () => {
+      this.mutable(id)
       const entry = this.entry(id)
       const location = await this.options.storage.canonicalPath(path)
       const duplicate = this.entries.find(value => value.path === location.path && value.id !== id)
@@ -136,12 +139,42 @@ export class WorkspaceService {
   }
   setModel(id: string, modelId: string): Promise<WorkspaceSnapshot> {
     return this.serial(async () => {
+      this.mutable(id)
       const model = this.options.models().find(model => model.id === modelId)
       if (!model) throw new ApplicationError('UNAVAILABLE', 'Connect ChatGPT and choose a currently available model.')
       return this.updateDocument(id, document => ({ ...document, selectedModel: { ...model } }))
     })
   }
   saveBrief(id: string, brief: string): Promise<WorkspaceSnapshot> {
-    return this.serial(() => this.updateDocument(id, document => ({ ...document, brief })))
+    return this.serial(() => { this.mutable(id); return this.updateDocument(id, document => ({ ...document, brief })) })
+  }
+  private mutable(id: string): void {
+    if (this.generationLocks.has(id)) throw new ApplicationError('BUSY', 'Finish or cancel this outline before changing its project settings.')
+  }
+  prepareOutline(id: string, modelId: string, brief: string, replace: boolean): Promise<{ path: string; digest: string | null; model: ModelChoice }> {
+    return this.serial(async () => {
+      this.mutable(id)
+      const entry = this.entry(id)
+      const loaded = await this.options.storage.load(entry.path)
+      if (!loaded.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Choose a writable folder before creating an outline.')
+      const cached = this.loaded.get(id)
+      if (cached && cached.digest !== loaded.digest) throw new ApplicationError('CONFLICT', 'This project changed outside the app. Reopen it before creating an outline.')
+      if (loaded.document?.outline && !replace) throw new ApplicationError('CONFLICT', 'Confirm replacement before creating another outline.')
+      const model = this.options.models().find(value => value.id === modelId)
+      if (!model) throw new ApplicationError('UNAVAILABLE', 'Connect ChatGPT and choose an available model before creating an outline.')
+      this.loaded.set(id, loaded)
+      await this.updateDocument(id, document => ({ ...document, selectedModel: { ...model }, brief }))
+      this.generationLocks.add(id)
+      return { path: entry.path, digest: this.loaded.get(id)!.digest, model: { ...model } }
+    })
+  }
+  releaseOutline(id: string): void { this.generationLocks.delete(id) }
+  saveOutline(id: string, value: SavedOutline, digest: string | null): Promise<WorkspaceSnapshot> {
+    return this.serial(async () => {
+      const outline = parseSavedOutline(value)
+      const loaded = this.loaded.get(id)
+      if (!loaded || loaded.digest !== digest) throw new ApplicationError('CONFLICT', 'The project changed while the outline was being created. Your new outline is still available here.')
+      return this.updateDocument(id, document => ({ ...document, name: outline.document.title, brief: outline.brief, outline }))
+    })
   }
 }

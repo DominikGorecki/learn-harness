@@ -24,4 +24,4 @@ Persist model preferences per project and validate changes against the connected
 
 ## Generation and future learning
 
-Generation remains the next slice. Use a privileged adapter, explicit submission, bounded cancellation, and distinct generated/saved results. Pi coding tools do not belong in the educational surface. Rich tutoring and mastery assessment are outside this milestone. See [security patterns](patterns-ipc-security.md) before extending file or AI access.
+Description-to-outline generation uses a privileged Pi utility adapter under [ADR-0010](ADRs/ADR-0010-bounded-pi-outline-generation.md). Explicit submission, project-owned operations, bounded cancellation, and distinct generated/saved results are implemented. Source-file understanding remains the next slice. Pi coding tools do not belong in the educational surface. Rich tutoring and mastery assessment are outside this milestone. See [security patterns](patterns-ipc-security.md) before extending file or AI access.

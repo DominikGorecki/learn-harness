@@ -3,15 +3,14 @@ import type { Model } from '@earendil-works/pi-ai'
 import { stream } from '@earendil-works/pi-ai/api/openai-responses'
 import { ApplicationError } from '../../shared/contracts'
 import { parseOutline } from '../../shared/outline'
-import type { LearningOutline } from '../../shared/outline'
+import type { OutlineEngineResult, EnginePhase } from '../../shared/generation'
+export type { OutlineEngineResult, EnginePhase } from '../../shared/generation'
 import type { ModelChoice } from '../../shared/account'
 import { boundedText } from '../../shared/validation'
 import { providerFailure } from '../auth/provider-errors'
 import { outlineSchema, clarificationSchema } from './outline-schema'
 import { learningPrompt } from './learning-prompt'
 
-export type OutlineEngineResult = { kind: 'outline'; document: LearningOutline } | { kind: 'needs-details'; question: string; reason: string }
-export type EnginePhase = 'planning' | 'validating'
 export interface OutlineEngineInput {
   model: ModelChoice; accessToken: string; baseUrl: string; brief: string
 }

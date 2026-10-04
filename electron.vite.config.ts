@@ -1,9 +1,10 @@
 import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 import { developmentCsp } from './src/main/security/policy'
+import { resolve } from 'node:path'
 
 export default defineConfig({
-  main: {},
+  main: { build: { rollupOptions: { input: { index: resolve('src/main/index.ts'), 'outline-worker': resolve('src/main/generation/worker-entry.ts') } } } },
   preload: {
     build: {
       externalizeDeps: false,

@@ -1,11 +1,11 @@
 import type { SavedOutline } from '../../../../shared/workspace'
 import { Icon } from '../../components/Icon'
 
-export function OutlineView({ saved }: { saved: SavedOutline }) {
+export function OutlineView({ saved, unsaved = false }: { saved: SavedOutline; unsaved?: boolean }) {
   const outline = saved.document
   const sources = saved.coverage.files.filter(file => file.status === 'read')
   return <article className="outline-view workspace-enter" aria-labelledby="outline-heading">
-    <header className="outline-introduction"><div className="outline-meta"><span className="eyebrow">Your learning outline</span><span className="saved-indicator"><Icon name="check" size={14} />Saved</span></div>
+    <header className="outline-introduction"><div className="outline-meta"><span className="eyebrow">Your learning outline</span><span className="saved-indicator"><Icon name={unsaved ? 'info' : 'check'} size={14} />{unsaved ? 'Not saved yet' : 'Saved'}</span></div>
       <h1 id="outline-heading" tabIndex={-1}>{outline.title}</h1><p className="outline-overview">{outline.overview}</p>
       <div className="outline-facts"><span>{outline.lessons.length} {outline.lessons.length === 1 ? 'lesson' : 'lessons'}</span><span>{outline.level}</span></div>
     </header>
