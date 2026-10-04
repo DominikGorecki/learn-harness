@@ -17,7 +17,7 @@ export interface AccountCredential {
 }
 
 export interface CredentialStore {
-  readonly persistence: 'protected' | 'session'
+  readonly persistence: 'protected' | 'local'
   read(): Promise<AccountCredential | null>
   write(credential: AccountCredential): Promise<void>
   clear(): Promise<void>

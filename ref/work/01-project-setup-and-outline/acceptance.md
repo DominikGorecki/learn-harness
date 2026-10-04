@@ -3,6 +3,8 @@
 Date: 2026-10-04
 Status: Implementation and native automated journeys/packaging verified on Windows, macOS and Linux; live-provider and manual account checks remain open.
 
+Native CI evidence applies to its recorded baseline commits. Subsequent appearance and durable-connection changes have separate local validation in the log.
+
 This audit does not treat deterministic protocol fixtures as real ChatGPT inference or as evidence of curriculum quality. The [PRD](../../prds/01-project-setup-and-outline.md) remains the acceptance authority. The [validation log](validation.md) records check history and granular implementation checkpoints.
 
 ## Evidence map
@@ -21,7 +23,7 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 | AUTH-01 | Browser OAuth/PKCE, signed identity, own app registration; account desktop journey. | Real browser/account authorization pending. |
 | AUTH-02 | Identity and plan permission are separate; account/provider tests cover declined permission and recovery. | Live permission behavior pending. |
 | AUTH-03 | Explicit delegated token, public Responses endpoint, account model catalogue, no ambient API-key fallback; Pi transport tests. | Real plan allowance consumption pending. |
-| AUTH-04 | Protected credential adapter, renewal, restart load and session-only fallback tests; draft preserved in desktop recovery. | Protected OS-store restart and live renewal require native/account verification. |
+| AUTH-04 | Protected/local credential adapters, legacy migration, renewal and durable sign-out tests; desktop restart exercises saved refresh-token renewal, and recovery preserves drafts. | Protected OS-store restart and live renewal require native/account verification. |
 | AUTH-05 | Connecting, cancelled, restricted, reconnect, permission and usage states; provider/account tests and recovery desktop journey. | Live provider classifications remain to confirm. |
 | AUTH-06 | Remote revoke attempt plus local clear, distinct revocation-failure message; account tests and desktop sign-out. | Live revocation pending. |
 | AUTH-07 | Private credential port/profile storage, secret-free snapshots, strict portable metadata, source exclusions. | No known local gap. |
@@ -87,6 +89,6 @@ This audit does not treat deterministic protocol fixtures as real ChatGPT infere
 1. Complete user-controlled ChatGPT browser authorization and generate a saved outline with the selected available model and included plan allowance. Never supply or copy tokens into project files or this audit.
 2. Review representative real outputs: a broad phrase, a detailed applied goal, incomplete notes requiring foundations, and conflicting notes plus explicit direction. Inspect coherence, ordering, scope, additions, source grounding and concrete module tasks.
 3. Complete manual OS folder-chooser inspection and Windows ACL-based read-only recovery checks. Automated native desktop journeys and packaging have run successfully; see the validation log for commit/run evidence.
-4. Verify protected OS credential restoration on an actual supported keychain environment. Headless Linux currently uses the disclosed session-only fallback; injected encryption tests establish adapter behavior only.
+4. Verify protected OS credential restoration on an actual supported keychain environment. Headless Linux now uses the disclosed durable local-file fallback under ADR-0014; actual OS-encrypted restart still requires native keychain evidence.
 
 The goal is incomplete until these requirements have evidence. The approved branch is published, and native automated runs have passed. Live account verification awaits user participation. Signed release installers, app-store distribution, final branding and additional document formats remain outside this milestone.

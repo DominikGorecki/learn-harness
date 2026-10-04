@@ -7,7 +7,7 @@ export interface AccountSnapshot {
   name: string | null
   email: string | null
   message: string | null
-  persistence: 'protected' | 'session'
+  persistence: 'protected' | 'local'
   models: ModelChoice[]
   modelsStatus: 'idle' | 'loading' | 'ready' | 'failed'
   canReopenBrowser: boolean

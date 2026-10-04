@@ -20,6 +20,10 @@ Keep `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false`, `webSe
 
 Built HTML/assets are served through a registered secure standard custom protocol. The handler allows GET requests only and a small fixed asset-path shape under the built renderer directory. It does not turn renderer-provided paths into general filesystem access. Production CSP disallows inline scripts/styles, network connections, frames, objects, and form submission. Dev CSP permits Vite refresh scripts/styles and its exact loopback websocket. Packaged apps ignore the development renderer URL.
 
+## Private connection files
+
+[ADR-0014](ADRs/ADR-0014-durable-account-connection.md) keeps login persistence in main's application-profile adapter. Store encrypted payloads when OS protection is available; otherwise use a disclosed local credential file with owner-only POSIX permissions. This is a persistent fallback, not a claim of keychain encryption. Reject symlinked directories/files, bound reads and validate stored formats. Do not copy credentials into renderer state, UI preference storage, project metadata or logs. Preserve undecryptable state; encryption failures do not trigger automatic plaintext downgrade.
+
 ## Adding capabilities
 
 Extend shared DTOs, runtime validation, and API types first; add one preload wrapper and one authorized main handler; cover the rejected inputs and real IPC journey. Keep renderer text as React text. Before adding Markdown/HTML, imports, external navigation, or model-produced actions, define their trust boundary explicitly. All event subscriptions must strip Electron event objects and return unsubscribe functions.

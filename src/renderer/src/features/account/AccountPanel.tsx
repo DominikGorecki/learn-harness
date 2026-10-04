@@ -42,7 +42,7 @@ export function AccountPanel({ open, onClose, account, locked = false }: { open:
       </button>{snapshot?.name && ['usage-limited', 'restricted'].includes(status) && <button className="account-secondary" disabled={busy || locked} onClick={() => void run(api => api.refreshModels())}>Check availability</button>}</>}
     </div>
     <p className="account-footnote">AI activity counts toward your existing plan limits. Your ChatGPT conversations and memories stay private.</p>
-    {snapshot?.persistence === 'session' && <p className="account-footnote">Protected storage is unavailable on this device. Your connection lasts until you quit the app.</p>}
+    {snapshot?.persistence === 'local' && <p className="account-footnote">This device stores login details in the app’s private data folder. OS keychain encryption is unavailable, so the local credential file is not encrypted.</p>}
     <details className="account-shortcuts"><summary>Keyboard shortcuts</summary><dl><dt>Settings</dt><dd>⌘ / Ctrl + ,</dd><dt>Open project</dt><dd>⌘ / Ctrl + O</dd><dt>Toggle navigation</dt><dd>⌘ / Ctrl + B</dd><dt>Create outline</dt><dd>⌘ / Ctrl + Enter</dd></dl></details>
     {snapshot?.name && !connecting && <button className="account-signout" disabled={busy || locked} onClick={() => void run(api => api.disconnectAccount())}>Sign out of this app</button>}
   </dialog>

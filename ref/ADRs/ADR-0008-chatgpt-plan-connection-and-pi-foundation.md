@@ -1,6 +1,6 @@
 # ADR-0008: ChatGPT plan connection and Pi runtime foundation
 
-- Status: Accepted
+- Status: Accepted; persistence fallback superseded by [ADR-0014](ADR-0014-durable-account-connection.md)
 - Date: 2026-10-04
 - Scope: implemented account connection and selected runtime foundation. Outline generation remains a subsequent ticket.
 

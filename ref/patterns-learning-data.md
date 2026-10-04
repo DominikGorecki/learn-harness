@@ -14,7 +14,7 @@ The project document is canonical. A profile registry tracks recent locations in
 
 Core serializes metadata operations and attributes results to their project. Renderer holds unsaved drafts by project handle. A result for another project cannot replace the active workspace. Registry failure after a project save is reported separately and does not falsely label the project save as failed.
 
-There is no database or cloud sync. Account credentials use protected profile storage with a disclosed session-only fallback when OS protection is unavailable. Credentials and installation host identity are separate from educational files.
+There is no database or cloud sync. Under [ADR-0014](ADRs/ADR-0014-durable-account-connection.md), account credentials persist in `<userData>/connection/chatgpt.json`, with OS encryption when available and an explicitly disclosed unencrypted local-file fallback otherwise. POSIX connection directories are owner-only (`0700`) and files are `0600`; Windows uses its app-data access controls and normally DPAPI. The new versioned file is authoritative; legacy `chatgpt.enc` is migrated, and sign-out clears both formats. A newly available keychain upgrades local storage. Credentials and installation host identity are separate from educational files.
 
 ## Account and models
 

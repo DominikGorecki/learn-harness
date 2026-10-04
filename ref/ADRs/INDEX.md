@@ -23,4 +23,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0013](ADR-0013-chatgpt-inspired-appearance.md) | Accepted | User-supplied ChatGPT visual references, semantic light/dark palettes and local appearance settings | Changing renderer appearance, Settings, theme preference or visual references |
 
+| [ADR-0014](ADR-0014-durable-account-connection.md) | Accepted | Durable profile credentials with OS encryption or disclosed private-file fallback | Changing account persistence, restoration, file migration or sign-out storage |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).
