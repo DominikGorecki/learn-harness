@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "lib": ["ES2022"], "types": ["node"], "allowImportingTsExtensions": true },
+  "include": ["src/main/**/*.ts", "src/preload/**/*.ts", "src/core/**/*.ts", "src/shared/**/*.ts", "scripts/**/*.ts", "tests/**/*.ts", "electron.vite.config.ts", "vitest.config.ts", "playwright.config.ts"]
+}

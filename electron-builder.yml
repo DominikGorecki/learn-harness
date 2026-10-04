@@ -1,0 +1,28 @@
+appId: com.example.edu-harness
+productName: Learning Studio
+directories:
+  output: dist
+files:
+  - out/**
+  - package.json
+asar: true
+npmRebuild: false
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+win:
+  target: nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+mac:
+  target: dmg
+  category: public.app-category.education
+linux:
+  target: AppImage
+  category: Education
+  syncDesktopName: true
