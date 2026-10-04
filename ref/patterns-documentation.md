@@ -1,6 +1,6 @@
 # Documentation patterns
 
-Governed by [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md) and [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md).
+Governed by [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
 
 ## Progressive discovery
 

@@ -21,4 +21,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0012](ADR-0012-generation-recovery-and-navigation.md) | Accepted | Explicit cancellation before navigation and confirmed save-conflict recovery | Changing run cancellation, unsaved results, conflicts, or draft preservation |
 
+| [ADR-0013](ADR-0013-chatgpt-inspired-appearance.md) | Accepted | User-supplied ChatGPT visual references, semantic light/dark palettes and local appearance settings | Changing renderer appearance, Settings, theme preference or visual references |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

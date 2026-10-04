@@ -1,6 +1,6 @@
 # UX patterns
 
-Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Pair with [design system](patterns-design-system.md) for appearance and [renderer](patterns-renderer.md) for implementation.
+Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md) and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md). Pair with [design system](patterns-design-system.md) for appearance and [renderer](patterns-renderer.md) for implementation.
 
 **Status:** adopted interaction rules. Current runtime capabilities remain those in [learning/data](patterns-learning-data.md). Project setup and outline creation are implemented; acceptance evidence is tracked for milestone behavior in [PRD 01](prds/01-project-setup-and-outline.md); richer Socratic activities remain product direction in [the overview](../docs/overview.md).
 
@@ -34,6 +34,10 @@ Compact context controls contain only decisions that affect the action. The draf
 | Saved project state | Portable `.edu` metadata and profile recent-project registry | Distinguish generation from a confirmed `.edu` save and preserve the last saved outline during regeneration. |
 
 A documented target does not justify placeholder connected states, dummy saved indicators, inactive future toolbars, or a simulated tutor presented as working AI.
+
+## Appearance settings
+
+Settings is available from the outer rail (bottom strip at narrow sizes) and Cmd/Ctrl+comma. Its Appearance group offers Light and Dark previews with native radio keyboard behavior. Apply the mode without closing the current project, resetting its draft, changing scroll position or touching an AI run. Escape, the close button and Done dismiss Settings and return focus to its trigger. Persist only the local presentation preference; if saving it fails, the current session still changes and the dialog explains the limit.
 
 ## Progress and recovery
 

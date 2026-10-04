@@ -1,5 +1,7 @@
 # Codex desktop UI reference and learning-workspace adaptation
 
+Historical reference: the later user-supplied ChatGPT screenshots and [appearance review](chatgpt-app-appearance.md) supersede this page as the primary visual reference under ADR-0013.
+
 - Researched: 2026-10-04.
 - Request: update this application's UI/UX patterns using the latest Codex desktop experience as inspiration.
 - Deliverable: documentation and design standards. Application code and the saved demo screenshot are unchanged.

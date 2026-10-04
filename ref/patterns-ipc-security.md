@@ -16,7 +16,7 @@ Each main handler verifies the live owning window, exact sender webContents, the
 
 ## Renderer restrictions
 
-Keep `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false`, `webSecurity: true`, and `webviewTag: false`. Deny renderer navigation, redirects, popups, embedded webviews, and browser permissions in the app's dedicated session. The account service may open its internally constructed, origin/path-allowlisted authorization URL in the system browser. No generic external-link capability is exposed.
+Keep `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false`, `webSecurity: true`, and `webviewTag: false`. Deny renderer navigation, redirects, popups, embedded webviews, and browser permissions in the app's dedicated `persist:edu-harness` session. Under [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), this persistent UI partition retains the non-sensitive renderer appearance preference; it does not grant browser permissions or change credential storage. The account service may open its internally constructed, origin/path-allowlisted authorization URL in the system browser. No generic external-link capability is exposed.
 
 Built HTML/assets are served through a registered secure standard custom protocol. The handler allows GET requests only and a small fixed asset-path shape under the built renderer directory. It does not turn renderer-provided paths into general filesystem access. Production CSP disallows inline scripts/styles, network connections, frames, objects, and form submission. Dev CSP permits Vite refresh scripts/styles and its exact loopback websocket. Packaged apps ignore the development renderer URL.
 

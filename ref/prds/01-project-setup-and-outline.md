@@ -9,7 +9,7 @@ Product context: [Education Harness overview](../../docs/overview.md).
 
 Extend the existing Electron desktop skeleton so a learner can connect their ChatGPT plan, open a folder as a learning project, choose its model, and generate a complete proposed learning outline from project material or a description. The outline and project metadata are saved in the project's root `.edu` folder and remain available after reopening the application.
 
-The interface should be beautiful, simple, and intuitive, with Codex-inspired project navigation and a spacious main workspace. Successful delivery requires real plan-backed inference and real saved project state.
+The interface should be beautiful, simple, and intuitive, with ChatGPT-inspired project navigation and a spacious main workspace. Successful delivery requires real plan-backed inference and real saved project state.
 
 ## Problem and starting point
 
@@ -205,7 +205,7 @@ For “Bayesian reasoning,” an acceptable outline might move through uncertain
 
 ### Visual direction
 
-Use the Codex-inspired direction adopted in [ADR-0007](../ADRs/ADR-0007-codex-inspired-design-and-ux.md). The [design system](../patterns-design-system.md) defines neutral surfaces, system sans-serif typography, semantic color/spacing tokens, compact navigation, and a spacious primary workspace. The [UX patterns](../patterns-ux.md) define input, navigation, progress, recovery, and keyboard/focus behavior. The existing warm/terracotta/serif demo is the implementation baseline to migrate; adoption of these standards does not mark this milestone implemented.
+Use the screenshot-led ChatGPT direction adopted in [ADR-0013](../ADRs/ADR-0013-chatgpt-inspired-appearance.md), amending [ADR-0007](../ADRs/ADR-0007-codex-inspired-design-and-ux.md). The [design system](../patterns-design-system.md) defines the tinted shell, slim rail, semantic Light/Dark surfaces, system typography, restrained purple accent and spacious workspace. The [UX patterns](../patterns-ux.md) govern input, navigation, recovery and focus. The user's subsequent UI scope authorizes Settings → Appearance with locally remembered Light/Dark choices. This presentation update does not change account/model availability, project storage or outline behavior. Runtime evidence and remaining product gates remain in the acceptance audit.
 
 The content plan is a simple dashboard, a project setup workspace, and a document-like outline view. The main area has one dominant task in each state. Avoid a dashboard-card mosaic, permanently visible technical inspectors, decorative metrics, and inactive controls for future functionality.
 

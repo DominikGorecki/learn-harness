@@ -1,6 +1,6 @@
 # ADR-0007: Codex-inspired learning workspace and focused design/UX patterns
 
-- Status: Accepted
+- Status: Accepted; palette, screenshot reference and theme scope amended by [ADR-0013](ADR-0013-chatgpt-inspired-appearance.md)
 - Date: 2026-10-04
 - Scope: adoption of documentation standards and design direction; renderer migration and new product capabilities are not implemented by this change.
 

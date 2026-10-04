@@ -1,14 +1,14 @@
 # Design system patterns
 
-Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Evidence and reference boundaries: [Codex desktop research](research/codex-desktop-ui.md).
+Governed by [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), which amends the palette and theme scope in [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Primary visual references: the user-supplied [light workspace](../docs/chatgpt-app-light.png) and [dark settings](../docs/chatgpt-app-dark.png). Interpretation and current evidence: [appearance review](research/chatgpt-app-appearance.md).
 
 **Status:** adopted visual standard, implemented in the project workspace and account panel. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
 
 ## Composition
 
-Use a quiet desktop workspace with neutral surfaces, system sans-serif type, compact navigation, and one spacious working area. The subject, current activity, and next action establish hierarchy. Brand identification stays compact in application chrome.
+Use a quiet desktop workspace with a slim outer icon rail, softly tinted project navigation, an inset primary surface, system sans-serif type, and generous working space. The subject, current activity, and next action establish hierarchy. Brand identification stays compact in application chrome.
 
-The shell contains navigation, a contextual header, the primary learning surface, and optional selected-item details. Start with two regions: navigation and workspace. Open a detail pane only for useful context such as a selected lesson's objectives or an outline's sources. Keep generic learning tips within the relevant activity rather than permanently occupying a third pane.
+The shell contains navigation, a contextual header, the primary learning surface, and optional selected-item details. The outer rail contains only working dashboard, folder and Settings actions; project navigation and workspace form the two main regions. At narrow widths the rail becomes a bottom strip and project navigation remains a drawer. Open a detail pane only for useful context such as a selected lesson's objectives or an outline's sources. Keep generic learning tips within the relevant activity rather than permanently occupying a third pane.
 
 Use rows, document sections, and disclosure for project/lesson lists. A bordered container should identify an input, interactive artifact, dialog, or a real group. Keep routine metadata quiet. Give each workspace state one primary action; account/model settings remain compact unless the learner is resolving them.
 
@@ -18,22 +18,24 @@ Use semantic CSS variables so components consume purpose-based values. Keep stat
 
 | Token role | Light target | Dark target | Purpose |
 | --- | --- | --- | --- |
-| `surface-canvas` | `#FFFFFF` | `#181818` | Main workspace |
-| `surface-navigation` | `#F5F5F5` | `#202020` | Sidebar |
-| `surface-raised` | `#FAFAFA` | `#262626` | Composer, menu, or panel |
-| `text-primary` | `#171717` | `#F5F5F5` | Main text and headings |
-| `text-secondary` | `#626262` | `#B0B0B0` | Supporting text |
-| `border-subtle` | `#E5E5E5` | `#3A3A3A` | Decorative separators |
-| `border-control` | `#808080` | `#808080` | Boundaries needed to recognize an input |
-| `surface-selected` | `#EAEAEA` | `#333333` | Current navigation row |
-| `accent` | `#1D4ED8` | `#60A5FA` | Focus, links, restrained selection emphasis |
-| `state-success` | `#166534` | `#86EFAC` | Confirmed successful result |
-| `state-warning` | `#92400E` | `#FCD34D` | Attention needed |
-| `state-error` | `#B91C1C` | `#FCA5A5` | Failure and corrective action |
+| `surface-shell` | `#EAF4F5` | `#1C2424` | Outer rail and window inset |
+| `surface-canvas` | `#FFFFFF` | `#181818` | Main workspace and dialogs |
+| `surface-navigation` | `#F5FAFB` | `#1B1E1E` | Project navigation |
+| `surface-raised` | `#F5F5F5` | `#232323` | Settings groups and feedback |
+| `text-primary` | `#222426` | `#F3F3F3` | Headings and learning text |
+| `text-secondary` | `#60656A` | `#B3B6B8` | Supporting text |
+| `text-muted` | `#656B71` | `#A1A5A8` | Quiet metadata |
+| `border-subtle` | `#E1E6E8` | `#343738` | Decorative separation |
+| `border-control` | `#858A90` | `#787D82` | Essential control boundaries |
+| `surface-selected` | `#E7EDEF` | `#303334` | Current navigation |
+| `accent` | `#7944CA` | `#B58AF8` | Focus, selected mode and small indicators |
+| `state-success` | `#22663B` | `#87DBA2` | Confirmed result |
+| `state-warning` | `#8A4B0D` | `#EFC17D` | Attention needed |
+| `state-error` | `#AD3030` | `#FFAAAA` | Failure and recovery |
 
-Primary buttons use `text-primary` as their fill and `surface-canvas` as their label color. Blue accents support orientation and focus; ordinary surfaces remain neutral. Use text and shape alongside state colors. A saved result, a completed activity, and a selected item have different meanings even when all appear positive.
+Primary buttons use `text-primary` as their fill and `surface-canvas` as their label color. Purple accents support orientation and focus; ordinary surfaces remain neutral. Use text and shape alongside state colors. A saved result, a completed activity, and a selected item have different meanings even when all appear positive.
 
-The first implementation can use the light target. Dark/system theme support and appearance settings require an explicit implementation slice. Documenting paired values does not authorize a custom-theme editor, imports, or theme sharing.
+Light and Dark are implemented through Settings → Appearance. Show visual previews with native radio semantics, apply changes immediately and remember the explicit choice on this device. With no saved choice, initialize from OS appearance; this is not a continuously following System mode. Themes cover every renderer surface, including account/recovery dialogs, selects and focus states. Custom palettes, theme import/export and font editing remain out of scope. Native window chrome follows the OS.
 
 ## Typography and spacing
 
@@ -49,9 +51,9 @@ Use the native system sans-serif stack for chrome, headings, and learning prose.
 
 Use sentence case. Essential information uses readable body text; small uppercase tracking is optional for a short section label. Long titles and learner text wrap. Metadata may truncate only when the full value remains available by keyboard-accessible disclosure or tooltip.
 
-Use a spacing scale of 4, 8, 12, 16, 24, 32, and 48 px. Default sidebar width is about 240 px, toolbar height about 48 px, and workspace inset 24–32 px. A reading/input column is normally 680–760 px wide, with wider outlines using available space. These are starting values; adapt to content and zoom rather than locking every screen to fixed dimensions.
+Use a spacing scale of 4, 8, 12, 16, 24, 32, and 48 px. Default outer rail width is 56 px, project sidebar width is 264 px (224 px at intermediate sizes), toolbar height about 53 px, and workspace inset 24–40 px. A reading/input column is normally 680–760 px wide, with wider outlines using available space. These are starting values; adapt to content and zoom rather than locking every screen to fixed dimensions.
 
-Use 6 px corners for rows, 8 px for buttons/inputs, and 12 px for menus/panels/composers. Keep borders thin and shadows light; reserve elevation for overlays or a surface whose separation affects use. Avoid decorating every content section with a card.
+Use 10 px corners for navigation rows, 12 px for ordinary buttons, 18–20 px for inset workspace/dialogs, and 24 px for the learning composer. Keep borders thin and shadows light; reserve elevation for overlays or a surface whose separation affects use. Avoid decorating every content section with a card.
 
 ## Component contracts
 
@@ -76,4 +78,4 @@ Hover/focus changes are about 100–150 ms; menu/disclosure/selection transition
 
 ## Review evidence
 
-Review actual desktop screenshots and interactions for empty, populated, pending, error, and completed states. Include the minimum supported window, 200% text zoom, keyboard operation, long titles/input, and reduced motion. Verify any implemented theme separately. Compare composition and behavior with the research reference, while keeping product identity and learning vocabulary ours.
+Review actual desktop screenshots and interactions for empty, populated, pending, error, and completed states. Include the minimum supported window, 200% text zoom, keyboard operation, long titles/input, and reduced motion. Verify any implemented theme separately. Compare composition and behavior with the supplied screenshots, while keeping product identity and learning vocabulary ours.
