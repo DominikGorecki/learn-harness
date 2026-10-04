@@ -17,7 +17,7 @@ export interface LearningOutline {
   additions: { topic: string; reason: string }[]; startingLessonId: string; lessons: OutlineLesson[]
 }
 export interface MaterialCoverage {
-  files: { path: string; status: 'read' | 'not-read' | 'unsupported' | 'unreadable' | 'too-large' | 'binary'; reason: string | null }[]
+  files: { path: string; status: 'read' | 'not-read' | 'unsupported' | 'unreadable' | 'too-large' | 'binary' | 'excluded'; reason: string | null }[]
   limitations: string[]
 }
 
@@ -73,7 +73,7 @@ export function parseOutline(value: unknown): LearningOutline {
 export function parseCoverage(value: unknown): MaterialCoverage {
   const data = strictRecord(value, ['files', 'limitations'])
   if (!Array.isArray(data.files) || data.files.length > 1000) throw new ApplicationError('INVALID_INPUT', 'The material coverage is invalid.')
-  const allowed = ['read', 'not-read', 'unsupported', 'unreadable', 'too-large', 'binary']
+  const allowed = ['read', 'not-read', 'unsupported', 'unreadable', 'too-large', 'binary', 'excluded']
   return {
     files: data.files.map(value => {
       const file = strictRecord(value, ['path', 'status', 'reason'])

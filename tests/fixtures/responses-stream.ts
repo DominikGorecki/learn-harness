@@ -1,11 +1,13 @@
 import type { ServerResponse } from 'node:http'
+let responseNumber = 0
 
 export function writeToolResponse(response: ServerResponse, options: {
   name?: string; args: unknown; terminal?: 'completed' | 'incomplete' | 'failed' | 'missing'; code?: string; namespace?: string
 }) {
   response.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' })
   const event = (type: string, data: Record<string, unknown>) => response.write(`event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`)
-  const item = { type: 'function_call', id: 'fc_fixture', call_id: 'call_fixture', name: options.name ?? 'submit_outline',
+  const number = ++responseNumber
+  const item = { type: 'function_call', id: `fc_fixture_${number}`, call_id: `call_fixture_${number}`, name: options.name ?? 'submit_outline',
     namespace: options.namespace ?? 'learning', arguments: JSON.stringify(options.args), status: 'completed' }
   event('response.created', { response: { id: 'resp_fixture', status: 'in_progress', output: [] } })
   event('response.output_item.added', { output_index: 0, item: { ...item, arguments: '', status: 'in_progress' } })

@@ -2,7 +2,7 @@
 
 A basic desktop learning workspace for Windows, macOS, and Linux, built with Electron, React, and TypeScript. The Node.js backend runs inside Electron main. The interface pairs compact project navigation with a spacious workspace inspired by Codex.
 
-The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. Description-to-outline generation uses the Pi harness in a dedicated utility process, with validated saves, cancellation, and retryable save failures. Folder-material understanding is the next slice under PRD 01.
+The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. Description-to-outline generation uses the Pi harness in a dedicated utility process, with validated saves, cancellation, and retryable save failures. Outlines can begin with a written topic, supported folder material, or both. Scoped text/Markdown reads, source coverage, and clarification are implemented; live/native acceptance remains in progress.
 
 Use **Connect ChatGPT** to connect an eligible account. Credentials use protected operating-system storage where available; otherwise the account panel explains that the connection lasts only for the app session. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 

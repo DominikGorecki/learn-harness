@@ -1,6 +1,6 @@
 # Ticket: project-setup-and-outline.T04 — Understand folder material and fill learning gaps
 
-Status: Open
+Status: Implemented and locally validated
 
 ## Source
 
@@ -36,11 +36,11 @@ Bounded nested text/Markdown inventory; excluded/unsupported/unreadable coverage
 
 ## Acceptance criteria
 
-- [ ] A relevant folder produces an outline without requiring a written brief and includes reasoned missing foundations.
-- [ ] No content is sent on ordinary folder opening; only bounded permitted content is available to the generation run.
-- [ ] Coverage describes what was and was not inspected; generated source references are verified against actual reads.
-- [ ] Ambiguous/unsupported material returns a useful input request rather than a fabricated confident subject.
-- [ ] Original source files remain unchanged.
+- [x] A relevant folder produces an outline without requiring a written brief and includes reasoned missing foundations.
+- [x] No content is sent on ordinary folder opening; only bounded permitted content is available to the generation run.
+- [x] Coverage describes what was and was not inspected; generated source references are verified against actual reads.
+- [x] Ambiguous/unsupported material returns a useful input request rather than a fabricated confident subject.
+- [x] Original source files remain unchanged.
 
 ## Traceability
 
@@ -48,4 +48,4 @@ INPUT-03 through INPUT-10; OUTLINE-02, OUTLINE-04; AC-06, AC-07, AC-08 and mater
 
 ## Completion evidence
 
-Pending implementation. Keep this section current with commits, validation, and any external verification still required.
+Implemented bounded read-only snapshots, Pi list/read tools, actual-read source validation, source coverage, separate inferred briefs, and details requests for unsupported/ambiguous material. Unit tests and real Electron signed HTTP/SSE journeys cover scope, source preservation, content-only creation, explicit goal transmission, and recovery. See [validation](validation.md). Semantic curriculum quality remains a live-provider T06 evaluation.

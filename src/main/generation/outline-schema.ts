@@ -2,7 +2,7 @@ import { Type } from '@earendil-works/pi-ai'
 import { learningMethods } from '../../shared/outline'
 
 const text = (maxLength: number) => Type.String({ minLength: 1, maxLength })
-const id = Type.String({ minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9_-]+$' })
+const id = Type.String({ minLength: 1, maxLength: 100, pattern: '^[A-Za-z0-9][A-Za-z0-9_-]*$' })
 const texts = (maxItems: number, maxLength: number, minItems = 0) => Type.Array(text(maxLength), { minItems, maxItems })
 const module = Type.Object({
   id, title: text(240), purpose: text(3000), method: Type.Union(learningMethods.map(method => Type.Literal(method))), task: text(5000)

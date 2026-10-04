@@ -39,12 +39,12 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     expect(fixture.inferenceRequests[0]!.model).toBe('fixture-model-fast')
     const original = (await saved()).outline
     expect(original?.document.lessons).toHaveLength(2)
-    expect(original?.coverage.files).toEqual([])
+    expect(original?.coverage.files.filter(file => file.status === 'read')).toEqual([])
     await page.getByRole('main').evaluate(element => { element.scrollTop = 0 })
-    await page.screenshot({ path: testInfo.outputPath('outline-overview.png') })
+    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('outline-overview.png') })
     await page.locator('.lesson-disclosure').first().locator('summary').click()
     await expect(page.getByRole('heading', { name: 'A forecast before the data' })).toBeVisible()
-    await page.screenshot({ path: testInfo.outputPath('generated-outline.png'), fullPage: true })
+    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('generated-outline.png'), fullPage: true })
 
     fixture.options.inferenceMode = 'hold'
     await page.getByRole('button', { name: 'Refine learning direction' }).click()

@@ -4,18 +4,18 @@ import type { AccountSnapshot } from '../../../../shared/account'
 import { Icon } from '../../components/Icon'
 import { ProjectModel } from './ProjectModel'
 
-export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate, onSave, onModel, onConnect, canCreate, refining = false }: {
-  project: ProjectSnapshot; account: AccountSnapshot | null; draft: string; busy: boolean; canCreate: boolean; refining?: boolean;
+export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate, onSave, onModel, onConnect, canCreate, refining = false, needsDetails = false }: {
+  project: ProjectSnapshot; account: AccountSnapshot | null; draft: string; busy: boolean; canCreate: boolean; refining?: boolean; needsDetails?: boolean;
   onDraft(value: string): void; onCreate(): void; onSave(): void; onModel(id: string): void; onConnect(): void
 }) {
   const saved = project.revision > 0 && draft.trim() === project.brief && Boolean(project.brief)
   return <section className="project-setup workspace-enter" aria-labelledby="project-heading">
     <div className="project-setup-intro"><span className="subject-emblem"><Icon name="spark" size={24} /></span>
       <p className="eyebrow">{refining ? 'Refine your direction' : 'Learning project'}</p><h1 id="project-heading" tabIndex={-1}>{refining ? 'Where should your learning go next?' : 'What would you like to learn?'}</h1>
-      <p>{project.sourceHint === 'files' ? 'Your project already has material to explore. Add a direction, or a question you want to understand.' : 'A topic, a question, or a bigger ambition. Start with as much or as little as you like.'}</p>
+      <p>{needsDetails ? 'Add a little direction to help shape your outline. A short description is enough.' : project.sourceHint === 'files' ? 'Start with the material in this folder. Add a direction if you have one, or let your notes shape the learning path.' : 'A topic, a question, or a bigger ambition. Start with as much or as little as you like.'}</p>
     </div>
     <form className="learning-composer" onSubmit={event => { event.preventDefault(); onCreate() }}>
-      <label htmlFor="learning-details">Your learning goal</label>
+      <label htmlFor="learning-details">Your learning goal{project.sourceHint === 'files' && !needsDetails ? ' (optional)' : ''}</label>
       <textarea id="learning-details" value={draft} onChange={event => onDraft(event.target.value)}
         maxLength={maximumBriefLength} rows={5} placeholder="I want to understand…" disabled={busy}
         onKeyDown={event => {
@@ -33,7 +33,7 @@ export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate,
     </div>
     {!draft.trim() && <div className="topic-suggestions"><span>For example</span>{['Bayesian reasoning', 'How cities work', 'The science of sleep'].map(topic =>
       <button key={topic} onClick={() => onDraft(topic)} disabled={busy}>{topic}<Icon name="arrow" size={12} /></button>)}</div>}
-    <p className="generation-disclosure">Creating an outline sends your learning description to ChatGPT and uses your included plan allowance. We’ll fill in foundations and suggest a path through the subject.</p>
+    <p className="generation-disclosure">{project.sourceHint === 'files' ? 'Creating an outline lets ChatGPT read relevant text and Markdown from this folder, along with your direction. Other formats and sensitive or hidden files are skipped.' : 'Creating an outline sends your learning description to ChatGPT.'} This uses your included plan allowance. We’ll fill in foundations and suggest a path through the subject.</p>
     <details className="project-folder"><summary><Icon name="folder" size={15} />Project folder<Icon name="down" size={12} /></summary><p>{project.folderPath}</p></details>
   </section>
 }

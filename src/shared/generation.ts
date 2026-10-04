@@ -1,16 +1,16 @@
 import type { ApiResult, ErrorCode } from './contracts'
 import type { SavedOutline } from './workspace'
-import type { LearningOutline } from './outline'
+import type { LearningOutline, MaterialCoverage } from './outline'
 import { maximumBriefLength } from './workspace'
 import { boundedText, identifier, strictRecord } from './validation'
 import { ApplicationError } from './contracts'
 
-export type GenerationStatus = 'preparing' | 'planning' | 'validating' | 'saving' | 'saved' | 'needs-details' | 'cancelled' | 'failed' | 'unsaved'
-export type OutlineEngineResult = { kind: 'outline'; document: LearningOutline } | { kind: 'needs-details'; question: string; reason: string }
-export type EnginePhase = 'planning' | 'validating'
+export type GenerationStatus = 'preparing' | 'examining' | 'planning' | 'validating' | 'saving' | 'saved' | 'needs-details' | 'cancelled' | 'failed' | 'unsaved'
+export type OutlineEngineResult = ({ kind: 'outline'; document: LearningOutline } | { kind: 'needs-details'; question: string; reason: string }) & { coverage?: MaterialCoverage }
+export type EnginePhase = 'examining' | 'planning' | 'validating'
 export interface OutlineRun {
   id: string; projectId: string; status: GenerationStatus; brief: string; modelId: string;
-  message: string; errorCode: ErrorCode | null; result: SavedOutline | null; question: string | null
+  message: string; errorCode: ErrorCode | null; result: SavedOutline | null; question: string | null; coverage: MaterialCoverage | null
 }
 export interface GenerationSnapshot { runs: OutlineRun[]; activeRunId: string | null }
 export interface StartOutlineRequest { projectId: string; brief: string; modelId: string; replace: boolean }
@@ -34,5 +34,5 @@ export function parseRunRequest(value: unknown): RunRequest {
   return { projectId: identifier(data.projectId), runId: identifier(data.runId) }
 }
 export function runIsBusy(run: OutlineRun | null | undefined): boolean {
-  return Boolean(run && ['preparing', 'planning', 'validating', 'saving'].includes(run.status))
+  return Boolean(run && ['preparing', 'examining', 'planning', 'validating', 'saving'].includes(run.status))
 }

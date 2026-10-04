@@ -27,6 +27,7 @@ export function OutlineView({ saved, unsaved = false }: { saved: SavedOutline; u
       {outline.additions.length > 0 && <details><summary>Connections and gaps to explore<Icon name="down" size={14} /></summary>{outline.additions.map((addition, index) => <div className="added-topic" key={index}><strong>{addition.topic}</strong><p>{addition.reason}</p></div>)}</details>}
       <details><summary>{sources.length ? 'Project material and coverage' : 'How this outline was shaped'}<Icon name="down" size={14} /></summary>
         {saved.brief && <p><strong>Your direction</strong> {saved.brief}</p>}
+        {saved.inferredBrief && <p><strong>Suggested direction from your material</strong> {saved.inferredBrief}</p>}
         <p>Created with {saved.model.name} on {new Date(saved.generatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}.</p>
         {saved.coverage.files.length > 0 && <ul className="coverage-list">{saved.coverage.files.map((file, index) => <li key={index}><span>{file.path}</span><span>{file.status === 'read' ? 'Read' : file.reason ?? 'Not used'}</span></li>)}</ul>}
         {saved.coverage.limitations.length > 0 && <ul className="plain-list">{saved.coverage.limitations.map((limit, index) => <li key={index}>{limit}</li>)}</ul>}

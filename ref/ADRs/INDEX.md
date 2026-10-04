@@ -17,4 +17,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0010](ADR-0010-bounded-pi-outline-generation.md) | Accepted | Bounded Pi generation, utility isolation, project-owned results and save recovery | Changing generation, worker lifecycle, inference transport, or result acceptance |
 
+| [ADR-0011](ADR-0011-scoped-material-understanding.md) | Accepted | Bounded material snapshots, educational read tools, verified coverage and clarification | Changing source formats, file scope, material transmission, or source claims |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

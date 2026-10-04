@@ -10,6 +10,10 @@ export function GenerationStatus({ run, onCancel, onSave, onConnect }: { run: Ou
     <span className={busy ? 'progress-orbit' : 'generation-status-icon'}>{!busy && <Icon name={run.status === 'needs-details' ? 'spark' : 'info'} size={17} />}</span>
     <div><p>{run.question ?? run.message}</p>{run.question && <p className="generation-detail">{run.message}</p>}
       {run.status === 'unsaved' && <p className="generation-detail">Keep this window open until the outline is saved.</p>}
+      {run.status === 'needs-details' && Boolean(run.coverage?.files.length) && <details className="clarification-coverage"><summary>Material considered</summary>
+        <ul>{run.coverage!.files.map(file => <li key={file.path}><span>{file.path}</span> — {file.status === 'read' ? 'Read' : file.reason ?? 'Not read'}</li>)}</ul>
+        {run.coverage!.limitations.map((limit, index) => <p className="generation-detail" key={index}>{limit}</p>)}
+      </details>}
       {needsAccount && <button className="quiet-button" onClick={onConnect}>Review ChatGPT connection<Icon name="arrow" size={14} /></button>}
     </div>
     {busy && run.status !== 'saving' && <button className="quiet-button" onClick={onCancel}>Cancel</button>}

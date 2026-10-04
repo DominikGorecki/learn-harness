@@ -176,7 +176,8 @@ export function App() {
             {displayedOutline && !generationBusy && !generatedUnsaved && <div className="outline-toolbar"><button className="quiet-button" onClick={() => setRefining(previous => ({ ...previous, [project.id]: isRefining ? null : project.outline!.generatedAt }))}>
               <Icon name={isRefining ? 'close' : 'refresh'} size={14} />{isRefining ? 'Back to outline' : 'Refine learning direction'}</button></div>}
             {(!displayedOutline || isRefining) && <ProjectSetup project={project} account={account.snapshot} draft={draft} busy={workspace.busy || generationBusy} refining={Boolean(project.outline)}
-              canCreate={project.writable && Boolean(draft.trim()) && !anyGenerationBusy && !currentModelUnavailable}
+              needsDetails={outlineRun?.status === 'needs-details'}
+              canCreate={project.writable && (Boolean(draft.trim()) || (project.sourceHint === 'files' && outlineRun?.status !== 'needs-details')) && !anyGenerationBusy && !currentModelUnavailable}
               onDraft={value => setDrafts(previous => ({ ...previous, [project.id]: value }))}
               onCreate={() => createOutline()}
               onSave={() => void run(api => api.saveProjectBrief({ projectId: project.id, brief: draft }))}

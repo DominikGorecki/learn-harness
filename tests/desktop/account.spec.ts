@@ -28,7 +28,7 @@ test('account panel completes signed OAuth, loads models, and signs out through 
     const state = await page.evaluate(async () => (globalThis as unknown as { learning: AccountApi }).learning.getAccount())
     expect(JSON.stringify(state)).not.toContain('fixture-access')
     expect(JSON.stringify(state)).not.toContain('fixture-refresh')
-    await page.screenshot({ path: testInfo.outputPath('account-protocol-fixture.png') })
+    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('account-protocol-fixture.png') })
     await page.getByRole('button', { name: 'Sign out of this app' }).click()
     await expect(page.getByRole('button', { name: 'Continue with ChatGPT' })).toBeVisible()
     expect(fixture.revoked()).toBe(1)

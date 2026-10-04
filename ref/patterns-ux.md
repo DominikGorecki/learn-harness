@@ -2,7 +2,7 @@
 
 Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Pair with [design system](patterns-design-system.md) for appearance and [renderer](patterns-renderer.md) for implementation.
 
-**Status:** adopted interaction rules. Current runtime capabilities remain those in [learning/data](patterns-learning-data.md). Project setup is implemented; outline creation is remaining milestone behavior in [PRD 01](prds/01-project-setup-and-outline.md); richer Socratic activities remain product direction in [the overview](../docs/overview.md).
+**Status:** adopted interaction rules. Current runtime capabilities remain those in [learning/data](patterns-learning-data.md). Project setup and outline creation are implemented; acceptance evidence is tracked for milestone behavior in [PRD 01](prds/01-project-setup-and-outline.md); richer Socratic activities remain product direction in [the overview](../docs/overview.md).
 
 ## Orientation and progressive disclosure
 
@@ -29,8 +29,8 @@ Compact context controls contain only decisions that affect the action. The draf
 | Home/navigation | Persistent project rows, native folder selection, dashboard | Project rows, clear empty state, and Open project; preserve the selected workspace. |
 | Main input | Large project-specific learning-goal draft | Topic/intent input for project outlines; show which material informs the request. |
 | Activity | No lesson-delivery activity in this milestone | Explain the activity, ask for useful learner work, and keep feedback connected to that work. |
-| Results | Rendering for persisted validated outline documents | A readable outline with ordered lessons, objectives, and module plans; selected-item details through disclosure. |
-| Account/model | ChatGPT connection, permission/recovery states, and account model discovery | Project model selection is implemented; browsing saved content remains usable without inference access. |
+| Results | Generated, validated and saved outline documents with coverage | A readable outline with ordered lessons, objectives, and module plans; selected-item details through disclosure. |
+| Account/model | ChatGPT connection, permission/recovery states, account model discovery and project preference | Project model selection is implemented; browsing saved content remains usable without inference access. |
 | Saved project state | Portable `.edu` metadata and profile recent-project registry | Distinguish generation from a confirmed `.edu` save and preserve the last saved outline during regeneration. |
 
 A documented target does not justify placeholder connected states, dummy saved indicators, inactive future toolbars, or a simulated tutor presented as working AI.

@@ -2,6 +2,8 @@ import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
 import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, StartOutlineRequest } from '../../shared/generation'
 import { parseSavedOutline } from '../../shared/workspace'
+import { parseCoverage } from '../../shared/outline'
+import { boundedText } from '../../shared/validation'
 import type { WorkspaceService } from '../workspace/service'
 
 export class GenerationService {
@@ -20,13 +22,12 @@ export class GenerationService {
   private update(run: OutlineRun, values: Partial<OutlineRun>): void { Object.assign(run, values); this.emit() }
   start(request: StartOutlineRequest): GenerationSnapshot {
     if (this.active) throw new ApplicationError('BUSY', 'An outline is already being created. Finish or cancel it before starting another.')
-    if (!request.brief.trim()) throw new ApplicationError('INVALID_INPUT', 'Add a topic or a question to start your outline.')
     if (!this.options.workspace.get().projects.some(project => project.id === request.projectId)) throw new ApplicationError('NOT_FOUND', 'Open this project before creating an outline.')
     const previous = this.runs.get(request.projectId)
     if (previous?.status === 'unsaved' && !request.replace) throw new ApplicationError('CONFLICT', 'Save your generated outline or confirm replacing it before starting again.')
     const controller = new AbortController()
     const run: OutlineRun = { id: this.options.createId(), projectId: request.projectId, brief: request.brief, modelId: request.modelId,
-      status: 'preparing', message: 'Preparing your learning project…', errorCode: null, result: null, question: null }
+      status: 'preparing', message: 'Preparing your learning project…', errorCode: null, result: null, question: null, coverage: null }
     this.runs.set(request.projectId, run)
     this.contexts.delete(request.projectId)
     this.active = { id: run.id, controller }
@@ -43,15 +44,19 @@ export class GenerationService {
       this.contexts.set(run.projectId, { digest: context.digest })
       signal.throwIfAborted()
       const outcome = await this.options.generate({ model: context.model, brief: request.brief, path: context.path }, signal, phase => {
-        if (!signal.aborted && this.active?.id === run.id) this.update(run, { status: phase, message: phase === 'planning' ? 'Building your learning outline…' : 'Checking the lessons and module plans…' })
+        if (!signal.aborted && this.active?.id === run.id) this.update(run, { status: phase, message: phase === 'examining' ? 'Exploring your project material…' : phase === 'planning' ? 'Building your learning outline…' : 'Checking the lessons and module plans…' })
       })
       signal.throwIfAborted()
+      const coverage = parseCoverage(outcome.coverage ?? { files: [], limitations: ['This outline was created from your learning description. No project files were read.'] })
+      this.update(run, { coverage })
       if (outcome.kind === 'needs-details') {
-        this.update(run, { status: 'needs-details', message: outcome.reason, question: outcome.question })
+        this.update(run, { status: 'needs-details', message: boundedText(outcome.reason, 'Reason', 2000), question: boundedText(outcome.question, 'Question', 2000) })
         return
       }
       const result = parseSavedOutline({ generatedAt: this.options.now(), model: context.model, brief: request.brief, document: outcome.document,
-        coverage: { files: [], limitations: ['This outline was created from your learning description. No project files were read.'] } })
+        inferredBrief: request.brief.trim() ? null : `${outcome.document.title}: ${outcome.document.scope}`, coverage })
+      const sources = new Set(coverage.files.filter(file => file.status === 'read').map(file => file.path))
+      if (result.document.lessons.some(lesson => lesson.sources.some(path => !sources.has(path)))) throw new ApplicationError('INVALID_INPUT', 'The outline refers to material that was not read. Please try again.')
       this.update(run, { status: 'saving', message: 'Saving your outline…', result })
       try {
         await this.options.workspace.saveOutline(run.projectId, result, context.digest)

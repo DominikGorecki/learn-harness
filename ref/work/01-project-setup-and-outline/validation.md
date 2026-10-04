@@ -17,7 +17,7 @@
 | T01 | Locally validated | Signed OAuth fixture, credential/model lifecycle, account IPC and desktop panel |
 | T02 | Locally validated | Atomic project storage, native folder IPC, responsive workspace, restart/relink desktop journey |
 | T03 | Locally validated | Actual Pi transport and utility-process desktop journey, saved outline, cancellation/recovery |
-| T04 | Open | Material understanding pending |
+| T04 | Locally validated | Bounded text/Markdown snapshot, actual Pi material tools, source evidence, desktop clarification |
 | T05 | Open | Integrated recovery and interaction review pending |
 | T06 | Open | Full acceptance and native/live evidence pending |
 
@@ -74,3 +74,12 @@ Pending implementation. Audit every PRD requirement and AC-01 through AC-14 agai
 - Linux x64 unpacked packaging passed using the installed Electron distribution: `ELECTRON_BUILDER_CACHE=/tmp/edu-harness-builder-cache npx electron-builder --dir --publish never -c.electronDist=node_modules/electron/dist`. The ordinary package command reached packaging but could not write the environment’s read-only default Electron download cache. The local-distribution override avoids that environment constraint without changing app configuration.
 - Inspected `app.asar`: main, outline worker, Pi Agent Core, and Pi Responses adapter are included; Electron fuses were applied. This establishes package assembly, not live inference or installer acceptance.
 - Retained a visually reviewed outline screenshot at `ref/research/assets/outline-workspace.png`, explicitly labelled as test-provider content in README.
+
+## T04 — material understanding
+
+- Added bounded, read-only UTF-8 text/Markdown snapshots in the utility process. Scope checks, no-follow file opens, file identity checks, hidden/secret/instruction/build exclusions, and entry/depth/file/byte budgets constrain access.
+- Pi receives a permitted inventory and read tool; only successfully read snapshot paths can appear as lesson sources. Core independently validates saved coverage/source relationships. Source files remain unchanged.
+- Folder-only projects can infer direction; the saved result distinguishes inferred scope from a written learner brief. Unsupported-only folders request details without inference; ambiguous material can ask one question and preserve the composer.
+- `npm run check`: passed with 121 tests, lint, type scopes, and production build. Material tests include nested text, exclusions, symlinks, unsupported/binary/oversize data, unreadable file permissions, traversal limits, cancelled scans, rejected path escapes, and actual-read citations.
+- Four real Electron journeys pass, including folder-only generation through actual Pi list/read/submit calls, coverage rendering, clarification followed by explicit direction, and unsupported-only recovery with no inference request. Automated fixture output does not prove live curriculum quality or semantic topic inference.
+- Reviewed material setup, coverage and unsupported recovery screenshots. Snapshot capture disables finite animations so evidence represents the settled interface. The clarification state now requires input and updates its label/instructions accordingly.

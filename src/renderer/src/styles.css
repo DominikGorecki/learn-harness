@@ -135,7 +135,11 @@ svg.icon { display: inline-block; flex-shrink: 0; vertical-align: middle; }
 .generation-status p { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
 .generation-status .generation-detail { margin-top: 5px; font-size: 12px; color: var(--text-secondary); }
 .generation-status-icon { margin-top: 2px; color: var(--text-secondary); }
+.clarification-coverage { margin-top: 12px; font-size: 12px; color: var(--text-secondary); }
+.clarification-coverage summary { cursor: pointer; }
+.clarification-coverage ul { padding-left: 16px; line-height: 1.7; overflow-wrap: anywhere; }
 .generation-status.needs-attention { border-color: #e6d5bd; }
+.generation-status + .project-setup { padding-top: 32px; }
 .progress-orbit { width: 16px; height: 16px; margin-top: 3px; border: 2px solid #d4d4d4; border-top-color: #525252; border-radius: 50%; animation: progress-turn 1s linear infinite; flex-shrink: 0; }
 @keyframes progress-turn { to { transform: rotate(360deg); } }
 .outline-toolbar { display: flex; justify-content: flex-end; max-width: 820px; margin: 20px auto 0; padding: 0 40px; }

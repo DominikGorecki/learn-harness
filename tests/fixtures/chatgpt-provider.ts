@@ -22,7 +22,7 @@ export interface ProviderFixtureOptions {
   subject?: string
   failModels?: number
   failRefresh?: boolean
-  inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify'
+  inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
 
 export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) {
@@ -100,10 +100,28 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
       if (url.pathname === '/revoke') { revoked++; response.writeHead(200); response.end(); return }
       if (url.pathname === '/v1/responses') {
         if (!request.headers.authorization?.startsWith('Bearer fixture-')) { json(response, 401, { error: 'invalid_token' }); return }
-        inferenceRequests.push(JSON.parse(await body(request)) as Record<string, unknown>)
+        const payload = JSON.parse(await body(request)) as Record<string, unknown>
+        inferenceRequests.push(payload)
         if (options.inferenceMode === 'hold') { response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
         if (options.inferenceMode === 'clarify') {
           writeToolResponse(response, { name: 'request_learning_details', args: { question: 'Which subject would you like to explore?', reason: 'The material does not point to one subject yet.' } }); return
+        }
+        if (options.inferenceMode === 'materials' || options.inferenceMode === 'materials-clarify') {
+          const input = payload.input as { type: string; name?: string; arguments?: string; output?: string }[]
+          const calls = input.filter(item => item.type === 'function_call')
+          if (!calls.some(call => call.name === 'list_materials')) { writeToolResponse(response, { name: 'list_materials', args: {} }); return }
+          const read = calls.find(call => call.name === 'read_material')
+          if (!read) {
+            const output = input.find(item => item.type === 'function_call_output')!
+            const materials = JSON.parse(output.output!) as { path: string }[]
+            writeToolResponse(response, { name: 'read_material', args: { path: materials[0]!.path } }); return
+          }
+          if (options.inferenceMode === 'materials-clarify') {
+            writeToolResponse(response, { name: 'request_learning_details', args: { question: 'Would you like to focus on probability or city planning?', reason: 'Your notes include two distinct subjects.' } }); return
+          }
+          const outline = learningOutline()
+          outline.lessons[0]!.sources = [(JSON.parse(read.arguments!) as { path: string }).path]
+          writeToolResponse(response, { args: outline }); return
         }
         writeToolResponse(response, { args: learningOutline(), terminal: options.inferenceMode === 'incomplete' ? 'incomplete' : options.inferenceMode === 'usage-limit' ? 'failed' : 'completed' })
         return

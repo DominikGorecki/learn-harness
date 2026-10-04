@@ -157,6 +157,7 @@ export class WorkspaceService {
       const entry = this.entry(id)
       const loaded = await this.options.storage.load(entry.path)
       if (!loaded.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Choose a writable folder before creating an outline.')
+      if (!brief.trim() && loaded.sourceHint === 'empty') throw new ApplicationError('INVALID_INPUT', 'Add a topic or a question to start your outline.')
       const cached = this.loaded.get(id)
       if (cached && cached.digest !== loaded.digest) throw new ApplicationError('CONFLICT', 'This project changed outside the app. Reopen it before creating an outline.')
       if (loaded.document?.outline && !replace) throw new ApplicationError('CONFLICT', 'Confirm replacement before creating another outline.')

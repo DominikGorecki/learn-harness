@@ -6,7 +6,7 @@ import type { LearningOutline, MaterialCoverage } from './outline'
 import { boundedText, identifier, strictRecord, timestamp } from './validation'
 
 export const maximumBriefLength = 32_000
-export interface SavedOutline { generatedAt: string; model: ModelChoice; brief: string; document: LearningOutline; coverage: MaterialCoverage }
+export interface SavedOutline { generatedAt: string; model: ModelChoice; brief: string; inferredBrief: string | null; document: LearningOutline; coverage: MaterialCoverage }
 export interface ProjectDocument {
   version: 1; projectId: string; revision: number; name: string; createdAt: string; updatedAt: string;
   selectedModel: ModelChoice | null; brief: string; outline: SavedOutline | null
@@ -55,8 +55,9 @@ export function parseModelChoice(value: unknown): ModelChoice {
   return { id: boundedText(data.id, 'Model identifier', 128), name: boundedText(data.name, 'Model name', 160) }
 }
 export function parseSavedOutline(value: unknown): SavedOutline {
-  const data = strictRecord(value, ['generatedAt', 'model', 'brief', 'document', 'coverage'])
+  const data = strictRecord(value, ['generatedAt', 'model', 'brief', 'inferredBrief', 'document', 'coverage'])
   return { generatedAt: timestamp(data.generatedAt), model: parseModelChoice(data.model), brief: boundedText(data.brief, 'Learning details', maximumBriefLength, true),
+    inferredBrief: data.inferredBrief === undefined || data.inferredBrief === null ? null : boundedText(data.inferredBrief, 'Inferred learning direction', 10_500),
     document: parseOutline(data.document), coverage: parseCoverage(data.coverage) }
 }
 export function parseProjectDocument(value: unknown): ProjectDocument {
