@@ -1,18 +1,18 @@
 # Learning Studio
 
-A basic desktop learning workspace for Windows, macOS, and Linux, built with Electron, React, and TypeScript. The Node.js backend runs inside Electron main. The interface has a sidebar, a central learning session, and a context panel inspired by task-oriented desktop workspaces.
+A basic desktop learning workspace for Windows, macOS, and Linux, built with Electron, React, and TypeScript. The Node.js backend runs inside Electron main. The interface pairs compact project navigation with a spacious workspace inspired by Codex.
 
-The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. It also retains three demo lessons with deterministic practice feedback; demo progress resets when the application quits. Project folders and AI-generated outlines are being implemented under PRD 01.
+The working slice includes a ChatGPT account panel with browser sign-in, verified identity, plan-usage permission, model discovery, and sign-out. Native folder projects, portable learning goals, separate model preferences, and missing-folder recovery are implemented. AI-generated outlines are the next slice under PRD 01.
 
 Use **Connect ChatGPT** to connect an eligible account. Credentials use protected operating-system storage where available; otherwise the account panel explains that the connection lasts only for the app session. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 
-![Learning Studio workspace](ref/research/assets/workspace.png)
+![Learning Studio project workspace](ref/research/assets/project-workspace.png)
 
 ## Product direction
 
 The [product overview](docs/overview.md) describes the education harness and its Socratic learning approach. The [first milestone PRD](ref/prds/01-project-setup-and-outline.md) defines functional ChatGPT plan access, folder-based projects, model selection, and saved AI-generated outlines. These documents describe planned behavior; the working slice above remains the current implementation.
 
-Future UI changes follow the Codex-inspired [design system](ref/patterns-design-system.md) and [UX patterns](ref/patterns-ux.md), supported by [current official-reference research](ref/research/codex-desktop-ui.md). This documentation update adopts the direction; the screenshot and running demo still show the initial appearance.
+Future UI changes follow the Codex-inspired [design system](ref/patterns-design-system.md) and [UX patterns](ref/patterns-ux.md), supported by [current official-reference research](ref/research/codex-desktop-ui.md). The workspace now implements this direction; full milestone evidence is tracked in the [implementation validation record](ref/work/01-project-setup-and-outline/validation.md).
 
 ## Run locally
 
@@ -57,7 +57,8 @@ On headless Linux, run desktop tests with `xvfb-run -a npm run test:desktop`; El
 ```text
 src/
   main/                 Electron lifecycle and Node backend composition
-    adapters/           Session repository implementation
+    auth/               Protected ChatGPT account and provider adapters
+    storage/            Atomic project and profile persistence
     ipc/                Authorized request handlers
     security/           CSP, trusted-origin policy, local asset protocol
   preload/              Small typed contextBridge capability API
@@ -66,9 +67,10 @@ src/
     src/
       app/              Workbench and navigation
       components/       Shared visual pieces
-      features/learning/ Goal and lesson/practice views
+      features/projects/ Dashboard, setup, and outline views
+      features/account/  Account connection panel
       lib/              Typed bridge result handling
-  core/learning/        Platform-independent courses and application service
+  core/workspace/       Platform-independent project service and storage ports
   shared/               DTOs, channels, errors, runtime request parsers
 tests/
   unit/                 Core behavior and boundary policy
@@ -89,8 +91,9 @@ The layout follows electron-vite's process directories. Core and shared are smal
 flowchart LR
   React[React UI] --> Preload[Typed preload API]
   Preload --> Main[Main IPC authorization and validation]
-  Main --> Service[Learning service]
-  Service --> Repository[In-memory repository]
+  Main --> Service[Workspace service]
+  Service --> Repository[Project files and profile registry]
+  Main --> Account[Protected account service]
 ```
 
 Use [AGENTS.md](AGENTS.md) for progressive discovery, [patterns](ref/patterns.md) for current rules, [ADRs](ref/ADRs/INDEX.md) for rationale, and the [research brief](ref/research/electron-learning-app.md) for primary sources and alternatives. The [validation record](ref/research/validation.md) distinguishes actual local results from configured platform targets.
@@ -109,4 +112,4 @@ These commands never publish. The included GitHub Actions workflow checks and pa
 
 ## Extend the skeleton
 
-Add learning behavior to core, define a serializable request/result in shared, expose one preload method, authorize/validate it in main, then implement its renderer state. A repository port already separates session behavior from storage. Introduce persistence or an AI adapter through that boundary when requirements are defined. Expensive parsing, indexing, or inference belongs in workers/utility processes rather than blocking Electron main.
+Add learning behavior to core, define a serializable request/result in shared, expose one preload method, authorize/validate it in main, then implement its renderer state. Async ports separate workspace behavior from project files and the profile registry. Add AI access through a privileged adapter with explicit submission and bounded lifecycle. Expensive parsing, indexing, or inference belongs in workers/utility processes rather than blocking Electron main.

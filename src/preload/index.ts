@@ -1,14 +1,10 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import { channels } from '../shared/contracts'
-import type { LearningApi } from '../shared/contracts'
 import { accountChannels } from '../shared/account'
 import type { AccountApi, AccountSnapshot } from '../shared/account'
+import { workspaceChannels } from '../shared/workspace'
+import type { WorkspaceApi, WorkspaceSnapshot } from '../shared/workspace'
 
-const learning: LearningApi & AccountApi = {
-  listCourses: () => ipcRenderer.invoke(channels.listCourses),
-  listSessions: () => ipcRenderer.invoke(channels.listSessions),
-  startSession: request => ipcRenderer.invoke(channels.startSession, request),
-  submitAnswer: request => ipcRenderer.invoke(channels.submitAnswer, request),
+const learning: AccountApi & WorkspaceApi = {
   getAccount: () => ipcRenderer.invoke(accountChannels.get),
   connectAccount: () => ipcRenderer.invoke(accountChannels.connect),
   cancelAccountConnection: () => ipcRenderer.invoke(accountChannels.cancel),
@@ -19,6 +15,18 @@ const learning: LearningApi & AccountApi = {
     const receive = (_event: unknown, snapshot: AccountSnapshot) => listener(snapshot)
     ipcRenderer.on(accountChannels.changed, receive)
     return () => { ipcRenderer.removeListener(accountChannels.changed, receive) }
+  },
+  getWorkspace: () => ipcRenderer.invoke(workspaceChannels.get),
+  openProject: () => ipcRenderer.invoke(workspaceChannels.open),
+  selectProject: request => ipcRenderer.invoke(workspaceChannels.select, request),
+  locateProject: request => ipcRenderer.invoke(workspaceChannels.locate, request),
+  showDashboard: () => ipcRenderer.invoke(workspaceChannels.dashboard),
+  setProjectModel: request => ipcRenderer.invoke(workspaceChannels.model, request),
+  saveProjectBrief: request => ipcRenderer.invoke(workspaceChannels.brief, request),
+  onWorkspaceChanged: listener => {
+    const receive = (_event: unknown, snapshot: WorkspaceSnapshot) => listener(snapshot)
+    ipcRenderer.on(workspaceChannels.changed, receive)
+    return () => { ipcRenderer.removeListener(workspaceChannels.changed, receive) }
   }
 }
 

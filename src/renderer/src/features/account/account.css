@@ -21,7 +21,7 @@
 .account-feedback.is-error { color: #b91c1c; background: #fff5f5; }
 .account-model-count { margin: 16px 0; color: #626262; font-size: 13px; }
 .account-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 18px; }
-.account-primary, .account-secondary { min-height: 40px; padding: 10px 16px; border: 1px solid transparent; border-radius: 8px; font: 500 14px/1.4 inherit; cursor: pointer; transition: background 120ms ease; }
+.account-primary, .account-secondary { min-height: 40px; padding: 10px 16px; border: 1px solid transparent; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1.4; cursor: pointer; transition: background 120ms ease; }
 .account-primary { flex: 1; background: #171717; color: #fff; }
 .account-primary:hover { background: #353535; }
 .account-secondary { background: #fff; color: #393939; border-color: #d0d0d0; }

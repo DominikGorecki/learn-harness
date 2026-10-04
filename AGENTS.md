@@ -13,7 +13,7 @@ This is a TypeScript Electron application with a React learning workspace and a 
 | --- | --- |
 | Process ownership, source layout, backend services | [Architecture](ref/patterns-architecture.md) |
 | Preload, IPC, schemas, protocols, permissions | [IPC and security](ref/patterns-ipc-security.md) |
-| Courses, sessions, feedback, persistence | [Learning and data](ref/patterns-learning-data.md) |
+| Projects, outlines, account models, persistence | [Learning and data](ref/patterns-learning-data.md) |
 | Visual composition, typography, color/spacing tokens, component states | [Design system](ref/patterns-design-system.md) |
 | Learner journeys, navigation, input, recovery, keyboard/focus | [UX](ref/patterns-ux.md) |
 | React components, renderer state, bridge results, safe rendering | [Renderer](ref/patterns-renderer.md) |
@@ -25,7 +25,7 @@ This is a TypeScript Electron application with a React learning workspace and a 
 
 Explicit user instructions and accepted task scope come first. Accepted ADRs govern durable decisions; focused patterns state current rules; maintained docs describe current contracts; code/tests show behavior. Research explains evidence and alternatives rather than silently overriding an accepted decision. Report contradictions and update the relevant guidance when resolving them.
 
-Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007. The Codex-inspired visual standard is adopted guidance; today's demo has not been migrated. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
+Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007. The project workspace follows the adopted Codex-inspired visual standard. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
 
 ## Essential boundaries
 
@@ -35,7 +35,7 @@ Before UI work, read the design system and UX patterns, then renderer rules and 
 - `src/preload` exposes named methods through `contextBridge`; never expose generic IPC, filesystem access, process execution, or secrets.
 - `src/renderer` uses React and the typed bridge; it imports no core/main/preload implementation.
 - Keep context isolation and renderer sandboxing enabled. Main validates every request's sender and every mutation's payload.
-- Demo content and session-only persistence are intentional. Do not present fixtures as AI output or question completion as mastery.
+- Project metadata is portable in `.edu`; recent locations and protected credentials belong in the application profile. Do not present protocol fixtures as live AI evidence or outline creation as mastery.
 
 ## Change workflow
 

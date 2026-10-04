@@ -12,9 +12,9 @@ The interface should be beautiful, simple, and intuitive, with Codex-inspired pr
 
 ## Problem and starting point
 
-The current application demonstrates a desktop learning flow using three sample lessons, goal-labelled sessions, and deterministic multiple-choice feedback. Session state disappears when the application quits. It has no account connection, AI provider, project-folder opening, per-project model selection, or generated curriculum.
+At PRD authoring, the application demonstrated a desktop learning flow using three sample lessons, goal-labelled sessions, and deterministic multiple-choice feedback. Session state disappeared when the application quit. That baseline had no account connection, AI provider, project-folder opening, per-project model selection, or generated curriculum. Current implementation evidence lives in the [work validation record](../work/01-project-setup-and-outline/validation.md).
 
-This baseline is documented in the [README](../../README.md), [learning and data patterns](../patterns-learning-data.md), and [ADR-0003](../ADRs/ADR-0003-core-learning-services-and-demo-state.md). The current views are [App](../../src/renderer/src/app/App.tsx), [StartView](../../src/renderer/src/features/learning/StartView.tsx), and [SessionView](../../src/renderer/src/features/learning/SessionView.tsx). The [package manifest](../../package.json) currently contains no Pi dependency.
+The historical baseline is recorded in [ADR-0003](../ADRs/ADR-0003-core-learning-services-and-demo-state.md). The maintained [README](../../README.md) and [learning and data patterns](../patterns-learning-data.md) describe current behavior. The project workspace replaces the original StartView/SessionView demo, and the [package manifest](../../package.json) now pins Pi dependencies.
 
 The next useful product step is a real learning-project foundation. Someone with a folder of notes should be able to obtain a coherent learning path. Someone starting with a topic name should obtain an equally usable structure without first completing a detailed questionnaire.
 

@@ -13,4 +13,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 | [ADR-0007](ADR-0007-codex-inspired-design-and-ux.md) | Accepted | Codex-inspired visual direction and separate design/UX guidance | Changing appearance, learner interaction, or UI documentation ownership |
 | [ADR-0008](ADR-0008-chatgpt-plan-connection-and-pi-foundation.md) | Accepted | Protected ChatGPT plan connection and Pi runtime foundation | Changing account identity, delegated inference access, credentials, or account model discovery |
 
+| [ADR-0009](ADR-0009-portable-project-workspace.md) | Accepted | Portable project metadata, native folder workspace, and retirement of demo runtime | Changing project persistence, identity, recovery, or workspace ownership |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

@@ -2,7 +2,7 @@
 
 Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Evidence and reference boundaries: [Codex desktop research](research/codex-desktop-ui.md).
 
-**Status:** adopted visual standard for future UI work. The current demo renderer has not been migrated. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
+**Status:** adopted visual standard, implemented in the project workspace and account panel. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
 
 ## Composition
 

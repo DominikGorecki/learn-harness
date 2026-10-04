@@ -1,6 +1,6 @@
 # Ticket: project-setup-and-outline.T02 — Open and persist learning projects in a polished desktop workspace
 
-Status: Open
+Status: Implemented and locally validated
 
 ## Source
 
@@ -35,11 +35,11 @@ Versioned profile registry and .edu state; native folder selection; deduplicatio
 
 ## Acceptance criteria
 
-- [ ] A selected ordinary folder opens and appears exactly once in the persisted dashboard.
-- [ ] Opening alone creates no .edu and makes no inference request; saved outlines remain readable without account access.
-- [ ] Model preferences persist separately in two projects and missing models require deliberate resolution.
-- [ ] Invalid or unavailable project state is preserved and recoverable through the UI.
-- [ ] Dashboard/setup are visually coherent under ADR-0007 and use real backend state.
+- [x] A selected ordinary folder opens and appears exactly once in the persisted dashboard.
+- [x] Opening alone creates no .edu and makes no inference request; saved outlines remain readable without account access.
+- [x] Model preferences persist separately in two projects and missing models require deliberate resolution.
+- [x] Invalid or unavailable project state is preserved and recoverable through the UI.
+- [x] Dashboard/setup are visually coherent under ADR-0007 and use real backend state.
 
 ## Traceability
 
@@ -47,4 +47,4 @@ PROJ-01 through PROJ-08; MODEL-01 through MODEL-07; INPUT-01, INPUT-02; AC-03, A
 
 ## Completion evidence
 
-Pending implementation. Keep this section current with commits, validation, and any external verification still required.
+Storage checkpoint: `ca805bf`. The desktop increment adds native selection/relink, dashboard/setup/outline presentation, model preferences, responsive navigation, and retirement of demo capabilities. Real Electron tests cover opening without writes, cancellation, two-project model/draft ownership, restart, moved-folder identity, reduced motion, narrow navigation/focus, and 200% zoom. See [validation](validation.md). Native Windows/macOS behavior remains a T06 acceptance gate.

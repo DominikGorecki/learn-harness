@@ -1,23 +1,27 @@
 # Learning and data patterns
 
-Governed by [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md) and [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md).
+Governed by [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md) and [ADR-0009](ADRs/ADR-0009-portable-project-workspace.md). ADR-0003 records the retired demo baseline.
 
-## Current learning slice
+## Project ownership
 
-`src/core/learning/courses.ts` owns three explicit sample definitions. Public course DTOs contain lesson text and choices, while answer keys and feedback stay in core. `createLearningService` lists courses, starts goal-labelled sessions, and evaluates one fixture question per session. IDs and timestamps come from injected functions.
+`src/core/workspace/service.ts` owns project use cases behind async storage/registry ports. Main canonicalizes native-selected folders, reads bounded metadata, and performs atomic saves. Opening creates no `.edu` and makes no inference request. Explicit model or brief changes create portable identity on first save.
 
-The service rejects unavailable courses/sessions and answers outside the selected course. Incorrect choices can be retried. A correct answer completes the question; later submissions for that completed session do not alter its recorded answer. This is completion, not mastery or retention assessment.
+`src/shared/workspace.ts` defines versioned `.edu/project.json`: identity, revision, display name, timestamps, model, brief, and optional saved outline. `src/shared/outline.ts` validates lessons, objectives, module methods/tasks, assumptions, additions, and coverage independently of origin. Model/learner content is never executable.
 
-## Storage ownership
+## Storage and recovery
 
-`SessionRepository` is the state port. `src/main/adapters/memory-session-repository.ts` uses a Map and returns/stores copies so external mutation cannot change owned state. Progress survives renderer reloads and window reopen while the same main process lives, but disappears when the app quits. UI copy communicates that limit. Core state is authoritative; React keeps view snapshots and unsent drafts.
+The project document is canonical. A profile registry tracks recent locations independently. Main rejects symlinked metadata, unsupported schemas, changed roots, oversize documents, and detected external edits. Failed replacement leaves previous bytes intact. Corrupt/unknown state is preserved; never silently initialize over it. Relinking verifies known portable identity.
 
-No database, cloud sync, or project-file import is present yet. Account credentials are versioned and protected in the application profile, with an explicit memory-only fallback when protected OS storage is unavailable. They are never project content. The non-secret installation host ID persists separately. Project persistence remains pending; define schema versions, failure recovery, backup/export, and privacy before implementing it.
+Core serializes metadata operations and attributes results to their project. Renderer holds unsaved drafts by project handle. A result for another project cannot replace the active workspace. Registry failure after a project save is reported separately and does not falsely label the project save as failed.
+
+There is no database or cloud sync. Account credentials use protected profile storage with a disclosed session-only fallback when OS protection is unavailable. Credentials and installation host identity are separate from educational files.
 
 ## Account and models
 
-The ChatGPT connection supports browser sign-in, verified identity, separate plan permission, renewal, account-specific model discovery, and local sign-out with remote revocation attempted. Public account state includes safe profile information and model choices, never tokens. A failed model query must not appear as a verified empty catalogue. Preserve a previous usable connection if replacement sign-in fails or is cancelled. The application never falls back to ambient API keys.
+The ChatGPT connection supports browser sign-in, verified identity, separate plan permission, renewal, model discovery, and local sign-out with remote revocation attempted. Public state contains safe profile/model information, never tokens. Failed model queries do not appear as verified empty catalogues. Preserve a usable connection if replacement sign-in fails or is cancelled. Never fall back to ambient API keys.
 
-## Future tutoring
+Persist model preferences per project and validate changes against the connected catalogue. Preserve a missing saved model visibly until deliberate replacement. Reading saved content does not require account access.
 
-User goals currently label a selected fixture session; they do not generate a curriculum. Keep sample responses labelled. A future AI provider belongs behind a core port and Node adapter, with credentials outside renderer, explicit content consent, timeouts/cancellation, and evidence for learning claims. Keep imported/model text untrusted. Review [security patterns](patterns-ipc-security.md) before extending the data surface.
+## Generation and future learning
+
+Generation remains the next slice. Use a privileged adapter, explicit submission, bounded cancellation, and distinct generated/saved results. Pi coding tools do not belong in the educational surface. Rich tutoring and mastery assessment are outside this milestone. See [security patterns](patterns-ipc-security.md) before extending file or AI access.

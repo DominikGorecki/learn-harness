@@ -1,9 +1,6 @@
 import { app, BrowserWindow, protocol, safeStorage, session, shell } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
-import { createLearningService } from '../core/learning/service'
-import { createMemorySessionRepository } from './adapters/memory-session-repository'
-import { registerLearningHandlers } from './ipc/handlers'
 import { appEntry, appOrigin, developmentOrigin } from './security/policy'
 import { registerRendererProtocol } from './security/protocol'
 import { AccountService } from './auth/account-service'
@@ -11,6 +8,10 @@ import { createChatGPTProvider } from './auth/chatgpt-provider'
 import { createCredentialStore } from './auth/credential-store'
 import { registerAccountHandlers } from './ipc/account-handlers'
 import { providerEnvironment } from './auth/provider-environment'
+import { WorkspaceService } from '../core/workspace/service'
+import { createProjectRegistry } from './storage/project-registry'
+import { createProjectStorage } from './storage/project-storage'
+import { registerWorkspaceHandlers } from './ipc/workspace-handlers'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -31,8 +32,8 @@ const expectedOrigin = developmentUrl ? developmentOrigin : appOrigin
 
 async function createWindow(): Promise<void> {
   mainWindow = new BrowserWindow({
-    width: 1280, height: 840, minWidth: 900, minHeight: 640,
-    title: 'Learning Studio', backgroundColor: '#faf9f6', show: false,
+    width: 1280, height: 840, minWidth: 600, minHeight: 480,
+    title: 'Learning Studio', backgroundColor: '#ffffff', show: false,
     webPreferences: {
       preload: join(import.meta.dirname, '../preload/index.cjs'),
       partition: 'edu-harness', contextIsolation: true, sandbox: true,
@@ -60,10 +61,6 @@ if (!app.requestSingleInstanceLock()) {
     rendererSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
     rendererSession.setPermissionCheckHandler(() => false)
     registerRendererProtocol(rendererSession, join(import.meta.dirname, '../renderer'))
-    const learning = createLearningService({
-      sessions: createMemorySessionRepository(), createId: randomUUID, now: () => new Date().toISOString()
-    })
-    registerLearningHandlers(learning, () => mainWindow, expectedOrigin)
     const providerEndpoints = providerEnvironment({ packaged: app.isPackaged,
       testProfile: process.env.EDU_HARNESS_TEST_DATA_DIR, fixtureOrigin: process.env.EDU_HARNESS_TEST_PROVIDER_URL })
     account = new AccountService({
@@ -81,6 +78,13 @@ if (!app.requestSingleInstanceLock()) {
       }
     })
     registerAccountHandlers(account, () => mainWindow, expectedOrigin)
+    const workspace = new WorkspaceService({
+      registry: createProjectRegistry(app.getPath('userData')), storage: createProjectStorage(),
+      models: () => { const snapshot = account?.get(); return snapshot?.status === 'connected' && snapshot.modelsStatus === 'ready' ? snapshot.models : [] },
+      createId: randomUUID, now: () => new Date().toISOString()
+    })
+    await workspace.initialize()
+    registerWorkspaceHandlers(workspace, () => mainWindow, expectedOrigin)
     await createWindow()
     void account.initialize()
     app.on('activate', () => {
