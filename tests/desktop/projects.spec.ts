@@ -61,7 +61,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     await expect(page.getByRole('textbox')).toHaveValue('An unsaved question about evidence')
     await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('project-workspace.png') })
 
-    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setSize(600, 640))
+    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setContentSize(600, 640))
     await expect(page.getByRole('button', { name: 'Show navigation' })).toBeVisible()
     await page.getByRole('button', { name: 'Show navigation' }).click()
     await expect(page.getByRole('dialog', { name: 'Project navigation' })).toBeVisible()

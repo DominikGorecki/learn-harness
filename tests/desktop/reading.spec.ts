@@ -35,7 +35,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await page.locator('.lesson-disclosure').first().locator('summary').focus()
     await page.keyboard.press('Enter')
     await expect(page.locator('.lesson-disclosure').first()).toHaveAttribute('open', '')
-    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setSize(600, 640))
+    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setContentSize(600, 640))
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(2))
     await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
     expect(await page.locator('.studio-workspace').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
@@ -46,7 +46,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await writeFile(testInfo.outputPath('long-outline-zoom.png'), Buffer.from(capture, 'base64'))
     await page.emulateMedia({ reducedMotion: 'reduce' })
     expect(await page.locator('.workspace-enter').evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).animationName)).toBe('none')
-    await desktop.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(1); BrowserWindow.getAllWindows()[0]!.setSize(1280, 840) })
+    await desktop.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(1); BrowserWindow.getAllWindows()[0]!.setContentSize(1280, 840) })
 
     if (process.platform !== 'win32' && process.geteuid?.() !== 0) {
       await chmod(folder, 0o500); await chmod(join(folder, '.edu'), 0o500)

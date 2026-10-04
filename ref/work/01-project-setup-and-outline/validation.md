@@ -146,3 +146,9 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - macOS temporary directories use `/var` aliases and Windows uses short user-directory paths. Some tests incorrectly passed these aliases directly to adapters that require the canonical root supplied by the workspace service. Temporary project fixtures now resolve `realpath` first; application path and symlink protections remain intact.
 - Windows also exposed a real `kill-dev` no-op failure: `Get-NetTCPConnection -LocalPort` returned a lookup error after successful shutdown. Discovery now enumerates connections with error reporting enabled and filters afterward, allowing a free port to return an empty list while preserving actual discovery failures.
 - `npm run check`: 126 tests, lint, types and production bundles passed after the corrections. `xvfb-run -a npm run test:desktop`: seven passed, with the artifact-only test intentionally skipped. Windows/macOS re-execution is still required.
+
+## Native viewport fixture correction
+
+- [Run 37228487262](https://github.com/DominikGorecki/learn-harness/actions/runs/37228487262) passed the complete Linux and macOS jobs, including unsigned packaging and packaged Pi runtime verification. Windows source checks and five desktop journeys passed, including copied-link authorization.
+- Two Windows desktop assertions incorrectly expected a 600px outer window to provide 600px of content. Windows borders left 584px (292 CSS pixels at 200% zoom). Responsive tests now use `setContentSize`, preserving the exact 300px zoomed-content assertion and all overflow/accessibility checks across native window frames.
+- Local `npm run check` passes (126 tests, lint, types and build); `xvfb-run -a npm run test:desktop` passes seven journeys, with the artifact-only test intentionally skipped.
