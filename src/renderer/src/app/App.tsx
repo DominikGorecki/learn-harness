@@ -13,6 +13,8 @@ import { GenerationStatus } from '../features/projects/GenerationStatus'
 import { runIsBusy } from '../../../shared/generation'
 import type { ProjectSummary } from '../../../shared/workspace'
 import type { AccountSnapshot } from '../../../shared/account'
+import { SettingsPanel } from '../features/settings/SettingsPanel'
+import { useAppearance } from '../features/settings/appearance'
 type NavigationIntent = { kind: 'open' | 'dashboard' } | { kind: 'select'; id: string }
 
 function Navigation({ projects, selected, busy, account, onOpen, onSelect, onDashboard, onAccount }: {
@@ -45,6 +47,9 @@ function Navigation({ projects, selected, busy, account, onOpen, onSelect, onDas
 }
 
 export function App() {
+  const appearance = useAppearance()
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const settingsTrigger = useRef<HTMLButtonElement>(null)
   const account = useAccount()
   const workspace = useWorkspace()
   const generation = useGeneration()
@@ -64,6 +69,7 @@ export function App() {
   const navigationDialog = useRef<HTMLDialogElement>(null)
   const navigationToggle = useRef<HTMLButtonElement>(null)
   const scroll = useRef<HTMLElement>(null)
+  const lastPresentedRun = useRef<string | null>(null)
   const project = workspace.snapshot?.activeProject ?? null
   const projects = workspace.snapshot?.projects ?? []
   const showSidebar = !narrow && !collapsed
@@ -86,6 +92,7 @@ export function App() {
   const selectProject = useCallback((id: string) => navigate({ kind: 'select', id }), [navigate])
   const dashboard = useCallback(() => navigate({ kind: 'dashboard' }), [navigate])
   const openAccount = useCallback(() => { closeNavigation(); setAccountOpen(true) }, [closeNavigation])
+  const openSettings = useCallback(() => { closeNavigation(); setSettingsOpen(true) }, [closeNavigation])
   const toggleNavigation = useCallback(() => {
     if (narrow) setNavigationOpen(value => !value)
     else setCollapsed(value => !value)
@@ -105,7 +112,8 @@ export function App() {
 
   useEffect(() => {
     const command = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.isComposing || accountOpen || confirmReplace || confirmSave || pendingNavigation || workspace.busy) return
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.isComposing || accountOpen || settingsOpen || confirmReplace || confirmSave || pendingNavigation || workspace.busy) return
+      if (event.key === ',') { event.preventDefault(); openSettings(); return }
       if (event.key.toLowerCase() === 'o') { event.preventDefault(); openProject() }
       const target = event.target as HTMLElement | null
       if (event.key.toLowerCase() === 'b' && !target?.matches('input, textarea, [contenteditable="true"]')) {
@@ -114,7 +122,7 @@ export function App() {
     }
     window.addEventListener('keydown', command)
     return () => window.removeEventListener('keydown', command)
-  }, [accountOpen, confirmReplace, confirmSave, pendingNavigation, workspace.busy, openProject, toggleNavigation])
+  }, [accountOpen, settingsOpen, confirmReplace, confirmSave, pendingNavigation, workspace.busy, openProject, openSettings, toggleNavigation])
 
   useEffect(() => {
     if (confirmReplace && !replacementDialog.current?.open) replacementDialog.current?.showModal()
@@ -133,10 +141,12 @@ export function App() {
   const loaded = workspace.snapshot !== null
   const savedRunId = outlineRun?.status === 'saved' ? outlineRun.id : null
   useEffect(() => {
-    if (!savedRunId || accountOpen || confirmReplace || document.activeElement?.matches('input, textarea, [contenteditable="true"]')) return
+    if (!savedRunId || lastPresentedRun.current === savedRunId) return
+    lastPresentedRun.current = savedRunId
+    if (accountOpen || settingsOpen || confirmReplace || document.activeElement?.matches('input, textarea, [contenteditable="true"]')) return
     scroll.current?.scrollTo({ top: 0 })
     if (document.activeElement === document.body) document.getElementById('outline-heading')?.focus({ preventScroll: true })
-  }, [savedRunId, accountOpen, confirmReplace])
+  }, [savedRunId, accountOpen, settingsOpen, confirmReplace])
   useEffect(() => {
     if (!loaded) return
     scroll.current?.scrollTo({ top: 0 })
@@ -172,6 +182,12 @@ export function App() {
 
   return <div className={'studio-shell ' + (showSidebar ? '' : 'without-sidebar')}>
     <a className="skip-link" href="#workspace">Skip to workspace</a>
+    <div className="studio-rail" role="group" aria-label="Workspace controls">
+      <button className="rail-button rail-home" aria-label="Project dashboard" title="Projects" onClick={dashboard}><Icon name="home" size={21} /><span className="rail-accent" /></button>
+      <button className="rail-button" aria-label="Choose project folder" title="Open project (⌘/Ctrl+O)" disabled={workspace.busy} onClick={openProject}><Icon name="folder" size={21} /></button>
+      <div className="rail-spacer" />
+      <button ref={settingsTrigger} className="rail-button" aria-label="Settings" title="Settings (⌘/Ctrl+,)" onClick={openSettings}><Icon name="settings" size={21} /></button>
+    </div>
     {showSidebar && <aside className="studio-sidebar">{navigation}</aside>}
     {narrow && <dialog ref={navigationDialog} className="mobile-navigation" aria-label="Project navigation"
       onCancel={event => { event.preventDefault(); closeNavigation() }} onClose={() => setNavigationOpen(false)}>
@@ -223,6 +239,8 @@ export function App() {
       </main>
     </div>
     <AccountPanel open={accountOpen} onClose={() => { setAccountOpen(false); if (narrow) navigationToggle.current?.focus() }} account={account} locked={anyGenerationBusy} />
+    <SettingsPanel open={settingsOpen} onClose={() => { setSettingsOpen(false); settingsTrigger.current?.focus() }}
+      appearance={appearance.appearance} onAppearance={appearance.chooseAppearance} persistent={appearance.persistent} />
     <dialog ref={replacementDialog} className="confirmation-dialog" aria-labelledby="replacement-heading" onCancel={() => setConfirmReplace(false)} onClose={() => setConfirmReplace(false)}>
       <h2 id="replacement-heading">Create a new learning outline?</h2>
       <p>{outlineRun?.status === 'unsaved' ? 'This will discard the unsaved result and use ChatGPT again.' : 'Your current outline stays available while the new one is created. A successful save replaces it. This uses your ChatGPT plan allowance.'}</p>

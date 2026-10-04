@@ -1,0 +1,45 @@
+.settings-dialog { width: min(620px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: auto; color: var(--text-primary); background: var(--surface-canvas); border: 1px solid var(--border-subtle); border-radius: 20px; box-shadow: var(--shadow-dialog); }
+.settings-dialog::backdrop { background: var(--overlay); backdrop-filter: blur(4px); }
+.settings-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border-subtle); }
+.settings-header h2 { font-size: 16px; letter-spacing: -.2px; }
+.settings-content { padding: 30px 32px 24px; }
+.settings-title { display: flex; align-items: center; gap: 12px; }
+.settings-title > .icon { color: var(--text-secondary); }
+.settings-title h3 { font-size: 25px; font-weight: 600; letter-spacing: -.6px; }
+.settings-description { margin: 8px 0 28px; color: var(--text-secondary); }
+.appearance-group { min-width: 0; margin: 0; padding: 0; border: 0; }
+.appearance-group legend { margin-bottom: 12px; font-weight: 550; }
+.appearance-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.appearance-option { position: relative; min-width: 0; padding: 8px; border: 1px solid var(--border-control); border-radius: 15px; cursor: pointer; background: var(--surface-raised); transition: border-color 130ms ease, background 130ms ease; }
+.appearance-option:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.appearance-option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 4px; }
+.appearance-option input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.appearance-option:hover { background: var(--surface-hover); }
+.appearance-preview { display: flex; height: 120px; overflow: hidden; padding: 6px 6px 0 0; border-radius: 9px; background: var(--preview-shell); color: var(--preview-ink); }
+.preview-light { --preview-shell: #eaf4f5; --preview-navigation: #f6fafb; --preview-canvas: #fff; --preview-ink: #bfc3c7; --preview-raised: #f4f4f4; }
+.preview-dark { --preview-shell: #1c2424; --preview-navigation: #1b1d1d; --preview-canvas: #181818; --preview-ink: #666; --preview-raised: #292929; }
+.preview-rail { display: flex; flex-direction: column; align-items: center; gap: 9px; width: 16px; padding-top: 12px; }
+.preview-rail i { width: 4px; height: 4px; border-radius: 50%; background: var(--preview-ink); }
+.preview-sidebar { width: 23%; padding: 12px 6px; background: var(--preview-navigation); border-radius: 5px 0 0 0; }
+.preview-sidebar i { display: block; height: 3px; margin-bottom: 9px; border-radius: 3px; background: var(--preview-ink); }
+.preview-sidebar i:first-child { width: 65%; margin-bottom: 17px; }
+.preview-workspace { position: relative; flex: 1; padding: 28px 12px 0; background: var(--preview-canvas); border-radius: 0 5px 0 0; }
+.preview-title, .preview-line { display: block; height: 4px; width: 75%; margin: 0 auto 7px; background: var(--preview-ink); border-radius: 3px; }
+.preview-line { height: 3px; width: 48%; opacity: .5; }
+.preview-composer { position: absolute; inset: auto 8px 8px; height: 29px; border-radius: 8px; background: var(--preview-raised); }
+.preview-composer i { position: absolute; top: 8px; left: 9px; width: 40%; height: 3px; border-radius: 3px; background: var(--preview-ink); opacity: .6; }
+.preview-composer b { position: absolute; bottom: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: #9859ed; }
+.appearance-label { display: flex; align-items: center; gap: 7px; padding: 12px 4px 4px; font-size: 13px; font-weight: 500; }
+.appearance-check { display: grid; place-items: center; margin-left: auto; width: 19px; height: 19px; border: 1px solid var(--border-control); border-radius: 50%; }
+.appearance-option:has(input:checked) .appearance-check { background: var(--accent); border-color: var(--accent); color: var(--accent-contrast); }
+.settings-note { margin-top: 22px; color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+.settings-footer { display: flex; justify-content: flex-end; padding: 0 32px 24px; }
+.settings-footer .button { min-width: 88px; }
+@media (max-width: 420px) {
+  .settings-header { padding: 14px 18px; }
+  .settings-content { padding: 22px 18px; }
+  .appearance-options { gap: 10px; }
+  .appearance-preview { height: 90px; }
+  .preview-sidebar { display: none; }
+  .settings-footer { padding: 0 18px 20px; }
+}

@@ -46,6 +46,15 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     await expect(page.getByRole('heading', { name: 'A forecast before the data' })).toBeVisible()
     await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('generated-outline.png'), fullPage: true })
 
+    const readingPosition = await page.getByRole('main').evaluate(element => { element.scrollTop = 150; return element.scrollTop })
+    expect(readingPosition).toBeGreaterThan(0)
+    await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('radio', { name: 'Dark', exact: true }).check()
+    await page.getByRole('button', { name: 'Done', exact: true }).click()
+    await expect.poll(() => page.getByRole('main').evaluate(element => element.scrollTop)).toBe(readingPosition)
+    expect(fixture.inferenceRequests).toHaveLength(1)
+    expect((await saved()).outline).toEqual(original)
+
     fixture.options.inferenceMode = 'hold'
     await page.getByRole('button', { name: 'Refine learning direction' }).click()
     await page.getByRole('textbox').fill('Bayesian reasoning with challenging practical examples and no calculus.')

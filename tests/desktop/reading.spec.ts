@@ -27,6 +27,9 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
   try {
     desktop = await playwright._electron.launch({ args: [resolve('out/main/index.js')], env: { ...env, EDU_HARNESS_TEST_DATA_DIR: join(root, 'profile') } })
     const page = await desktop.firstWindow()
+    await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('radio', { name: 'Dark', exact: true }).check()
+    await page.getByRole('button', { name: 'Done', exact: true }).click()
     await choose(folder)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await expect(page.getByRole('heading', { name: outline.title, exact: true })).toBeVisible()

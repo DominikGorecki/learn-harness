@@ -40,7 +40,7 @@ async function createWindow(): Promise<void> {
     title: 'Learning Studio', backgroundColor: '#ffffff', show: false,
     webPreferences: {
       preload: join(import.meta.dirname, '../preload/index.cjs'),
-      partition: 'edu-harness', contextIsolation: true, sandbox: true,
+      partition: 'persist:edu-harness', contextIsolation: true, sandbox: true,
       nodeIntegration: false, webSecurity: true, webviewTag: false
     }
   })
@@ -61,7 +61,7 @@ if (!app.requestSingleInstanceLock()) {
     mainWindow?.focus()
   })
   app.whenReady().then(async () => {
-    const rendererSession = session.fromPartition('edu-harness')
+    const rendererSession = session.fromPartition('persist:edu-harness')
     rendererSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
     rendererSession.setPermissionCheckHandler(() => false)
     registerRendererProtocol(rendererSession, join(import.meta.dirname, '../renderer'))
