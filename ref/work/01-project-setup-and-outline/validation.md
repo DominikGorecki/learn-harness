@@ -133,3 +133,9 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 - `xvfb-run -a npm run test:desktop`: seven journeys passed; the artifact-only test remains intentionally skipped. The new journey disables system-browser launching, copies the real pending fixture URL through IPC and the OS clipboard, follows that URL, and completes signed authorization/model discovery without another sign-in attempt.
 - Visually reviewed the manual-link account panel screenshot. This establishes local clipboard/protocol behavior; actual Windows-browser/WSL clipboard and loopback routing remain user-environment checks.
 - User explicitly approved publishing `codex/project-setup-and-outline` to the configured GitHub origin for native CI.
+
+## Native CI publication and clean-install repair
+
+- Published the approved branch at `05fc6b4`; [run 37228181858](https://github.com/DominikGorecki/learn-harness/actions/runs/37228181858) started on all three native operating systems.
+- The first run exposed an incomplete lockfile: npm 11.19 required the missing optional `undici@7.30.0` entry. Added the npm-generated entry without changing any existing dependency version.
+- A fresh isolated install with npm 11.19 now passes (`npm ci`, including Electron binary installation and the application postinstall). The local sandbox needed `electron_config_cache=/tmp/edu-harness-electron-cache` because its home cache is read-only. Audit reported zero vulnerabilities. Native execution results remain pending the repaired branch run.
