@@ -40,6 +40,8 @@ Project state should travel with the folder. Account credentials belong to the p
 
 The exact organization of future lesson documents, notes, and other learner artifacts is still to be decided. Human-readable learning work and practical portability are desired product qualities.
 
+The [progressive discovery and interactive module proposal](progressive-learning-workspace.md) records a future design for evolving knowledge files, compact JSON indexes, and application-rendered Socratic activities. It does not change the current single-document storage contract.
+
 ## Learning hierarchy
 
 | Element | Purpose | Example |
