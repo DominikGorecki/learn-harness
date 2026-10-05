@@ -12,6 +12,8 @@ Playwright refreshes passing flows in place under `ref/flows/`; each flow index 
 
 ## Composition
 
+[ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md) adopts the [selected bottom split panel](../docs/design/component-designs/01-generation-streaming/generation-streaming-selection.md) for all inference. Its timeline uses connected actual-activity icons, with planned upcoming steps distinct from completed work; the wider side shows selectable provisional content. Use existing Light/Dark tokens and responsive workbench space without obstructing navigation. Panel implementation/capture acceptance remains pending; [AI operations](patterns-ai.md) describes the implemented foundation and migration status. This reference does not authorize changes to saved outline row styling.
+
 Use a quiet desktop workspace with a slim outer icon rail, softly tinted project navigation, an inset primary surface, system sans-serif type, and generous working space. The subject, current activity, and next action establish hierarchy. Brand identification stays compact in application chrome.
 
 The shell contains navigation, a contextual header, the primary learning surface, and optional selected-item details. The outer rail contains only working dashboard, folder and Settings actions; project navigation and workspace form the two main regions. At narrow widths the rail becomes a bottom strip and project navigation remains a drawer. Open a detail pane only for useful context such as a selected lesson's objectives or an outline's sources. Keep generic learning tips within the relevant activity rather than permanently occupying a third pane.

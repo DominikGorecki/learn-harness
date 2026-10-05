@@ -1,10 +1,10 @@
 # Shared Pi Streaming — Ticket Map
 
-Status: Open
+Status: In progress
 Source: [Ready spec](ai-streaming.spec.md)
 Date: 2026-10-05
 
-These tickets authorize planning only. All seven start Open; no implementation, test execution or runtime acceptance is claimed. Implement the complete bundle before release so no diagnostic or educational inference bypass remains.
+The tickets were authored as planning artifacts with all seven Open. The active `spec-implement` goal now authorizes their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01 is accepted; T02–T07 remain open. Implement the complete bundle before release so no diagnostic or educational inference bypass remains.
 
 ## Implementation order
 

@@ -4,6 +4,8 @@ Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [AD
 
 ## Process and source ownership
 
+[ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md) establishes the shared [AI operation route](patterns-ai.md). Core `AiCoordinator` owns synchronous admission/private leases, cancellation/settlement and immutable bounded activity; main composes one instance, owns authorization and exposes named activity IPC. Full results and recoverable staged edits remain domain-owned. Transport, existing producer and workbench-panel migration are pending; the direct-main diagnostic implementation described below is a legacy path awaiting that migration. Every future inference producer must follow the shared route, with owner-aware credential renewal.
+
 Use the electron-vite process layout: `src/main/index.ts`, `src/preload/index.ts`, and `src/renderer/index.html` with React under `src/renderer/src`. Main owns windows, OS integration, protocol serving, permissions, composition, and authorized IPC routing. Preload translates named capabilities into IPC. Renderer handles presentation and user intent.
 
 The Node backend is hosted in main for this small slice. There is no Express server or separate listening backend. Keep handlers short; compose a learning application service rather than implementing learning behavior in IPC callbacks.

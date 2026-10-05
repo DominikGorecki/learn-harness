@@ -47,13 +47,13 @@
       "sha256": "9076683c97f79db619b1abee46acfba6118c50e6f8a021a5e1196a88f2be8b97"
     }
   ],
-  "capturedAt": "2026-10-05T13:17:37.267Z",
+  "capturedAt": "2026-10-05T17:36:21.118Z",
   "testSha256": "f7a81c3df39746d6f7d648622b3bfb3b505de60d00ca1692d691a81578a5f1a5",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/materials.spec.ts",
   "testTitle": "folder-only learning, verified source coverage, ambiguity and unsupported recovery",
-  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "revision": "db0b22d1d2f511ef39ccf9d6f6086697e94a5f3e",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

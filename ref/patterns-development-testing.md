@@ -29,6 +29,8 @@ The script never signals PID 0/1, itself, or its ancestors. It rechecks PID/star
 
 ## Required evidence
 
+The [ADR-0022 AI integration](patterns-ai.md) requires deterministic admission, cancellation/cleanup, stale-correlation, immutable preview, frame/history bounds and 100 ms batching regressions, plus real named bridge rejection/subscription tests. Its transport/producer migration must also prove received streams beyond old deadlines, silence/worker health separately, valid protocol tail/EOF acceptance, independent model proof and bounded safe diagnostics. Long-stream fixtures, packaged-worker and actual panel flows remain pending at foundation adoption; no fixture establishes live-provider eligibility. Keep all existing code/desktop gates and flow reporters.
+
 Unpackaged Electron runs automatically write main-owned development diagnostics under `<userData>/logs` ([ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md)). The launch terminal prints the directory. JSONL records use UTC timestamps, session/sequence identifiers, levels, process sources, fixed events and safe scalar metadata; IPC request IDs correlate downstream worker/provider events. Ten files of at most 5 MiB bound retained disk usage, and a bounded queue reports overload. Tests use isolated profiles. Packaged apps do not enable this logger. Normal shutdown drains for at most two seconds; forced termination can lose pending rows. Existing safe model summaries remain printed and also enter the file. Never add payload dumps or raw messages; follow the diagnostic boundary in IPC/security.
 
 - `npm run lint`: typescript-eslint, React hooks, and dependency restrictions.

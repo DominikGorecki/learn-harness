@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T01 - Shared AI operation ownership and activity contracts
-Status: Open
+Status: Done
 
 ## Source
 
@@ -53,11 +53,11 @@ Provider transport, producer migration, panel rendering, persisted transcripts, 
 
 ## Acceptance criteria
 
-- [ ] One lease owns admission; races and duplicates cannot execute competing tasks.
-- [ ] Correlated, bounded preview snapshots remain distinct from accepted output; lifecycle transitions cannot be lost behind coalescing.
-- [ ] Named capabilities pass real bridge and rejection tests with sandboxing intact.
-- [ ] Cancellation/settlement release only the correct owner and never revive late updates.
-- [ ] The new ADR/index/pattern changes identify scoped supersession and staged implementation honestly.
+- [x] One lease owns admission; races and duplicates cannot execute competing tasks.
+- [x] Correlated, bounded preview snapshots remain distinct from accepted output; lifecycle transitions cannot be lost behind coalescing.
+- [x] Named capabilities pass real bridge and rejection tests with sandboxing intact.
+- [x] Cancellation/settlement release only the correct owner and never revive late updates.
+- [x] The new ADR/index/pattern changes identify scoped supersession and staged implementation honestly.
 
 ## Manual verification
 
@@ -65,7 +65,16 @@ Inspect the development bridge from an isolated Electron profile and confirm emp
 
 ## Completion evidence
 
-Pending authorized implementation. Fill in actual changed contracts, focused and desktop results, decision number, requirement evidence and remaining migration gates. Do not mark the bundle complete here.
+Accepted foundation on `master`, based on `db0b22d` plus this ticket's reviewed changes. Prerequisites: none. Worker `t01_coordinator` used GPT-6.1 Sol / high; independent `t01_review` used the same model/effort. The primary inspected the core/shared/IPC/preload diff, tests, ADR-0022, focused guidance and actual account/recovery PNGs before acceptance.
+
+Delivered synchronous global admission and diagnostic reuse, immutable correlated partial DTOs, actual UTF-8/wire/history bounds, 100 ms preview coalescing, named authorized activity capabilities, awaited cancellation and domain settlement. Reviewed fixes permanently reject aborted progress and memoize cancellation before synchronous abort dispatch; regression tests cover cleanup failure and reentrant cancellation. ADR-0022 and both discovery indexes adopt the common route with transport/producer/UI migration explicitly pending.
+
+- Focused `npm test -- tests/unit/ai-coordinator.test.ts tests/unit/ai-activity.test.ts tests/unit/capability.test.ts`: 29 passed, exit 0.
+- `npm run check`: exit 0; lint, 219 passed / 3 skipped in 19 unit files, flow integrity, both TypeScript scopes and production build.
+- `npm run test:desktop`: exit 0; 13 passed / 1 packaged-worker skipped, native Windows signed local fixtures, configured flow reporter intact. Real bridge checks cover empty query, event stripping/unsubscribe and forged/stale/malformed cancellation rejection.
+- `npm run test:flows`, changed-guidance relative-link audit and `git diff --check`: passed. Reviewed account and three changed recovery captures; other refreshed images retained their prior bytes. The usage-recovery image's feedback lies above its viewport, a checkpoint limitation to address in T05/T06.
+
+Validation used the normal host execution context without changing application sandboxing. No remaining owned Electron/Playwright processes were found. No live inference or packaged qualification ran here. Producers, transport, panel and full R01–R23 acceptance remain open in T02–T07; this ticket does not close the bundle. See [validation](validation.md) and [acceptance](acceptance.md).
 
 ## Notes
 

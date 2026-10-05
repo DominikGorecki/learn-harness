@@ -1,0 +1,35 @@
+# AI operation patterns
+
+Governed by [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md), retaining [ADR-0010](ADRs/ADR-0010-bounded-pi-outline-generation.md), [ADR-0012](ADRs/ADR-0012-generation-recovery-and-navigation.md), [ADR-0015](ADRs/ADR-0015-explicit-model-access-verification.md), [ADR-0016](ADRs/ADR-0016-requested-extra-model-choices.md), [ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md) and [ADR-0019](ADRs/ADR-0019-topic-edits-and-project-file-access.md) outside its scoped supersession.
+
+## Implementation status
+
+The core coordinator, bounded shared DTOs/runtime parsers and named authorized activity bridge are implemented. Current producers still use their existing lifecycle/transport and existing UI; migration, receiving-byte inactivity, protocol-tail acceptance, worker health and the approved bottom panel remain pending in [the streaming bundle](work/02-ai-streaming/ai-streaming.spec.md). Do not release a mixed producer state or claim the foundation establishes streaming/live-provider acceptance. The rules below are adopted integration requirements for completing the migration and for every future model-output feature. OAuth/discovery/renewal/revocation are not inference operations.
+
+## Ownership and producer recipe
+
+1. Define a sanctioned task profile and domain acceptance adapter: operation kind, authorized model resolution, project/topic or account owner, permitted data/tools and safe preview policy. This does not authorize automatic/background AI or arbitrary tools.
+2. Claim the main-composed `AiCoordinator` synchronously before any authorization or preparation can yield. `claim` returns a private lease and `reused`; launch work only when `reused` is false. Competing requests fail BUSY, without a queue/provider call. Same fixed diagnostic target reuses its lease. Main must permit credential renewal for that owner while denying competing inference/account replacement.
+3. Register `lease.setCancellation` before yielding. Its callback must await actual task/worker cleanup and must never await `lease.settled`, avoiding a self-wait. Use the lease signal for immediate abort. Cleanup failure keeps ownership until explicit failed/cancelled owner settlement; aborted owners cannot publish late phase/preview/success updates.
+4. Execute through the shared Pi utility adapter with sanctioned endpoints, token on the private port, restricted environment, request whitelist, no redirects/provider storage/automatic retries and unchanged request/response/turn/file budgets. No new direct provider fetch bypass or separate progress-only modal without a new durable decision.
+5. Publish actual bounded progress and use the workbench panel. Bind operation/project/stable-topic identity from the trusted launch context; provider turn and candidate revision order updates. Replace repair candidates instead of appending duplicate outlines. `phase` is immediate; `progress` coalesces latest state at 100 ms. Snapshot revision and operation sequence let consumers ignore delayed queries/events. A newer turn can begin a new candidate-revision sequence; older pairs are rejected.
+6. Keep domain ownership through validation/publication. Call `phase('saving')` before publication; Cancel then fails BUSY. Settle saved only after backend-confirmed storage, verified only after independent diagnostic proof. Other terminal outcomes release admission exactly once. Full accepted/unsaved output and staged files remain in the domain service for storage-only retry, independently of the global panel.
+7. Add focused race/bounds/privacy tests, actual Electron bridge/process tests and reviewed flow captures. Retain separate live-account/platform/accessibility gates. See [development/testing](patterns-development-testing.md) and [flow maintenance](patterns-flow.md).
+
+## Transport acceptance and liveness
+
+Use 180-second received-byte inactivity rather than total duration. Arm at request start, reset once on entry into body wait and on every nonempty body chunk before event parsing. SSE comments/fragments count; an open silent socket, empty chunk, local heartbeat or UI activity does not. Each provider turn has a fresh interval; local tools disarm network waiting. Show a nonterminal waiting hint after 30 seconds without bytes, with Cancel available. Worker spawn/health deadlines remain independent (30-second spawn, 5-second heartbeat/30-second health silence).
+
+Require Pi acceptance plus private protocol completion and clean body EOF for the same request before successful terminal/tool delivery. Continue inactivity through the response tail, including after `[DONE]`; errors, malformed tails, transport failure, post-completion silence or cancellation reject acceptance. Bound private observation without retaining reply content; count body bytes once before branching and cancel all readers together. No second inference request or raw public protocol events.
+
+## Provisional public state
+
+Shared [activity contracts](../src/shared/ai/activity.ts) define only serializable display data; they are separate from `LearningOutline`/`SavedOutline`. Incomplete outline fields are allowed. Topic lesson content requires the selected stable lesson ID; absent identity shows waiting without another lesson. Diagnostic previews contain only boolean reply/completion/model-match evidence; completed-looking evidence still requires private domain verification.
+
+Preview prose is limited to 64 KiB UTF-8, history to 40 entries and labels to 256 characters. The 96 KiB complete-frame cap includes escaping and metadata; abbreviation and cumulative omitted history are explicit. Activity entries reflect actual operations; `upcoming` may mark planned validation/save, while completed reads require successful actual reads. No raw tool arguments/results, private thinking, read-file content, file baselines, tokens or provider errors belong in public frames or logs.
+
+Start/phase/terminal state bypasses preview coalescing. Subscribers run asynchronously outside producer callbacks; exceptions and unresolved subscriber promises cannot alter domain results. Cancel/settlement clears pending preview delivery, rejects old ownership and preserves the terminal presentation without owning admission. Snapshots are immutable copies; activity remains memory-only.
+
+## UI and trust owners
+
+[Architecture](patterns-architecture.md) owns process directions; [IPC/security](patterns-ipc-security.md) owns sender/payload validation and private boundaries; [learning/data](patterns-learning-data.md) owns accepted/saved state, topic locality and model proof. The approved workbench bottom panel follows [design system](patterns-design-system.md), [UX](patterns-ux.md) and [renderer](patterns-renderer.md), with actual journey references under [flows](patterns-flow.md). Design images are targets, not working application evidence.

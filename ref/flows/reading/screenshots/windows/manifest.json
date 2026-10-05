@@ -32,13 +32,13 @@
       "sha256": "6547b85cd6c0054caffc332e4e0628762f5da4cbd06daead29cc6ceb4bdf5e9e"
     }
   ],
-  "capturedAt": "2026-10-05T13:18:01.236Z",
+  "capturedAt": "2026-10-05T17:36:53.249Z",
   "testSha256": "7d7a7cdddec2ebcb9779da0d8d43998535f45d6fbf14621e2849b60962353754",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/reading.spec.ts",
   "testTitle": "long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved",
-  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "revision": "db0b22d1d2f511ef39ccf9d6f6086697e94a5f3e",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

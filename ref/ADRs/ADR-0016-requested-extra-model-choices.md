@@ -4,6 +4,8 @@
 - Date: 2026-10-04
 - Scope: user-requested GPT-6.1 Sol and GPT-6 Luna picker additions. Supersedes ADR-0015's requirement to verify Sol each session before selection; keeps its diagnostic boundaries.
 
+[ADR-0022](ADR-0022-shared-pi-streaming-lifecycle.md) supersedes the reused direct-main diagnostic transport/30-second inference deadline with the shared lease/Pi route. Migration remains pending at foundation adoption. Extra choices, fixed targets, independent connection-session proof, endpoint and secrecy remain unchanged.
+
 ## Context
 
 The user ran the corrected Sol test through this app and supplied a summary with HTTP 200, matching `gpt-6.1-sol`, nonempty streamed text, completed status, no provider error and `outcome: verified` after 3967 ms. Discovery still omitted Sol. They requested adding Sol and `gpt-6-luna`, then explicitly chose to keep both as extra choices after restart even when the provider catalogue omits them. No live Luna test has been supplied.

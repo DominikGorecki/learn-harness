@@ -1,5 +1,6 @@
 import type { AccountApi } from '../../shared/account'
 import type { WorkspaceApi } from '../../shared/workspace'
 import type { GenerationApi } from '../../shared/generation'
+import type { AiApi } from '../../shared/ai/activity'
 
-declare global { interface Window { learning: AccountApi & WorkspaceApi & GenerationApi } }
+declare global { interface Window { learning: AccountApi & WorkspaceApi & GenerationApi & AiApi } }

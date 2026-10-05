@@ -8,6 +8,8 @@ Before UI/interaction work, select the relevant [documented flow and screenshots
 
 ## Orientation and progressive disclosure
 
+Under [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md), all inference must use the visible workbench panel with actual waiting/activity, measured elapsed time, supported Cancel and a provisional preview. Other AI submissions remain paused until owner cleanup/domain settlement, while saved reading and ordinary disclosures remain usable. Preserve submission drafts/focus/reading position and explicit Stay here / Cancel and switch navigation; closing an overlay never cancels inference. The coordinator/bridge foundation exists, but producer/panel migration remains pending. Read [AI operations](patterns-ai.md) before implementing that interaction.
+
 At any point the learner can identify the current subject/project, the current activity or document, what is happening, and the next useful action. Keep project navigation stable while the main workspace changes between setup, learning, and review. The header identifies the selected work; it does not repeat every setting or folder detail.
 
 Start with compact navigation and a spacious task area. Add a contextual detail pane for the selected lesson, source, or result only when it helps the current decision. Keep support information close to the part of the activity it explains. Broad tutorials and account configuration should not interrupt an already-understood learning action.

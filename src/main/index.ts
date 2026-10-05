@@ -13,6 +13,8 @@ import { createProjectRegistry } from './storage/project-registry'
 import { createProjectStorage } from './storage/project-storage'
 import { registerWorkspaceHandlers } from './ipc/workspace-handlers'
 import { GenerationService } from '../core/generation/service'
+import { AiCoordinator } from '../core/ai/coordinator'
+import { registerAiHandlers } from './ipc/ai-handlers'
 import { registerGenerationHandlers } from './ipc/generation-handlers'
 import { runOutlineWorker } from './generation/worker-client'
 import { initializeDiagnostics, observeWindow, registerRendererDiagnostics } from './logging/runtime'
@@ -30,6 +32,7 @@ if (!app.isPackaged && process.env.EDU_HARNESS_TEST_DATA_DIR) {
 let mainWindow: BrowserWindow | null = null
 let account: AccountService | null = null
 let generation: GenerationService | null = null
+const ai = new AiCoordinator({ now: () => performance.now(), createId: randomUUID })
 let diagnostics = silentLogger
 let stopping = false
 let logsClosed = false
@@ -70,6 +73,7 @@ if (!app.requestSingleInstanceLock()) {
     diagnostics = await initializeDiagnostics()
     logDiagnostic('info', 'main', 'app.ready')
     registerRendererDiagnostics(() => mainWindow, expectedOrigin)
+    registerAiHandlers(ai, () => mainWindow, expectedOrigin)
     const rendererSession = session.fromPartition('persist:edu-harness')
     rendererSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
     rendererSession.setPermissionCheckHandler(() => false)
@@ -129,7 +133,7 @@ if (!app.requestSingleInstanceLock()) {
     generation?.dispose(); account?.dispose()
     // Give buffered diagnostics a bounded opportunity to reach disk on normal exit.
     const deadline = setTimeout(() => { logsClosed = true; app.quit() }, 2000)
-    void diagnostics.close().finally(() => {
+    void ai.dispose().catch(() => { logDiagnostic('error', 'main', 'app.stopping', { code: 'INTERNAL' }) }).then(() => diagnostics.close()).finally(() => {
       clearTimeout(deadline); logsClosed = true; app.quit()
     })
   })

@@ -28,6 +28,8 @@ Under [ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md), bootstrap impor
 
 ## Asynchronous state
 
+The shared [AI activity contract](../src/shared/ai/activity.ts) and typed bridge are available under [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md); global subscription/panel consumption is pending. Consumers must compare snapshot revision/operation sequence so a late initial query or stale preview cannot replace newer state, unsubscribe on cleanup, and render only safe text projections. Global activity is presentation state; accepted/unsaved output remains domain-owned. Follow [AI operations](patterns-ai.md) and the design/UX owners when implementing the selected panel, focus, scrolling and action availability.
+
 The workspace serializes short metadata operations and keeps drafts by project handle. Event revisions prevent a late initial query or API response from replacing newer published state. Key longer generation requests/results to their owning project and operation. Disable conflicting mutations; navigation during generation offers an explicit stay/cancel choice. Ignore stale results after view cleanup, and unsubscribe from any future event bridge. Do not simulate saving, cancellation, or provider availability in React.
 
 Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), keep outline-edit drafts keyed to their project and saved-outline revision. The renderer sends only the project/model identifiers and learner changes; main/core load authoritative saved context. Dismissing, cancelling or failing a rewrite preserves its draft and prior saved outline; a successful save starts a fresh draft.

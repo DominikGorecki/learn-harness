@@ -62,13 +62,13 @@
       "sha256": "d8438e49c0c4cc05358d74e5864bfeca6806e08adfe0453a80c8ac4c5fd389f9"
     }
   ],
-  "capturedAt": "2026-10-05T13:17:58.909Z",
+  "capturedAt": "2026-10-05T17:36:50.782Z",
   "testSha256": "7d6fb1fc4cb4e532136d824549a3a6d63181a6820c57dbd7f9ad3c4ef1b0a657",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "revision": "db0b22d1d2f511ef39ccf9d6f6086697e94a5f3e",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

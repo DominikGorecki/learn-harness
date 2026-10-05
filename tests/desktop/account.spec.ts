@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { AccountApi } from '../../src/shared/account'
+import type { AiApi } from '../../src/shared/ai/activity'
 
 test('account panel restores and renews its connection after restart and signs out durably', { tag: '@account-connection', annotation: { type: 'flow', description: 'account-connection' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
@@ -19,6 +20,45 @@ test('account panel restores and renews its connection after restart and signs o
     // signed identity verification, model request, service, preload, and UI run.
     await desktop.evaluate(({ shell }) => { shell.openExternal = async url => { await fetch(url) } })
     let page = await desktop.firstWindow()
+    const activity = await page.evaluate(async () => {
+      const bridge = (globalThis as unknown as { learning: AiApi }).learning
+      const empty = await bridge.getAiActivity()
+      const unsubscribe = bridge.onAiActivityChanged(() => { throw new Error('An empty coordinator must not emit producer activity') })
+      const isUnsubscribe = typeof unsubscribe === 'function'
+      unsubscribe(); unsubscribe()
+      const stale = await bridge.cancelAiOperation({ operationId: 'stale' })
+      const malformed = await bridge.cancelAiOperation({ operationId: 'stale', timeout: 0 } as Parameters<AiApi['cancelAiOperation']>[0])
+      return { empty, isUnsubscribe, stale, malformed }
+    })
+    expect(activity.empty).toEqual({ ok: true, data: { revision: 0, active: null, settled: null } })
+    expect(activity.isUnsubscribe).toBe(true)
+    expect(activity.stale).toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } })
+    expect(activity.malformed).toMatchObject({ ok: false, error: { code: 'INVALID_INPUT' } })
+    await page.evaluate(() => {
+      const target = globalThis as unknown as { learning: AiApi; aiBridgeEvidence: { revision: number; keys: string[] }[]; unsubscribeAi: () => void }
+      target.aiBridgeEvidence = []
+      target.unsubscribeAi = target.learning.onAiActivityChanged(snapshot => target.aiBridgeEvidence.push({ revision: snapshot.revision, keys: Object.keys(snapshot) }))
+    })
+    await desktop.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.webContents.send('ai:activity-changed', { revision: 1, active: null, settled: null }) })
+    await page.waitForFunction(() => (globalThis as unknown as { aiBridgeEvidence: unknown[] }).aiBridgeEvidence.length === 1)
+    const subscription = await page.evaluate(() => {
+      const target = globalThis as unknown as { aiBridgeEvidence: { revision: number; keys: string[] }[]; unsubscribeAi: () => void }
+      target.unsubscribeAi(); return target.aiBridgeEvidence
+    })
+    expect(subscription).toEqual([{ revision: 1, keys: ['revision', 'active', 'settled'] }])
+    await desktop.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.webContents.send('ai:activity-changed', { revision: 2, active: null, settled: null }) })
+    // A subsequent IPC reply ensures the sent event has crossed the bridge before checking unsubscribe.
+    await page.evaluate(async () => { await (globalThis as unknown as { learning: AiApi }).learning.getAiActivity() })
+    expect(await page.evaluate(() => (globalThis as unknown as { aiBridgeEvidence: unknown[] }).aiBridgeEvidence.length)).toBe(1)
+    // Exercise authorization through real Electron IPC, without adding a public raw-IPC capability.
+    const forgedActivity = await desktop.evaluate(async ({ ipcMain, webContents }) => {
+      const listener = (ipcMain as unknown as { _invokeHandlers: Map<string, (event: unknown, payload?: unknown) => Promise<unknown>> })._invokeHandlers
+      const contents = webContents.getAllWebContents().find(item => item.getURL().startsWith('learningapp://workspace'))!
+      const forged = { sender: {}, senderFrame: contents.mainFrame }
+      return Promise.all(['ai:get-activity', 'ai:cancel-operation'].map(channel => listener.get(channel)!(forged, channel.includes('cancel') ? { operationId: 'stale' } : undefined)))
+    })
+    expect(forgedActivity).toEqual([expect.objectContaining({ ok: false, error: expect.objectContaining({ code: 'FORBIDDEN' }) }),
+      expect.objectContaining({ ok: false, error: expect.objectContaining({ code: 'FORBIDDEN' }) })])
     await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
     await page.getByRole('button', { name: 'Continue with ChatGPT' }).click()

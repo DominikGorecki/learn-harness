@@ -2,7 +2,7 @@
 
 Status: Accepted — 2026-10-04
 
-Project-file tool and publication scope extended by [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md); process, inference and cancellation bounds remain applicable.
+Project-file tool and publication scope extended by [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md). [ADR-0022](ADR-0022-shared-pi-streaming-lifecycle.md) supersedes fixed elapsed inference/watchdog deadlines with received-byte inactivity and global ownership; transport/producer migration is pending at foundation adoption. Other process, size/turn, acceptance, endpoint and cancellation/publication guarantees remain applicable.
 
 ## Context
 

@@ -1,6 +1,6 @@
 # ADR-0015: Explicit verification of an unlisted model
 
-- Status: Accepted; the selection gate is superseded by [ADR-0016](ADR-0016-requested-extra-model-choices.md). Diagnostic transport and proof requirements remain accepted.
+- Status: Accepted; the selection gate is superseded by [ADR-0016](ADR-0016-requested-extra-model-choices.md). [ADR-0022](ADR-0022-shared-pi-streaming-lifecycle.md) supersedes only direct-main diagnostic transport and its 30-second inference deadline; migration remains pending at foundation adoption. Fixed targets, endpoint, secrecy and independent completion/model/text proof remain accepted.
 - Date: 2026-10-04
 - Scope: user-requested GPT-6.1 Sol diagnostic and session model availability. Supplements ADR-0008; keeps its account connection and transport.
 

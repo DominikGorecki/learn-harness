@@ -5,6 +5,8 @@ import { workspaceChannels } from '../shared/workspace'
 import type { WorkspaceApi, WorkspaceSnapshot } from '../shared/workspace'
 import { generationChannels } from '../shared/generation'
 import type { GenerationApi, GenerationSnapshot } from '../shared/generation'
+import { aiChannels } from '../shared/ai/activity'
+import type { AiApi, AiActivitySnapshot } from '../shared/ai/activity'
 import { rendererDiagnosticChannel, rendererDiagnosticMessage, safeLogData } from '../shared/diagnostics'
 
 // Automatic failure telemetry carries no messages, URLs, promises or material.
@@ -24,7 +26,14 @@ diagnosticWindow.addEventListener('message', event => {
     ...safeLogData({ errorType: data.errorType, line: data.line, column: data.column }) })
 })
 
-const learning: AccountApi & WorkspaceApi & GenerationApi = {
+const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi = {
+  getAiActivity: () => ipcRenderer.invoke(aiChannels.get),
+  cancelAiOperation: request => ipcRenderer.invoke(aiChannels.cancel, request),
+  onAiActivityChanged: listener => {
+    const receive = (_event: unknown, snapshot: AiActivitySnapshot) => listener(snapshot)
+    ipcRenderer.on(aiChannels.changed, receive)
+    return () => { ipcRenderer.removeListener(aiChannels.changed, receive) }
+  },
   getAccount: () => ipcRenderer.invoke(accountChannels.get),
   connectAccount: () => ipcRenderer.invoke(accountChannels.connect),
   cancelAccountConnection: () => ipcRenderer.invoke(accountChannels.cancel),

@@ -5,6 +5,9 @@ import { providerEnvironment } from '../../src/main/auth/provider-environment'
 import { chatgptEndpoints } from '../../src/main/auth/chatgpt-provider'
 import { appOrigin } from '../../src/main/security/policy'
 import { ApplicationError } from '../../src/shared/contracts'
+import { AiCoordinator } from '../../src/core/ai/coordinator'
+import { registerAiHandlers } from '../../src/main/ipc/ai-handlers'
+import { aiChannels } from '../../src/shared/ai/activity'
 
 const handlers = vi.hoisted(() => new Map<string, (event: IpcMainInvokeEvent, payload?: unknown) => Promise<unknown>>())
 vi.mock('electron', () => ({ ipcMain: { handle: (channel: string, handler: (event: IpcMainInvokeEvent, payload?: unknown) => Promise<unknown>) => handlers.set(channel, handler) } }))
@@ -37,6 +40,27 @@ describe('asynchronous privileged capabilities', () => {
     expect(JSON.stringify(reply)).not.toContain('private token')
     expect(log.mock.calls.flat().join(' ')).not.toContain('private token')
     log.mockRestore()
+  })
+  it('authorizes named AI capabilities and rejects malformed, stale and privileged cancellation input', async () => {
+    const coordinator = new AiCoordinator({ now: () => 0, createId: () => 'operation' })
+    const unsubscribe = registerAiHandlers(coordinator, () => window, appOrigin)
+    const get = handlers.get(aiChannels.get)!, cancel = handlers.get(aiChannels.cancel)!
+    await expect(get(event)).resolves.toEqual({ ok: true, data: { revision: 0, active: null, settled: null } })
+    await expect(get(event, {})).resolves.toMatchObject({ ok: false, error: { code: 'INVALID_INPUT' } })
+    for (const payload of [undefined, {}, { operationId: 1 }, { operationId: 'a/b' }, { operationId: 'operation', model: 'other' }, { operationId: 'operation', timeout: 0 }]) {
+      await expect(cancel(event, payload)).resolves.toMatchObject({ ok: false, error: { code: 'INVALID_INPUT' } })
+    }
+    await expect(cancel(event, { operationId: 'stale' })).resolves.toMatchObject({ ok: false, error: { code: 'NOT_FOUND' } })
+    for (const hostile of [{ ...event, sender: {} }, { ...event, senderFrame: { ...mainFrame, url: `${appOrigin}/other.html` } },
+      { ...event, senderFrame: { ...mainFrame, origin: 'https://evil.example' } }]) {
+      await expect(get(hostile as IpcMainInvokeEvent)).resolves.toMatchObject({ ok: false, error: { code: 'FORBIDDEN' } })
+      await expect(cancel(hostile as IpcMainInvokeEvent, { operationId: 'operation' })).resolves.toMatchObject({ ok: false, error: { code: 'FORBIDDEN' } })
+    }
+    const { lease } = coordinator.claim({ kind: 'test-sol', model: { id: 'gpt-6.1-sol', name: 'Sol' }, heading: 'Testing Sol', requestSummary: '' })
+    const cleanup = vi.fn(async () => {}); lease.setCancellation(cleanup)
+    await expect(cancel(event, { operationId: lease.operationId })).resolves.toMatchObject({ ok: true, data: { active: null, settled: { outcome: 'cancelled' } } })
+    expect(cleanup).toHaveBeenCalledOnce()
+    unsubscribe(); await coordinator.dispose()
   })
 })
 
