@@ -1,0 +1,13 @@
+{
+  "flow": "packaged-worker",
+  "captures": [],
+  "capturedAt": "2026-10-05T18:23:39.748Z",
+  "testSha256": "a95ccfb6e1db82723c955ac9b4bc704bdbe6cc397c23b40b7b1d08efe89a15dd",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/packaged-worker.spec.ts",
+  "testTitle": "packaged ASAR worker loads its Pi dependencies and reads only scoped material",
+  "revision": "53db6b2aea91328c4342a671440db96c7de7874a",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

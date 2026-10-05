@@ -77,9 +77,42 @@ test('model and utility diagnostics retain transport evidence and request correl
     await page.getByLabel('Project model').selectOption('fixture-model')
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
     await expect(page.getByText('Saved', { exact: true })).toBeVisible()
-    await desktop.close(); desktop = undefined
+    const savedPath = join(folder, '.edu/project.json')
     const logs = join(profile, 'logs')
-    const text = (await Promise.all((await readdir(logs)).filter(name => name.endsWith('.jsonl')).map(name => readFile(join(logs, name), 'utf8')))).join('')
+    const logText = async () => (await Promise.all((await readdir(logs)).filter(name => name.endsWith('.jsonl')).map(name => readFile(join(logs, name), 'utf8')))).join('')
+    fixture.options.inferenceMode = 'hold'
+    await page.getByRole('button', { name: 'Refine learning direction' }).click()
+    await page.getByRole('textbox').fill('LOG_PRIVATE_REVISED_GOAL')
+    const startRevision = async () => {
+      await page.getByRole('button', { name: 'Create new outline', exact: true }).click()
+      await page.getByRole('dialog').getByRole('button', { name: 'Create new outline', exact: true }).click()
+    }
+    await startRevision()
+    await expect.poll(() => fixture.inferenceRequests.length).toBe(3)
+    // Refining the brief is an intentional existing save before generation starts.
+    const original = await readFile(savedPath, 'utf8')
+    await expect.poll(async () => {
+      const entries = (await logText()).trim().split('\n').map(line => JSON.parse(line))
+      const worker = entries.filter(entry => entry.event === 'worker.started').at(-1)
+      return entries.filter(entry => entry.event === 'worker.health' && entry.data.workerId === worker?.data.workerId).length
+    }, { timeout: 10_000 }).toBeGreaterThanOrEqual(2)
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect(page.getByText('Outline creation cancelled. Your previous outline is unchanged.', { exact: true })).toBeVisible()
+    await expect.poll(() => desktop!.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Learning outline').length)).toBe(0)
+    expect(await readFile(savedPath, 'utf8')).toBe(original)
+    await startRevision()
+    await expect.poll(() => fixture.inferenceRequests.length).toBe(4)
+    const beforeWorkerLoss = await readFile(savedPath, 'utf8')
+    await desktop.evaluate(({ app }) => {
+      const worker = app.getAppMetrics().find(metric => metric.name === 'Learning outline')
+      if (!worker) throw new Error('Expected the owned outline worker')
+      process.kill(worker.pid)
+    })
+    await expect(page.getByText('The outline process stopped unexpectedly. Your previous work is unchanged.', { exact: true })).toBeVisible()
+    await expect.poll(() => desktop!.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Learning outline').length)).toBe(0)
+    expect(await readFile(savedPath, 'utf8')).toBe(beforeWorkerLoss)
+    await desktop.close(); desktop = undefined
+    const text = await logText()
     for (const secret of ['LOG_PRIVATE_', 'fixture-access', 'fixture-refresh', 'learner@example.test', 'Test Learner', 'Bayesian reasoning', fixture.baseUrl]) expect(text).not.toContain(secret)
     const entries = text.trim().split('\n').map(line => JSON.parse(line))
     expect(entries.find(entry => entry.event === 'model.test').data).toMatchObject({ requestedModel: 'gpt-6.1-sol', httpStatus: 200, outcome: 'verified' })
@@ -88,9 +121,12 @@ test('model and utility diagnostics retain transport evidence and request correl
     expect(worker.data.requestId).toBeTruthy()
     expect(entries.some(entry => entry.event === 'ipc.started' && entry.data.requestId === worker.data.requestId)).toBe(true)
     const events = entries.filter(entry => entry.data.workerId === worker.data.workerId)
-    expect(events.map(entry => entry.event)).toEqual(expect.arrayContaining(['worker.spawned', 'engine.request', 'engine.response', 'engine.terminal', 'engine.tool', 'worker.completed']))
+    expect(events.map(entry => entry.event)).toEqual(expect.arrayContaining(['worker.spawned', 'worker.health', 'engine.request', 'engine.response', 'engine.transport', 'engine.terminal', 'engine.tool', 'worker.completed', 'worker.exited']))
     expect(events.every(entry => entry.data.requestId === worker.data.requestId)).toBe(true)
     expect(events.find(entry => entry.event === 'engine.tool').data.tool).toBe('submit_outline')
+    expect(entries.some(entry => entry.event === 'engine.transport' && entry.data.bytes > 0 && entry.data.transportStage === 'receiving')).toBe(true)
+    expect(entries.some(entry => entry.event === 'engine.transport' && entry.data.terminalReason === 'cancelled')).toBe(true)
+    expect(entries.filter(entry => entry.event === 'worker.failed').map(entry => entry.data.code)).toEqual(expect.arrayContaining(['CANCELLED', 'INTERNAL']))
   } finally {
     await desktop?.close()
     await fixture.close()

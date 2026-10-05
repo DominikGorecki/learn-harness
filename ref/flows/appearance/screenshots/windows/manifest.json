@@ -77,13 +77,13 @@
       "sha256": "3c8b9767cd53b25f36c22bba25b47cdb6bf2d596e2965643048a6762d0505992"
     }
   ],
-  "capturedAt": "2026-10-05T17:36:07.465Z",
+  "capturedAt": "2026-10-05T18:19:40.005Z",
   "testSha256": "9b4603814f7c4cc3fca1561a42e7b3e4e852b13f9b43e70793e36b5867ae36b7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/appearance.spec.ts",
   "testTitle": "appearance changes every surface, preserves drafts, and survives a desktop restart",
-  "revision": "db0b22d1d2f511ef39ccf9d6f6086697e94a5f3e",
+  "revision": "53db6b2aea91328c4342a671440db96c7de7874a",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

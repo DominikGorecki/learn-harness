@@ -1,4 +1,5 @@
 import { accountChannels } from './account'
+import { aiChannels } from './ai/activity'
 import { generationChannels } from './generation'
 import { workspaceChannels } from './workspace'
 
@@ -12,23 +13,25 @@ export type LogEvent = 'session.started' | 'app.ready' | 'app.stopping' | 'app.s
   'process.gone' | 'process.unhandled' | 'preload.failed' | 'renderer.error' | 'renderer.rejection' |
   'console.output' | 'ipc.started' | 'ipc.completed' | 'ipc.failed' | 'account.changed' |
   'workspace.changed' | 'generation.changed' | 'worker.started' | 'worker.spawned' |
-  'worker.phase' | 'worker.completed' | 'worker.failed' | 'worker.exited' |
+  'worker.phase' | 'worker.completed' | 'worker.failed' | 'worker.exited' | 'worker.health' | 'worker.stopping' |
   'engine.materials' | 'engine.request' | 'engine.response' | 'engine.terminal' |
-  'engine.tool' | 'engine.turn' | 'model.test' | 'logging.dropped'
+  'engine.tool' | 'engine.turn' | 'engine.transport' | 'model.test' | 'logging.dropped'
 
 const enumFields: Record<string, readonly string[]> = {
-  channel: [...Object.values(accountChannels), ...Object.values(generationChannels), ...Object.values(workspaceChannels)],
+  channel: [...Object.values(accountChannels), ...Object.values(aiChannels), ...Object.values(generationChannels), ...Object.values(workspaceChannels)],
   code: ['INVALID_INPUT', 'NOT_FOUND', 'FORBIDDEN', 'INTERNAL', 'AUTH_REQUIRED', 'PLAN_PERMISSION_REQUIRED', 'ACCESS_RESTRICTED', 'USAGE_LIMIT', 'NETWORK', 'CANCELLED', 'BUSY', 'UNAVAILABLE', 'STORAGE', 'CONFLICT'],
   errorType: ['Error', 'TypeError', 'RangeError', 'SyntaxError', 'ReferenceError', 'URIError', 'EvalError', 'ApplicationError', 'AggregateError', 'unknown'],
   status: ['disconnected', 'connecting', 'connected', 'permission-required', 'reconnect-required', 'restricted', 'usage-limited', 'preparing', 'examining', 'planning', 'validating', 'saving', 'saved', 'needs-details', 'cancelled', 'failed', 'unsaved'],
   modelsStatus: ['idle', 'loading', 'ready', 'failed'],
-  phase: ['examining', 'planning', 'validating'], kind: ['outline', 'needs-details'],
+  phase: ['preparing', 'waiting', 'receiving', 'examining', 'planning', 'validating', 'finished'], kind: ['outline', 'needs-details'],
+  transportStage: ['waiting', 'receiving', 'ended'],
+  terminalReason: ['completed', 'cancelled', 'network-idle', 'transport-error', 'invalid-event', 'request-limit', 'response-limit', 'provider-error', 'incomplete', 'missing-completion'],
   availability: ['available', 'missing', 'unreadable'],
   reason: ['clean-exit', 'abnormal-exit', 'killed', 'crashed', 'oom', 'launch-failed', 'integrity-failure'],
   processType: ['Utility', 'GPU', 'Zygote', 'Sandbox helper', 'renderer', 'main'],
   origin: ['uncaughtException', 'unhandledRejection'],
   method: ['log', 'info', 'warn', 'error', 'debug', 'trace'],
-  tool: ['list_materials', 'read_material', 'submit_outline', 'request_learning_details'],
+  tool: ['list_materials', 'read_material', 'list_project_files', 'read_project_file', 'write_project_file', 'submit_outline', 'request_learning_details'],
   terminalEvent: ['response.completed', 'response.incomplete', 'response.failed', 'error'],
   requestedModel: ['gpt-6.1-sol', 'gpt-6-luna'],
   contentType: ['sse', 'json', 'other', 'missing'],
@@ -38,8 +41,8 @@ const enumFields: Record<string, readonly string[]> = {
   outcome: ['network_error', 'http_error', 'stream_error', 'missing_body', 'invalid_event', 'response_too_large', 'missing_completion', 'incomplete_response', 'unexpected_status', 'model_mismatch', 'missing_output', 'verified', 'cancelled', 'timeout'],
   platform: ['win32', 'darwin', 'linux']
 }
-const numbers = new Set(['elapsedMs', 'exitCode', 'pid', 'windowId', 'line', 'column', 'arguments', 'omittedCharacters', 'projects', 'runs', 'files', 'readableFiles', 'turn', 'httpStatus', 'bytes', 'events', 'textDeltaEvents', 'completedEvents', 'dropped'])
-const booleans = new Set(['hasStreamedText', 'hasFinalText', 'hasOutline', 'hasActiveProject', 'writable', 'rewriting', 'completed', 'blocked', 'packaged', 'development'])
+const numbers = new Set(['elapsedMs', 'exitCode', 'pid', 'windowId', 'line', 'column', 'arguments', 'omittedCharacters', 'projects', 'runs', 'files', 'readableFiles', 'turn', 'httpStatus', 'bytes', 'chunks', 'events', 'lastByteAgeMs', 'semanticAgeMs', 'textDeltaEvents', 'completedEvents', 'dropped'])
+const booleans = new Set(['hasStreamedText', 'hasFinalText', 'hasOutline', 'hasActiveProject', 'writable', 'rewriting', 'completed', 'blocked', 'waiting', 'packaged', 'development'])
 const identifiers = new Set(['requestId', 'workerId', 'runId', 'projectId'])
 const versions = new Set(['appVersion', 'electronVersion', 'nodeVersion', 'chromeVersion'])
 

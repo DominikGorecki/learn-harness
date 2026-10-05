@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { safeLogData } from '../../src/shared/diagnostics'
+import { aiChannels } from '../../src/shared/ai/activity'
 import { createFileLogger, errorDiagnostic, logDiagnostic, setDiagnosticLogger, silentLogger, withDiagnosticRequest } from '../../src/main/logging/logger'
 
 const roots: string[] = []
@@ -21,6 +22,11 @@ afterEach(async () => {
 })
 
 describe('development structured file logging', () => {
+  it('recognizes only the fixed activity channels and sanitized project tools', () => {
+    for (const channel of Object.values(aiChannels)) expect(safeLogData({ channel, prompt: 'PRIVATE_PROMPT' })).toEqual({ channel })
+    for (const tool of ['list_project_files', 'read_project_file', 'write_project_file']) expect(safeLogData({ tool, arguments: { path: 'PRIVATE_PATH' } })).toEqual({ tool })
+    expect(safeLogData({ channel: 'ai:PRIVATE_CHANNEL', tool: 'PRIVATE_TOOL', content: 'PRIVATE_CONTENT' })).toEqual({ channel: 'unrecognized', tool: 'unrecognized' })
+  })
   it('preserves ordered records, correlation, private permissions and normal-exit flushing', async () => {
     const root = await directory(), logger = await createFileLogger(root)
     setDiagnosticLogger(logger)

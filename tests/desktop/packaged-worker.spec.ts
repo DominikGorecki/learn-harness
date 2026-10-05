@@ -22,20 +22,27 @@ test('packaged ASAR worker loads its Pi dependencies and reads only scoped mater
     desktop = await playwright._electron.launch({ args: [resolve('out/main/index.js')], env: { ...env, EDU_HARNESS_TEST_DATA_DIR: join(root, 'profile') } })
     await desktop.firstWindow()
     const result = await desktop.evaluate(async ({ utilityProcess }, input) => new Promise<WorkerReply>((resolve, reject) => {
-      const worker = utilityProcess.fork(input.workerPath, [], { stdio: 'ignore' })
-      let settled = false
+      const workerEnv = Object.fromEntries(['PATH', 'SystemRoot', 'WINDIR', 'TEMP', 'TMP', 'TMPDIR', 'LANG', 'LC_ALL', 'SSL_CERT_FILE', 'SSL_CERT_DIR']
+        .flatMap(key => process.env[key] ? [[key, process.env[key]!]] : []))
+      const worker = utilityProcess.fork(input.workerPath, [], { env: workerEnv, stdio: 'ignore' })
+      let stopping = false, terminal: WorkerReply | undefined, failure: Error | undefined
       const finish = (message?: WorkerReply, error?: Error) => {
-        if (settled) return
-        settled = true; clearTimeout(timeout); worker.kill()
-        if (error) reject(error); else resolve(message!)
+        if (stopping) return
+        stopping = true; terminal = message; failure = error; clearTimeout(timeout); worker.kill()
       }
       const timeout = setTimeout(() => finish(undefined, new Error('Packaged worker timed out')), 15_000)
-      worker.once('spawn', () => worker.postMessage({ type: 'start', input: { model: { id: 'fixture-model', name: 'Fixture model' }, accessToken: 'fixture-access',
+      worker.once('spawn', () => worker.postMessage({ type: 'start', profile: 'outline', input: { model: { id: 'fixture-model', name: 'Fixture model' }, accessToken: 'fixture-access',
         baseUrl: input.baseUrl, brief: '', path: input.project } }))
       worker.on('message', (message: WorkerReply) => { if (message.type === 'result' || message.type === 'error') finish(message) })
-      worker.once('exit', () => { if (!settled) finish(undefined, new Error('Packaged worker exited before completing')) })
+      worker.on('error', () => finish(undefined, new Error('Packaged worker could not start or continue')))
+      worker.once('exit', () => {
+        clearTimeout(timeout); worker.removeAllListeners()
+        if (failure) reject(failure)
+        else if (terminal) resolve(terminal)
+        else reject(new Error('Packaged worker exited before completing'))
+      })
     }), { workerPath: join(asar!, 'out/main/outline-worker.js'), baseUrl: `${fixture.baseUrl}/v1`, project })
-    expect(result).toMatchObject({ type: 'result', result: { kind: 'outline', document: { title: 'Bayesian reasoning' }, coverage: { files: [{ path: 'notes.md', status: 'read' }] } } })
+    expect(result).toMatchObject({ type: 'result', profile: 'outline', result: { kind: 'outline', document: { title: 'Bayesian reasoning' }, coverage: { files: [{ path: 'notes.md', status: 'read' }] } } })
     expect(fixture.inferenceRequests).toHaveLength(3)
   } finally { await desktop?.close(); await fixture.close(); await rm(root, { recursive: true, force: true }) }
 })

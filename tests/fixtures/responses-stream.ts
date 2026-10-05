@@ -2,7 +2,7 @@ import type { ServerResponse } from 'node:http'
 let responseNumber = 0
 
 export function writeToolResponse(response: ServerResponse, options: {
-  name?: string; args: unknown; terminal?: 'completed' | 'incomplete' | 'failed' | 'missing'; code?: string; namespace?: string
+  name?: string; args: unknown; terminal?: 'completed' | 'incomplete' | 'failed' | 'missing'; code?: string; namespace?: string; tail?: string; keepOpen?: boolean
 }) {
   if (!response.headersSent) response.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache' })
   const event = (type: string, data: Record<string, unknown>) => response.write(`event: ${type}\ndata: ${JSON.stringify({ type, ...data })}\n\n`)
@@ -19,5 +19,6 @@ export function writeToolResponse(response: ServerResponse, options: {
     usage: { input_tokens: 100, output_tokens: 200, total_tokens: 300 },
     ...(terminal === 'incomplete' ? { incomplete_details: { reason: 'max_output_tokens' } } : {}),
     ...(terminal === 'failed' ? { error: { code: options.code ?? 'subscription_sharing_usage_limit_exceeded', message: 'RAW SECRET PROVIDER ERROR' } } : {}) } })
-  response.end()
+  if (options.tail) response.write(options.tail)
+  if (!options.keepOpen) response.end()
 }

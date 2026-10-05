@@ -10,10 +10,10 @@ This matrix records verified implementation evidence, not design approval or pro
 | --- | --- | --- |
 | R01 — shared Pi path for all five starts | T04 | Pending |
 | R02 — synchronous global admission/deduplication | T01 | T01 foundation accepted: coordinator race/reuse tests; producer enforcement still pending T03/T04/T06 |
-| R03 — receiving stream has no elapsed cutoff | T02 | Pending deterministic and ≥200-second real elapsed evidence |
-| R04 — silence recovery/per-turn idle | T02 | Pending |
-| R05 — independent worker health | T02 | Pending |
-| R06 — retained byte/turn/file bounds | T02 | Pending |
+| R03 — receiving stream has no elapsed cutoff | T02 | T02 deterministic receiving/comment/fragment tests past old cutoffs and pinned SDK timeout audit accepted; ≥200-second real elapsed evidence pending T06 |
+| R04 — silence recovery/per-turn idle | T02 | T02 header-once/empty/silent-tail/fresh-turn idle and timer cleanup tests accepted; integrated panel recovery pending T06 |
+| R05 — independent worker health | T02 | T02 spawn/health/replay/cancellation/exit tests and real utility health/cancel/death journey accepted |
+| R06 — retained byte/turn/file bounds | T02 | T02 request/response caps, existing turn/topic tests and independently bounded large escaped/Unicode full-result proof accepted; producer/diagnostic integration pending T03/T04/T06 |
 | R07 — truthful text/structured activity | T03 | Pending |
 | R08 — tolerant provisional schema/candidate replacement | T03 | Pending |
 | R09 — ownership/revision/topic isolation | T01 | T01 foundation accepted: stale/duplicate/cancelled correlation and strict stable-topic preview tests; projector/UI evidence pending |
@@ -28,7 +28,7 @@ This matrix records verified implementation evidence, not design approval or pro
 | R18 — accepted domain terminal/lease release | T03 | Pending |
 | R19 — theme/zoom/keyboard/motion/accessibility | T05 | Pending automated and actual review; OS accessibility qualifications separate |
 | R20 — reading/scroll/navigation/account ownership | T05 | Pending |
-| R21 — safe bounded liveness/health diagnostics | T02 | Pending |
+| R21 — safe bounded liveness/health diagnostics | T02 | T02 safe byte/semantic-age/health/terminal summaries, privacy/observer tests and real correlated logs accepted; migrated model summaries/integrated audit pending |
 | R22 — mandatory future AI recipe/ADR/guidance | T07 | ADR-0022 and canonical AI/discovery foundation accepted; producer migration and final maintained-document/source audit pending T07 |
 | R23 — passing flow references/exact gate evidence | T06 | Pending |
 

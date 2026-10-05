@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T02 - Pi byte liveness and independent worker health
-Status: Open
+Status: Done
 
 ## Source
 
@@ -52,11 +52,11 @@ Main/utility own fetch, credentials, clocks and process control; core/shared con
 
 ## Acceptance criteria
 
-- [ ] No total timer expires a receiving response or multi-turn operation.
-- [ ] Only observed nonempty chunks extend network liveness; silent streams and lost workers settle through separate tested policies.
-- [ ] Existing request/response/turn/file limits and explicit cancellation remain enforced.
-- [ ] Both sanctioned profile envelopes share the transport; secrets/raw events remain private and malformed worker frames fail safely.
-- [ ] Bounded diagnostics distinguish silence, receiving data and worker health without content leakage.
+- [x] No total timer expires a receiving response or multi-turn operation.
+- [x] Only observed nonempty chunks extend network liveness; silent streams and lost workers settle through separate tested policies.
+- [x] Existing request/response/turn/file limits and explicit cancellation remain enforced.
+- [x] Both sanctioned profile envelopes share the transport; secrets/raw events remain private and malformed worker frames fail safely.
+- [x] Bounded diagnostics distinguish silence, receiving data and worker health without content leakage.
 
 ## Manual verification
 
@@ -64,7 +64,13 @@ Run isolated fixture requests with heartbeat-only waits, silence and worker term
 
 ## Completion evidence
 
-Pending authorized implementation: transport/worker policy, timeout inventory, exact test results, safe diagnostic examples and cleanup evidence.
+Accepted on 2026-10-05 by the coordinator after implementation/diff/test review. Worker `pi_transport_audit`, GPT-6.1 Sol / high; independent reviewer `t01_review`, same model/effort. Prerequisite T01 is committed as `53db6b2aea91328c4342a671440db96c7de7874a` on `master`.
+
+Shared Pi raw-byte inactivity/full-EOF transport and strict outline/model-access worker profiles replace elapsed generation/worker watchdogs. Independent spawn/health monitoring and cancellation wait for actual exit. Private result bounds derive from existing outline/coverage/edit budgets, separately from preview caps. Safe bounded transport/health logs and async observer isolation retain acceptance despite presentation/logging failure.
+
+Final evidence: focused transport/lifecycle/engine/logging tests 66 passed / one platform skip; `npm run check` exit 0 (255 passed / 3 skipped, lint/types/build/flows); `npm run test:desktop` exit 0 (13 passed / expected packaged skip); `npm run package` exit 0 (Windows x64 unpacked); `npm run test:packaged` exit 0 (one passed); refreshed `npm run test:flows` and diff checks passed. The coordinator independently ran flow integrity and reviewed changed captures, protocol/SDK timeout composition and all acceptance criteria. Review findings were repaired with direct regressions before acceptance. Exact commands, earlier failures and evidence limits are in [validation](validation.md).
+
+Real utility evidence covers health reports, cooperative cancellation, unexpected worker death, actual exit and unchanged request-start saved bytes. Packaged evidence uses the ASAR worker under a development host; it does not certify hardened window startup. No test-owned processes remained; pre-existing dev/watch processes were preserved. The unaccelerated ≥200-second journey, producer migration, panel and live/native qualifications remain subsequent work; this ticket does not close the bundle.
 
 ## Notes
 

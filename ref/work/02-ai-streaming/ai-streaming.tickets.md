@@ -4,7 +4,7 @@ Status: In progress
 Source: [Ready spec](ai-streaming.spec.md)
 Date: 2026-10-05
 
-The tickets were authored as planning artifacts with all seven Open. The active `spec-implement` goal now authorizes their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01 is accepted; T02–T07 remain open. Implement the complete bundle before release so no diagnostic or educational inference bypass remains.
+The tickets were authored as planning artifacts with all seven Open. The active `spec-implement` goal now authorizes their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01 and T02 are accepted; T03–T07 remain open. Implement the complete bundle before release so no diagnostic or educational inference bypass remains.
 
 ## Implementation order
 

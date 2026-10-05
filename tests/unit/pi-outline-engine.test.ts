@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net'
 import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { generateWithPi } from '../../src/main/generation/pi-outline-engine'
 import { learningOutline } from '../fixtures/learning-outline'
 import { writeToolResponse } from '../fixtures/responses-stream'
@@ -30,6 +30,20 @@ const model = { id: 'fixture-model', name: 'Learning model' }
 const options = () => ({ signal: new AbortController().signal, onPhase: () => {} })
 
 describe('actual Pi agent and plan Responses transport', () => {
+  it.each(['data: broken-json\n\n', 'data: [DONE]\n\ndata: {"type":"response.failed","response":{"error":{"code":"model_not_found","message":"RAW SECRET"}}}\n\n'])('holds outline tools until clean EOF rejects a bad tail (%s)', async tail => {
+    const server = await fixture(response => writeToolResponse(response, { args: learningOutline(), tail }))
+    const diagnostic = vi.fn()
+    await expect(generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayes' }, { ...options(), onDiagnostic: diagnostic })).rejects.toMatchObject({ code: tail.includes('broken-json') ? 'NETWORK' : 'UNAVAILABLE' })
+    expect(diagnostic.mock.calls.some(([event]) => event === 'engine.tool')).toBe(false)
+    expect(server.requests).toHaveLength(1)
+  })
+  it('isolates rejected asynchronous phase, transport and diagnostic subscribers', async () => {
+    const server = await fixture(response => writeToolResponse(response, { args: learningOutline() }))
+    const reject = vi.fn(async () => { throw new Error('PRIVATE_OBSERVER_ERROR') })
+    await expect(generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayes' }, { signal: new AbortController().signal,
+      onPhase: reject, onTransport: reject, onDiagnostic: reject })).resolves.toMatchObject({ kind: 'outline' })
+    expect(reject).toHaveBeenCalled()
+  })
   it('includes saved outline JSON on every Pi turn and lets rewrites retain recorded sources without unnecessary reads', async () => {
     const path = await realpath(await mkdtemp(join(tmpdir(), 'edu-pi-rewrite-')))
     close.push(() => rm(path, { recursive: true, force: true }))

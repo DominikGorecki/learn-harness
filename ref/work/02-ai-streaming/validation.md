@@ -37,7 +37,7 @@ No baseline desktop, packaging or live-account inference was run at this point. 
 
 ### T01 — accepted foundation
 
-Worker `t01_coordinator`, GPT-6.1 Sol / high; independent reviewer `t01_review`, same model/effort. No prerequisites. Source baseline for the accepted checks: `db0b22d` plus reviewed T01 edits (the spec-only refinement was committed as `db0b22d` during this goal). Commit SHA is recorded after the ticket commit, avoiding a self-reference.
+Worker `t01_coordinator`, GPT-6.1 Sol / high; independent reviewer `t01_review`, same model/effort. No prerequisites. Source baseline for the accepted checks: `db0b22d` plus reviewed T01 edits (the spec-only refinement was committed as `db0b22d` during this goal). Accepted commit: `53db6b2aea91328c4342a671440db96c7de7874a`, reachable on `master`; post-commit worktree was clean.
 
 Delivered core ownership/leases, shared bounded immutable preview schemas and named authorized main/preload activity methods. ADR-0022, indexes and focused patterns explicitly distinguish this foundation from pending producer/transport/panel migration. Primary reviewed actual implementation/tests; reviewer found two cancellation races, both fixed with direct regressions and then confirmed resolved.
 
@@ -52,6 +52,40 @@ Delivered core ownership/leases, shared bounded immutable preview schemas and na
 | Cleanup | Worker checked owned processes: no Electron/Playwright/out-main process remained |
 
 Initial strict optional test-type findings were repaired before the passing full check. Required gates used normal host execution; application sandbox/context isolation remained intact. Reporter refreshed 13 passing Windows flow sets at `db0b22d`, source dirty; packaged references were skipped. The usage-recovery PNG retains saved-context/connection-warning presentation but its provider feedback is above the captured viewport; T05/T06 must improve that checkpoint before final UI acceptance. No live/provider-account or packaging qualification is claimed. Complete producer race/latency/UI evidence remains pending.
+
+Primary post-handoff validation: `npm run test:flows` exit 0, `git diff --check` and staged diff check passed; 324 relative links resolved in 33 changed documents. All 59 accepted paths were reviewed and staged explicitly.
+
+### T02 — accepted transport and worker lifecycle
+
+Worker `pi_transport_audit` reused as transport/backend implementer, GPT-6.1 Sol / high. Prerequisite T01 accepted at `53db6b2aea91328c4342a671440db96c7de7874a`. Its read-only transport plan and T01 API comparison found no blocker. One mutating worker owns the Pi transport/protocol/lifecycle and focused tests; domain admission/projection/account migration remain T03/T04. Checks and acceptance are pending.
+
+Primary and independent reviewer `t01_review` inspected the developing transport and worker implementation. Required follow-ups were sent to the worker: abort SDK-only failures before waiting on a still-receiving private tail; retain known provider-code classification from delayed non-OK bodies; reject missing/non-string SSE event types after apparent completion; handle cancellation between fetch resolution and reader installation; and isolate asynchronous observer rejections without awaiting subscribers. These reviews are read-only evidence, not passing regressions or ticket acceptance. The full-result envelope is separately bounded from progress frames using existing outline/coverage/edit schema budgets, including JSON escaping and topic localization.
+
+Primary inspected pinned OpenAI `client.mjs`: `fetchWithTimeout` clears its timer when fetch returns headers, and `parseResponseWithTimeout` bypasses its buffered-body deadline when `options.stream` is true. The new adapter returns the wrapped body at headers; a fake-clock test alone does not accelerate that SDK's native timer. Source inventory shows the old generation total/watchdog timers removed in the developing diff; the direct diagnostic 30-second deadline is still present and belongs to T04's migration. T02 worker reports its focused command passed 67 tests in four files; exact command and stable full-gate evidence remain to be confirmed at handoff.
+
+The worker reports an initial full `npm run check` exit 0 (252 passed / 3 skipped, lint, types, build and flow consistency). Subsequent request-cap terminal-summary and fixed AI-channel diagnostic changes require a fresh final check. Electron/capture evidence and ticket acceptance are still pending.
+
+Latest worker-reported full check: exit 0, 254 passed / 3 skipped across 21 files, including the request-cap and fixed-channel privacy regressions. Independent reviewer confirmed the reported races/classification/observer issues are fixed with meaningful coverage and found no new blocking issue; this review did not run tests. Initial full desktop gate had 12 passes, one packaged skip and one failure in the new diagnostic test's byte baseline: refining the brief legitimately persists before generation. The worker corrected the baseline to request-start persisted bytes; primary inspected that correction. The affected flow and full desktop reruns remain pending before acceptance. No production change was made to satisfy that assertion.
+
+Further diagnostic-flow corrections use separate persisted preparation baselines for both held requests and counts 3/4, because the fixture also records the earlier model test and initial outline. The earlier count 2 could complete before the held request actually began. With those assertions corrected, the flow exposed a production logging gap: stopping workers discarded the ended/cancelled diagnostic summary before exit. The worker is retaining bounded cleanup diagnostic frames during stopping while continuing to ignore late progress/phase/result updates. This lifecycle change requires fresh checks; no acceptance is inferred from the earlier full-check result.
+
+Worker reports the final full desktop rerun passed 13 tests / one expected packaged-worker skip, including the extended nonvisual diagnostic flow. Primary opened the changed dashboard-empty and usage-recovery PNGs: dashboard composition is legible; the earlier usage-recovery feedback remains outside the captured viewport and still needs T05/T06 checkpoint improvement. Package preflight also identified the old packaged fixture's missing `profile: 'outline'` request discriminant; that fixture must migrate before the packaged gate. Final code/flow/package outcomes and acceptance remain pending.
+
+Final coordinator acceptance supersedes the intermediate pending statements above. All listed gates passed after the fixes, with worker edits frozen before record updates. Source baseline: `53db6b2` plus reviewed T02 edits; commit follows this record. Primary reviewed all code/tests, independently confirmed flow integrity/diff checks and opened the final changed reading/recovery PNGs. Long/zoomed reading remains scrollable; unsaved recovery and Retry save are visible; the usage-feedback viewport limitation remains a T05/T06 checkpoint task. No new streaming panel is claimed.
+
+| Final command | Actual result |
+| --- | --- |
+| `npm test -- tests/unit/pi-stream-liveness.test.ts tests/unit/worker-lifecycle.test.ts tests/unit/pi-outline-engine.test.ts tests/unit/logging.test.ts` | Exit 0; 66 passed / one Windows symlink-directory test skipped, four files |
+| `npm run check` | Exit 0; 255 passed / 3 skipped in 21 files, lint, both TypeScript scopes, production build and flow consistency |
+| `npm run test:desktop` | Exit 0; 13 passed / one expected packaged-worker skip; Windows signed local fixtures and configured reporter |
+| `npm run package` | Exit 0; Windows x64 unpacked artifact, pinned dependencies unchanged |
+| `npm run test:packaged` | Exit 0; one passed; actual ASAR Pi worker/dependencies under development host, profile contract and scoped reads |
+| Post-refresh `npm run test:flows` | Exit 0; primary independently reran it with exit 0 |
+| `git diff --check` | Exit 0; primary independently confirmed |
+
+Additional initial focused failures were repaired: response-cap failure released the raw reader before cancelling it (now cancels/awaits before lock release); repeated cooperative stop prematurely killed a pending cleanup (now reuses the grace period). Direct regressions passed. The Windows skip is the existing `refuses a symlinked log directory` guard, not missing streaming coverage. Final real diagnostic evidence includes two health reports, cancellation summary, worker loss, actual process exit and each request's persisted-byte baseline. The packaged fixture now uses the required profile, restricted environment and exit-before-settlement; no production security was weakened.
+
+All 14 passing Windows flow sets refreshed (including newly recorded packaged-worker metadata) at `53db6b2`, source dirty. Changed final PNGs are reading/long-outline-zoom, recovery/generated-unsaved and recovery/usage-recovery; other refreshed PNG bytes are unchanged. Cleanup inspection found no test-owned process; the user's October 4 dev/watch parent and respawned normal-profile Electron host were preserved. No live request or unaccelerated 200-second acceptance was run; T03–T07 and integrated/external qualifications remain unresolved.
 
 ## Pre-implementation Pi transport audit
 
