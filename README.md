@@ -36,6 +36,12 @@ Login information is stored in `connection/chatgpt.json` under the app data dire
 
 The app restores the connection and refreshes expired access tokens when possible. **Sign out of this app** removes the saved credentials. A revoked connection or unreadable credential file still requires reconnecting. On devices without OS keychain encryption, the file is unencrypted and relies on filesystem permissions; account settings disclose this. Login information never belongs in a learning project's `.edu` folder.
 
+## Open-source privacy
+
+Keep credentials, copied application profiles, private learning projects, local logs, and signing keys out of contributions. `.gitignore` excludes these common locations and file types, but it does not remove previously tracked files or protect files added with force. Use isolated test data in screenshots and diagnostic artifacts, review their visible content, and use a GitHub noreply email for commits if you do not want your personal email published.
+
+The [privacy audit](ref/research/privacy-audit.md) records the reviewed source/history/artifacts, local cleanup, and remaining public-history exposure. Deleting private material in a new commit does not erase it from older commits, other branches, forks, or cached copies.
+
 ## Run locally
 
 Use Node.js 24+ and npm. Node is a development requirement; a packaged app contains its own runtime.

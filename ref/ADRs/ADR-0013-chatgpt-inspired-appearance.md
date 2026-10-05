@@ -6,7 +6,7 @@
 
 ## Context
 
-The user supplied [light](../../docs/chatgpt-app-light.png) and [dark](../../docs/chatgpt-app-dark.png) screenshots of the current ChatGPT application, asked that they guide the UI and documentation, and explicitly requested light/dark switching in settings. The screenshots replace the earlier generic Codex reference as the primary visual reference for this change. They show a narrow icon rail, a tinted project sidebar, an inset workspace, spacious composition, rounded controls, and a restrained purple accent. The dark reference also demonstrates grouped appearance controls and visual mode previews.
+The user supplied light and dark screenshots of the current ChatGPT application, asked that they guide the UI and documentation, and explicitly requested light/dark switching in settings. The screenshots replace the earlier generic Codex reference as the primary visual reference for this change. They show a narrow icon rail, a tinted project sidebar, an inset workspace, spacious composition, rounded controls, and a restrained purple accent. The dark reference also demonstrates grouped appearance controls and visual mode previews. The original images were subsequently excluded from the current public source for privacy; the [appearance review](../research/chatgpt-app-appearance.md) retains the observations and isolated application captures.
 
 ## Decision
 

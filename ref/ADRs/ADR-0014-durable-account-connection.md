@@ -6,7 +6,7 @@
 
 ## Context
 
-The user reports having to log in after every restart and explicitly requires login information to remain in the application's home/data directory, including the Windows equivalent. The previous adapter deliberately discarded credentials at exit without a protected OS keychain. An isolated Electron probe on this WSL/Linux host returned `encryptionAvailable: false`, backend `basic_text`, and the default profile `/home/dardawk/.config/Learning Studio`. The behavior followed the earlier fallback decision but did not satisfy the requested persistence.
+The user reports having to log in after every restart and explicitly requires login information to remain in the application's home/data directory, including the Windows equivalent. The previous adapter deliberately discarded credentials at exit without a protected OS keychain. An isolated Electron probe on this WSL/Linux host returned `encryptionAvailable: false`, backend `basic_text`, and the default profile `~/.config/Learning Studio`. The behavior followed the earlier fallback decision but did not satisfy the requested persistence.
 
 ## Decision
 

@@ -170,7 +170,7 @@ See [acceptance audit](acceptance.md): all 58 functional/scenario IDs are mapped
 
 ## Durable connection follow-up — ADR-0014
 
-- The user reported repeated sign-in after restart and required persistent login information in the app's per-user data directory. An isolated Electron probe confirmed this WSL/Linux environment reports `encryptionAvailable: false` with backend `basic_text`; the default app profile resolves to `/home/dardawk/.config/Learning Studio`. The temporary probe profile was removed. No learner credentials were read or copied.
+- The user reported repeated sign-in after restart and required persistent login information in the app's per-user data directory. An isolated Electron probe confirmed this WSL/Linux environment reports `encryptionAvailable: false` with backend `basic_text`; the default app profile resolves to `~/.config/Learning Studio`. The temporary probe profile was removed. No learner credentials were read or copied.
 - Replaced the memory-only fallback with a durable, versioned `connection/chatgpt.json` envelope. OS encryption remains preferred. Without it, local credentials are unencrypted and protected by owner-only POSIX directory/file permissions, with an accurate account-panel disclosure. Windows normally uses DPAPI and inherited profile ACLs.
 - Added bounded private-file reads, ownership/nonregular/symlink checks, `0700` connection directories and `0600` files on POSIX. Protected storage failures preserve the previous bytes rather than silently downgrading. Legacy encrypted files migrate, valid local files upgrade when a keychain becomes available, and sign-out clears both canonical and legacy credentials.
 - `npm run check`: passed with 134 unit tests, lint, both type scopes and production bundles.

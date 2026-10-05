@@ -4,10 +4,10 @@ Date: 2026-10-04. Source: the two screenshots explicitly supplied by the user. T
 
 ## Reference and interpretation
 
-- [Light workspace reference](../../docs/chatgpt-app-light.png): a narrow outer rail, pale cool navigation, white inset workspace, generous empty space, simple project rows and a rounded composer. A small purple indicator provides emphasis.
-- [Dark appearance reference](../../docs/chatgpt-app-dark.png): a dark tinted shell, nearly black workspace, raised charcoal settings groups, fine dividers and purple selection borders around mode previews.
+- Light workspace reference: a narrow outer rail, pale cool navigation, white inset workspace, generous empty space, simple project rows and a rounded composer. A small purple indicator provides emphasis.
+- Dark appearance reference: a dark tinted shell, nearly black workspace, raised charcoal settings groups, fine dividers and purple selection borders around mode previews.
 
-The screenshots show different activities. Light is a project workspace; Dark is an appearance-settings page. Neither is evidence of the other product's implementation, hidden states or exact token system. Learning Studio adapts the visible structure and tone to its current learning flows. The supplied screenshots remain unmodified.
+The screenshots show different activities. Light is a project workspace; Dark is an appearance-settings page. Neither is evidence of the other product's implementation, hidden states or exact token system. Learning Studio adapts the visible structure and tone to its current learning flows. The originals were removed from the current source during the privacy audit because their sidebars and profile photos contain personal information. The isolated application captures below provide public visual evidence; they are not the original references.
 
 ## Design brief
 

@@ -11,3 +11,22 @@ coverage/
 .DS_Store
 Thumbs.db
 .cbx/
+
+# Local audit/cache files, learning data, and copied application profiles.
+.tmp/
+privacy-audit-local/
+.edu/
+connection/
+logs/
+chatgpt.json
+chatgpt.enc
+host-id
+
+# Local credentials and signing material (examples may be committed explicitly).
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
