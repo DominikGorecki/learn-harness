@@ -24,7 +24,28 @@ The project picker includes **GPT-6.1 Sol** (`gpt-6.1-sol`) and **GPT-6 Luna** (
 
 Open **Account settings → Test GPT-6.1 Sol** or **Test GPT-6 Luna** to check access with a short reply using a small amount of your plan allowance. Successful tests show a separate verification state for each model during the current connection session. Failed or cancelled tests preserve both choices and any other model's successful verification. Refresh retains verification; reconnect and restart reset verification badges while keeping the extra choices. Tests send no learning-project content.
 
-For troubleshooting, run the app with `npm run dev`, repeat the selected test, and copy the single `[Sol model test]` or `[Luna model test]` JSON summary from the launch terminal together with the account-panel message. It reports HTTP status, stream event counts, known returned model/status values, recognized provider error codes, boolean text evidence (`hasStreamedText` and `hasFinalText`), byte count, elapsed time and the specific outcome. A matching completed response can verify text delivered in deltas even when the final event omits its output array. Tokens, account identity, request headers, prompts, reply text and raw provider errors are excluded. Unrecognized provider values are labeled `unrecognized`. The summary is printed to the main-process console; it is not saved to a diagnostic file. A missing completion, incomplete reply or model mismatch remains inconclusive; an explicit `model_not_found` identifies a provider rejection for this connection. Do not copy the saved connection file or full unrelated terminal output.
+For troubleshooting, run the app with `npm run dev`, repeat the selected test, and copy the single `[Sol model test]` or `[Luna model test]` JSON summary from the launch terminal together with the account-panel message. It reports HTTP status, stream event counts, known returned model/status values, recognized provider error codes, boolean text evidence (`hasStreamedText` and `hasFinalText`), byte count, elapsed time and the specific outcome. A matching completed response can verify text delivered in deltas even when the final event omits its output array. Tokens, account identity, request headers, prompts, reply text and raw provider errors are excluded. Unrecognized provider values are labeled `unrecognized`. Unpackaged runs also save the summary as a structured `model.test` event in the development log. A missing completion, incomplete reply or model mismatch remains inconclusive; an explicit `model_not_found` identifies a provider rejection for this connection. Do not copy the saved connection file or full unrelated terminal output.
+
+## Development logs
+
+`npm run dev` automatically writes UTF-8 JSONL files to `logs` inside the app data directory (Windows: `%APPDATA%\Learning Studio\logs`). The launch terminal prints the actual directory. Unpackaged previews and desktop tests also log; tests use their isolated profile. Packaged apps do not enable development file logging. No additional setup or dependency is required.
+
+Each line has `schemaVersion`, UTC `timestamp`, `sessionId`, `sequence`, main `pid`, `level`, `source`, `event`, and `data`. Logs cover startup/shutdown, windows, IPC outcomes/timings, account/workspace/generation state, utility lifecycle, material counts, inference transport/terminal events, tool names/turns, model-test summaries, renderer/preload failures and console occurrence metadata. Match `data.requestId` to follow one IPC request through provider/utility work; use `workerId` for a worker and `runId`/`projectId` for generation state.
+
+Files rotate at 5 MiB; the ten most recent owned files are retained across launches (about 50 MiB maximum). A bounded queue reports `logging.dropped` during overload. File writes are asynchronous; unavailable storage prints a fixed warning and the app continues. Normal shutdown waits up to two seconds for pending rows, while forced exits can lose buffered diagnostics. Main fatal exceptions get a synchronous safe marker.
+
+Logs exclude credentials, account identity, URLs/paths, request/reply bodies, prompts, outlines, source material and raw provider/error messages. Arbitrary console strings/objects record occurrence/length metadata; known structured diagnostics retain their safe details. Error records retain type and the first app bundle line/column, without message, function names or absolute stack paths. External npm/Vite output and Chromium's raw debug streams are outside these application logs. See [ADR-0018](ref/ADRs/ADR-0018-development-file-diagnostics.md).
+
+Read the current launch in PowerShell:
+
+```powershell
+$logFile = Get-ChildItem -LiteralPath "$env:APPDATA\Learning Studio\logs" -Filter 'session-*.jsonl' |
+  Sort-Object Name | Select-Object -Last 1
+Get-Content -LiteralPath $logFile.FullName -Wait
+# Filter already-written rows by event:
+Get-Content -LiteralPath $logFile.FullName | ConvertFrom-Json |
+  Where-Object event -eq 'ipc.failed' | Format-List
+```
 
 ## Saved connection
 

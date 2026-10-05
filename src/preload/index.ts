@@ -5,6 +5,24 @@ import { workspaceChannels } from '../shared/workspace'
 import type { WorkspaceApi, WorkspaceSnapshot } from '../shared/workspace'
 import { generationChannels } from '../shared/generation'
 import type { GenerationApi, GenerationSnapshot } from '../shared/generation'
+import { rendererDiagnosticChannel, rendererDiagnosticMessage, safeLogData } from '../shared/diagnostics'
+
+// Automatic failure telemetry carries no messages, URLs, promises or material.
+const diagnosticWindow = globalThis as unknown as {
+  location: { origin: string }
+  addEventListener(type: string, listener: (event: { source: unknown; origin: string; data: unknown }) => void): void
+}
+let diagnosticCount = 0, diagnosticInterval = Date.now()
+diagnosticWindow.addEventListener('message', event => {
+  if (event.source !== diagnosticWindow || event.origin !== diagnosticWindow.location.origin) return
+  if (!event.data || typeof event.data !== 'object') return
+  const data = event.data as Record<string, unknown>
+  if (data.type !== rendererDiagnosticMessage || (data.event !== 'renderer.error' && data.event !== 'renderer.rejection')) return
+  if (Date.now() - diagnosticInterval >= 1000) { diagnosticCount = 0; diagnosticInterval = Date.now() }
+  if (++diagnosticCount > 100) return
+  ipcRenderer.send(rendererDiagnosticChannel, { event: data.event,
+    ...safeLogData({ errorType: data.errorType, line: data.line, column: data.column }) })
+})
 
 const learning: AccountApi & WorkspaceApi & GenerationApi = {
   getAccount: () => ipcRenderer.invoke(accountChannels.get),

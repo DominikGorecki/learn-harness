@@ -3,6 +3,7 @@ import type { BrowserWindow } from 'electron'
 import type { WorkspaceService } from '../../core/workspace/service'
 import { parseBriefRequest, parseModelRequest, parseProjectRequest, workspaceChannels } from '../../shared/workspace'
 import { noPayload, registerCapability } from './capability'
+import { logDiagnostic } from '../logging/logger'
 
 export function registerWorkspaceHandlers(workspace: WorkspaceService, currentWindow: () => BrowserWindow | null, expectedOrigin: string): () => void {
   const choose = async () => {
@@ -36,6 +37,9 @@ export function registerWorkspaceHandlers(workspace: WorkspaceService, currentWi
     return workspace.saveBrief(projectId, brief)
   })
   return workspace.subscribe(snapshot => {
+    const project = snapshot.activeProject
+    logDiagnostic('info', 'main', 'workspace.changed', { projects: snapshot.projects.length, hasActiveProject: Boolean(project),
+      projectId: project?.projectId, availability: project?.availability, writable: project?.writable, hasOutline: Boolean(project?.outline) })
     const window = currentWindow()
     if (window && !window.isDestroyed() && !window.webContents.isDestroyed()) window.webContents.send(workspaceChannels.changed, snapshot)
   })

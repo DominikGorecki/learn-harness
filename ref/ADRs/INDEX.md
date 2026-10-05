@@ -31,4 +31,8 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0017](ADR-0017-outline-rewrites-with-saved-context.md) | Accepted | Selected-model outline rewrites with saved JSON orientation and inherited source evidence | Changing outline edits, generation context or source provenance across revisions |
 
+| [ADR-0018](ADR-0018-development-file-diagnostics.md) | Accepted | Main-owned bounded development JSONL diagnostics with safe metadata across processes | Changing file logging, diagnostic fields, privacy, retention or failure collection |
+
+| [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md) | Accepted | Isolated topic rewrites, project-wide Pi text-file tools and recoverable multi-file saves | Changing topic editing, project content writes, folder ownership or file-save recovery |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

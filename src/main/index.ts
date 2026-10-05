@@ -15,6 +15,8 @@ import { registerWorkspaceHandlers } from './ipc/workspace-handlers'
 import { GenerationService } from '../core/generation/service'
 import { registerGenerationHandlers } from './ipc/generation-handlers'
 import { runOutlineWorker } from './generation/worker-client'
+import { initializeDiagnostics, observeWindow, registerRendererDiagnostics } from './logging/runtime'
+import { errorDiagnostic, logDiagnostic, silentLogger } from './logging/logger'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -28,6 +30,9 @@ if (!app.isPackaged && process.env.EDU_HARNESS_TEST_DATA_DIR) {
 let mainWindow: BrowserWindow | null = null
 let account: AccountService | null = null
 let generation: GenerationService | null = null
+let diagnostics = silentLogger
+let stopping = false
+let logsClosed = false
 const developmentUrl = !app.isPackaged ? process.env.ELECTRON_RENDERER_URL : undefined
 if (developmentUrl && new URL(developmentUrl).origin !== developmentOrigin) {
   throw new Error('The development renderer must use the configured loopback origin.')
@@ -44,6 +49,7 @@ async function createWindow(): Promise<void> {
       nodeIntegration: false, webSecurity: true, webviewTag: false
     }
   })
+  observeWindow(mainWindow)
   mainWindow.once('ready-to-show', () => mainWindow?.show())
   mainWindow.on('closed', () => { mainWindow = null })
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
@@ -61,6 +67,9 @@ if (!app.requestSingleInstanceLock()) {
     mainWindow?.focus()
   })
   app.whenReady().then(async () => {
+    diagnostics = await initializeDiagnostics()
+    logDiagnostic('info', 'main', 'app.ready')
+    registerRendererDiagnostics(() => mainWindow, expectedOrigin)
     const rendererSession = session.fromPartition('persist:edu-harness')
     rendererSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false))
     rendererSession.setPermissionCheckHandler(() => false)
@@ -105,10 +114,23 @@ if (!app.requestSingleInstanceLock()) {
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) void createWindow().catch(() => app.quit())
     })
-  }).catch(() => {
+  }).catch(error => {
+    logDiagnostic('error', 'main', 'app.start-failed', errorDiagnostic(error))
     console.error('Learning Studio could not start.')
     app.quit()
   })
   app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
-  app.on('before-quit', () => { generation?.dispose(); account?.dispose() })
+  app.on('before-quit', event => {
+    if (logsClosed) return
+    event.preventDefault()
+    if (stopping) return
+    stopping = true
+    logDiagnostic('info', 'main', 'app.stopping')
+    generation?.dispose(); account?.dispose()
+    // Give buffered diagnostics a bounded opportunity to reach disk on normal exit.
+    const deadline = setTimeout(() => { logsClosed = true; app.quit() }, 2000)
+    void diagnostics.close().finally(() => {
+      clearTimeout(deadline); logsClosed = true; app.quit()
+    })
+  })
 }
