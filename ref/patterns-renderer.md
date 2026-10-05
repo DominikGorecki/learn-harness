@@ -4,6 +4,8 @@ Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [AD
 
 Read [design system](patterns-design-system.md) for appearance and [UX](patterns-ux.md) for interaction contracts before changing a screen. This file owns renderer implementation rules.
 
+Open the [current application screenshots](patterns-design-system.md#current-application-screenshots) before renderer UI work, including the matching [Light](screenshots/current/outline-light.jpg) and [Dark](screenshots/current/outline-dark.jpg) workspace views. Compare the affected component with the observed UI and source; screenshots do not prove bridge/backend behavior. Refresh obsolete captures using the design-system [replacement procedure](patterns-design-system.md#refresh-the-screenshots).
+
 ## Organization and state
 
 `app/App.tsx` composes project navigation, the learning workspace, and account settings. Put project views under `features/projects`, account views under `features/account`, appearance views/state under `features/settings`, reusable visual primitives under `components`, and transport result handling under `lib`. Use plain React state until complexity demonstrates a need for a state library or router. No SSR/Next.js backend runs in this desktop app.

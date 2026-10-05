@@ -4,6 +4,8 @@ Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md) and [ADR-0
 
 **Status:** adopted interaction rules. Current runtime capabilities remain those in [learning/data](patterns-learning-data.md). Project setup and outline creation are implemented; acceptance evidence is tracked for milestone behavior in [PRD 01](prds/01-project-setup-and-outline.md); richer Socratic activities remain product direction in [the overview](../docs/overview.md).
 
+Before UI/interaction work, open the [current application screenshot gallery](patterns-design-system.md#current-application-screenshots), especially the [expanded topic](screenshots/current/topic-expanded-dark.jpg), [topic editor](screenshots/current/topic-editor-dark.jpg), [learning-direction composer](screenshots/current/learning-direction-light.jpg) and [appearance settings](screenshots/current/appearance-dark.jpg). These show observed screen states; exercise the running journey for behavior. The design-system pattern owns the [remove-and-regenerate procedure](patterns-design-system.md#refresh-the-screenshots).
+
 ## Orientation and progressive disclosure
 
 At any point the learner can identify the current subject/project, the current activity or document, what is happening, and the next useful action. Keep project navigation stable while the main workspace changes between setup, learning, and review. The header identifies the selected work; it does not repeat every setting or folder detail.

@@ -4,6 +4,41 @@ Governed by [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), which amen
 
 **Status:** adopted visual standard, implemented in the project workspace and account panel. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
 
+## Current application screenshots
+
+Before UI/design work, open the relevant images below to understand the implemented interface, then inspect the affected source and running app. These captures complement the adopted visual rules; they do not authorize new features or establish backend correctness, accessibility, or provider acceptance.
+
+The replaceable reference set lives in `ref/screenshots/current/`. Captured on **2026-10-05** from the existing running Windows Electron development app, with repository HEAD `6d61e83`, at **1267 × 834** capture pixels. Files preserve the computer-use tool's original JPEG output. Navigation was collapsed to keep account identity out of the images. The project is “Understanding Cognitive Behavioral Therapy”; its existing timeout notice and topic-edit draft were retained. No inference or project save was submitted. Native chrome and the capture cursor/highlight are visible.
+
+| Surface | Screenshot | What to inspect |
+| --- | --- | --- |
+| Saved outline, Dark | [outline-dark.jpg](screenshots/current/outline-dark.jpg) | Shell, header/model control, recovery notice, heading, reading column and saved state |
+| Saved outline, Light | [outline-light.jpg](screenshots/current/outline-light.jpg) | The same composition with Light surfaces and text |
+| Expanded topic, Dark | [topic-expanded-dark.jpg](screenshots/current/topic-expanded-dark.jpg) | Topic disclosure, separate edit icon, objectives and module content |
+| Topic editor, Dark | [topic-editor-dark.jpg](screenshots/current/topic-editor-dark.jpg) | Scoped change explanation, preserved draft, model/allowance copy and actions |
+| Learning direction, Light | [learning-direction-light.jpg](screenshots/current/learning-direction-light.jpg) | Goal composer, model selector and explicit Create new outline action |
+| Appearance, Dark | [appearance-dark.jpg](screenshots/current/appearance-dark.jpg) | Modal, mode previews, selected radio, focus and Done action |
+| Appearance, Light | [appearance-light.jpg](screenshots/current/appearance-light.jpg) | Light modal surfaces and selected-mode styling |
+
+This set covers the listed views only. Dashboard, account identity, expanded navigation, active generation, additional recovery states, narrow windows and zoom are not captured here. Earlier isolated full-navigation/theme captures remain historical evidence in the [appearance review](research/chatgpt-app-appearance.md); design explorations under `docs/design/` are proposals, not running-app screenshots.
+
+### Refresh the screenshots
+
+Refresh this set after material UI changes or when it no longer matches the running app. Replace the current set rather than accumulating dated copies in this directory.
+
+1. Inspect the existing gallery and running app. Record the original project, theme, navigation, disclosure and scroll state. Use the computer-use skill to select the actual Learning Studio Electron window; if it is not running, start it with `npm run dev` from a terminal tool and then select its returned window. Use public/sample learning content. Hide account identity and keep folder paths collapsed; dashboard/account captures need an isolated sample profile if they expose identity or local user paths. Do not sign out, overwrite learner content, or submit inference just to obtain a visual reference.
+2. Remove only the existing image files in `ref/screenshots/current/` with a filesystem tool, then regenerate the gallery through the app UI. From the repository root, the following PowerShell command removes those images without touching historical research assets or design explorations:
+
+   ```powershell
+   Get-ChildItem -LiteralPath .\ref\screenshots\current -File |
+     Where-Object { $_.Extension -in '.jpg', '.jpeg', '.png', '.webp' } |
+     Remove-Item
+   ```
+
+3. Use a consistent window size and zoom across matching Light/Dark views. Capture the outline top, an expanded topic, the topic editor (dismiss without submitting), the learning-direction composer, and Settings → Appearance in both modes. Add other relevant implemented views when safe sample data is available. Activate the selected window immediately before capture, allow scrolling/transitions to settle, and inspect each returned screenshot before saving: reject captures of another foreground app, obscured controls, unintended paths or identity. Reobserve after every UI action; never reuse stale element indexes or screenshot coordinates.
+4. Save the reviewed screenshot bytes directly from the computer-use capture to this directory, using stable surface/theme filenames and the actual image format. Do not replace them with generated mockups or retouch them to suggest a different UI. Keep the existing filenames where the surfaces still apply; remove retired rows and add links for new captures.
+5. Update this section's capture date, repository revision, platform, dimensions, visible state and coverage limits. Open the saved files to verify they decode and match the reviewed views, and verify every relative image link resolves. Restore the original app state when possible without interfering with newer user interaction. Review `git diff --check` and the changed-file list; run application checks separately if implementation code also changed.
+
 ## Composition
 
 Use a quiet desktop workspace with a slim outer icon rail, softly tinted project navigation, an inset primary surface, system sans-serif type, and generous working space. The subject, current activity, and next action establish hierarchy. Brand identification stays compact in application chrome.

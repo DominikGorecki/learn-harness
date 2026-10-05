@@ -10,6 +10,8 @@ Patterns state current rules and name their governing ADRs. ADRs state rationale
 
 UI guidance has three owners: [design system](patterns-design-system.md) for appearance/components, [UX](patterns-ux.md) for learner interaction, and [renderer](patterns-renderer.md) for implementation. Product documents link to these standards and retain their own scope/status. Keep historical research and screenshots identified as earlier evidence when a later decision changes the visual direction.
 
+Keep replaceable running-app references in `ref/screenshots/current/`, linked from the [design-system gallery](patterns-design-system.md#current-application-screenshots) and relevant UI patterns. The design-system pattern owns capture metadata, coverage limits and the [remove-and-regenerate procedure](patterns-design-system.md#refresh-the-screenshots). Refresh that set in place; preserve historical research evidence and label design mockups separately.
+
 ## Maintenance
 
 For a durable change, add the next ADR and update the ADR index, pattern index, and affected domain patterns together. Amend or supersede prior decisions explicitly. Routine features/refactors inside accepted boundaries do not require new ADRs. Keep links relative within the repository and verify they resolve.

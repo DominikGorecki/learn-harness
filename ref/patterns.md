@@ -16,4 +16,4 @@ Read this map, select the area touched by the task, then read its focused rules 
 
 Start with [AGENTS.md](../AGENTS.md) for task routing and authority. When a durable rule changes, update its focused file, this index, and [ADRs/INDEX.md](ADRs/INDEX.md) together.
 
-For UI work, read design system → UX → renderer. New capabilities still require their task/PRD and governing domain decisions; an interaction pattern is not evidence that its feature exists.
+For UI work, read design system → UX → renderer and open the relevant [current application screenshots](patterns-design-system.md#current-application-screenshots). The design-system pattern also owns their [refresh procedure](patterns-design-system.md#refresh-the-screenshots). New capabilities still require their task/PRD and governing domain decisions; an interaction pattern is not evidence that its feature exists.
