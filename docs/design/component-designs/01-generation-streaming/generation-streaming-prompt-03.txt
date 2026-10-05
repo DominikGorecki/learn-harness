@@ -1,0 +1,35 @@
+Use case: ui-mockup. Create one focused high-resolution desktop UI reference, using the attached six-option contact sheet as the actual visual reference. The user chose SHEET 02 OPTION 4, the bottom-left "Bottom split panel", and wants the little ACTIVITY ICONS CONNECTED with a thin vertical timeline like SHEET 02 OPTION 3, the top-right "Activity-first right panel". This means visual line connectors, not hyperlinks.
+
+Show ONE enlarged complete Learning Studio desktop window, no grid, no option numbers, no sheet captions, no device bezel. Preserve the selected OPTION 4 composition, restrained charcoal dark theme, slim outer icon rail, compact full-height project sidebar, spacious saved outline above, and docked bottom split panel ONLY within main content, to the RIGHT of navigation. The sidebar and Account footer remain unobstructed all the way to the window bottom. The bottom panel is NOT an overlay over navigation and NOT a separate window. Use a believable wide desktop viewport, generous legible text, tidy proportions.
+
+Critical requested change: LEFT SIDE OF BOTTOM PANEL has exactly three activity steps in a VERTICAL CONNECTED TIMELINE, borrowing option 3's icon treatment:
+top: small green filled circle with white check, label "Read topic notes";
+middle: clearly emphasized purple ring/dot circle, label "Drafting historical context";
+bottom: gray hollow circle, label "Check and save".
+A fine muted vertical line visibly joins circle centers, with gaps where it passes behind circles, showing clear continuous linkage BETWEEN top and middle and BETWEEN middle and bottom. No large arrows. Strong current step, muted upcoming step. Only completed read is green; no claim of percentage complete or ETA.
+
+Keep the rest of option 4's useful traits: a stable header across the bottom panel with title/request on left, timer and white Cancel button right; a narrow left timeline column separated by a thin vertical divider from a WIDER right draft-preview column. Footer scope at left and paused-AI note at right. Saved outline occupies the upper portion; panel occupies approximately bottom 40–45% of main workspace. Panel border subtle, corners 18px, raised charcoal surface. Both preview and timeline readable at desktop scale.
+
+Exact visible copy:
+App "Learning Studio".
+Project in sidebar and document title "Bayesian reasoning".
+Upper document intro "Learn to update beliefs as evidence arrives."
+Saved document heading "Your path through the subject".
+Unchanged saved topic rows:
+"01  Beliefs before evidence", small summary "What do you believe before you see the next clue?"
+"02  Historical foundations", small OLD summary "An introduction to probability and changing beliefs."
+"03  Updating a belief", small summary "How should you revise your beliefs with new evidence?"
+Pencil AI edit icons on saved topic rows visibly gray/disabled; selected topic 02 subtle highlight, no saved-content change yet.
+Bottom panel title "Updating Historical foundations".
+Request "I would like to learn further history on this topic".
+Timer "00:42 elapsed".
+Button "Cancel".
+Right column label "Draft preview · Not saved".
+Draft title "Historical foundations".
+Draft prose "From early probability problems to Bayes’s theorem."
+Growing second paragraph "Ideas about uncertainty began with games of chance…" followed by small subtle purple streaming cursor.
+Footer left "Only this topic will change."
+Footer right "Other AI actions are paused."
+Sidebar navigation "Projects", "Open project", "Your projects", project row and "Account" footer.
+
+Visual invariants: outer shell #1C2424, navigation #1B1E1E, canvas #181818, bottom-panel surface #232323, bright text #F3F3F3, supporting #B3B6B8, borders #343738, small accent #B58AF8. Neutral system sans-serif, thin borders, ample space. Saved upper document muted but comfortably readable; active bottom panel prominent. No decorative imagery, no raw JSON/logs/private thinking, no extra actions, no completion percentages, no new modal, no after-save content in saved outline, no watermark. Keep all main panel content cleanly within workspace boundaries. This is a focused refinement concept, not a working application screenshot.

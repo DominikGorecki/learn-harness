@@ -1,6 +1,6 @@
 # Generation streaming: design exploration
 
-Status: first comparison round; no selected direction or implementation authorization.
+Status: focused third revision; bottom split panel preferred with connected activity icons. Final reference acceptance and implementation remain pending.
 
 ![Six streaming layouts](generation-streaming-sheet-01.png)
 
@@ -37,4 +37,36 @@ Method: built-in image generation, with inspected project screenshots as style a
 - [Exact generation prompt](generation-streaming-prompt-01.txt)
 - References: `ref/research/assets/appearance-workspace-dark.png` and `ref/research/assets/outline-workspace.png`.
 
-Next decision: select a numbered direction or identify specific traits to combine. No standalone final reference or selection handoff has been produced yet.
+## Sheet 02: right and bottom panel refinement
+
+User feedback: likes sheet 01 options 2 and 4; wants the bottom panel contained within the main window's content region.
+
+![Refined right and bottom panels](generation-streaming-sheet-02.png)
+
+Preserved dark palette, app shell, activity and draft content, elapsed time, Cancel and paused-AI copy. The top row compares compact, draft-first and activity-first right panels. The bottom row compares a split activity/preview dock, a wide prose dock with compact phase strip, and an inset panel. All bottom panels are confined to the main workspace, leaving navigation visible to the bottom of the window.
+
+The first generation of sheet 02 still extended option 6 into navigation. A targeted image edit corrected that panel's bounds. The inspected saved sheet now keeps each bottom panel to the right of the sidebar. Generated miniature copy and background content remain approximate; the saved topic must remain unchanged in an implementation, and disabled AI affordances need explicit visual and functional treatment.
+
+Suggested next comparison: sheet 02 option 4 emphasizes activity beside the draft; option 5 gives streamed prose more horizontal space. No final direction has been chosen.
+
+- [Sheet 02](generation-streaming-sheet-02.png)
+- [Sheet 02 before boundary correction](generation-streaming-sheet-02-before-repair.png)
+- [Generation prompt](generation-streaming-prompt-02.txt)
+- [Targeted repair prompt](generation-streaming-prompt-02-repair.txt)
+
+Generation used the actual first sheet as the reference; the boundary repair used the generated second sheet as its edit target. No application implementation was changed.
+
+## Revision 03: bottom split panel with connected activity icons
+
+User feedback: prefers sheet 02 option 4, with the activity icons connected like option 3. Interpreted as a vertical visual connector between steps, rather than clickable hyperlinks.
+
+![Bottom panel with connected timeline](generation-streaming-revision-03.png)
+
+The focused standalone refinement preserves the bottom panel inside the main workspace, unobstructed sidebar, left activity/right draft composition, elapsed time, Cancel and paused-AI copy. Thin vertical connectors join the completed green check, active purple circle and upcoming hollow circle. The upper saved topic retains its old synopsis while new historical prose appears only in the draft area.
+
+Inspection confirms connected activity steps and correct panel containment. As with prior concepts, pencil icons are visually gray but their actual disabled semantics and interaction require implementation. The generated topic rows have more visible borders and the outline is less dimmed than the miniature reference; these are approximate visual details to review rather than changes to accepted application behavior.
+
+- [Revision 03](generation-streaming-revision-03.png)
+- [Exact revision prompt](generation-streaming-prompt-03.txt)
+
+Method: built-in image generation using sheet 02 as the actual reference and explicitly selecting its options 4 and 3. No application code changed. The next decision is whether this focused revision matches the intended final direction; no final selection handoff has been produced yet.
