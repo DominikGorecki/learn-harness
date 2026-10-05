@@ -1,0 +1,4 @@
+interface:
+  display_name: "Investigate"
+  short_description: "Investigate project behavior with grounded evidence"
+  default_prompt: "Use $investigate to investigate this Learning Studio project question through its AGENTS.md guidance, maintained docs, code, and tests, then report findings and uncertainty."
