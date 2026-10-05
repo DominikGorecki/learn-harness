@@ -1,0 +1,32 @@
+Use case: ui-mockup.
+Create ONE polished, high-resolution UI DESIGN CONTACT SHEET with SIX meaningfully different desktop generation-progress layouts for Learning Studio, arranged exactly THREE COLUMNS by TWO ROWS. All six cells must have comparable scale and the same running state, project, copy and dark theme. Each cell is a complete miniature desktop app window with the same slim icon rail, compact project sidebar and large primary workspace. Outside each window place a large clear option number and short caption: "1  Centered dialog", "2  Right panel", "3  Main workspace", "4  Bottom panel", "5  Inline topic", "6  Split preview". Neutral charcoal sheet gutters. Aim for a large landscape canvas and crisp legible type, not a photograph or tilted device mockup.
+
+INPUT IMAGE 1 is a style reference only: reproduce its restrained dark app palette, neutral system sans typography, narrow outer icon rail, sidebar, spacious document surface, rounded panels, and small muted purple activity accents. INPUT IMAGE 2 is an outline structure reference only: adapt its reading surface, numbered topic rows and document hierarchy to that dark styling. No personal/account details from reference images; bottom account label only "Account". Preserve the familiar app shell, but use "Bayesian reasoning" as the project in all cells.
+
+COMMON STATE: An existing topic is being rewritten to add historical context, using streamed structured draft content. The user can NOT start any other AI request until this one finishes or is cancelled. AI edit controls and AI-submit controls are gray/disabled. Navigation and saved-content reading may remain available in panel layouts; gray out only the affected document/actions, keeping inactive text legible. The saved outline remains intact. Progress is indeterminate: no percent completion, no invented ETA. Draft must be clearly labeled "Draft preview · Not saved". Keep the active generation surface bright enough to read while the underlying saved document is visibly muted. Make each generation surface substantially more prominent than a small status banner. Always show an explicit "Cancel" button on the active surface, not a confusing close-only icon. No developer logs, raw JSON, terminal display or private thinking.
+
+COMMON VISIBLE COPY use these exact strings where their roles appear:
+App "Learning Studio"
+Project "Bayesian reasoning"
+Heading "Updating Historical foundations"
+Request "I would like to learn further history on this topic"
+Elapsed "00:42 elapsed"
+Restriction "Other AI actions are paused."
+Activity rows: completed "Read topic notes", currently running "Drafting historical context", upcoming "Check and save".
+Draft label "Draft preview · Not saved"
+Draft title "Historical foundations"
+Draft prose "From early probability problems to Bayes’s theorem."
+A second unfinished paragraph "Ideas about uncertainty began with games of chance…"
+Scope note "Only this topic will change."
+Button "Cancel".
+Saved background contains "Your path through the subject" and three quiet topic rows: "01  Beliefs before evidence", "02  Historical foundations", "03  Updating a belief". Small pencil buttons in background are disabled. Do not add approval buttons, queue actions, new AI submission buttons, fake save confirmations or percent progress bars.
+
+OPTION DIFFERENCES:
+1 CENTERED DIALOG: generously sized center modal atop a dimmed saved outline, title/request/elapsed at top, slim vertical activity list at left, draft at right, Cancel and paused note in footer. Clearly separated active overlay.
+2 RIGHT PANEL: wide docked right-hand generation panel with a vertical activity list and developing draft beneath it; saved outline visible muted at left, active topic highlighted subtly; Cancel in panel header, paused note near footer. A convincing desktop drawer.
+3 MAIN WORKSPACE: primary reading column becomes a spacious generation document, with large title, request, compact horizontal phase indicators then streaming draft prose beneath, elapsed and Cancel in upper right. Small faint "Saved outline" document glimpse alongside/behind under dimming so context survives. No floating dialog.
+4 BOTTOM PANEL: saved outline muted in the upper half, large bottom dock spanning the MAIN workspace width only, not covering navigation; bottom panel has activity on left and draft on right, its own stable header with title/elapsed/Cancel. Distinct horizontal console-like proportion but readable prose, not logs.
+5 INLINE TOPIC: generation panel embedded directly underneath topic 02 within the outline; other topic rows and unrelated surrounding content subdued. Topic 02 expanded and bright, showing activity rows, request, draft prose, elapsed and Cancel. Strong local ownership and no separate global drawer.
+6 SPLIT PREVIEW: main workspace has two similarly sized columns: left "Saved topic" muted with old readable overview "An introduction to probability and changing beliefs.", right "Draft preview · Not saved" bright and streaming, with common new draft title/prose. A stable generation header above both has Updating heading, request, elapsed and Cancel; slim activity row and paused note below. Clearly shows before and provisional after.
+
+Design guidance: shell #1C2424, canvas #181818, navigation #1B1E1E, raised generation surfaces #232323, primary text #F3F3F3, secondary #B3B6B8, borders #343738, accent #B58AF8. White-filled dark-text Cancel buttons or legible outlined neutral Cancel buttons. Purple used sparingly for the active streaming dot/cursor, green only for completed read step. Soft rounded 18–20px panel corners, refined thin borders. Keep all six options consistent and comparable, no watermark, no huge decoration, no blurry tiny body text, no clipped panels. These are exploratory concept mockups, not implementation screenshots.

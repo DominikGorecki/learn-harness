@@ -1,0 +1,42 @@
+Use case: ui-mockup.
+Generate ONE new six-option contact sheet for the Learning Studio generation-streaming component. This is sheet 02, a refinement of the supplied image, NOT a final selection. Layout exactly 3 columns by 2 rows, six comparable complete desktop app miniatures, crisp high-resolution landscape canvas with readable text and narrow neutral charcoal gutters. Label each miniature OUTSIDE its window:
+"1  Compact right panel", "2  Draft-first right panel", "3  Activity-first right panel",
+"4  Bottom split panel", "5  Bottom draft panel", "6  Inset bottom panel".
+
+Use the supplied sheet as the actual visual reference, specifically sheet 01 OPTION 2 (top center) for the right panel and OPTION 4 (bottom left) for the bottom panel. Preserve their restrained dark palette, familiar narrow icon rail, project sidebar, neutral system sans type, document hierarchy, thin borders, small purple activity accents, white Cancel button, panel title, streamed prose and not-saved label. Refine ONLY these two families. Do not include a centered modal, full-screen generation page, inline topic card or before/after comparison.
+
+CRITICAL CORRECTION: ALL THREE BOTTOM PANELS must be INSIDE THE MAIN CONTENT AREA of the same app window, to the RIGHT of the project navigation. They must NEVER span under, cover, overlap or hide the left icon rail, project sidebar, project rows or Account footer. Draw a very clear full-height vertical boundary between project navigation and main content. Keep that rail and sidebar completely unobstructed down to the bottom edge of EVERY screenshot. The bottom panel's LEFT EDGE must align with the LEFT EDGE of the MAIN CONTENT region, not the app's left edge. The bottom panel sits below the saved outline as a real docked region or inset panel within the workspace, not a floating separate window or OS overlay. Give the main region enough width to make this obvious.
+
+Common desktop state in all six: existing "Bayesian reasoning" saved outline visible and muted but readable, topic "02  Historical foundations" being rewritten to add history. Keep background saved rows "01  Beliefs before evidence", "02  Historical foundations", "03  Updating a belief" with unchanged old content; no newly generated draft may appear in the saved rows. Existing topic edit pencil icons visibly disabled/gray. No other AI request may be started until this finishes or is cancelled. Saved reading remains available. The generation panel stays bright and legible. No percentages, fake ETA, logs, JSON, private thinking, approval buttons, queue buttons, minimize behavior or extra AI actions.
+
+Visible copy common to all six, spelled exactly:
+App "Learning Studio"
+Project "Bayesian reasoning"
+Saved heading "Your path through the subject"
+Generation title "Updating Historical foundations"
+Request "I would like to learn further history on this topic"
+Timer "00:42 elapsed"
+Restriction "Other AI actions are paused."
+Completed activity "Read topic notes" with small green check
+Running activity "Drafting historical context" with small purple activity dot or ring
+Upcoming activity "Check and save" in muted gray
+Draft label "Draft preview · Not saved"
+Draft title "Historical foundations"
+Draft prose "From early probability problems to Bayes’s theorem."
+Next growing paragraph "Ideas about uncertainty began with games of chance…" with a subtle purple text cursor
+Scope "Only this topic will change."
+Action "Cancel" always clearly reachable.
+Bottom sidebar label "Account".
+Do not replace learner prose with filler text. Omit secondary copy rather than making text tiny, but retain generation title, current activity, draft label, preview prose, timer, Cancel and paused explanation in every panel.
+
+Top-row differences:
+1 COMPACT RIGHT PANEL: modest-width docked right panel, vertical completed/current/upcoming activity rows at top, stacked draft below. Preserve comfortable saved-outline reading space beside it. Footer paused note and Cancel.
+2 DRAFT-FIRST RIGHT PANEL: wider right dock; header title/request/timer/Cancel, large draft preview immediately beneath. A small horizontal phase row or concise completed/current/upcoming list near footer. Most panel space belongs to streaming prose. Saved outline still visible at left.
+3 ACTIVITY-FIRST RIGHT PANEL: right dock with a well-spaced vertical activity timeline in upper portion, the active stage clearly emphasized, and a smaller but fully readable draft preview beneath. Header and stable footer. Strongest emphasis on what is happening now.
+
+Bottom-row differences, each strictly within main workspace:
+4 BOTTOM SPLIT PANEL: a docked bottom region taking roughly 40–45% of MAIN workspace height. A header with title, timer and Cancel; beneath, a narrow activity column LEFT and wider streaming draft column RIGHT separated by a fine vertical rule. Footer scope and paused copy. The saved outline remains above; sidebar untouched.
+5 BOTTOM DRAFT PANEL: a docked bottom region taking roughly 40–45% of main workspace height. Header title/request with timer/Cancel at right; compact horizontal phase strip below; wide full-width streaming prose below that. Footer paused copy. No vertical activity column. Saved outline above; sidebar untouched.
+6 INSET BOTTOM PANEL: bottom region inside main workspace with generous side margins, rounded 18–20px raised surface, subtle top divider or panel boundary; title/timer/Cancel in its header. A compact status column beside a draft area, slightly calmer and more spacious than option 4. This panel is anchored within the main region and does not overlap saved text; saved outline above, full sidebar visible.
+
+Palette: outer shell #1C2424, navigation #1B1E1E, canvas #181818, raised panel #232323, text #F3F3F3 and #B3B6B8, border #343738, accent #B58AF8. Keep saved documents subtly dimmed, rather than rendering unreadable gray-on-gray. Panels more prominent than banners, clean product-design polish, consistent scale across six, no watermark, no decorative imagery, no clipped controls. Preserve the useful quiet visual character of reference options 2 and 4. These are concept images, not implementation evidence.
