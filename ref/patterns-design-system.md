@@ -1,6 +1,6 @@
 # Design system patterns
 
-Governed by [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), which amends the palette and theme scope in [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Primary visual references: the user-supplied [light workspace](../docs/chatgpt-app-light.png) and [dark settings](../docs/chatgpt-app-dark.png). Interpretation and current evidence: [appearance review](research/chatgpt-app-appearance.md).
+Governed by [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), which amends the palette and theme scope in [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md). Primary visual direction comes from the user-supplied light workspace and dark settings screenshots. Their originals are excluded from public source for privacy. Interpretation and isolated application captures: [appearance review](research/chatgpt-app-appearance.md).
 
 **Status:** adopted visual standard, implemented in the project workspace and account panel. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
 
