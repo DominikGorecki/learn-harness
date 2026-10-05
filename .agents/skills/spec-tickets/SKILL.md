@@ -3,13 +3,13 @@ name: spec-tickets
 description: Turn a ready Learning Studio spec into dependency-aware tickets beside it in ref/work, with Electron ownership, requirement coverage, and project validation gates. Use for ticket authoring before implementation.
 metadata:
   collection: "spec skills"
-  version: "2.0.0-project.1"
+  version: "2.0.0-project.2"
   project: "edu-harness"
 ---
 
 # Spec tickets
 
-Turn one ready spec into the fewest coherent tickets that can be implemented and accepted one at a time; aim for 1–8 unless the source justifies more. Invocation authorizes ticket artifacts, not implementation or commits.
+Turn one ready spec into the fewest coherent tickets that can be implemented and accepted one at a time; aim for 1–8 unless the source justifies more. Standalone invocation authorizes ticket artifacts, not implementation or commits. When called as the preparation stage of an authorized `spec-implement` run, return the tickets, coverage and blockers to that coordinator; it continues implementation and commits under the enclosing authorization.
 
 ## Learning Studio project contract
 
@@ -34,4 +34,4 @@ Turn one ready spec into the fewest coherent tickets that can be implemented and
 
 Follow the `ref/work` bundle rules above. The bundle remains incomplete while tickets, relevant prerequisites, or mandatory acceptance gates are unresolved. `spec-implement` owns fresh whole-spec verification and evidence-based closure; statuses alone do not prove completion.
 
-Finish with ticket paths, dependencies, requirement coverage, and blockers. Suggest `spec-implement` for the whole bundle or `spec-implement-ticket` for a named ticket as separately authorized next stages.
+Finish with ticket paths, dependencies, requirement coverage, and blockers. For standalone use, suggest `spec-implement` for the whole bundle or `spec-implement-ticket` for a named ticket as separately authorized next stages. When called by `spec-implement`, return this evidence to the coordinator and continue the already authorized workflow without asking for another stage approval.
