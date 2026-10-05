@@ -155,14 +155,17 @@ export class WorkspaceService {
   private mutable(id: string): void {
     if (this.generationLocks.has(id)) throw new ApplicationError('BUSY', 'Finish or cancel this outline before changing its project settings.')
   }
-  prepareOutline(id: string, modelId: string, brief: string, replace: boolean): Promise<{ path: string; digest: string | null; model: ModelChoice }> {
+  prepareOutline(id: string, modelId: string, brief: string, replace: boolean, rewrite = false): Promise<{ path: string; digest: string | null; model: ModelChoice; brief: string; currentOutline: SavedOutline | null }> {
     return this.serial(async () => {
       this.mutable(id)
       const entry = this.entry(id)
       const loaded = await this.options.storage.load(entry.path)
       this.assertIdentity(entry, loaded)
+      const currentOutline = loaded.document?.outline ?? null
+      if (rewrite && !currentOutline) throw new ApplicationError('UNAVAILABLE', 'Save an outline before requesting changes to it.')
+      if (rewrite) brief = loaded.document!.brief
       if (!loaded.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Choose a writable folder before creating an outline.')
-      if (!brief.trim() && loaded.sourceHint === 'empty') throw new ApplicationError('INVALID_INPUT', 'Add a topic or a question to start your outline.')
+      if (!rewrite && !brief.trim() && loaded.sourceHint === 'empty') throw new ApplicationError('INVALID_INPUT', 'Add a topic or a question to start your outline.')
       const cached = this.loaded.get(id)
       if (cached && cached.digest !== loaded.digest) throw new ApplicationError('CONFLICT', 'This project changed outside the app. Reopen it before creating an outline.')
       if (loaded.document?.outline && !replace) throw new ApplicationError('CONFLICT', 'Confirm replacement before creating another outline.')
@@ -171,7 +174,7 @@ export class WorkspaceService {
       this.loaded.set(id, loaded)
       await this.updateDocument(id, document => ({ ...document, selectedModel: { ...model }, brief }))
       this.generationLocks.add(id)
-      return { path: entry.path, digest: this.loaded.get(id)!.digest, model: { ...model } }
+      return { path: entry.path, digest: this.loaded.get(id)!.digest, model: { ...model }, brief, currentOutline }
     })
   }
   releaseOutline(id: string): void { this.generationLocks.delete(id) }

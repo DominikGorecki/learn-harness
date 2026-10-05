@@ -96,7 +96,7 @@ if (!app.requestSingleInstanceLock()) {
       generate: async (input, signal, onPhase) => {
         const authorized = await account!.authorizeModel(input.model.id)
         signal.throwIfAborted()
-        return runOutlineWorker({ model: authorized.model, accessToken: authorized.accessToken, baseUrl: providerEndpoints.resource, brief: input.brief, path: input.path }, { signal, onPhase })
+        return runOutlineWorker({ ...input, model: authorized.model, accessToken: authorized.accessToken, baseUrl: providerEndpoints.resource }, { signal, onPhase })
       }
     })
     registerGenerationHandlers(generation, () => mainWindow, expectedOrigin)

@@ -14,16 +14,23 @@ export interface OutlineRun {
 }
 export interface GenerationSnapshot { runs: OutlineRun[]; activeRunId: string | null }
 export interface StartOutlineRequest { projectId: string; brief: string; modelId: string; replace: boolean }
+export interface RewriteOutlineRequest { projectId: string; modelId: string; changes: string }
 export interface RunRequest { projectId: string; runId: string }
 export interface SaveOutlineRequest extends RunRequest { replaceChanged?: boolean }
 export interface GenerationApi {
   getGeneration(): Promise<ApiResult<GenerationSnapshot>>
   createOutline(request: StartOutlineRequest): Promise<ApiResult<GenerationSnapshot>>
+  rewriteOutline(request: RewriteOutlineRequest): Promise<ApiResult<GenerationSnapshot>>
   cancelOutline(request: RunRequest): Promise<ApiResult<GenerationSnapshot>>
   retryOutlineSave(request: SaveOutlineRequest): Promise<ApiResult<GenerationSnapshot>>
   onGenerationChanged(listener: (snapshot: GenerationSnapshot) => void): () => void
 }
-export const generationChannels = { get: 'outline:get', start: 'outline:start', cancel: 'outline:cancel', save: 'outline:save', changed: 'outline:changed' } as const
+export const generationChannels = { get: 'outline:get', start: 'outline:start', rewrite: 'outline:rewrite', cancel: 'outline:cancel', save: 'outline:save', changed: 'outline:changed' } as const
+export function parseRewriteOutline(value: unknown): RewriteOutlineRequest {
+  const data = strictRecord(value, ['projectId', 'modelId', 'changes'])
+  return { projectId: identifier(data.projectId), modelId: boundedText(data.modelId, 'Model', 128),
+    changes: boundedText(data.changes, 'Outline changes', maximumBriefLength) }
+}
 export function parseStartOutline(value: unknown): StartOutlineRequest {
   const data = strictRecord(value, ['projectId', 'brief', 'modelId', 'replace'])
   if (typeof data.replace !== 'boolean') throw new ApplicationError('INVALID_INPUT', 'Choose whether to replace the saved outline.')

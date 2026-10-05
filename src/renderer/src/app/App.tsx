@@ -8,6 +8,7 @@ import { Dashboard } from '../features/projects/Dashboard'
 import { ProjectSetup } from '../features/projects/ProjectSetup'
 import { ProjectModel } from '../features/projects/ProjectModel'
 import { OutlineView } from '../features/projects/OutlineView'
+import { OutlineEditDialog } from '../features/projects/OutlineEditDialog'
 import { useGeneration } from '../features/projects/useGeneration'
 import { GenerationStatus } from '../features/projects/GenerationStatus'
 import { runIsBusy } from '../../../shared/generation'
@@ -57,6 +58,9 @@ export function App() {
   const [accountOpen, setAccountOpen] = useState(false)
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [refining, setRefining] = useState<Record<string, string | null>>({})
+  const [editProjectId, setEditProjectId] = useState<string | null>(null)
+  const [editDrafts, setEditDrafts] = useState<Record<string, { outlineAt: string; text: string }>>({})
+  const [submittingEdit, setSubmittingEdit] = useState(false)
   const [confirmReplace, setConfirmReplace] = useState(false)
   const replacementDialog = useRef<HTMLDialogElement>(null)
   const [pendingNavigation, setPendingNavigation] = useState<NavigationIntent | null>(null)
@@ -112,7 +116,7 @@ export function App() {
 
   useEffect(() => {
     const command = (event: KeyboardEvent) => {
-      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.isComposing || accountOpen || settingsOpen || confirmReplace || confirmSave || pendingNavigation || workspace.busy) return
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.isComposing || accountOpen || settingsOpen || editProjectId || confirmReplace || confirmSave || pendingNavigation || workspace.busy) return
       if (event.key === ',') { event.preventDefault(); openSettings(); return }
       if (event.key.toLowerCase() === 'o') { event.preventDefault(); openProject() }
       const target = event.target as HTMLElement | null
@@ -122,7 +126,7 @@ export function App() {
     }
     window.addEventListener('keydown', command)
     return () => window.removeEventListener('keydown', command)
-  }, [accountOpen, settingsOpen, confirmReplace, confirmSave, pendingNavigation, workspace.busy, openProject, openSettings, toggleNavigation])
+  }, [accountOpen, settingsOpen, editProjectId, confirmReplace, confirmSave, pendingNavigation, workspace.busy, openProject, openSettings, toggleNavigation])
 
   useEffect(() => {
     if (confirmReplace && !replacementDialog.current?.open) replacementDialog.current?.showModal()
@@ -169,6 +173,18 @@ export function App() {
   const generatedUnsaved = outlineRun && ['unsaved', 'saving'].includes(outlineRun.status) ? outlineRun.result : null
   const displayedOutline = generatedUnsaved ?? project?.outline
   const isRefining = Boolean(project?.outline && refining[project.id] === project.outline.generatedAt)
+  const editDraft = project?.outline && editDrafts[project.id]?.outlineAt === project.outline.generatedAt ? editDrafts[project.id]!.text : ''
+  const rewriteOutline = async () => {
+    if (!project?.outline || submittingEdit || workspace.busy || anyGenerationBusy) return
+    if (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || account.snapshot.modelTestStatus === 'testing') {
+      setEditProjectId(null); openAccount(); return
+    }
+    setSubmittingEdit(true)
+    try {
+      const state = await generation.run(api => api.rewriteOutline({ projectId: project.id, modelId, changes: editDraft }))
+      if (state) setEditProjectId(null)
+    } finally { setSubmittingEdit(false) }
+  }
   const cancelAndNavigate = async () => {
     if (!pendingNavigation) return
     if (activeRun) {
@@ -234,13 +250,21 @@ export function App() {
               onSave={() => void run(api => api.saveProjectBrief({ projectId: project.id, brief: draft }))}
               onModel={modelId => void run(api => api.setProjectModel({ projectId: project.id, modelId }))} onConnect={openAccount} />}
             {currentModelUnavailable && <p className="model-recovery">Your saved model is unavailable. Choose another project model to create an outline.</p>}
-            {displayedOutline && <OutlineView saved={displayedOutline} unsaved={Boolean(generatedUnsaved)} />}
+            {displayedOutline && <OutlineView saved={displayedOutline} unsaved={Boolean(generatedUnsaved)}
+              onEdit={() => { generation.clearError(); setEditProjectId(project.id) }}
+              editDisabled={!project.writable || workspace.busy || anyGenerationBusy || Boolean(generatedUnsaved) || submittingEdit} />}
           </>}
       </main>
     </div>
     <AccountPanel open={accountOpen} onClose={() => { setAccountOpen(false); if (narrow) navigationToggle.current?.focus() }} account={account} locked={anyGenerationBusy} />
     <SettingsPanel open={settingsOpen} onClose={() => { setSettingsOpen(false); settingsTrigger.current?.focus() }}
       appearance={appearance.appearance} onAppearance={appearance.chooseAppearance} persistent={appearance.persistent} />
+    {project?.outline && <OutlineEditDialog open={editProjectId === project.id} outline={project.outline} draft={editDraft}
+      modelName={account.snapshot?.models.find(model => model.id === modelId)?.name ?? project.selectedModel?.name ?? ''}
+      canSubmit={project.writable && !workspace.busy && !anyGenerationBusy && !generatedUnsaved && !currentModelUnavailable && account.snapshot?.modelTestStatus !== 'testing'}
+      busy={submittingEdit} error={generation.error} question={outlineRun?.status === 'needs-details' ? outlineRun.question : null}
+      onDraft={text => setEditDrafts(previous => ({ ...previous, [project.id]: { outlineAt: project.outline!.generatedAt, text } }))}
+      onSubmit={() => void rewriteOutline()} onClose={() => setEditProjectId(null)} />}
     <dialog ref={replacementDialog} className="confirmation-dialog" aria-labelledby="replacement-heading" onCancel={() => setConfirmReplace(false)} onClose={() => setConfirmReplace(false)}>
       <h2 id="replacement-heading">Create a new learning outline?</h2>
       <p>{outlineRun?.status === 'unsaved' ? 'This will discard the unsaved result and use ChatGPT again.' : 'Your current outline stays available while the new one is created. A successful save replaces it. This uses your ChatGPT plan allowance.'}</p>

@@ -7,7 +7,7 @@ import { WorkspaceService } from '../../src/core/workspace/service'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
 import { createProjectRegistry } from '../../src/main/storage/project-registry'
 import { ApplicationError } from '../../src/shared/contracts'
-import { parseRunRequest, parseStartOutline } from '../../src/shared/generation'
+import { parseRunRequest, parseStartOutline, parseRewriteOutline } from '../../src/shared/generation'
 import type { OutlineEngineResult } from '../../src/shared/generation'
 import { learningOutline } from '../fixtures/learning-outline'
 
@@ -28,6 +28,63 @@ async function setup(generate: ConstructorParameters<typeof GenerationService>[0
   return { root, path, workspace, service, storage, request, generator, onBusy, onAccountFailure }
 }
 describe('generation ownership and durable outcomes', () => {
+  it('rewrites the authoritative outline with the selected model while preserving the learning brief', async () => {
+    const { service, request, workspace, generator, path } = await setup()
+    service.start(request); await service.waitForIdle()
+    expect(generator.mock.calls[0]![0].currentOutline).toBeNull()
+    const original = workspace.get().activeProject!.outline!
+    const revised = learningOutline(); revised.lessons.reverse(); revised.startingLessonId = revised.lessons[0]!.id
+    generator.mockResolvedValueOnce({ kind: 'outline', document: revised })
+    service.rewrite({ projectId: request.projectId, modelId: request.modelId, changes: 'Move 01 after 02' })
+    await service.waitForIdle()
+    expect(generator.mock.calls[1]![0]).toEqual({ model: { id: request.modelId, name: 'One' }, path,
+      brief: request.brief, currentOutline: original, changes: 'Move 01 after 02' })
+    expect(service.get().runs[0]?.status).toBe('saved')
+    const stored = JSON.parse(await readFile(join(path, '.edu/project.json'), 'utf8'))
+    expect(stored).toMatchObject({ brief: request.brief, outline: { brief: request.brief, document: revised } })
+    // Regeneration also supplies the current JSON, rather than losing project orientation.
+    service.start({ ...request, replace: true }); await service.waitForIdle()
+    expect(generator.mock.calls[2]![0].currentOutline?.document).toEqual(revised)
+  })
+  it('requires a saved outline and rejects forged or blank rewrite requests', async () => {
+    const { service, request, generator } = await setup()
+    for (const changes of ['', '  ', 'x'.repeat(32_001), null]) {
+      expect(() => parseRewriteOutline({ projectId: request.projectId, modelId: request.modelId, changes })).toThrow()
+    }
+    expect(() => parseRewriteOutline({ projectId: request.projectId, modelId: request.modelId, changes: 'Reorder', currentOutline: learningOutline() })).toThrow()
+    service.rewrite({ projectId: request.projectId, modelId: request.modelId, changes: 'Reorder' }); await service.waitForIdle()
+    expect(service.get().runs[0]?.errorCode).toBe('UNAVAILABLE')
+    expect(generator).not.toHaveBeenCalled()
+  })
+  it('preserves the saved outline and brief on rewrite failure or cancellation, and retries saves without inference', async () => {
+    const { service, request, workspace, generator, storage } = await setup()
+    service.start(request); await service.waitForIdle()
+    const original = workspace.get().activeProject!.outline
+    const rewrite = { projectId: request.projectId, modelId: request.modelId, changes: 'Add practical examples' }
+    generator.mockRejectedValueOnce(new ApplicationError('NETWORK', 'Try again.'))
+    service.rewrite(rewrite); await service.waitForIdle()
+    expect(workspace.get().activeProject).toMatchObject({ outline: original, brief: request.brief })
+    const started = deferred<void>(), pending = deferred<OutlineEngineResult>()
+    generator.mockImplementationOnce(async () => { started.resolve(); return pending.promise })
+    const state = service.rewrite(rewrite); await started.promise
+    const cancelled = service.cancel({ projectId: request.projectId, runId: state.activeRunId! })
+    pending.resolve({ kind: 'outline', document: learningOutline() }); await cancelled
+    expect(service.get().runs[0]?.status).toBe('cancelled')
+    expect(workspace.get().activeProject).toMatchObject({ outline: original, brief: request.brief })
+    const save = storage.save.bind(storage)
+    const spy = vi.spyOn(storage, 'save').mockImplementation(async (...args) => {
+      if (args[1].outline?.generatedAt !== original?.generatedAt) throw new ApplicationError('STORAGE', 'Full disk.')
+      return save(...args)
+    })
+    service.rewrite(rewrite); await service.waitForIdle()
+    const run = service.get().runs[0]!
+    expect(run.status).toBe('unsaved')
+    expect(() => service.rewrite(rewrite)).toThrow(/Save your generated outline/)
+    spy.mockRestore()
+    await service.retrySave({ projectId: request.projectId, runId: run.id })
+    expect(service.get().runs[0]?.status).toBe('saved')
+    expect(generator).toHaveBeenCalledTimes(4)
+  })
   it('saves the complete result with the originating model, brief and time', async () => {
     const { service, request, workspace, onBusy } = await setup()
     expect(service.start(request).activeRunId).toBeTruthy()

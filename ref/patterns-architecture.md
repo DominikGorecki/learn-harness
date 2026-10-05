@@ -1,6 +1,6 @@
 # Architecture patterns
 
-Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md), and [ADR-0009](ADRs/ADR-0009-portable-project-workspace.md).
+Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md), [ADR-0009](ADRs/ADR-0009-portable-project-workspace.md), and [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md).
 
 ## Process and source ownership
 
@@ -17,6 +17,8 @@ Core imports shared contracts and defines repository/time/identity ports. Main i
 Account lifecycle lives in `src/main/auth`: application connection service, testable OAuth/provider and credential adapters, and loopback listener. Its asynchronous IPC uses `registerCapability`, which awaits the result before constructing its reply. Shared account snapshots contain no credentials. [ADR-0014](ADRs/ADR-0014-durable-account-connection.md) governs durable protected/local credential storage in the application profile and restoration through the existing account lifecycle. Pi Agent Core/Pi AI are pinned runtime dependencies for the educational harness; generation runs in a dedicated Electron utility process under [ADR-0010](ADRs/ADR-0010-bounded-pi-outline-generation.md). Core `GenerationService` owns project/run state and a worker port; main owns authorization and worker startup/termination.
 
 The explicit short model diagnostic in [ADR-0015](ADRs/ADR-0015-explicit-model-access-verification.md) uses an asynchronous bounded HTTP/SSE account adapter in main. It sends no project material and has no agent/tool loop. [ADR-0016](ADRs/ADR-0016-requested-extra-model-choices.md) adds fixed Sol/Luna choices after successful discovery and independent optional tests. Shared contains serializable fixed choices; account main owns their composition, test serialization and session proof. Educational outline generation remains in the Pi utility process. Session verification is account-owned state; it is not persisted as entitlement or required to select the requested extras.
+
+Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), core obtains the saved outline through identity- and digest-checked workspace storage and passes it to the existing Pi utility process as untrusted learning context. Main retains worker, account authorization and process lifecycle ownership; the renderer cannot provide authoritative saved JSON or filesystem paths.
 
 ## Growth boundary
 

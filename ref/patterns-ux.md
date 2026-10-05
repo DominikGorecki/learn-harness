@@ -61,6 +61,8 @@ Replacing or deleting durable learner work requires a clear statement of the aff
 
 ## Review and learning interaction
 
+Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), a quiet, keyboard-accessible edit icon beside “Your path through the subject” opens a native dialog for numbered or freeform changes. Show current numbered topics through disclosure, identify the selected model and allowance use, and state that a successful save replaces the outline. Opening/dismissing starts no inference; Escape restores trigger focus. Preserve full project/outline-keyed drafts on dismissal, cancellation or failure, including oversized input. Use explicit Rewrite outline or IME-safe Cmd/Ctrl+Enter. Disable edits during competing operations, for read-only state or while a result is unsaved. Keep the current outline readable during the rewrite and reuse generation/save recovery. Inherited source evidence is visibly distinguished from sources read during this revision.
+
 Keep outputs readable as working documents. Use lesson rows and expandable module plans for outlines, with sources/assumptions available where needed. Preserve place when expanding a lesson or viewing supporting material. An AI-proposed outline is a revisable proposal; show its assumptions and material-informed coverage as required by the PRD.
 
 In future Socratic sessions, orient the learner to the activity and ask one useful question at a time. Keep their explanation, prediction, or revised model easy to find beside the feedback that addresses it. Show a clear stopping point and a useful way to return. The module repertoire remains in [Socratic learning](../docs/socratic-learning.md); this UI update does not select an assessment algorithm or infer mastery from a badge.

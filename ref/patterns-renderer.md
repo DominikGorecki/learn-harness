@@ -1,6 +1,6 @@
 # Renderer patterns
 
-Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0002](ADRs/ADR-0002-sandboxed-capability-ipc.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
+Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0002](ADRs/ADR-0002-sandboxed-capability-ipc.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), and [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md).
 
 Read [design system](patterns-design-system.md) for appearance and [UX](patterns-ux.md) for interaction contracts before changing a screen. This file owns renderer implementation rules.
 
@@ -25,6 +25,8 @@ Render goals/material/model text as text; do not introduce `dangerouslySetInnerH
 ## Asynchronous state
 
 The workspace serializes short metadata operations and keeps drafts by project handle. Event revisions prevent a late initial query or API response from replacing newer published state. Key longer generation requests/results to their owning project and operation. Disable conflicting mutations; navigation during generation offers an explicit stay/cancel choice. Ignore stale results after view cleanup, and unsubscribe from any future event bridge. Do not simulate saving, cancellation, or provider availability in React.
+
+Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), keep outline-edit drafts keyed to their project and saved-outline revision. The renderer sends only the project/model identifiers and learner changes; main/core load authoritative saved context. Dismissing, cancelling or failing a rewrite preserves its draft and prior saved outline; a successful save starts a fresh draft.
 
 ## Current implementation and migration evidence
 

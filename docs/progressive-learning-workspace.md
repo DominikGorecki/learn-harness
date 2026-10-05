@@ -18,6 +18,8 @@ Educational generation uses Pi Agent Core and Pi AI in an Electron utility proce
 
 The existing material scan excludes `.edu`. Pi has no filesystem mutation, shell, extension loading, or automatic project instruction discovery tools. The proposed design therefore needs explicit discovery and update capabilities; changing the files alone will not enable it.
 
+The outline edit flow is now implemented under [ADR-0017](../ref/ADRs/ADR-0017-outline-rewrites-with-saved-context.md). Every educational generation call receives the validated saved outline JSON as orientation (or null before initial creation), retained across Pi tool turns. A rewrite receives the learner's numbered/freeform changes separately, uses the selected project model, and lets Pi read additional supported material as needed before submitting a complete replacement for application validation and saving. Previously read source references can carry forward with an explicit inherited-evidence label. This uses the current nested outline format; the separate indexes, manifests, activities and sessions below remain future proposals.
+
 Current decisions remain authoritative: [portable project storage](../ref/ADRs/ADR-0009-portable-project-workspace.md), [bounded Pi generation](../ref/ADRs/ADR-0010-bounded-pi-outline-generation.md), and [scoped material understanding](../ref/ADRs/ADR-0011-scoped-material-understanding.md).
 
 ## File ownership

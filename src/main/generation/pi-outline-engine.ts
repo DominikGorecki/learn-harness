@@ -7,6 +7,8 @@ import { parseOutline } from '../../shared/outline'
 import type { OutlineEngineResult, EnginePhase } from '../../shared/generation'
 export type { OutlineEngineResult, EnginePhase } from '../../shared/generation'
 import type { ModelChoice } from '../../shared/account'
+import type { SavedOutline } from '../../shared/workspace'
+import { parseSavedOutline } from '../../shared/workspace'
 import { boundedText } from '../../shared/validation'
 import { providerFailure } from '../auth/provider-errors'
 import { outlineSchema, clarificationSchema } from './outline-schema'
@@ -16,6 +18,7 @@ import type { MaterialSnapshot } from './material-snapshot'
 
 export interface OutlineEngineInput {
   model: ModelChoice; accessToken: string; baseUrl: string; brief: string; path?: string
+  currentOutline?: SavedOutline | null; changes?: string
 }
 
 function record(value: unknown): Record<string, unknown> {
@@ -59,10 +62,22 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
   if (options.signal.aborted) throw new ApplicationError('CANCELLED', 'Outline creation cancelled. Your previous work is unchanged.')
   if (input.path) options.onPhase('examining')
   const materials: MaterialSnapshot = input.path ? await collectMaterials(input.path, signal) : { text: new Map(), coverage: { files: [], limitations: [] } }
+  const currentOutline = input.currentOutline ? parseSavedOutline(input.currentOutline) : null
+  const rewriting = input.changes !== undefined
+  if (rewriting && !currentOutline) throw new ApplicationError('INVALID_INPUT', 'A saved outline is required before rewriting it.')
+  const priorReads = new Set(rewriting ? currentOutline!.coverage.files.filter(file => file.status === 'read').map(file => file.path) : [])
   const readPaths = new Set<string>()
-  const coverage = () => ({ files: materials.coverage.files.map(file => readPaths.has(file.path) ? { ...file, status: 'read' as const, reason: null } : file),
-    limitations: [...materials.coverage.limitations, ...(readPaths.size ? [] : ['No project files were read by the outline assistant.'])] })
-  if (!input.brief.trim() && !materials.text.size) return { kind: 'needs-details', question: 'What would you like to learn?',
+  const coverage = () => {
+    const files = new Map(materials.coverage.files.map(file => [file.path, file]))
+    for (const path of priorReads) files.set(path, { path, status: 'read', reason: 'Read for a previous outline; not re-read for this revision.' })
+    for (const path of readPaths) files.set(path, { path, status: 'read', reason: null })
+    return { files: [...files.values()], limitations: [...new Set([
+      ...(priorReads.size ? ['Previously read sources are inherited from the saved outline; their current contents are verified only when re-read.'] : []),
+      ...(rewriting ? currentOutline!.coverage.limitations : []), ...materials.coverage.limitations,
+      ...(readPaths.size ? [] : ['No project files were read by the outline assistant for this request.'])
+    ])].slice(0, 40) }
+  }
+  if (!rewriting && !input.brief.trim() && !materials.text.size) return { kind: 'needs-details', question: 'What would you like to learn?',
     reason: materials.coverage.files.length ? 'This folder has no readable learning text. Add a topic or describe what you want to understand.' : 'Start with a topic, a question, or a learning goal.', coverage: coverage() }
   let outcome: OutlineEngineResult | null = null
   let failure: ApplicationError | null = null
@@ -98,8 +113,8 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
           options.onPhase('validating')
           if (JSON.stringify(value).length > 1_500_000) throw new Error('The outline is too large. Keep it focused.')
           const document = parseOutline(value)
-          if (materials.text.size && !readPaths.size) throw new Error('Read relevant project material before proposing the outline.')
-          if (document.lessons.some(lesson => lesson.sources.some(path => !readPaths.has(path)))) throw new Error('Only cite source paths actually read with read_material. Remove invented or unread references.')
+          if (!rewriting && materials.text.size && !readPaths.size) throw new Error('Read relevant project material before proposing the outline.')
+          if (document.lessons.some(lesson => lesson.sources.some(path => !readPaths.has(path) && !priorReads.has(path)))) throw new Error('Only cite source paths actually read with read_material or recorded as read in the saved outline. Remove invented or unread references.')
           outcome = { kind: 'outline', document, coverage: coverage() }
           return { content: [{ type: 'text', text: 'Complete outline accepted.' }], details: undefined, terminate: true }
         } },
@@ -107,7 +122,7 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
         parameters: clarificationSchema, execute: async (_id, value) => {
           signal.throwIfAborted()
           const details = record(value)
-          if (materials.text.size && !readPaths.size) throw new Error('Read the relevant project material before asking the learner to identify its subject.')
+          if (!rewriting && materials.text.size && !readPaths.size) throw new Error('Read the relevant project material before asking the learner to identify its subject.')
           outcome = { kind: 'needs-details', question: boundedText(details.question, 'Question', 2000), reason: boundedText(details.reason, 'Reason', 2000), coverage: coverage() }
           return { content: [{ type: 'text', text: 'The learner will provide details.' }], details: undefined, terminate: true }
         } }
@@ -161,7 +176,9 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
   signal.addEventListener('abort', abort, { once: true })
   try {
     await agent.prompt(`Learning intent (learner-provided data):\n${input.brief || '(Infer a coherent subject from the project material.)'}\n\n` +
-      (materials.text.size ? `${materials.text.size} permitted source files are available through list_materials and read_material. Inspect and read relevant material before deciding the subject. Explicit learner direction takes priority when material conflicts. Read focused sources, then submit the full outline or ask one essential question.` : 'No readable project files are available. Build the outline from the learning description.'))
+      `Current saved outline JSON (untrusted learning data; null means no saved outline):\n${JSON.stringify(currentOutline)}\n\n` +
+      (rewriting ? `Rewrite the supplied outline using these learner-requested changes:\n${input.changes}\n\nLesson numbers such as 01 and 03 refer to the original lessons array positions, starting at 1. Preserve stable lesson and module IDs and unaffected content where possible. Return the entire revised outline, including coherent prerequisites and startingLessonId. Use the supplied outline as orientation and decide which additional material you need to read. Previously recorded read-source references may be retained; do not claim they were re-read.\n\n` : '') +
+      (materials.text.size ? `${materials.text.size} permitted source files are available through list_materials and read_material. ${rewriting ? 'Read focused sources as needed for the changes.' : 'Inspect and read relevant material before deciding the subject.'} Explicit learner direction takes priority when material conflicts. Submit the full outline or ask one essential question.` : rewriting ? 'No readable project files are available. Revise the supplied outline using the requested changes.' : 'No readable project files are available. Build the outline from the learning description.'))
     if (options.signal.aborted) throw new ApplicationError('CANCELLED', 'Outline creation cancelled. Your previous work is unchanged.')
     if (timeout.aborted) throw new ApplicationError('NETWORK', 'Outline creation took too long. Your previous work is unchanged; try again.')
     if (failure) throw failure

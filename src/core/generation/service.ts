@@ -1,6 +1,7 @@
 import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
-import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, SaveOutlineRequest, StartOutlineRequest } from '../../shared/generation'
+import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, SaveOutlineRequest, StartOutlineRequest, RewriteOutlineRequest } from '../../shared/generation'
+import type { SavedOutline } from '../../shared/workspace'
 import { parseSavedOutline } from '../../shared/workspace'
 import { parseCoverage } from '../../shared/outline'
 import { boundedText } from '../../shared/validation'
@@ -14,13 +15,17 @@ export class GenerationService {
   private listeners = new Set<(snapshot: GenerationSnapshot) => void>()
   constructor(private readonly options: {
     workspace: WorkspaceService; createId(): string; now(): string; onBusy(busy: boolean): void; onAccountFailure(error: ApplicationError): void;
-    generate(input: { model: ModelChoice; brief: string; path: string }, signal: AbortSignal, onPhase: (phase: EnginePhase) => void): Promise<OutlineEngineResult>
+    generate(input: { model: ModelChoice; brief: string; path: string; currentOutline: SavedOutline | null; changes?: string }, signal: AbortSignal, onPhase: (phase: EnginePhase) => void): Promise<OutlineEngineResult>
   }) {}
   get(): GenerationSnapshot { return structuredClone({ runs: [...this.runs.values()], activeRunId: this.active?.id ?? null }) }
   subscribe(listener: (snapshot: GenerationSnapshot) => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private emit(): void { for (const listener of this.listeners) listener(this.get()) }
   private update(run: OutlineRun, values: Partial<OutlineRun>): void { Object.assign(run, values); this.emit() }
-  start(request: StartOutlineRequest): GenerationSnapshot {
+  rewrite(request: RewriteOutlineRequest): GenerationSnapshot {
+    if (this.runs.get(request.projectId)?.status === 'unsaved') throw new ApplicationError('CONFLICT', 'Save your generated outline before requesting changes to it.')
+    return this.start({ projectId: request.projectId, modelId: request.modelId, brief: '', replace: true }, request.changes)
+  }
+  start(request: StartOutlineRequest, changes?: string): GenerationSnapshot {
     if (this.active) throw new ApplicationError('BUSY', 'An outline is already being created. Finish or cancel it before starting another.')
     if (!this.options.workspace.get().projects.some(project => project.id === request.projectId)) throw new ApplicationError('NOT_FOUND', 'Open this project before creating an outline.')
     const previous = this.runs.get(request.projectId)
@@ -33,18 +38,19 @@ export class GenerationService {
     this.active = { id: run.id, controller }
     this.options.onBusy(true)
     this.emit()
-    this.task = this.execute(run, request, controller.signal)
+    this.task = this.execute(run, request, controller.signal, changes)
     return this.get()
   }
-  private async execute(run: OutlineRun, request: StartOutlineRequest, signal: AbortSignal): Promise<void> {
+  private async execute(run: OutlineRun, request: StartOutlineRequest, signal: AbortSignal, changes?: string): Promise<void> {
     let locked = false
     try {
-      const context = await this.options.workspace.prepareOutline(run.projectId, request.modelId, request.brief, request.replace)
+      const context = await this.options.workspace.prepareOutline(run.projectId, request.modelId, request.brief, request.replace, changes !== undefined)
       locked = true
       this.contexts.set(run.projectId, { digest: context.digest })
       signal.throwIfAborted()
-      const outcome = await this.options.generate({ model: context.model, brief: request.brief, path: context.path }, signal, phase => {
-        if (!signal.aborted && this.active?.id === run.id) this.update(run, { status: phase, message: phase === 'examining' ? 'Exploring your project material…' : phase === 'planning' ? 'Building your learning outline…' : 'Checking the lessons and module plans…' })
+      this.update(run, { brief: context.brief })
+      const outcome = await this.options.generate({ model: context.model, brief: context.brief, path: context.path, currentOutline: context.currentOutline, changes }, signal, phase => {
+        if (!signal.aborted && this.active?.id === run.id) this.update(run, { status: phase, message: phase === 'examining' ? 'Exploring your project material…' : phase === 'planning' ? changes !== undefined ? 'Rewriting your learning outline…' : 'Building your learning outline…' : 'Checking the lessons and module plans…' })
       })
       signal.throwIfAborted()
       const coverage = parseCoverage(outcome.coverage ?? { files: [], limitations: ['This outline was created from your learning description. No project files were read.'] })
@@ -53,8 +59,8 @@ export class GenerationService {
         this.update(run, { status: 'needs-details', message: boundedText(outcome.reason, 'Reason', 2000), question: boundedText(outcome.question, 'Question', 2000) })
         return
       }
-      const result = parseSavedOutline({ generatedAt: this.options.now(), model: context.model, brief: request.brief, document: outcome.document,
-        inferredBrief: request.brief.trim() ? null : `${outcome.document.title}: ${outcome.document.scope}`, coverage })
+      const result = parseSavedOutline({ generatedAt: this.options.now(), model: context.model, brief: context.brief, document: outcome.document,
+        inferredBrief: changes !== undefined ? context.currentOutline!.inferredBrief : context.brief.trim() ? null : `${outcome.document.title}: ${outcome.document.scope}`, coverage })
       const sources = new Set(coverage.files.filter(file => file.status === 'read').map(file => file.path))
       if (result.document.lessons.some(lesson => lesson.sources.some(path => !sources.has(path)))) throw new ApplicationError('INVALID_INPUT', 'The outline refers to material that was not read. Please try again.')
       this.update(run, { status: 'saving', message: 'Saving your outline…', result })

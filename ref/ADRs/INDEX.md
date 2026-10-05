@@ -29,4 +29,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0016](ADR-0016-requested-extra-model-choices.md) | Accepted | Persistent Sol/Luna picker supplements with independent optional diagnostics | Changing extra model choices, independent proof or diagnostic target ownership |
 
+| [ADR-0017](ADR-0017-outline-rewrites-with-saved-context.md) | Accepted | Selected-model outline rewrites with saved JSON orientation and inherited source evidence | Changing outline edits, generation context or source provenance across revisions |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

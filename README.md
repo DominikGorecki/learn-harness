@@ -6,6 +6,8 @@ The working slice includes a ChatGPT account panel with browser sign-in, verifie
 
 Open **Settings → Appearance** (gear icon, or **⌘/Ctrl+,**) to choose Light or Dark. Your choice applies immediately and is remembered on this device. With no saved choice, the app starts with the OS appearance.
 
+Use the edit icon beside **Your path through the subject** to rewrite a saved outline. Describe changes freely or refer to numbered topics, such as “Move 01 after 03”. **Rewrite outline** uses the selected project model and sends the current outline JSON as context; Pi reads further supported material as needed. A successful save updates `.edu/project.json`. Cancellation/failure preserves the prior outline and edit draft; a save failure retains the new result for storage-only retry. This uses your ChatGPT plan allowance. See [ADR-0017](ref/ADRs/ADR-0017-outline-rewrites-with-saved-context.md).
+
 Use **Connect ChatGPT** to connect an eligible account. During sign-in, **Copy sign-in link** lets you paste the link into your preferred browser if automatic browser opening does not work (for example, in WSL). Keep the app open while completing sign-in. Your connection is saved in the app data directory and restored after restart. Credentials use OS encryption where available; otherwise the account panel identifies the unencrypted local-file fallback. On Linux/WSL the connection folder and files are restricted to your user. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 
 ![Learning Studio light workspace](ref/research/assets/appearance-workspace-light.png)

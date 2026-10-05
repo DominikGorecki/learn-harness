@@ -23,6 +23,7 @@ export interface ProviderFixtureOptions {
   failModels?: number
   failRefresh?: boolean
   hideFastModel?: boolean
+  outlineResult?: ReturnType<typeof learningOutline>
   modelTestMode?: 'completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
   inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
@@ -137,7 +138,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
           outline.lessons[0]!.sources = [(JSON.parse(read.arguments!) as { path: string }).path]
           writeToolResponse(response, { args: outline }); return
         }
-        writeToolResponse(response, { args: learningOutline(), terminal: options.inferenceMode === 'incomplete' ? 'incomplete' : options.inferenceMode === 'usage-limit' ? 'failed' : 'completed' })
+        writeToolResponse(response, { args: options.outlineResult ?? learningOutline(), terminal: options.inferenceMode === 'incomplete' ? 'incomplete' : options.inferenceMode === 'usage-limit' ? 'failed' : 'completed' })
         return
       }
       json(response, 404, { error: 'not_found' })

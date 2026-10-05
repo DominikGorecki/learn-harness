@@ -235,6 +235,16 @@ svg.icon { display: inline-block; flex-shrink: 0; vertical-align: middle; }
 .learning-outcomes li { display: flex; align-items: flex-start; gap: 10px; color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
 .learning-outcomes .icon { margin-top: 3px; color: var(--text-muted); }
 .section-introduction { margin-bottom: 22px; }
+.lesson-path-heading { display: flex; align-items: center; gap: 8px; }
+.outline-edit-dialog { max-width: 580px; }
+.outline-edit-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.outline-edit-topics { margin: 16px 0; color: var(--text-secondary); font-size: 13px; }
+.outline-edit-topics ol { list-style: none; padding: 0; }
+.outline-edit-topics li { margin-top: 8px; }
+.outline-edit-topics li span { color: var(--text-muted); margin-right: 8px; }
+.outline-edit-dialog label { display: block; margin: 18px 0 8px; font-size: 14px; font-weight: 500; }
+.outline-edit-dialog textarea { width: 100%; resize: vertical; min-height: 120px; padding: 12px; border: 1px solid var(--border-control); border-radius: 12px; background: var(--surface-canvas); color: var(--text-primary); font: inherit; font-size: 14px; line-height: 1.6; }
+.outline-edit-dialog .generation-disclosure { margin: 16px 0; }
 .section-introduction p { margin-top: 8px; color: var(--text-secondary); font-size: 13px; }
 .lesson-disclosure { border-top: 1px solid var(--border-subtle); }
 .lesson-disclosure:last-child { border-bottom: 1px solid var(--border-subtle); }

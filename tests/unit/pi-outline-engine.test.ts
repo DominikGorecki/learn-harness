@@ -30,6 +30,31 @@ const model = { id: 'fixture-model', name: 'Learning model' }
 const options = () => ({ signal: new AbortController().signal, onPhase: () => {} })
 
 describe('actual Pi agent and plan Responses transport', () => {
+  it('includes saved outline JSON on every Pi turn and lets rewrites retain recorded sources without unnecessary reads', async () => {
+    const path = await realpath(await mkdtemp(join(tmpdir(), 'edu-pi-rewrite-')))
+    close.push(() => rm(path, { recursive: true, force: true }))
+    await writeFile(join(path, 'unrelated.md'), 'UNRELATED_TEXT_SHOULD_NOT_BE_TRANSMITTED')
+    const document = learningOutline(); document.lessons[0]!.sources = ['old-notes.md']
+    const currentOutline = { generatedAt: '2026-10-04T12:00:00Z', model, brief: 'Bayes', inferredBrief: null, document,
+      coverage: { files: [{ path: 'old-notes.md', status: 'read' as const, reason: null }], limitations: ['Prior snapshot.'] } }
+    const revised = structuredClone(document); revised.lessons.reverse(); revised.startingLessonId = revised.lessons[0]!.id
+    const invalid = structuredClone(revised); invalid.lessons[0]!.sources = ['invented.md']
+    const server = await fixture((response, turn) => writeToolResponse(response, { args: turn === 1 ? invalid : revised }))
+    const result = await generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayes', path,
+      currentOutline, changes: 'Move 01 after 02' }, options())
+    expect(result).toMatchObject({ kind: 'outline', document: revised, coverage: { files: expect.arrayContaining([
+      { path: 'old-notes.md', status: 'read', reason: expect.stringContaining('not re-read') },
+      { path: 'unrelated.md', status: 'not-read', reason: expect.any(String) }
+    ]) } })
+    expect(server.requests).toHaveLength(2)
+    for (const request of server.requests) {
+      const input = JSON.stringify(request.payload.input)
+      expect(input).toContain(JSON.stringify(currentOutline).replaceAll('"', '\\"'))
+      expect(input).toContain('Move 01 after 02')
+      expect(input).toContain('original lessons array positions')
+      expect(input).not.toContain('UNRELATED_TEXT_SHOULD_NOT_BE_TRANSMITTED')
+    }
+  })
   it('uses the selected model, explicit token and namespaced educational tools, then accepts only the completed outline', async () => {
     const server = await fixture(response => writeToolResponse(response, { args: learningOutline() }))
     const phases: string[] = []
