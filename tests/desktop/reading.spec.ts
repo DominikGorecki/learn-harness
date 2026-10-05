@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { chmod, mkdir, mkdtemp, realpath, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -7,7 +7,7 @@ import { createProjectStorage } from '../../src/main/storage/project-storage'
 import { learningOutline } from '../fixtures/learning-outline'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
-test('long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved', async ({ playwright }, testInfo) => {
+test('long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved', { tag: '@reading', annotation: { type: 'flow', description: 'reading' } }, async ({ playwright, flow }) => {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-reading-desktop-')))
   const folder = join(root, 'A subject with a long descriptive folder name'), corrupt = join(root, 'Corrupt project')
   await mkdir(folder); await mkdir(corrupt); await mkdir(join(corrupt, '.edu'))
@@ -45,8 +45,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     expect(await page.getByRole('main').evaluate(element => element.clientHeight)).toBeGreaterThan(150)
     await page.getByRole('button', { name: 'Refine learning direction' }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('button', { name: 'Refine learning direction' })).toBeInViewport()
-    const capture = await desktop.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0]!.webContents.capturePage()).toPNG().toString('base64'))
-    await writeFile(testInfo.outputPath('long-outline-zoom.png'), Buffer.from(capture, 'base64'))
+    await flow.capture(desktop, page, 'long-outline-zoom')
     await page.emulateMedia({ reducedMotion: 'reduce' })
     expect(await page.locator('.workspace-enter').evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).animationName)).toBe('none')
     await desktop.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(1); BrowserWindow.getAllWindows()[0]!.setContentSize(1280, 840) })
@@ -75,7 +74,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await expect(page.getByRole('heading', { name: 'This project needs attention.' })).toBeVisible()
     await page.getByRole('button', { name: 'Try again', exact: true }).click()
     expect(await readFile(join(corrupt, '.edu/project.json'), 'utf8')).toBe(invalid)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('unreadable-project.png') })
+    await flow.capture(desktop, page, 'unreadable-project')
   } finally {
     await desktop?.close()
     await chmod(folder, 0o700); await chmod(join(folder, '.edu'), 0o700)

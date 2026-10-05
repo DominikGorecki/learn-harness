@@ -1,0 +1,59 @@
+{
+  "flow": "outline-edit",
+  "captures": [
+    {
+      "id": "outline-edit-light",
+      "caption": "Whole-path editor with a numbered change request in Light mode.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "959084ea3cdcfdd56909845aa5ad510ea04bad96a72e6a98f62fa459fd894426"
+    },
+    {
+      "id": "outline-edit-dark",
+      "caption": "Preserved whole-path draft in Dark mode.",
+      "width": 1583,
+      "height": 973,
+      "theme": "dark",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "4de7886a03bca7d123e5e31eb791d3e2111274a600e578b67852aea11cdb6757"
+    },
+    {
+      "id": "outline-edit-zoom",
+      "caption": "Rewrite action remains reachable at 200% zoom.",
+      "width": 750,
+      "height": 800,
+      "theme": "dark",
+      "viewport": {
+        "width": 300,
+        "height": 320
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "56b1df0680d7f120c1529f3ef1dc97680d67c61ce645498b2a88ddc9ce6e187c"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:17:48.131Z",
+  "testSha256": "fa60a3f4da14cbd536bd8d510078642c154cbe67045f2fda9f21bbfde7a82635",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/outline-edit.spec.ts",
+  "testTitle": "edit dialog rewrites the numbered path through Pi with the active model and persists it across restart",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

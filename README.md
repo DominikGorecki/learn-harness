@@ -14,9 +14,7 @@ Pi can browse/read throughout the selected project and create or edit UTF-8 text
 
 Use **Connect ChatGPT** to connect an eligible account. During sign-in, **Copy sign-in link** lets you paste the link into your preferred browser if automatic browser opening does not work (for example, in WSL). Keep the app open while completing sign-in. Your connection is saved in the app data directory and restored after restart. Credentials use OS encryption where available; otherwise the account panel identifies the unencrypted local-file fallback. On Linux/WSL the connection folder and files are restricted to your user. Automated tests exercise a local signed-token protocol fixture; real ChatGPT-plan inference remains a separate acceptance gate.
 
-![Learning Studio light workspace](ref/research/assets/appearance-workspace-light.png)
-
-[Dark workspace](ref/research/assets/appearance-workspace-dark.png) · [Appearance settings](ref/research/assets/appearance-settings-dark.png). Captures show the running application with an isolated test project; they are separate from the supplied visual references.
+Current UI references are organized by [documented Playwright flow](ref/patterns-flow.md). See [Appearance](ref/flows/appearance/index.md) for Light/Dark workspace and settings captures, [Outline](ref/flows/outline/index.md) for saved learning documents and [Topic editing](ref/flows/topic-edit/index.md) for the scoped editor. Passing desktop tests replace their flow/platform screenshots and regenerate capture tables; the AI maintains each journey explanation after reviewing changes.
 
 ## Product direction
 
@@ -98,7 +96,8 @@ The script runs directly with Node 24 and has no additional npm dependencies. It
 
 ```bash
 npm run check          # lint, focused tests, both type scopes, production build
-npm run test:desktop   # build and exercise the real Electron application
+npm run test:desktop   # build, exercise Electron and refresh passing flow references
+npm run test:flows     # check flow registration, reference indexes and screenshots
 npm start             # open the most recent production build
 npm run package       # build an unpacked app for the current OS in dist/
 npm run test:packaged # exercise the packaged Pi worker after packaging
@@ -129,10 +128,12 @@ src/
   shared/               DTOs, channels, errors, runtime request parsers
 tests/
   unit/                 Core behavior and boundary policy
-  desktop/              Real Electron smoke journey
+  desktop/              Real Electron journeys
+  flows/                Flow catalog, capture fixture and publishing reporter
 ref/
   patterns.md           Pattern index
   patterns-*.md         Focused current rules
+  flows/<flow-id>/       Journey explanation, latest platform captures and metadata
   ADRs/INDEX.md          Decision index
   ADRs/ADR-*.md          Numbered decisions and rationale
   research/             Source-linked research and validation evidence

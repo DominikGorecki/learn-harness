@@ -1,0 +1,29 @@
+{
+  "flow": "account-connection",
+  "captures": [
+    {
+      "id": "account-protocol-fixture",
+      "caption": "Connected account panel using the signed local provider fixture.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "76e68543d1316063c1d02b76e7181c75f12dd7f3e825dfdbf0a1a33aa1b79dca"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:17:20.294Z",
+  "testSha256": "dd15492a08cb7e41678bec9955cdc9dd0d1dc23a3aaddc2856cc6127aef007f5",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/account.spec.ts",
+  "testTitle": "account panel restores and renews its connection after restart and signs out durably",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

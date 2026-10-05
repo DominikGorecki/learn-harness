@@ -1,11 +1,11 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, realpath, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, readFile, readdir, rename, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 
-test('real folders, project preferences, restart, relink, and responsive navigation', async ({ playwright }, testInfo) => {
+test('real folders, project preferences, restart, relink, and responsive navigation', { tag: '@projects', annotation: { type: 'flow', description: 'projects' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-project-desktop-')))
   const profile = join(root, 'profile')
@@ -24,7 +24,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     desktop = await launch()
     let page = await desktop.firstWindow()
     await expect(page.getByRole('heading', { name: 'What would you like to understand?' })).toBeVisible()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('dashboard-empty.png') })
+    await flow.capture(desktop, page, 'dashboard-empty')
     await choose(first)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await expect(page.getByRole('textbox', { name: 'Your learning goal' })).toBeVisible()
@@ -59,7 +59,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     await choose(null)
     await page.getByRole('button', { name: 'Open project', exact: false }).click()
     await expect(page.getByRole('textbox')).toHaveValue('An unsaved question about evidence')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('project-workspace.png') })
+    await flow.capture(desktop, page, 'project-workspace')
 
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setContentSize(600, 640))
     await expect(page.getByRole('button', { name: 'Show navigation' })).toBeVisible()
@@ -67,7 +67,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     await expect(page.getByRole('dialog', { name: 'Project navigation' })).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(page.getByRole('button', { name: 'Show navigation' })).toBeFocused()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('project-narrow.png') })
+    await flow.capture(desktop, page, 'project-narrow')
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(2))
     await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
     await page.getByRole('button', { name: 'Save learning goal' }).scrollIntoViewIfNeeded()
@@ -76,8 +76,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     expect(await page.locator('.studio-workspace').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     // Electron's native capture avoids Playwright clipping screenshots to CSS
     // dimensions when webContents has a non-default zoom factor.
-    const capture = await desktop.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0]!.webContents.capturePage()).toPNG().toString('base64'))
-    await writeFile(testInfo.outputPath('project-zoom-200.png'), Buffer.from(capture, 'base64'))
+    await flow.capture(desktop, page, 'project-zoom-200')
     await page.emulateMedia({ reducedMotion: 'reduce' })
     expect(await page.locator('.workspace-enter').evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).animationName)).toBe('none')
     await desktop.close(); desktop = undefined

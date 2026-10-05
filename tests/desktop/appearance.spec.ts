@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, readdir, realpath, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
-test('appearance changes every surface, preserves drafts, and survives a desktop restart', async ({ playwright }, testInfo) => {
+test('appearance changes every surface, preserves drafts, and survives a desktop restart', { tag: '@appearance', annotation: { type: 'flow', description: 'appearance' } }, async ({ playwright, flow }) => {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-appearance-')))
   const folder = join(root, 'Learning about oceans')
   await mkdir(folder)
@@ -22,23 +22,23 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     await expect(page.getByRole('dialog', { name: 'Settings', exact: true })).toBeVisible()
     await page.getByRole('radio', { name: 'Light', exact: true }).check()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('settings-light.png') })
+    await flow.capture(desktop, page, 'settings-light')
     await page.getByRole('button', { name: 'Done', exact: true }).click()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('workspace-light.png') })
+    await flow.capture(desktop, page, 'workspace-light')
     await page.keyboard.press('ControlOrMeta+,')
     await page.getByRole('radio', { name: 'Light', exact: true }).focus()
     await page.keyboard.press('ArrowRight')
     await expect(page.getByRole('radio', { name: 'Dark', exact: true })).toBeChecked()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('settings-dark.png') })
+    await flow.capture(desktop, page, 'settings-dark')
     await page.keyboard.press('Escape')
     await expect(page.getByRole('button', { name: 'Settings', exact: true })).toBeFocused()
     await expect(page.getByRole('textbox')).toHaveValue(draft)
     await expect(page.locator('.studio-workspace')).toHaveCSS('background-color', 'rgb(24, 24, 24)')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('workspace-dark.png') })
+    await flow.capture(desktop, page, 'workspace-dark')
     await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('dialog')).toHaveCSS('background-color', 'rgb(24, 24, 24)')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('account-dark.png') })
+    await flow.capture(desktop, page, 'account-dark')
     await page.keyboard.press('Escape')
     expect(await readdir(folder)).toEqual([])
 

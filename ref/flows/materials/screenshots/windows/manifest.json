@@ -1,0 +1,59 @@
+{
+  "flow": "materials",
+  "captures": [
+    {
+      "id": "material-setup",
+      "caption": "Folder-only setup with an optional learning goal.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "c26ce8af86a33edd52fc904146d15003c311d21299a169e06fd412a1a061391c"
+    },
+    {
+      "id": "material-coverage",
+      "caption": "Saved outline with supported and unsupported source coverage disclosed.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "1e3c6bff1346a2d4c84dfcebc6b27fb6db5cc66bbe99fdcc031fa47429cf608c"
+    },
+    {
+      "id": "unsupported-material",
+      "caption": "Recovery for a folder containing only unsupported learning files.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "9076683c97f79db619b1abee46acfba6118c50e6f8a021a5e1196a88f2be8b97"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:17:37.267Z",
+  "testSha256": "f7a81c3df39746d6f7d648622b3bfb3b505de60d00ca1692d691a81578a5f1a5",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/materials.spec.ts",
+  "testTitle": "folder-only learning, verified source coverage, ambiguity and unsupported recovery",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

@@ -1,6 +1,6 @@
 # Documentation patterns
 
-Governed by [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
+Governed by [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
 
 ## Progressive discovery
 
@@ -10,7 +10,7 @@ Patterns state current rules and name their governing ADRs. ADRs state rationale
 
 UI guidance has three owners: [design system](patterns-design-system.md) for appearance/components, [UX](patterns-ux.md) for learner interaction, and [renderer](patterns-renderer.md) for implementation. Product documents link to these standards and retain their own scope/status. Keep historical research and screenshots identified as earlier evidence when a later decision changes the visual direction.
 
-Keep replaceable running-app references in `ref/screenshots/current/`, linked from the [design-system gallery](patterns-design-system.md#current-application-screenshots) and relevant UI patterns. The design-system pattern owns capture metadata, coverage limits and the [remove-and-regenerate procedure](patterns-design-system.md#refresh-the-screenshots). Refresh that set in place; preserve historical research evidence and label design mockups separately.
+Under [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [flow patterns](patterns-flow.md) own journey discovery and reference maintenance. Keep AI-maintained explanations in `ref/flows/<flow-id>/index.md` and passing Playwright captures in its platform screenshot directories. The runner owns generated tables/manifests; contributors own semantic prose and visual review. Preserve dated historical research and distinguish proposal mockups.
 
 ## Maintenance
 

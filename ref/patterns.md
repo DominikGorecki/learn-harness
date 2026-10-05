@@ -10,10 +10,11 @@ Read this map, select the area touched by the task, then read its focused rules 
 | Composition, visual tokens, typography, component states | [Design system](patterns-design-system.md) | ADR-0007, ADR-0013 |
 | Navigation, input, progress, recovery, keyboard/focus | [UX](patterns-ux.md) | ADR-0007, ADR-0012, ADR-0013, ADR-0015, ADR-0016, ADR-0017, ADR-0019 |
 | React organization, request state, safe rendering | [Renderer](patterns-renderer.md) | ADR-0001, ADR-0002, ADR-0003, ADR-0007, ADR-0013, ADR-0017, ADR-0018, ADR-0019 |
-| Tooling, development shutdown, diagnostics, tests, CI checks | [Development and testing](patterns-development-testing.md) | ADR-0004, ADR-0006, ADR-0018 |
+| Documented journeys, screenshots and automatic reference refresh | [Flows](patterns-flow.md) | ADR-0004, ADR-0005, ADR-0020 |
+| Tooling, development shutdown, diagnostics, tests, CI checks | [Development and testing](patterns-development-testing.md) | ADR-0004, ADR-0006, ADR-0018, ADR-0020 |
 | Platform targets, packaging, release | [Distribution](patterns-distribution.md) | ADR-0004 |
-| Progressive discovery and ADR lifecycle | [Documentation](patterns-documentation.md) | ADR-0005, ADR-0007, ADR-0013 |
+| Progressive discovery and ADR lifecycle | [Documentation](patterns-documentation.md) | ADR-0005, ADR-0007, ADR-0013, ADR-0020 |
 
 Start with [AGENTS.md](../AGENTS.md) for task routing and authority. When a durable rule changes, update its focused file, this index, and [ADRs/INDEX.md](ADRs/INDEX.md) together.
 
-For UI work, read design system → UX → renderer and open the relevant [current application screenshots](patterns-design-system.md#current-application-screenshots). The design-system pattern also owns their [refresh procedure](patterns-design-system.md#refresh-the-screenshots). New capabilities still require their task/PRD and governing domain decisions; an interaction pattern is not evidence that its feature exists.
+For UI work, read design system → UX → renderer, then select the relevant [flow explanation and screenshots](patterns-flow.md). That pattern owns Playwright refresh and AI narrative maintenance. New capabilities still require their task/PRD and governing domain decisions; an interaction pattern is not evidence that its feature exists.

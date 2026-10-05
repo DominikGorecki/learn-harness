@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
-test('folder-only learning, verified source coverage, ambiguity and unsupported recovery', async ({ playwright }, testInfo) => {
+test('folder-only learning, verified source coverage, ambiguity and unsupported recovery', { tag: '@materials', annotation: { type: 'flow', description: 'materials' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture({ inferenceMode: 'materials' })
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-material-desktop-')))
   const folder = join(root, 'Notes'), ambiguous = join(root, 'Mixed notes'), unsupported = join(root, 'Slides')
@@ -35,7 +35,7 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await expect(page.getByRole('textbox', { name: 'Your learning goal (optional)' })).toHaveValue('')
     expect(fixture.inferenceRequests).toHaveLength(0)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('material-setup.png') })
+    await flow.capture(desktop, page, 'material-setup')
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
     const document = JSON.parse(await readFile(join(folder, '.edu/project.json'), 'utf8')) as ProjectDocument
@@ -48,7 +48,7 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     expect(await readFile(join(folder, 'chapters/notes.md'), 'utf8')).toBe(source)
     await page.getByText('Project material and coverage', { exact: true }).click()
     await expect(page.getByText('chapters/notes.md', { exact: true })).toBeVisible()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('material-coverage.png') })
+    await flow.capture(desktop, page, 'material-coverage')
 
     fixture.options.inferenceMode = 'materials-clarify'
     await choose(ambiguous)
@@ -71,7 +71,7 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     expect(fixture.inferenceRequests).toHaveLength(before)
     await page.getByText('Material considered', { exact: true }).click()
     await expect(page.getByText('lecture.pdf', { exact: true })).toBeVisible()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('unsupported-material.png') })
+    await flow.capture(desktop, page, 'unsupported-material')
   } finally {
     await desktop?.close()
     await fixture.close()

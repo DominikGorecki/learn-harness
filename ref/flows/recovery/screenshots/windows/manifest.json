@@ -1,0 +1,59 @@
+{
+  "flow": "recovery",
+  "captures": [
+    {
+      "id": "generation-pending",
+      "caption": "A real utility-process request held by the local provider fixture.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "0b56441589fa884f17000590b2cd4bd01bfea2e747e9f53a23fdd98869c3f641"
+    },
+    {
+      "id": "generated-unsaved",
+      "caption": "A generated outline retained after an actual filesystem save failure.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "a0d30f9e87dea0ba92f54e7ab1c11d2d7c9712aea508e0d0581fcc75e7e60513"
+    },
+    {
+      "id": "usage-recovery",
+      "caption": "Provider usage-limit feedback with the learner draft preserved.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "003d7ed6c1db09f2c4826068f17d948625cef9df045494f0604d8cc2608172fb"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:18:14.323Z",
+  "testSha256": "e57946910f71486b656891deff00579cb0b391d6db30ad8de5b4204123e86d44",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/recovery.spec.ts",
+  "testTitle": "save retry, model recovery, usage limits, and explicit cancellation before switching preserve work",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

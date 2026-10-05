@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, realpath, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, realpath, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
@@ -8,7 +8,7 @@ import { learningOutline } from '../fixtures/learning-outline'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
-test('edit dialog rewrites the numbered path through Pi with the active model and persists it across restart', async ({ playwright }, testInfo) => {
+test('edit dialog rewrites the numbered path through Pi with the active model and persists it across restart', { tag: '@outline-edit', annotation: { type: 'flow', description: 'outline-edit' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-edit-desktop-')))
   const folder = join(root, 'Learning'); await mkdir(folder)
@@ -38,7 +38,7 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     await expect(input).toBeFocused()
     const changes = 'Move 01 after 02 and add practical examples to the first topic.'
     await input.fill(changes)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('outline-edit-light.png') })
+    await flow.capture(desktop, page, 'outline-edit-light')
     await page.keyboard.press('Escape')
     await expect(edit).toBeFocused()
     expect(fixture.inferenceRequests).toHaveLength(0)
@@ -59,7 +59,7 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     await page.getByRole('radio', { name: 'Dark', exact: true }).check()
     await page.getByRole('button', { name: 'Done', exact: true }).click()
     await edit.click(); await expect(input).toHaveValue(changes)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('outline-edit-dark.png') })
+    await flow.capture(desktop, page, 'outline-edit-dark')
     await desktop.evaluate(({ BrowserWindow }) => {
       const window = BrowserWindow.getAllWindows()[0]!
       window.setContentSize(600, 640); window.webContents.setZoomFactor(2)
@@ -72,8 +72,7 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     })).toBe(true)
     await dialog.getByRole('button', { name: 'Rewrite outline' }).scrollIntoViewIfNeeded()
     await expect(dialog.getByRole('button', { name: 'Rewrite outline' })).toBeInViewport()
-    const zoomCapture = await desktop.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0]!.webContents.capturePage()).toPNG().toString('base64'))
-    await writeFile(testInfo.outputPath('outline-edit-zoom.png'), Buffer.from(zoomCapture, 'base64'))
+    await flow.capture(desktop, page, 'outline-edit-zoom')
     await desktop.evaluate(({ BrowserWindow }) => {
       const window = BrowserWindow.getAllWindows()[0]!
       window.webContents.setZoomFactor(1); window.setContentSize(1280, 840)

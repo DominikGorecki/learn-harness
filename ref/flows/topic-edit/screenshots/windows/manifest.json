@@ -1,0 +1,59 @@
+{
+  "flow": "topic-edit",
+  "captures": [
+    {
+      "id": "topic-edit-light",
+      "caption": "Topic editor with its own change draft in Light mode.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "896690b251f15415121b737437c8d1c704553559e3cd0316d58278e2bd2f1aec"
+    },
+    {
+      "id": "topic-edit-dark",
+      "caption": "The retained topic draft after cancellation, in Dark mode.",
+      "width": 1583,
+      "height": 973,
+      "theme": "dark",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "3ec7d5b9d8f7c0b1f960fa91e283a97256fd95da24293a67d3d0ff22918b4e5c"
+    },
+    {
+      "id": "topic-edit-zoom",
+      "caption": "Topic rewrite action remains reachable at 200% zoom.",
+      "width": 750,
+      "height": 800,
+      "theme": "dark",
+      "viewport": {
+        "width": 300,
+        "height": 320
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "dc6abb10bbefda7ce023ef8a3d867e6f989db8d9d06976dcbc8268de0e6e27bc"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:18:21.870Z",
+  "testSha256": "d996a88d8b5f485a2f428b996c9dfd946da42110b7cebb818ea917dbf010b0f4",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/topic-edit.spec.ts",
+  "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

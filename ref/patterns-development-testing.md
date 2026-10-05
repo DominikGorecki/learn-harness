@@ -1,6 +1,6 @@
 # Development and testing patterns
 
-Governed by [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md) and [ADR-0006](ADRs/ADR-0006-development-port-shutdown.md).
+Governed by [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md) and [ADR-0006](ADRs/ADR-0006-development-port-shutdown.md).
 
 ## Commands and dependency ownership
 
@@ -24,10 +24,15 @@ Unpackaged Electron runs automatically write main-owned development diagnostics 
 - `npm test`: focused core behavior, request parsing, state isolation, and origin/asset policy.
 - `npm run build`: both type scopes plus all production bundles.
 - `npm run test:desktop`: a real Electron journey using Playwright's experimental Electron API. Verifies account OAuth, native projects, Pi utility-process generation, preload/IPC, saved results, cancellation, and restart semantics.
+- `npm run test:flows`: checks flow registration, indexes, capture tables, PNG digests and reference links. Included in `npm run check`.
 - `npm run package`: current-OS unpacked application and hardened packaging configuration.
 - `npm run test:packaged`: explicitly exercise the current artifact’s ASAR worker and runtime dependencies through a development Electron host. Run after packaging, with Xvfb on headless Linux. This does not disable packaged fuses or substitute for hardened-app startup verification.
 
-`npm run check` combines lint/tests/build. Extend tests for meaningful behavior and trust boundaries, not every presentation detail. Use isolated temporary profiles in desktop tests, clean up the owned process/profile, and collect screenshots. Resolve temporary project roots with `realpath` before calling storage/worker adapters, matching the workspace service contract; macOS temporary directories and Windows short paths can otherwise produce aliases. No standalone Playwright browser installation is required for Electron automation.
+`npm run check` combines lint, unit tests, flow-reference checks and build. Extend tests for meaningful behavior and trust boundaries, not every presentation detail. Use isolated temporary profiles in desktop tests, clean up the owned process/profile, and collect screenshots. Resolve temporary project roots with `realpath` before calling storage/worker adapters, matching the workspace service contract; macOS temporary directories and Windows short paths can otherwise produce aliases. No standalone Playwright browser installation is required for Electron automation.
+
+## Flow reference refresh
+
+Each desktop journey declares a stable flow annotation/tag and uses `tests/flows/fixture.ts`. The configured reporter stages screenshots in `test-results` and replaces only the complete passing flow/platform sets under `ref/flows`, regenerating each flow index's capture block. Failed/skipped journeys preserve earlier references; interrupted runs publish none. See [flow patterns](patterns-flow.md) for progressive discovery, focused commands, publication recovery and AI-maintained explanations. Do not override the configured reporter when refreshing references. CI uploads `ref/flows` with diagnostics without committing. This tooling stays outside application bundles and does not expose a renderer filesystem API.
 
 ## Environment and CI
 

@@ -17,6 +17,7 @@ This is a TypeScript Electron application with a React learning workspace and a 
 | Visual composition, typography, color/spacing tokens, component states | [Design system](ref/patterns-design-system.md) |
 | Learner journeys, navigation, input, recovery, keyboard/focus | [UX](ref/patterns-ux.md) |
 | React components, renderer state, bridge results, safe rendering | [Renderer](ref/patterns-renderer.md) |
+| Documented journeys and current screenshots | [Flows](ref/patterns-flow.md) |
 | Commands, tests, lint, CI | [Development and testing](ref/patterns-development-testing.md) |
 | Installers, fuses, signing, release | [Distribution](ref/patterns-distribution.md) |
 | Adding or revising project guidance | [Documentation](ref/patterns-documentation.md) |
@@ -25,7 +26,7 @@ This is a TypeScript Electron application with a React learning workspace and a 
 
 Explicit user instructions and accepted task scope come first. Accepted ADRs govern durable decisions; focused patterns state current rules; maintained docs describe current contracts; code/tests show behavior. Research explains evidence and alternatives rather than silently overriding an accepted decision. Report contradictions and update the relevant guidance when resolving them.
 
-Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007/ADR-0013. The project workspace follows the user-supplied ChatGPT screenshots and implemented Light/Dark appearance standard. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
+Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007/ADR-0013. Select only the relevant journey explanations and screenshots through [Flows](ref/patterns-flow.md); follow its Playwright refresh and AI maintenance workflow when creating or changing a flow. The project workspace follows the user-supplied ChatGPT screenshots and implemented Light/Dark appearance standard. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
 
 ## Essential boundaries
 

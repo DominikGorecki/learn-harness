@@ -1,0 +1,74 @@
+{
+  "flow": "projects",
+  "captures": [
+    {
+      "id": "dashboard-empty",
+      "caption": "Empty dashboard before choosing a project folder.",
+      "width": 1583,
+      "height": 1004,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 803
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "829146d78d4e1b097fe118a5f9ac2ab77ee27015ce9776a91edef457500784b2"
+    },
+    {
+      "id": "project-workspace",
+      "caption": "Project-specific goal draft and saved model preference.",
+      "width": 1583,
+      "height": 1004,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 803
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "5cc81e6a5b260027152fea5c586497abe5ca080c01c5df0686822b92555fd41b"
+    },
+    {
+      "id": "project-narrow",
+      "caption": "600-pixel content width after dismissing the navigation drawer.",
+      "width": 750,
+      "height": 800,
+      "theme": "light",
+      "viewport": {
+        "width": 600,
+        "height": 640
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "f4b765769ca831e27fda2b0b90c16d6f780d85ed7463daaf2d6fbfddf7a2db47"
+    },
+    {
+      "id": "project-zoom-200",
+      "caption": "Narrow project composer at 200% Electron zoom.",
+      "width": 750,
+      "height": 800,
+      "theme": "light",
+      "viewport": {
+        "width": 300,
+        "height": 320
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "d8438e49c0c4cc05358d74e5864bfeca6806e08adfe0453a80c8ac4c5fd389f9"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:17:58.909Z",
+  "testSha256": "7d6fb1fc4cb4e532136d824549a3a6d63181a6820c57dbd7f9ad3c4ef1b0a657",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/projects.spec.ts",
+  "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

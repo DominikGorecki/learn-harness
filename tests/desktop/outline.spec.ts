@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
-test('Pi utility process creates, validates, saves and reopens an outline; cancellation preserves prior work', async ({ playwright }, testInfo) => {
+test('Pi utility process creates, validates, saves and reopens an outline; cancellation preserves prior work', { tag: '@outline', annotation: { type: 'flow', description: 'outline' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-outline-desktop-')))
   const folder = join(root, 'My learning')
@@ -41,10 +41,10 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     expect(original?.document.lessons).toHaveLength(2)
     expect(original?.coverage.files.filter(file => file.status === 'read')).toEqual([])
     await page.getByRole('main').evaluate(element => { element.scrollTop = 0 })
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('outline-overview.png') })
+    await flow.capture(desktop, page, 'outline-overview')
     await page.locator('.lesson-disclosure').first().locator('summary').click()
     await expect(page.getByRole('heading', { name: 'A forecast before the data' })).toBeVisible()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('generated-outline.png'), fullPage: true })
+    await flow.capture(desktop, page, 'generated-outline', { fullPage: true })
 
     const readingPosition = await page.getByRole('main').evaluate(element => { element.scrollTop = 150; return element.scrollTop })
     expect(readingPosition).toBeGreaterThan(0)

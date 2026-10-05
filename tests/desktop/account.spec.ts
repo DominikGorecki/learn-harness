@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { AccountApi } from '../../src/shared/account'
 
-test('account panel restores and renews its connection after restart and signs out durably', async ({ playwright }, testInfo) => {
+test('account panel restores and renews its connection after restart and signs out durably', { tag: '@account-connection', annotation: { type: 'flow', description: 'account-connection' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
   const profile = await mkdtemp(join(tmpdir(), 'edu-account-desktop-'))
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>
@@ -29,7 +29,7 @@ test('account panel restores and renews its connection after restart and signs o
     const state = await page.evaluate(async () => (globalThis as unknown as { learning: AccountApi }).learning.getAccount())
     expect(JSON.stringify(state)).not.toContain('fixture-access')
     expect(JSON.stringify(state)).not.toContain('fixture-refresh')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('account-protocol-fixture.png') })
+    await flow.capture(desktop, page, 'account-protocol-fixture')
     // Expire only this isolated fixture profile to exercise real renewal on boot.
     // The encrypted variant uses the running OS storage adapter, not a fake cipher.
     const connectionFile = join(profile, 'connection', 'chatgpt.json')
@@ -71,7 +71,7 @@ test('account panel restores and renews its connection after restart and signs o
   }
 })
 
-test('manual sign-in link completes OAuth when the system browser cannot open', async ({ playwright }, testInfo) => {
+test('manual sign-in link completes OAuth when the system browser cannot open', { tag: '@manual-sign-in', annotation: { type: 'flow', description: 'manual-sign-in' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
   const profile = await mkdtemp(join(tmpdir(), 'edu-account-copy-desktop-'))
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>
@@ -97,7 +97,7 @@ test('manual sign-in link completes OAuth when the system browser cannot open', 
     expect(validLink).toBe(true)
     const state = await page.evaluate(async () => (globalThis as unknown as { learning: AccountApi }).learning.getAccount())
     expect(JSON.stringify(state)).not.toContain('code_challenge')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('manual-sign-in-link.png') })
+    await flow.capture(desktop, page, 'manual-sign-in-link')
     // Simulate pasting the copied link into a browser; the real loopback callback
     // and signed token/model exchange complete through the running app.
     await desktop.evaluate(async ({ clipboard }) => { await fetch(await clipboard.readText()); await clipboard.clear() })

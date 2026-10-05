@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { WorkerReply } from '../../src/main/generation/worker-protocol'
 
-test('packaged ASAR worker loads its Pi dependencies and reads only scoped material', async ({ playwright }) => {
+test('packaged ASAR worker loads its Pi dependencies and reads only scoped material', { tag: '@packaged-worker', annotation: { type: 'flow', description: 'packaged-worker' } }, async ({ playwright }) => {
   const asar = process.env.EDU_PACKAGED_WORKER_ASAR
   test.skip(!asar, 'Run npm run test:packaged after packaging to test the current artifact explicitly.')
   const fixture = await startChatGPTFixture({ inferenceMode: 'materials' })

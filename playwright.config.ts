@@ -6,6 +6,6 @@ export default defineConfig({
   workers: 1,
   timeout: 45_000,
   expect: { timeout: 10_000 },
-  reporter: 'list',
+  reporter: [['list'], ['./tests/flows/reporter.ts']],
   use: { trace: 'retain-on-failure' }
 })

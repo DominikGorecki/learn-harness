@@ -4,7 +4,7 @@ Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [AD
 
 Read [design system](patterns-design-system.md) for appearance and [UX](patterns-ux.md) for interaction contracts before changing a screen. This file owns renderer implementation rules.
 
-Open the [current application screenshots](patterns-design-system.md#current-application-screenshots) before renderer UI work, including the matching [Light](screenshots/current/outline-light.jpg) and [Dark](screenshots/current/outline-dark.jpg) workspace views. Compare the affected component with the observed UI and source; screenshots do not prove bridge/backend behavior. Refresh obsolete captures using the design-system [replacement procedure](patterns-design-system.md#refresh-the-screenshots).
+Before renderer UI work, choose the relevant [flow explanation and screenshots](patterns-flow.md). Compare the affected component against its observed checkpoint and source. Use [appearance](flows/appearance/index.md) for matching Light/Dark views and [flow maintenance](patterns-flow.md#creating-or-changing-a-flow) to refresh references after changes. Screenshots do not prove bridge/backend behavior.
 
 ## Organization and state
 

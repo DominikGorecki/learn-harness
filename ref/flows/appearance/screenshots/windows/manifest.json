@@ -1,0 +1,89 @@
+{
+  "flow": "appearance",
+  "captures": [
+    {
+      "id": "settings-light",
+      "caption": "Light selected in the Appearance dialog.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "43a9cd2a29dd9c43780f645a23663788f330ad5069f1ee9ebb335f4c4c5a012d"
+    },
+    {
+      "id": "workspace-light",
+      "caption": "Light project composer with its existing learning draft.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "d6a64ad4f2b747e849db02a705992af569368a60fc18d096bc6f50b1c027a856"
+    },
+    {
+      "id": "settings-dark",
+      "caption": "Dark selected through radio keyboard navigation.",
+      "width": 1583,
+      "height": 973,
+      "theme": "dark",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "c3139c1d013615e1c8078087e6c56495404e5dadd3d67d2cbdb3558145477d6a"
+    },
+    {
+      "id": "workspace-dark",
+      "caption": "Dark project composer with the same draft.",
+      "width": 1583,
+      "height": 973,
+      "theme": "dark",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "73d6282d4f927230cd1a41cb8e6add9d32e9aa51ceaa82cf86f04a5f484acdda"
+    },
+    {
+      "id": "account-dark",
+      "caption": "Disconnected account panel in Dark mode.",
+      "width": 1583,
+      "height": 973,
+      "theme": "dark",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "3c8b9767cd53b25f36c22bba25b47cdb6bf2d596e2965643048a6762d0505992"
+    }
+  ],
+  "capturedAt": "2026-10-05T13:17:24.978Z",
+  "testSha256": "9b4603814f7c4cc3fca1561a42e7b3e4e852b13f9b43e70793e36b5867ae36b7",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/appearance.spec.ts",
+  "testTitle": "appearance changes every surface, preserves drafts, and survives a desktop restart",
+  "revision": "ca844a1c29106b444bc2c49d8301124496c2fb1b",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

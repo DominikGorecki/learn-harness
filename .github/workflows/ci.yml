@@ -40,7 +40,9 @@ jobs:
         if: always()
         with:
           name: diagnostics-${{ runner.os }}
-          path: test-results/
+          path: |
+            test-results/
+            ref/flows/
           if-no-files-found: ignore
       - name: Packaged Pi runtime (Linux)
         if: runner.os == 'Linux'
@@ -57,8 +59,10 @@ jobs:
             dist/*.AppImage
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: always()
         with:
           name: packaged-diagnostics-${{ runner.os }}
-          path: test-results/
+          path: |
+            test-results/
+            ref/flows/
           if-no-files-found: ignore

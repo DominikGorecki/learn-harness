@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -8,7 +8,7 @@ import { learningOutline } from '../fixtures/learning-outline'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
-test('topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart', async ({ playwright }, testInfo) => {
+test('topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart', { tag: '@topic-edit', annotation: { type: 'flow', description: 'topic-edit' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-topic-desktop-')))
   const folder = join(root, 'Learning'); await mkdir(folder)
@@ -44,7 +44,7 @@ test('topic dialog updates its outline branch and real topic files while preserv
     await expect(input).toBeFocused()
     const changes = 'I would like to learn further history on this topic.'
     await input.fill(changes)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('topic-edit-light.png') })
+    await flow.capture(desktop, page, 'topic-edit-light')
     await page.keyboard.press('Escape'); await expect(topicEdit).toBeFocused()
     expect(fixture.inferenceRequests).toHaveLength(0)
     await otherEdit.click(); await expect(input).toHaveValue(''); await input.fill('Other topic draft'); await page.keyboard.press('Escape')
@@ -86,13 +86,12 @@ test('topic dialog updates its outline branch and real topic files while preserv
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).check(); await page.getByRole('button', { name: 'Done', exact: true }).click()
     await topicEdit.click(); await expect(input).toHaveValue(changes)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('topic-edit-dark.png') })
+    await flow.capture(desktop, page, 'topic-edit-dark')
     await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.setContentSize(600, 640); window.webContents.setZoomFactor(2) })
     expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     await dialog.getByRole('button', { name: 'Rewrite topic' }).scrollIntoViewIfNeeded()
     await expect(dialog.getByRole('button', { name: 'Rewrite topic' })).toBeInViewport()
-    const zoomCapture = await desktop.evaluate(async ({ BrowserWindow }) => (await BrowserWindow.getAllWindows()[0]!.webContents.capturePage()).toPNG().toString('base64'))
-    await writeFile(testInfo.outputPath('topic-edit-zoom.png'), Buffer.from(zoomCapture, 'base64'))
+    await flow.capture(desktop, page, 'topic-edit-zoom')
     await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.webContents.setZoomFactor(1); window.setContentSize(1280, 840) })
     await dialog.getByRole('button', { name: 'Rewrite topic' }).click()
     const expected = { ...original.outline!.document, lessons: [revisedTopic, original.outline!.document.lessons[1]] }

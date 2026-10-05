@@ -1,11 +1,11 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, readFile, readdir, realpath, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 
-test('development logs collect main, renderer and preload telemetry without content or a public log API', async ({ playwright }) => {
+test('development logs collect main, renderer and preload telemetry without content or a public log API', { tag: '@diagnostics', annotation: { type: 'flow', description: 'diagnostics' } }, async ({ playwright }) => {
   const profile = await mkdtemp(join(tmpdir(), 'edu-logging-desktop-'))
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>
   const desktop = await playwright._electron.launch({ args: [resolve('out/main/index.js')], env: { ...env, EDU_HARNESS_TEST_DATA_DIR: profile } })
@@ -51,7 +51,7 @@ test('development logs collect main, renderer and preload telemetry without cont
   }
 })
 
-test('model and utility diagnostics retain transport evidence and request correlation while excluding learner data', async ({ playwright }) => {
+test('model and utility diagnostics retain transport evidence and request correlation while excluding learner data', { tag: '@inference-diagnostics', annotation: { type: 'flow', description: 'inference-diagnostics' } }, async ({ playwright }) => {
   const fixture = await startChatGPTFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-log-generation-')))
   const folder = join(root, 'LOG_PRIVATE_FOLDER'), profile = join(root, 'profile')

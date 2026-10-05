@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { AccountApi } from '../../src/shared/account'
 
-test('extra choices survive restart while independent diagnostic evidence resets', async ({ playwright }, testInfo) => {
+test('extra choices survive restart while independent diagnostic evidence resets', { tag: '@model-access', annotation: { type: 'flow', description: 'model-access' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture({ modelTestMode: 'failed' })
   const root = await mkdtemp(join(tmpdir(), 'edu-model-test-'))
   const project = join(root, 'Learning project')
@@ -39,7 +39,7 @@ test('extra choices survive restart while independent diagnostic evidence resets
     await page.getByRole('button', { name: 'Test GPT-6.1 Sol', exact: true }).click()
     await expect(page.getByRole('alert')).toContainText('This model is not available')
     await expect(page.getByText('4 model choices for your projects')).toBeVisible()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('model-test-failed.png') })
+    await flow.capture(desktop, page, 'model-test-failed')
     expect(fixture.inferenceRequests).toHaveLength(1)
 
     fixture.options.modelTestMode = 'hold'
@@ -65,9 +65,9 @@ test('extra choices survive restart while independent diagnostic evidence resets
     const state = await page.evaluate(async () => (globalThis as unknown as { learning: AccountApi }).learning.getAccount())
     expect(JSON.stringify(state)).not.toContain('fixture-access')
     expect(JSON.stringify(state)).not.toContain('RAW SECRET')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('model-test-verified-light.png') })
+    await flow.capture(desktop, page, 'model-test-verified-light')
     await page.locator('html').evaluate(element => element.setAttribute('data-theme', 'dark'))
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('model-test-verified-dark.png') })
+    await flow.capture(desktop, page, 'model-test-verified-dark')
     await page.keyboard.press('Escape')
     await page.getByLabel('Project model').selectOption('gpt-6.1-sol')
     await expect.poll(async () => {

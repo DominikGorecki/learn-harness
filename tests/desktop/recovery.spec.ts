@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -6,7 +6,7 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { ProjectDocument } from '../../src/shared/workspace'
 
-test('save retry, model recovery, usage limits, and explicit cancellation before switching preserve work', async ({ playwright }, testInfo) => {
+test('save retry, model recovery, usage limits, and explicit cancellation before switching preserve work', { tag: '@recovery', annotation: { type: 'flow', description: 'recovery' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture({ inferenceMode: 'hold' })
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-recovery-desktop-')))
   const folder = join(root, 'First subject'), other = join(root, 'Second subject')
@@ -46,7 +46,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     expect(fixture.inferenceRequests).toHaveLength(0)
     await page.getByRole('textbox').press('ControlOrMeta+Enter')
     await expect.poll(() => fixture.inferenceRequests.length).toBe(1)
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('generation-pending.png') })
+    await flow.capture(desktop, page, 'generation-pending')
     await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('button', { name: 'Sign out of this app' })).toBeDisabled()
     await page.keyboard.press('Escape')
@@ -58,7 +58,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     fixture.completePending()
     await expect(page.getByRole('button', { name: 'Retry save' })).toBeVisible()
     await expect(page.getByText('Not saved yet', { exact: true })).toBeVisible()
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('generated-unsaved.png') })
+    await flow.capture(desktop, page, 'generated-unsaved')
     await page.getByRole('button', { name: 'Projects', exact: true }).first().click()
     await page.getByRole('main').getByRole('button', { name: /First subject/ }).click()
     await expect(page.getByRole('heading', { name: 'This project needs attention.' })).toBeVisible()
@@ -89,7 +89,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await expect(page.getByRole('main').getByText(/Your ChatGPT usage limit has been reached/)).toBeVisible()
     expect((await saved()).outline).toEqual(original)
     await expect(page.getByRole('textbox')).toHaveValue('A deeper look at evidence and base rates')
-    await page.screenshot({ animations: 'disabled', path: testInfo.outputPath('usage-recovery.png') })
+    await flow.capture(desktop, page, 'usage-recovery')
     await page.getByRole('button', { name: 'Review ChatGPT connection' }).click()
     await page.getByRole('button', { name: 'Check availability' }).click()
     await expect(page.getByRole('heading', { name: 'Connected to ChatGPT' })).toBeVisible()

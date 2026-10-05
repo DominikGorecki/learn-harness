@@ -4,7 +4,7 @@ Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md) and [ADR-0
 
 **Status:** adopted interaction rules. Current runtime capabilities remain those in [learning/data](patterns-learning-data.md). Project setup and outline creation are implemented; acceptance evidence is tracked for milestone behavior in [PRD 01](prds/01-project-setup-and-outline.md); richer Socratic activities remain product direction in [the overview](../docs/overview.md).
 
-Before UI/interaction work, open the [current application screenshot gallery](patterns-design-system.md#current-application-screenshots), especially the [expanded topic](screenshots/current/topic-expanded-dark.jpg), [topic editor](screenshots/current/topic-editor-dark.jpg), [learning-direction composer](screenshots/current/learning-direction-light.jpg) and [appearance settings](screenshots/current/appearance-dark.jpg). These show observed screen states; exercise the running journey for behavior. The design-system pattern owns the [remove-and-regenerate procedure](patterns-design-system.md#refresh-the-screenshots).
+Before UI/interaction work, select the relevant [documented flow and screenshots](patterns-flow.md), especially [topic editing](flows/topic-edit/index.md), [outline generation](flows/outline/index.md), [projects](flows/projects/index.md) and [appearance](flows/appearance/index.md). Read the journey and assertion scope, then view selected checkpoints. Flow patterns own automatic refresh and AI narrative maintenance; exercise the running journey for behavior.
 
 ## Orientation and progressive disclosure
 

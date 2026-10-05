@@ -35,4 +35,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md) | Accepted | Isolated topic rewrites, project-wide Pi text-file tools and recoverable multi-file saves | Changing topic editing, project content writes, folder ownership or file-save recovery |
 
+| [ADR-0020](ADR-0020-playwright-flow-references.md) | Accepted | Per-flow explanations, platform-specific passing Playwright screenshots and generated capture indexes | Changing flow discovery, screenshot publication, freshness or AI maintenance |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).
