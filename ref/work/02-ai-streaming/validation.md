@@ -237,4 +237,23 @@ Primary failure investigation and repair: read-only trace proves prior cancellat
 
 ## External qualifications and limits
 
+### Final primary gates and capture follow-up
+
+The T02 test-only termination repair was committed as `e83944bd36b59663b0995167046385fb25293b70`. All seven implementation commits and that repair were present before the fresh primary sequence below. Workers were frozen. Runtime/test source was stable; only owned generated flow references were dirty during publication. These passing results supersede the earlier whole-bundle failure and pending statements, without erasing their evidence.
+
+| Primary command | Actual result |
+| --- | --- |
+| `npm.cmd run check` (40189) | Exit 0: lint, 24 unit files / 282 passed / three existing platform skips, flows, both type scopes and production build |
+| `npm.cmd run test:desktop` (13758) | Exit 0: fifteen passed / one expected ASAR skip, 6.2 minutes; configured reporter published normally |
+| `npm.cmd run test:flows` after desktop | Exit 0: indexes, manifests and screenshot links consistent |
+| `npm.cmd run package` (24835) | Exit 0: Windows x64 / Electron 44.5.1; configured ASAR integrity/fuses retained |
+| `npm.cmd run test:packaged` | Exit 0: one passed, 1.7 seconds test / 2.4 seconds total; actual ASAR outline plus fixed Sol/Luna worker profiles |
+| `npm.cmd run test:flows` after packaged | Exit 0 |
+
+Commands used PowerShell and `login:false` on the normal Windows host through automatic approval review, preserving Electron sandbox/security and the configured reporter. The actual unaccelerated stream received for **200,508 ms**, delivered the final burst marker through the named bridge in **130 ms**, received **82,348 bytes**, and emitted **56 bounded ordered frames / one burst semantic preview**. It remained active/cancellable past 190 seconds with unchanged authoritative bytes. Real write and genuine exit barriers proved Saving cancellation guards and unverified/BUSY Checking before independently accepted terminal settlement. The strengthened unexpected-worker-exit diagnostic passed within its unchanged ten-second assertion. Actual model access, all three educational producers, session/privacy, recovery, reading/navigation and adaptation journeys passed.
+
+Final frozen PNG review found a first-candidate checkpoint gap: named bridge data was present before React painted the draft, leaving a no-draft placeholder in the capture. A primary-owned T06 test-only follow-up adds actual DOM title assertions before both repair captures. Scoped `npm.cmd run test:desktop -- tests/desktop/ai-streaming.spec.ts --grep '@ai-streaming-repair'` (83908) passed one in 4.7 seconds / 5.6 seconds total with normal publication. The primary opened all three refreshed repair images and all nineteen final changed PNGs: actual first/replacement/saved candidates, waiting/structured/Checking/Saving/Saved, dashboard diagnostic privacy, rejected input, readable clipped prose/label/Cancel at 200%, and storage-only/usage recovery. No runtime/CSS, timeout, reporter, permission or package change was introduced. Post-follow-up `npm.cmd run check` (19843) passed the same 282 tests / three skips plus lint/flows/types/build. Full desktop/package qualification above remains evidence for the unchanged runtime; the later scoped run supplies the corrected checkpoint evidence rather than claiming another full run.
+
+The package's existing default-icon/dependency warnings were nonfatal. A signtool progress line does not establish configured certificate signing or a public release. Packaged tests load the real `app.asar/out/main/outline-worker.js` and dependencies under an automation-capable development host, checking all five requests, tool-free diagnostic privacy, restricted environment, completed/model/text/clean-EOF evidence and actual exit/PID absence. Hardened packaged-window startup, installers/signing and other native platforms remain separately unqualified.
+
 Live-account streaming and Sol/Luna eligibility are separate from protocol fixtures. Deliberately expensive live timing requests are not required or authorized by fixture acceptance. Native macOS/Linux appearance, OS screen-reader/accessibility and suspend/resume require separate actual evidence. Record observed manual findings and unavailable gates explicitly; do not silently mark them passed.

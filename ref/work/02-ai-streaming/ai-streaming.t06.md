@@ -73,5 +73,9 @@ Worker reviewed all changed/new images, including all five final outline capture
 
 ## Notes
 
+### Final capture follow-up
+
+During final primary review, the first-repair PNG showed the no-draft placeholder despite the named-bridge preview assertion having passed. The primary added actual rendered draft-title assertions before both candidate captures; no production, timer, reporter or security setting changed. Scoped `npm.cmd run test:desktop -- tests/desktop/ai-streaming.spec.ts --grep '@ai-streaming-repair'` (83908, normal Windows host, `login:false`) passed one journey in 4.7 seconds / 5.6 seconds total and published normally. Primary opened all three refreshed PNGs: the first title/provisional prose, distinct replacement without the old title, and independently saved final result are visible. Final `npm.cmd run check` (19843) passed lint, 282 tests / three existing platform skips, flows, both type scopes and production build. The full primary desktop/package/ASAR gates at `e83944bd36b59663b0995167046385fb25293b70` had already passed; this later checkpoint-only repair leaves that qualified runtime unchanged. See [validation](validation.md) for the complete primary acceptance sequence.
+
 - Requirements covered: primary R23; supporting R01–R21 through integrated evidence, not replacement of their primary ticket tests.
 - Blockers: none for authoring. Graphical/packaging and external qualification limits must be resolved or reported during implementation.
