@@ -21,10 +21,12 @@ export interface AiOperationInput {
   model: { id: string; name: string }; heading: string; requestSummary: string
 }
 export interface AiOperation extends AiOperationInput {
+  /** sequence is local to operationId; compare snapshots across owners by revision. */
   operationId: string; sequence: number; phase: AiPhase; outcome: AiOutcome | null; errorCode: ErrorCode | null;
   elapsedMs: number; lastByteAgeMs: number | null; turn: number; previewRevision: number;
   preview: AiPreview; abbreviated: boolean; activity: AiActivityEntry[]; omittedActivityCount: number; canCancel: boolean
 }
+/** revision increases globally throughout this application session. */
 export interface AiActivitySnapshot { revision: number; active: AiOperation | null; settled: AiOperation | null }
 export interface CancelAiOperationRequest { operationId: string }
 export interface AiApi {

@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "1e3c6bff1346a2d4c84dfcebc6b27fb6db5cc66bbe99fdcc031fa47429cf608c"
+      "sha256": "f711b8faf8279ad10a2a93fe03700d44ac62b436504768e20ab5d23697b4a905"
     },
     {
       "id": "unsupported-material",
@@ -44,16 +44,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "9076683c97f79db619b1abee46acfba6118c50e6f8a021a5e1196a88f2be8b97"
+      "sha256": "3f483a30b73d75ee5e90892dce2158aac4f12cbf0a2da37875c10717a9aa3b19"
     }
   ],
-  "capturedAt": "2026-10-05T19:27:55.799Z",
-  "testSha256": "f7a81c3df39746d6f7d648622b3bfb3b505de60d00ca1692d691a81578a5f1a5",
+  "capturedAt": "2026-10-05T20:47:08.718Z",
+  "testSha256": "09f6c743ce26da2c7970c966b809219abb2f637313e6cf80bfdc4ac6ac906f71",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/materials.spec.ts",
   "testTitle": "folder-only learning, verified source coverage, ambiguity and unsupported recovery",
-  "revision": "3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7",
+  "revision": "d7103ac828f33e9ea26483147f9eb5550564c8ee",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

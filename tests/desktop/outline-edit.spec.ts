@@ -8,8 +8,13 @@ import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import { learningOutline } from '../fixtures/learning-outline'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
 import type { ProjectDocument } from '../../src/shared/workspace'
+import type { AccountApi } from '../../src/shared/account'
+import type { AiApi } from '../../src/shared/ai/activity'
 
 test('edit dialog rewrites the numbered path through Pi with the active model and persists it across restart', { tag: '@outline-edit', annotation: { type: 'flow', description: 'outline-edit' } }, async ({ playwright, flow }) => {
+  // Three owned workers and restart can each wait for bounded process startup/exit.
+  // Keep prompt admission checks and the suite's normal 45-second limit unchanged.
+  test.setTimeout(150_000)
   const fixture = await startChatGPTFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-edit-desktop-')))
   const folder = join(root, 'Learning'); await mkdir(folder)
@@ -83,7 +88,10 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     expect(fixture.inferenceRequests).toHaveLength(0)
     fixture.options.inferenceMode = 'preview-hold'
     await input.press('ControlOrMeta+Enter')
-    await expect.poll(() => fixture.inferenceRequests.length).toBe(1)
+    await expect(dialog).not.toBeVisible()
+    await expect(page.locator('#ai-operation-heading')).toBeFocused()
+    await expect(page.locator('.ai-panel .ai-request-summary')).toHaveText(changes)
+    await expect.poll(() => fixture.inferenceRequests.length, { timeout: 35_000 }).toBe(1)
     await expect(edit).toBeDisabled()
     expect((await saved()).outline).toEqual(original.outline)
     await expect.poll(async () => (await aiActivity(page)).active?.preview.kind).toBe('outline')
@@ -113,11 +121,36 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     expect((await aiActivity(page)).settled).toMatchObject({ kind: 'rewrite-outline', outcome: 'saved', preview: { kind: 'outline', title: revised.title } })
     expect((await saved()).brief).toBe(original.brief)
     await edit.click(); await expect(input).toHaveValue(''); await page.keyboard.press('Escape')
+    // An external main-owned diagnostic wins admission before this editor's key handler.
+    // A rejected start keeps the covering input, rather than pretending it was accepted.
+    fixture.options.modelTestMode = 'hold'
+    await edit.click(); await input.fill('Keep this rejected rewrite draft intact.')
+    await page.evaluate(() => {
+      type Shortcut = { key: string; ctrlKey: boolean; metaKey: boolean }
+      const host = globalThis as unknown as { learning: AccountApi; document: { addEventListener(type: string, listener: (event: Shortcut) => void, capture: boolean): void; removeEventListener(type: string, listener: (event: Shortcut) => void, capture: boolean): void } }
+      const admit = (event: Shortcut) => { if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) { host.document.removeEventListener('keydown', admit, true); void host.learning.testLunaModel() } }
+      host.document.addEventListener('keydown', admit, true)
+    })
+    await input.press('ControlOrMeta+Enter')
+    await expect(dialog).toBeVisible()
+    await expect(dialog.getByRole('alert')).toContainText('Another AI action is still running.')
+    await expect(input).toHaveValue('Keep this rejected rewrite draft intact.')
+    await expect.poll(() => fixture.inferenceRequests.length).toBe(3)
+    await flow.capture(desktop, page, 'outline-edit-rejected')
+    await page.keyboard.press('Escape')
+    await expect(page.locator('#ai-operation-heading')).toBeFocused()
+    await page.evaluate(async () => {
+      const api = (globalThis as unknown as { learning: AiApi }).learning
+      const state = await api.getAiActivity(); if (state.ok && state.data.active) await api.cancelAiOperation({ operationId: state.data.active.operationId })
+    })
+    await expect(edit).toBeEnabled()
+    await edit.click(); await expect(input).toHaveValue('Keep this rejected rewrite draft intact.')
+    await page.keyboard.press('Escape'); await expect(edit).toBeFocused()
     await desktop.close(); desktop = undefined
     desktop = await launch(); page = await desktop.firstWindow()
     await page.getByRole('main').getByRole('button', { name: /Bayesian reasoning/ }).click()
     await expect(page.locator('.lesson-title').first()).toHaveText(revised.lessons[0]!.title)
-    expect(fixture.inferenceRequests).toHaveLength(2)
+    expect(fixture.inferenceRequests).toHaveLength(3)
   } finally {
     await desktop?.close(); await fixture.close(); await rm(root, { recursive: true, force: true })
   }

@@ -73,6 +73,8 @@ test('model and utility diagnostics retain transport evidence and request correl
     await page.getByRole('button', { name: 'Continue with ChatGPT' }).click()
     await expect(page.getByText('4 model choices for your projects')).toBeVisible()
     await page.getByRole('button', { name: 'Test GPT-6.1 Sol', exact: true }).click()
+    await expect(page.locator('.ai-panel')).toHaveAttribute('data-outcome', 'verified')
+    await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('button', { name: 'GPT-6.1 Sol verified', exact: true })).toBeDisabled()
     await page.keyboard.press('Escape')
     await page.getByLabel('Project model').selectOption('fixture-model')

@@ -17,6 +17,21 @@
       "sha256": "896690b251f15415121b737437c8d1c704553559e3cd0316d58278e2bd2f1aec"
     },
     {
+      "id": "topic-streaming-light",
+      "caption": "Selected-topic-only provisional draft with a trusted saved topic title and connected actual activities.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "33425ebf2a0e15288d0c00835c848ebc2df4a9400a4a240742451b09e375d14c"
+    },
+    {
       "id": "topic-edit-dark",
       "caption": "The retained topic draft after cancellation, in Dark mode.",
       "width": 1583,
@@ -29,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "3ec7d5b9d8f7c0b1f960fa91e283a97256fd95da24293a67d3d0ff22918b4e5c"
+      "sha256": "3e10e6f8027fe104cbd2017c856106e433351746008b8588945ce173f8b753a1"
     },
     {
       "id": "topic-edit-zoom",
@@ -44,16 +59,31 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "dc6abb10bbefda7ce023ef8a3d867e6f989db8d9d06976dcbc8268de0e6e27bc"
+      "sha256": "2fc87771ce991269cb5cda91bed0d3dd97de02ac4ff2380073124a417a3ca028"
+    },
+    {
+      "id": "topic-streaming-zoom",
+      "caption": "Long topic request and reachable independent draft/activity regions at narrow width and 200% zoom.",
+      "width": 750,
+      "height": 800,
+      "theme": "dark",
+      "viewport": {
+        "width": 300,
+        "height": 320
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "05b8909e5a0ec00308c4f0e849c36b9ae907f97bec7f6626101a1472e5c4d303"
     }
   ],
-  "capturedAt": "2026-10-05T19:30:16.388Z",
-  "testSha256": "c149d7ddbad8a21e55772ff620a980b2647aba8586ffb9cf6fa324e7fc22ee28",
+  "capturedAt": "2026-10-05T20:49:12.765Z",
+  "testSha256": "7365366f9bf91aba285b5cc19f827f5e5e3c491ff9ea0697f433d4975c656ebe",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-edit.spec.ts",
   "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
-  "revision": "3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7",
+  "revision": "d7103ac828f33e9ea26483147f9eb5550564c8ee",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

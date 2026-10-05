@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
 import { learningOutline } from '../fixtures/learning-outline'
 import type { ProjectDocument } from '../../src/shared/workspace'
+import type { AiApi } from '../../src/shared/ai/activity'
 
 test('long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved', { tag: '@reading', annotation: { type: 'flow', description: 'reading' } }, async ({ playwright, flow }) => {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-reading-desktop-')))
@@ -21,6 +22,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
   const document: ProjectDocument = { version: 1, projectId: 'reading-project', revision: 1, name: outline.title, createdAt: '2026-10-04T12:00:00Z', updatedAt: '2026-10-04T12:00:00Z',
     selectedModel: model, brief: 'A long detailed description. '.repeat(200), outline: { generatedAt: '2026-10-04T12:00:00Z', model, brief: 'Complex evidence', inferredBrief: null, document: outline, coverage: { files: [], limitations: ['Description-based outline.'] } } }
   await createProjectStorage().save(folder, document, null)
+  const savedBefore = await readFile(join(folder, '.edu/project.json'), 'utf8')
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>
   let desktop: ElectronApplication | undefined
   const choose = async (path: string) => desktop!.evaluate(({ dialog }, selected) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [selected] }) }, path)
@@ -49,6 +51,15 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await page.emulateMedia({ reducedMotion: 'reduce' })
     expect(await page.locator('.workspace-enter').evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).animationName)).toBe('none')
     await desktop.evaluate(({ BrowserWindow }) => { BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(1); BrowserWindow.getAllWindows()[0]!.setContentSize(1280, 840) })
+    const readingPosition = await page.getByRole('main').evaluate(element => { element.scrollTop = 125; return element.scrollTop })
+    expect(readingPosition).toBeGreaterThan(0)
+    await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('radio', { name: 'Light', exact: true }).check()
+    await page.keyboard.press('Escape')
+    await expect.poll(() => page.getByRole('main').evaluate(element => element.scrollTop)).toBe(readingPosition)
+    expect(await page.evaluate(async () => (globalThis as unknown as { learning: AiApi }).learning.getAiActivity())).toMatchObject({ ok: true, data: { active: null, settled: null } })
+    await expect(page.locator('.ai-panel')).toHaveCount(0)
+    expect(await readFile(join(folder, '.edu/project.json'), 'utf8')).toBe(savedBefore)
 
     if (process.platform !== 'win32' && process.geteuid?.() !== 0) {
       await chmod(folder, 0o500); await chmod(join(folder, '.edu'), 0o500)

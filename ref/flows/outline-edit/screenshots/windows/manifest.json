@@ -45,15 +45,30 @@
       "method": "electron",
       "maskedLocalPaths": false,
       "sha256": "56b1df0680d7f120c1529f3ef1dc97680d67c61ce645498b2a88ddc9ce6e187c"
+    },
+    {
+      "id": "outline-edit-rejected",
+      "caption": "Raced admission rejection preserves the editor and its input while the diagnostic owns AI activity.",
+      "width": 1600,
+      "height": 1050,
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 840
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "cf56331cc23754eb4e081c15e7077b4676ec279e527a2d0fb6e934cb2c2fccd3"
     }
   ],
-  "capturedAt": "2026-10-05T19:28:44.245Z",
-  "testSha256": "18906dbf4bc217419caf1a44ccc73f8ed61d5a283bdfb4d6a2d5e5edbcef949a",
+  "capturedAt": "2026-10-05T20:48:27.936Z",
+  "testSha256": "7780f3d99837f285c3fb6fd5a7eb92222171e12309dee9bb21e72664efba4dee",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline-edit.spec.ts",
   "testTitle": "edit dialog rewrites the numbered path through Pi with the active model and persists it across restart",
-  "revision": "3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7",
+  "revision": "d7103ac828f33e9ea26483147f9eb5550564c8ee",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -15,7 +15,7 @@ export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate,
       <p className="eyebrow">{refining ? 'Refine your direction' : 'Learning project'}</p><h1 id="project-heading" tabIndex={-1}>{refining ? 'Where should your learning go next?' : 'What would you like to learn?'}</h1>
       <p>{needsDetails ? 'Add a little direction to help shape your outline. A short description is enough.' : project.sourceHint === 'files' ? 'Start with the material in this folder. Add a direction if you have one, or let your notes shape the learning path.' : 'A topic, a question, or a bigger ambition. Start with as much or as little as you like.'}</p>
     </div>
-    <form className="learning-composer" onSubmit={event => { event.preventDefault(); if (!tooLong) onCreate() }}>
+    <form className="learning-composer" onSubmit={event => { event.preventDefault(); if (canCreate && !busy && !tooLong) onCreate() }}>
       <label htmlFor="learning-details">Your learning goal{project.sourceHint === 'files' && !needsDetails ? ' (optional)' : ''}</label>
       <textarea id="learning-details" value={draft} onChange={event => onDraft(event.target.value)}
         rows={5} placeholder="I want to understand…" disabled={busy} aria-invalid={tooLong || undefined} aria-describedby={tooLong ? 'learning-details-error' : undefined}

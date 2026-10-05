@@ -6,7 +6,7 @@ import { exportJWK, generateKeyPair, SignJWT } from 'jose'
 import { planScope } from '../../src/main/auth/types'
 import type { ChatGPTEndpoints } from '../../src/main/auth/chatgpt-provider'
 import { learningOutline } from './learning-outline'
-import { writeToolResponse } from './responses-stream'
+import { writeProgressiveToolResponse, writeToolResponse } from './responses-stream'
 
 const keyPair = generateKeyPair('RS256')
 const wrongKeyPair = generateKeyPair('RS256')
@@ -26,7 +26,7 @@ export interface ProviderFixtureOptions {
   outlineResult?: ReturnType<typeof learningOutline>
   projectFileCalls?: { name: string; args: Record<string, unknown> }[]
   modelTestMode?: 'completed' | 'slow-completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
-  inferenceMode?: 'outline' | 'hold' | 'preview-hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
+  inferenceMode?: 'outline' | 'hold' | 'preview-hold' | 'progressive-hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
 
 export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) {
@@ -37,6 +37,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   const inferenceRequests: Record<string, unknown>[] = []
   const pendingInference: ServerResponse[] = []
   const previewPending = new WeakSet<ServerResponse>()
+  const progressive = new Map<ServerResponse, () => void>()
   const diagnosticPending = new WeakMap<ServerResponse, string>()
   const diagnosticTimers = new Set<ReturnType<typeof setTimeout>>()
   const codes = new Map<string, { nonce: string; challenge: string; clientId: string }>()
@@ -141,6 +142,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
           const call = options.projectFileCalls[turn]
           if (call) { writeToolResponse(response, call); return }
         }
+        if (options.inferenceMode === 'progressive-hold') { pendingInference.push(response); previewPending.add(response); progressive.set(response, writeProgressiveToolResponse(response, options.outlineResult ?? learningOutline())); return }
         if (options.inferenceMode === 'preview-hold') { pendingInference.push(response); previewPending.add(response); writeToolResponse(response, { args: options.outlineResult ?? learningOutline(), keepOpen: true }); return }
         if (options.inferenceMode === 'hold') { pendingInference.push(response); response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
         if (options.inferenceMode === 'clarify') {
@@ -177,7 +179,8 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   }
   return {
     baseUrl, endpoints, authorizations, tokens, inferenceRequests, options,
-    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) { const target = diagnosticPending.get(response); if (target) completeDiagnostic(response, target); else if (previewPending.has(response)) response.end(); else writeToolResponse(response, { args: learningOutline() }) } },
+    advancePreview: () => { for (const advance of progressive.values()) advance() },
+    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) { const target = diagnosticPending.get(response); if (target) completeDiagnostic(response, target); else if (previewPending.has(response)) { progressive.get(response)?.(); progressive.delete(response); response.end() } else writeToolResponse(response, { args: learningOutline() }) } },
     modelsRequested: () => modelsRequested, revoked: () => revoked,
     close: () => new Promise<void>((resolve, reject) => { for (const timer of diagnosticTimers) clearTimeout(timer); diagnosticTimers.clear(); server.closeAllConnections(); server.close(error => error ? reject(error) : resolve()) })
   }

@@ -14,7 +14,37 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "eb8279a9e9efde994fa67653490eee959d17ebb2c679ece33066ff3070a6741e"
+      "sha256": "ea86824c059b2a63223c6a8687173201f922740452aa9156c32c3bf8d6c6f428"
+    },
+    {
+      "id": "model-test-waiting-hint",
+      "caption": "A real 30-second silent response remains cancellable with a nonterminal waiting explanation.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "32f4a1e5306bcef9b004a7c7c24783b62f90314ab879b811fd7090169338186c"
+    },
+    {
+      "id": "model-test-dashboard-waiting",
+      "caption": "Global diagnostic panel remains discoverable after navigation to the project-free dashboard.",
+      "width": 1583,
+      "height": 973,
+      "theme": "light",
+      "viewport": {
+        "width": 1266,
+        "height": 778
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": true,
+      "sha256": "0fbb533d66b1e235bce8538fc31c731c3dda7ccc63e436cf68d498ca477cb032"
     },
     {
       "id": "model-test-verified-light",
@@ -29,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cc69da2d9f97f14c460f2ac82ef6d21136faacf9e77731b21c638b6a1237f588"
+      "sha256": "793896b92ad6f96d6a3397f7295e88b1beab9a58eb7fd78bcfe9d107f96ca342"
     },
     {
       "id": "model-test-verified-dark",
@@ -44,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "6d10afebf0acdd4fdcee439a0b2fee7921d1ee5fbbc52cd5a3d07fabbbd14107"
+      "sha256": "22f1703476c75ce979ecb5aebd23849cea44fd97f5fd38242760e79390af0b89"
     }
   ],
-  "capturedAt": "2026-10-05T19:28:36.524Z",
-  "testSha256": "aa7c48418732b6baad56c7c18658351f6a5d664ffdb8e3b33681aa04ae03f650",
+  "capturedAt": "2026-10-05T20:48:18.694Z",
+  "testSha256": "0f71dc72d06a4185d31079cba36b77cb04dafd35f954423cacd18712a509e518",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7",
+  "revision": "d7103ac828f33e9ea26483147f9eb5550564c8ee",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

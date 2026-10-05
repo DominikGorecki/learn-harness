@@ -37,7 +37,7 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     expect(fixture.inferenceRequests).toHaveLength(0)
     await flow.capture(desktop, page, 'material-setup')
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
     const document = JSON.parse(await readFile(join(folder, '.edu/project.json'), 'utf8')) as ProjectDocument
     expect(document.outline?.document.lessons[0]?.sources).toEqual(['chapters/notes.md'])
     expect(document.outline?.coverage.files).toEqual(expect.arrayContaining([
@@ -59,8 +59,9 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     await page.getByRole('textbox').fill('Focus on Bayesian reasoning; use examples from city planning.')
     fixture.options.inferenceMode = 'materials'
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
+    await expect(page.getByRole('main').getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
     expect(JSON.stringify(fixture.inferenceRequests.at(-1)?.input)).toContain('Focus on Bayesian reasoning; use examples from city planning.')
+    await expect(page.locator('.ai-panel')).toHaveAttribute('data-outcome', 'saved')
 
     await choose(unsupported)
     await page.getByRole('button', { name: 'Open project', exact: false }).click()

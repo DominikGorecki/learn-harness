@@ -3,9 +3,9 @@ import { maximumBriefLength } from '../../../../shared/workspace'
 import type { SavedOutline } from '../../../../shared/workspace'
 import { Icon } from '../../components/Icon'
 
-export function OutlineEditDialog({ open, outline, topicId, draft, modelName, canSubmit, busy, error, question, onDraft, onSubmit, onClose }: {
+export function OutlineEditDialog({ open, outline, topicId, draft, modelName, canSubmit, busy, error, question, onDraft, onSubmit, onClose, restoreFocus = true }: {
   open: boolean; outline: SavedOutline; draft: string; modelName: string; canSubmit: boolean; busy: boolean;
-  topicId?: string | null; error: string | null; question: string | null; onDraft(value: string): void; onSubmit(): void; onClose(): void
+  topicId?: string | null; error: string | null; question: string | null; restoreFocus?: boolean; onDraft(value: string): void; onSubmit(): void; onClose(): void
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const input = useRef<HTMLTextAreaElement>(null)
@@ -20,8 +20,15 @@ export function OutlineEditDialog({ open, outline, topicId, draft, modelName, ca
       dialog.current?.showModal()
       input.current?.focus()
     }
-    if (!open && dialog.current?.open) { dialog.current.close(); trigger.current?.focus({ preventScroll: true }) }
-  }, [open])
+    if (!open && dialog.current?.open) {
+      dialog.current.close()
+      if (restoreFocus) {
+        const target = trigger.current?.isConnected && !trigger.current.matches(':disabled') ? trigger.current :
+          document.getElementById('ai-operation-heading') ?? document.getElementById('project-heading') ?? document.getElementById('outline-heading') ?? document.getElementById('dashboard-heading') ?? document.getElementById('workspace')
+        target?.focus({ preventScroll: true })
+      }
+    }
+  }, [open, restoreFocus])
   return <dialog ref={dialog} className="confirmation-dialog outline-edit-dialog" aria-labelledby="outline-edit-heading"
     onCancel={event => { event.preventDefault(); onClose() }}>
     <div className="outline-edit-heading"><h2 id="outline-edit-heading">{topic ? 'Edit topic' : 'Edit your learning path'}</h2><button type="button" className="icon-button" aria-label="Close outline editor" onClick={onClose}><Icon name="close" size={18} /></button></div>

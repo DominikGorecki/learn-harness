@@ -1,7 +1,7 @@
 import type { SavedOutline } from '../../../../shared/workspace'
 import { Icon } from '../../components/Icon'
 
-export function OutlineView({ saved, unsaved = false, onEdit, onEditTopic, editDisabled = false }: { saved: SavedOutline; unsaved?: boolean; onEdit?(): void; onEditTopic?(topicId: string): void; editDisabled?: boolean }) {
+export function OutlineView({ saved, unsaved = false, onEdit, onEditTopic, editDisabled = false, activeTopicId }: { saved: SavedOutline; unsaved?: boolean; onEdit?(): void; onEditTopic?(topicId: string): void; editDisabled?: boolean; activeTopicId?: string }) {
   const outline = saved.document
   const sources = saved.coverage.files.filter(file => file.status === 'read')
   return <article className="outline-view workspace-enter" aria-labelledby="outline-heading">
@@ -13,9 +13,9 @@ export function OutlineView({ saved, unsaved = false, onEdit, onEditTopic, editD
     <section className="lesson-path" aria-labelledby="lesson-path-heading"><div className="section-introduction"><div className="lesson-path-heading"><h2 id="lesson-path-heading">Your path through the subject</h2>
       {onEdit && <button className="icon-button" aria-label="Edit learning path" title={editDisabled ? 'Finish the current operation and save your outline before editing.' : 'Edit learning path'} disabled={editDisabled} onClick={onEdit}><Icon name="edit" size={16} /></button>}
     </div><p>A foundation to build on, one idea at a time.</p></div>
-      {outline.lessons.map((lesson, index) => <div className="lesson-row" key={lesson.id}><details className="lesson-disclosure">
+      {outline.lessons.map((lesson, index) => <div className="lesson-row" key={lesson.id} data-ai-active={lesson.id === activeTopicId || undefined}><details className="lesson-disclosure">
         <summary><span className="lesson-number">{String(index + 1).padStart(2, '0')}</span><span className="lesson-summary"><span className="lesson-title">{lesson.title}</span><span>{lesson.question}</span></span>
-          {lesson.id === outline.startingLessonId && <span className="starting-label">Start here</span>}<Icon name="down" size={16} /></summary>
+          {lesson.id === activeTopicId && <span className="starting-label ai-topic-marker">Updating</span>}{lesson.id === outline.startingLessonId && lesson.id !== activeTopicId && <span className="starting-label">Start here</span>}<Icon name="down" size={16} /></summary>
         <div className="lesson-detail"><p className="lesson-overview">{lesson.overview}</p><h3>Learning objectives</h3>
           <ul className="plain-list">{lesson.objectives.map((objective, index) => <li key={index}>{objective}</li>)}</ul>
           {lesson.prerequisites.length > 0 && <p className="lesson-prerequisites"><strong>Builds on</strong> {lesson.prerequisites.join(' · ')}</p>}

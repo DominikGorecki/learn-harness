@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T05 - Approved workbench streaming panel for every AI start
-Status: Open
+Status: Done
 
 ## Source
 
@@ -53,11 +53,11 @@ React owns visual/focus/scroll state; backend snapshots determine acceptance, ca
 
 ## Acceptance criteria
 
-- [ ] All five accepted start kinds show the locked bottom panel immediately, including account tests without a project.
-- [ ] Connected timeline states and scope/terminal labels are truthful; partial output is readable and unsaveable.
-- [ ] Other AI actions are disabled/guarded until settlement while saved reading and supported navigation remain usable.
-- [ ] Drafts, storage recovery, cancellation/saving limits and focus continuity survive all tested outcomes.
-- [ ] Both themes, narrow/zoomed layout, long content, manual scrolling and reduced motion are reviewed on actual Electron evidence.
+- [x] All five accepted start kinds show the locked bottom panel immediately, including account tests without a project.
+- [x] Connected timeline states and scope/terminal labels are truthful; partial output is readable and unsaveable.
+- [x] Other AI actions are disabled/guarded until settlement while saved reading and supported navigation remain usable.
+- [x] Drafts, storage recovery, cancellation/saving limits and focus continuity survive all tested outcomes.
+- [x] Both themes, narrow/zoomed layout, long content, manual scrolling and reduced motion are reviewed on actual Electron evidence.
 
 ## Manual verification
 
@@ -65,7 +65,13 @@ Compare isolated passing app captures with the locked final image, preserving ex
 
 ## Completion evidence
 
-Pending authorized implementation: all-producer panel evidence, reviewed captures, interaction checks, accessibility findings and explicit remaining external gates.
+Accepted by the primary after source/test inspection, focused read-only review, passing required gates and actual app image review. Worker `t01_coordinator`, GPT-6.1 Sol / high; prerequisites T03 `3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7` and T04 `d7103ac828f33e9ea26483147f9eb5550564c8ee` are reachable on `master`.
+
+All five accepted starts use the locked bottom dock and shared synchronous renderer guard. The hook subscribes before querying, orders new owners by global snapshot revision and compares local sequence only within one operation. Accepted overlays yield to focused progress; rejected inputs remain intact. Topic titles come from saved identity. Educational provisional drafts and account evidence remain separate; accepted unsaved output survives replacement of global activity and retries storage without inference. Navigation awaits project cancellation/publication; diagnostic activity follows account scope across views. Terminal focus handoff preserves an independently focused reader, and dismissal restores the current view.
+
+Final `npm run check` passed lint, 282 unit tests / three platform skips across 24 files, flows, both type scopes and build. Full `npm run test:desktop` passed thirteen tests / one expected packaged skip; a subsequent recovery-only checkpoint refresh passed one test after making Retry save visible in its image. Post-refresh `npm run test:flows`, primary flow/diff checks and 128 local links in sixteen changed Markdown files passed. Exact intermediate failures, source repairs, transient reporter failures, evidence-based scoped test budgets and their passing reruns are retained in [validation](validation.md).
+
+Primary reviewed actual Light/Dark split docks, selected-topic and long-request previews, 600×480/200% and 600×640/200% readable clipped content, dashboard diagnostics, the real 30-second waiting hint, unsaved Retry save, usage feedback and failed verification. Real Electron assertions cover selectable text, manual reading/preview position, named regions, keyboard/IME/focus, motion preference, admission/count/privacy and retained bytes. Representative source-token contrast passes; this is not OS screen-reader certification. Live inference, other native platforms, suspend/resume, packaged profiles and fresh whole-bundle integration remain separate T06/final qualifications. Source/captures were frozen before acceptance; no reporter/security/runtime deadline was weakened.
 
 ## Notes
 

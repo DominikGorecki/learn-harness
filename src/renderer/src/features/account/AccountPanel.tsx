@@ -3,7 +3,7 @@ import { additionalAccountModels } from '../../../../shared/account'
 import type { AccountController } from './useAccount'
 import './account.css'
 
-export function AccountPanel({ open, onClose, account, locked = false }: { open: boolean; onClose(): void; account: AccountController; locked?: boolean }) {
+export function AccountPanel({ open, onClose, account, locked = false, onTest }: { open: boolean; onClose(): void; account: AccountController; locked?: boolean; onTest(modelId: string): void }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const { snapshot, busy, error, run, cancelModelTest } = account
   const status = snapshot?.status ?? 'disconnected'
@@ -28,7 +28,7 @@ export function AccountPanel({ open, onClose, account, locked = false }: { open:
     </div>}
     {snapshot?.message && <p className="account-feedback" role="status">{snapshot.message}</p>}
     {error && <p className="account-feedback is-error" role="alert">{error}</p>}
-    {locked && <p className="account-feedback" role="status">Finish or cancel your outline before changing this connection.</p>}
+    {locked && <p className="account-feedback" role="status">Other AI actions are paused. Finish or cancel the current AI request before changing this connection.</p>}
     {connected && <p className="account-model-count" role="status">{snapshot?.modelsStatus === 'loading' ? 'Finding your available models…' :
       snapshot?.modelsStatus === 'ready' ? `${snapshot.models.length} model choices for your projects` : 'Model availability needs a refresh.'}</p>}
     {snapshot?.modelTestMessage && <p className={`account-feedback ${snapshot.modelTestStatus === 'failed' ? 'is-error' : ''}`}
@@ -39,7 +39,7 @@ export function AccountPanel({ open, onClose, account, locked = false }: { open:
         additionalAccountModels.map(model => {
           const verified = snapshot?.verifiedModelIds.includes(model.id)
           return <button key={model.id} className="account-secondary" disabled={busy || locked || snapshot?.modelsStatus !== 'ready' || verified}
-            onClick={() => void run(api => model.id === 'gpt-6.1-sol' ? api.testSolModel() : api.testLunaModel())}>
+            onClick={() => onTest(model.id)}>
             {verified ? `${model.name} verified` : `Test ${model.name}`}</button>
         })}</div>
     </div>}
@@ -50,7 +50,7 @@ export function AccountPanel({ open, onClose, account, locked = false }: { open:
         <button className="account-secondary" disabled={busy} onClick={() => void run(api => api.cancelAccountConnection())}>Cancel sign-in</button>
       </> : connected ? <>
         <button className="account-primary" onClick={onClose}>Done</button>
-        <button className="account-secondary" disabled={busy || testing} onClick={() => void run(api => api.refreshModels())}>Refresh models</button>
+        <button className="account-secondary" disabled={busy || testing || locked} onClick={() => void run(api => api.refreshModels())}>Refresh models</button>
       </> : <><button className="account-primary" disabled={busy || !snapshot || locked} onClick={() => void run(api => api.connectAccount())}>
         {busy ? 'Connecting…' : status === 'permission-required' ? 'Enable ChatGPT plan usage' : status === 'reconnect-required' ? 'Reconnect ChatGPT' : 'Continue with ChatGPT'}
       </button>{snapshot?.name && ['usage-limited', 'restricted'].includes(status) && <button className="account-secondary" disabled={busy || locked} onClick={() => void run(api => api.refreshModels())}>Check availability</button>}</>}

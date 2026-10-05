@@ -1,5 +1,6 @@
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
+import type { AiApi } from '../../src/shared/ai/activity'
 import { mkdir, mkdtemp, readdir, realpath, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -35,6 +36,8 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     await expect(page.getByRole('button', { name: 'Settings', exact: true })).toBeFocused()
     await expect(page.getByRole('textbox')).toHaveValue(draft)
     await expect(page.locator('.studio-workspace')).toHaveCSS('background-color', 'rgb(24, 24, 24)')
+    expect(await page.evaluate(async () => (globalThis as unknown as { learning: AiApi }).learning.getAiActivity())).toMatchObject({ ok: true, data: { active: null, settled: null } })
+    await expect(page.locator('.ai-panel')).toHaveCount(0)
     await flow.capture(desktop, page, 'workspace-dark')
     await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('dialog')).toHaveCSS('background-color', 'rgb(24, 24, 24)')
