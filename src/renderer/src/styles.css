@@ -246,8 +246,10 @@ svg.icon { display: inline-block; flex-shrink: 0; vertical-align: middle; }
 .outline-edit-dialog textarea { width: 100%; resize: vertical; min-height: 120px; padding: 12px; border: 1px solid var(--border-control); border-radius: 12px; background: var(--surface-canvas); color: var(--text-primary); font: inherit; font-size: 14px; line-height: 1.6; }
 .outline-edit-dialog .generation-disclosure { margin: 16px 0; }
 .section-introduction p { margin-top: 8px; color: var(--text-secondary); font-size: 13px; }
-.lesson-disclosure { border-top: 1px solid var(--border-subtle); }
-.lesson-disclosure:last-child { border-bottom: 1px solid var(--border-subtle); }
+.lesson-row { display: flex; align-items: flex-start; gap: 8px; border-top: 1px solid var(--border-subtle); }
+.lesson-row:last-child { border-bottom: 1px solid var(--border-subtle); }
+.lesson-disclosure { flex: 1; min-width: 0; }
+.topic-edit-button { margin-top: 20px; flex-shrink: 0; }
 .lesson-disclosure > summary { display: flex; align-items: center; gap: 15px; min-height: 90px; padding: 20px 4px; list-style: none; cursor: pointer; }
 .lesson-disclosure > summary::-webkit-details-marker { display: none; }
 .lesson-disclosure > summary:hover .lesson-title { color: var(--text-secondary); }

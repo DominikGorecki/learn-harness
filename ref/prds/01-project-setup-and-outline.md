@@ -261,6 +261,8 @@ This section records the user's explicit exceptions to the product-only scope. I
 
 ### Required foundation
 
+The subsequent explicit user authorization in [ADR-0019](../ADRs/ADR-0019-topic-edits-and-project-file-access.md) extends item 5 below: Pi can browse/read the selected project and stage requested content creation/editing outside root `.edu`. Topic edits restrict writes to their own folder and preserve other outline content. The original milestone's read-only-material acceptance remains historical baseline behavior, rather than a prohibition on that authorized extension.
+
 1. Extend the existing Electron application. Preserve its established desktop and security foundations.
 2. Use Pi as the backing education harness to inspect supported content in the selected folder and create the outline in its root `.edu` folder.
 3. Reuse Pi's dedicated **Sign in with ChatGPT** subscription flow as the basis for OAuth 2.0 / OpenID Connect with PKCE and delegated plan usage. The relevant permission is `chatgpt.tokens.use.direct`.

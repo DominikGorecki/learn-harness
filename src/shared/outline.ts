@@ -16,6 +16,14 @@ export interface LearningOutline {
   title: string; overview: string; scope: string; level: string; outcomes: string[]; assumptions: string[];
   additions: { topic: string; reason: string }[]; startingLessonId: string; lessons: OutlineLesson[]
 }
+
+/** A topic edit may replace one stable lesson only; all surrounding content is authoritative. */
+export function localizeTopicOutline(current: LearningOutline, proposed: LearningOutline, topicId: string): LearningOutline {
+  if (!current.lessons.some(lesson => lesson.id === topicId)) throw new ApplicationError('NOT_FOUND', 'This topic is no longer in the saved outline. Reopen the project before editing.')
+  const topic = proposed.lessons.find(lesson => lesson.id === topicId)
+  if (!topic) throw new ApplicationError('INVALID_INPUT', 'The revised topic must keep its original identifier. Please try again.')
+  return parseOutline({ ...current, lessons: current.lessons.map(lesson => lesson.id === topicId ? topic : lesson) })
+}
 export interface MaterialCoverage {
   files: { path: string; status: 'read' | 'not-read' | 'unsupported' | 'unreadable' | 'too-large' | 'binary' | 'excluded'; reason: string | null }[]
   limitations: string[]

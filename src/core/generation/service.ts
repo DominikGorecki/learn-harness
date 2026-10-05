@@ -1,21 +1,23 @@
 import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
-import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, SaveOutlineRequest, StartOutlineRequest, RewriteOutlineRequest } from '../../shared/generation'
+import type { EnginePhase, GenerationSnapshot, OutlineEngineResult, OutlineRun, RunRequest, SaveOutlineRequest, StartOutlineRequest, RewriteOutlineRequest, RewriteTopicRequest } from '../../shared/generation'
 import type { SavedOutline } from '../../shared/workspace'
 import { parseSavedOutline } from '../../shared/workspace'
-import { parseCoverage } from '../../shared/outline'
+import { parseCoverage, parseOutline, localizeTopicOutline } from '../../shared/outline'
+import type { ProjectChanges } from '../workspace/ports'
+import { parseProjectFileEdits } from '../../shared/project-files'
 import { boundedText } from '../../shared/validation'
 import type { WorkspaceService } from '../workspace/service'
 
 export class GenerationService {
   private runs = new Map<string, OutlineRun>()
-  private contexts = new Map<string, { digest: string | null }>()
+  private contexts = new Map<string, { digest: string | null; changes?: ProjectChanges }>()
   private active: { id: string; controller: AbortController } | null = null
   private task: Promise<void> | null = null
   private listeners = new Set<(snapshot: GenerationSnapshot) => void>()
   constructor(private readonly options: {
     workspace: WorkspaceService; createId(): string; now(): string; onBusy(busy: boolean): void; onAccountFailure(error: ApplicationError): void;
-    generate(input: { model: ModelChoice; brief: string; path: string; currentOutline: SavedOutline | null; changes?: string }, signal: AbortSignal, onPhase: (phase: EnginePhase) => void): Promise<OutlineEngineResult>
+    generate(input: { model: ModelChoice; brief: string; path: string; currentOutline: SavedOutline | null; changes?: string; topicId?: string; topicWriteRoot?: string }, signal: AbortSignal, onPhase: (phase: EnginePhase) => void): Promise<OutlineEngineResult>
   }) {}
   get(): GenerationSnapshot { return structuredClone({ runs: [...this.runs.values()], activeRunId: this.active?.id ?? null }) }
   subscribe(listener: (snapshot: GenerationSnapshot) => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
@@ -25,32 +27,38 @@ export class GenerationService {
     if (this.runs.get(request.projectId)?.status === 'unsaved') throw new ApplicationError('CONFLICT', 'Save your generated outline before requesting changes to it.')
     return this.start({ projectId: request.projectId, modelId: request.modelId, brief: '', replace: true }, request.changes)
   }
-  start(request: StartOutlineRequest, changes?: string): GenerationSnapshot {
+  rewriteTopic(request: RewriteTopicRequest): GenerationSnapshot {
+    if (this.runs.get(request.projectId)?.status === 'unsaved') throw new ApplicationError('CONFLICT', 'Save your generated outline before requesting changes to it.')
+    return this.start({ projectId: request.projectId, modelId: request.modelId, brief: '', replace: true }, request.changes, request.topicId)
+  }
+  start(request: StartOutlineRequest, changes?: string, topicId?: string): GenerationSnapshot {
     if (this.active) throw new ApplicationError('BUSY', 'An outline is already being created. Finish or cancel it before starting another.')
     if (!this.options.workspace.get().projects.some(project => project.id === request.projectId)) throw new ApplicationError('NOT_FOUND', 'Open this project before creating an outline.')
     const previous = this.runs.get(request.projectId)
     if (previous?.status === 'unsaved' && !request.replace) throw new ApplicationError('CONFLICT', 'Save your generated outline or confirm replacing it before starting again.')
     const controller = new AbortController()
     const run: OutlineRun = { id: this.options.createId(), projectId: request.projectId, brief: request.brief, modelId: request.modelId,
-      status: 'preparing', message: 'Preparing your learning project…', errorCode: null, result: null, question: null, coverage: null }
+      status: 'preparing', message: 'Preparing your learning project…', errorCode: null, result: null, question: null, coverage: null, ...(topicId ? { topicId } : {}) }
     this.runs.set(request.projectId, run)
     this.contexts.delete(request.projectId)
     this.active = { id: run.id, controller }
     this.options.onBusy(true)
     this.emit()
-    this.task = this.execute(run, request, controller.signal, changes)
+    this.task = this.execute(run, request, controller.signal, changes, topicId)
     return this.get()
   }
-  private async execute(run: OutlineRun, request: StartOutlineRequest, signal: AbortSignal, changes?: string): Promise<void> {
+  private async execute(run: OutlineRun, request: StartOutlineRequest, signal: AbortSignal, changes?: string, topicId?: string): Promise<void> {
     let locked = false
     try {
-      const context = await this.options.workspace.prepareOutline(run.projectId, request.modelId, request.brief, request.replace, changes !== undefined)
+      const context = await this.options.workspace.prepareOutline(run.projectId, request.modelId, request.brief, request.replace, changes !== undefined, topicId)
       locked = true
+      const topicUpdate = topicId ? { topicId, folder: context.topicFolder ?? null } : undefined
+      const topicWriteRoot = topicId ? context.topicFolder?.folder ?? topicId : undefined
       this.contexts.set(run.projectId, { digest: context.digest })
       signal.throwIfAborted()
       this.update(run, { brief: context.brief })
-      const outcome = await this.options.generate({ model: context.model, brief: context.brief, path: context.path, currentOutline: context.currentOutline, changes }, signal, phase => {
-        if (!signal.aborted && this.active?.id === run.id) this.update(run, { status: phase, message: phase === 'examining' ? 'Exploring your project material…' : phase === 'planning' ? changes !== undefined ? 'Rewriting your learning outline…' : 'Building your learning outline…' : 'Checking the lessons and module plans…' })
+      const outcome = await this.options.generate({ model: context.model, brief: context.brief, path: context.path, currentOutline: context.currentOutline, changes, ...(topicId ? { topicId, topicWriteRoot } : {}) }, signal, phase => {
+        if (!signal.aborted && this.active?.id === run.id) this.update(run, { status: phase, message: phase === 'examining' ? 'Exploring your project material…' : phase === 'planning' ? topicId ? 'Rewriting this topic…' : changes !== undefined ? 'Rewriting your learning outline…' : 'Building your learning outline…' : 'Checking the lessons and module plans…' })
       })
       signal.throwIfAborted()
       const coverage = parseCoverage(outcome.coverage ?? { files: [], limitations: ['This outline was created from your learning description. No project files were read.'] })
@@ -59,14 +67,17 @@ export class GenerationService {
         this.update(run, { status: 'needs-details', message: boundedText(outcome.reason, 'Reason', 2000), question: boundedText(outcome.question, 'Question', 2000) })
         return
       }
-      const result = parseSavedOutline({ generatedAt: this.options.now(), model: context.model, brief: context.brief, document: outcome.document,
+      const document = topicId ? localizeTopicOutline(context.currentOutline!.document, parseOutline(outcome.document), topicId) : outcome.document
+      const result = parseSavedOutline({ generatedAt: this.options.now(), model: context.model, brief: context.brief, document,
         inferredBrief: changes !== undefined ? context.currentOutline!.inferredBrief : context.brief.trim() ? null : `${outcome.document.title}: ${outcome.document.scope}`, coverage })
       const sources = new Set(coverage.files.filter(file => file.status === 'read').map(file => file.path))
       if (result.document.lessons.some(lesson => lesson.sources.some(path => !sources.has(path)))) throw new ApplicationError('INVALID_INPUT', 'The outline refers to material that was not read. Please try again.')
+      const projectChanges = { edits: parseProjectFileEdits(outcome.projectEdits ?? [], topicWriteRoot), topic: topicUpdate }
+      this.contexts.set(run.projectId, { digest: context.digest, changes: projectChanges })
       this.update(run, { status: 'saving', message: 'Saving your outline…', result })
       try {
-        await this.options.workspace.saveOutline(run.projectId, result, context.digest)
-        this.update(run, { status: 'saved', message: 'Outline saved to your project.' })
+        await this.options.workspace.saveOutline(run.projectId, result, context.digest, false, projectChanges)
+        this.update(run, { status: 'saved', message: topicId ? 'Topic saved. Other topics and outline sections are unchanged.' : 'Outline saved to your project.' })
       } catch (error) { this.saveFailure(run, error) }
     } catch (error) {
       const safe = signal.aborted ? new ApplicationError('CANCELLED', 'Outline creation cancelled. Your previous outline is unchanged.') :
@@ -104,7 +115,7 @@ export class GenerationService {
     this.active = { id: run.id, controller: new AbortController() }
     this.update(run, { status: 'saving', message: 'Saving your outline…', errorCode: null })
     try {
-      await this.options.workspace.saveOutline(run.projectId, run.result, context.digest, request.replaceChanged)
+      await this.options.workspace.saveOutline(run.projectId, run.result, context.digest, request.replaceChanged, context.changes)
       this.update(run, { status: 'saved', message: 'Outline saved to your project.' })
     } catch (error) { this.saveFailure(run, error) }
     finally { this.active = null; this.emit() }

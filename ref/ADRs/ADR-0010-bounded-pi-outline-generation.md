@@ -2,6 +2,8 @@
 
 Status: Accepted — 2026-10-04
 
+Project-file tool and publication scope extended by [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md); process, inference and cancellation bounds remain applicable.
+
 ## Context
 
 PRD 01 requires complete curriculum outlines using the learner’s ChatGPT plan. Generation must keep the desktop responsive, preserve prior work, and distinguish completed inference from durable storage.

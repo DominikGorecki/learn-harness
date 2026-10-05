@@ -2,7 +2,8 @@ import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
 import { parseSavedOutline } from '../../shared/workspace'
 import type { ProjectDocument, ProjectSnapshot, ProjectSummary, SavedOutline, WorkspaceSnapshot } from '../../shared/workspace'
-import type { LoadedProject, ProjectRegistry, ProjectStorage, RegisteredProject } from './ports'
+import type { LoadedProject, ProjectRegistry, ProjectStorage, RegisteredProject, TopicFolderState, ProjectChanges } from './ports'
+import { localizeTopicOutline } from '../../shared/outline'
 
 export class WorkspaceService {
   private entries: RegisteredProject[] = []
@@ -118,7 +119,7 @@ export class WorkspaceService {
       return this.get()
     })
   }
-  private async updateDocument(id: string, update: (document: ProjectDocument) => ProjectDocument): Promise<WorkspaceSnapshot> {
+  private async updateDocument(id: string, update: (document: ProjectDocument) => ProjectDocument, changes?: ProjectChanges): Promise<WorkspaceSnapshot> {
     const entry = this.entry(id)
     const loaded = this.loaded.get(id) ?? await this.options.storage.load(entry.path)
     this.assertIdentity(entry, loaded)
@@ -127,7 +128,7 @@ export class WorkspaceService {
     const previous = loaded.document
     const document = update(previous ?? { version: 1, projectId: this.options.createId(), revision: 0, name: entry.name,
       createdAt: now, updatedAt: now, selectedModel: null, brief: '', outline: null })
-    const saved = await this.options.storage.save(entry.path, { ...document, revision: (previous?.revision ?? 0) + 1, updatedAt: now }, loaded.digest)
+    const saved = await this.options.storage.save(entry.path, { ...document, revision: (previous?.revision ?? 0) + 1, updatedAt: now }, loaded.digest, changes)
     this.loaded.set(id, saved)
     const updated = { ...entry, name: saved.document!.name, projectId: saved.document!.projectId, hasOutline: Boolean(saved.document!.outline) }
     try { await this.remember(updated) }
@@ -155,7 +156,7 @@ export class WorkspaceService {
   private mutable(id: string): void {
     if (this.generationLocks.has(id)) throw new ApplicationError('BUSY', 'Finish or cancel this outline before changing its project settings.')
   }
-  prepareOutline(id: string, modelId: string, brief: string, replace: boolean, rewrite = false): Promise<{ path: string; digest: string | null; model: ModelChoice; brief: string; currentOutline: SavedOutline | null }> {
+  prepareOutline(id: string, modelId: string, brief: string, replace: boolean, rewrite = false, topicId?: string): Promise<{ path: string; digest: string | null; model: ModelChoice; brief: string; currentOutline: SavedOutline | null; topicFolder?: TopicFolderState | null }> {
     return this.serial(async () => {
       this.mutable(id)
       const entry = this.entry(id)
@@ -163,6 +164,8 @@ export class WorkspaceService {
       this.assertIdentity(entry, loaded)
       const currentOutline = loaded.document?.outline ?? null
       if (rewrite && !currentOutline) throw new ApplicationError('UNAVAILABLE', 'Save an outline before requesting changes to it.')
+      const topicIndex = topicId ? currentOutline?.document.lessons.findIndex(lesson => lesson.id === topicId) ?? -1 : -1
+      if (topicId && topicIndex < 0) throw new ApplicationError('NOT_FOUND', 'This topic is no longer in the saved outline.')
       if (rewrite) brief = loaded.document!.brief
       if (!loaded.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Choose a writable folder before creating an outline.')
       if (!rewrite && !brief.trim() && loaded.sourceHint === 'empty') throw new ApplicationError('INVALID_INPUT', 'Add a topic or a question to start your outline.')
@@ -171,16 +174,18 @@ export class WorkspaceService {
       if (loaded.document?.outline && !replace) throw new ApplicationError('CONFLICT', 'Confirm replacement before creating another outline.')
       const model = this.options.models().find(value => value.id === modelId)
       if (!model) throw new ApplicationError('UNAVAILABLE', 'Connect ChatGPT and choose an available model before creating an outline.')
+      const topicFolder = topicId ? await this.options.storage.prepareTopicFolder(entry.path, loaded.document!.projectId, currentOutline!.document.lessons[topicIndex]!, topicIndex + 1, currentOutline!.document.lessons.filter(lesson => lesson.id !== topicId)) : undefined
       this.loaded.set(id, loaded)
       await this.updateDocument(id, document => ({ ...document, selectedModel: { ...model }, brief }))
       this.generationLocks.add(id)
-      return { path: entry.path, digest: this.loaded.get(id)!.digest, model: { ...model }, brief, currentOutline }
+      return { path: entry.path, digest: this.loaded.get(id)!.digest, model: { ...model }, brief, currentOutline, ...(topicId ? { topicFolder } : {}) }
     })
   }
   releaseOutline(id: string): void { this.generationLocks.delete(id) }
-  saveOutline(id: string, value: SavedOutline, digest: string | null, replaceChanged = false): Promise<WorkspaceSnapshot> {
+  saveOutline(id: string, value: SavedOutline, digest: string | null, replaceChanged = false, changes?: ProjectChanges): Promise<WorkspaceSnapshot> {
     return this.serial(async () => {
       const outline = parseSavedOutline(value)
+      const topicUpdate = changes?.topic
       if (replaceChanged) {
         const entry = this.entry(id)
         const latest = await this.options.storage.load(entry.path)
@@ -190,7 +195,17 @@ export class WorkspaceService {
       }
       const loaded = this.loaded.get(id)
       if (!loaded || loaded.digest !== digest) throw new ApplicationError('CONFLICT', 'The project changed while the outline was being created. Your new outline is still available here.')
-      return this.updateDocument(id, document => ({ ...document, name: outline.document.title, brief: outline.brief, outline }))
+      return this.updateDocument(id, document => {
+        if (topicUpdate) {
+          if (!document.outline) throw new ApplicationError('CONFLICT', 'The saved outline is missing. Reopen the project before editing.')
+          const files = new Map(document.outline.coverage.files.map(file => [file.path, file]))
+          for (const file of outline.coverage.files) if (file.status === 'read' || !files.has(file.path)) files.set(file.path, file)
+          return { ...document, outline: { ...outline, brief: document.outline.brief, inferredBrief: document.outline.inferredBrief,
+            document: localizeTopicOutline(document.outline.document, outline.document, topicUpdate.topicId),
+            coverage: { files: [...files.values()], limitations: [...new Set([...document.outline.coverage.limitations, ...outline.coverage.limitations])].slice(0, 40) } } }
+        }
+        return { ...document, name: outline.document.title, brief: outline.brief, outline }
+      }, changes)
     })
   }
 }

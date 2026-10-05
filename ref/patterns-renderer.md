@@ -20,6 +20,8 @@ Render goals/material/model text as text; do not introduce `dangerouslySetInnerH
 
 ## Local appearance state
 
+Under [ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md), bootstrap imports `lib/diagnostics.ts` before React initialization. Page error/rejection listeners post fixed safe metadata through same-origin DOM messages; preload/main authorize and project it before development persistence. No logger or filesystem API is exposed on `window.learning`. Never forward error messages, promises, URLs, payloads or learning content. This telemetry does not prevent default error behavior or alter UI state.
+
 `features/settings/appearance.ts` owns the Light/Dark preference. Apply it before the first React render through `data-theme` on the document root; CSS semantic tokens style all features. A valid stored choice takes precedence over the initial OS preference. Store only this non-sensitive presentation value in renderer-origin localStorage (`learning-studio.appearance`) in the dedicated persistent UI partition, catch unavailable storage, and keep project/account data behind the typed bridge. Appearance never writes `.edu` metadata or starts inference. OS title bars remain native.
 
 ## Asynchronous state
@@ -29,6 +31,8 @@ The workspace serializes short metadata operations and keeps drafts by project h
 Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), keep outline-edit drafts keyed to their project and saved-outline revision. The renderer sends only the project/model identifiers and learner changes; main/core load authoritative saved context. Dismissing, cancelling or failing a rewrite preserves its draft and prior saved outline; a successful save starts a fresh draft.
 
 ## Current implementation and migration evidence
+
+[ADR-0019](ADRs/ADR-0019-topic-edits-and-project-file-access.md) adds `onEditTopic` to outline rows and a topic variant of `OutlineEditDialog`. Use a separate button alongside the disclosure so editing never toggles it. Draft keys include project and topic ID (null for the whole path); topic drafts track their own content revision, while path drafts track the outline revision. Clear the successful edit's draft without clearing drafts for unchanged topics. Send only stable IDs/model/changes through `rewriteTopic`; no file paths or saved JSON come from React. Run topic IDs distinguish clarification/conflict feedback. Scoped save-conflict copy must describe only the topic replacement and preserved unrelated content.
 
 The workspace uses neutral surfaces, system typography, project rows, a large goal composer, native account/navigation dialogs, and real per-project model preferences. The sidebar collapses below 880 CSS pixels; Open project and toggle-navigation shortcuts are implemented. Generation, cancellation, clarification, readable results, confirmed replacement, and save retry are implemented. Light/Dark settings are implemented under ADR-0013; command menus remain outside this milestone. ADR-0009 retires the demo and defines portable state.
 

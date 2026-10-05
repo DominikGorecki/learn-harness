@@ -2,6 +2,8 @@
 
 Status: Accepted — 2026-10-04
 
+Topic-local rewrites and requested project-file changes are added by [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md), which extends the earlier no-filesystem-mutation scope below.
+
 ## Context
 
 The learner requests a subtle edit action beside “Your path through the subject”, with numbered or freeform changes interpreted by Pi using the active project model. The progressive-learning workspace proposal describes discovery from project orientation; its separate manifests and tutoring sessions remain future work.

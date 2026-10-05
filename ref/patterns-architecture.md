@@ -22,6 +22,10 @@ Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), core obt
 
 ## Growth boundary
 
+Development diagnostics follow [ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md): `src/main/logging` owns one asynchronous, bounded JSONL writer in the application profile. Shared owns safe field projection and internal event types. Preload automatically forwards failure metadata on an authorized internal channel; no public logger or filesystem API is exposed. Utility events travel through the existing private port. Core remains unaware of logging implementations; main instruments composition and subscriptions. Packaged applications do not persist these development diagnostics.
+
 Keep one package until independent build/runtime ownership justifies packages. Add files by responsibility rather than generic `utils` or `services` dumping grounds. Future compute-heavy document parsing, indexing, or local inference goes into workers or utility processes with bounded jobs, cancellation, and lifecycle ownership. That process isolation is not sufficient to safely execute arbitrary learner code.
 
 See [IPC/security](patterns-ipc-security.md) before adding a capability and [learning/data](patterns-learning-data.md) before adding storage or tutoring behavior.
+
+[ADR-0019](ADRs/ADR-0019-topic-edits-and-project-file-access.md) adds topic rewrites and project-wide content tools. The Pi utility process stages text-file edits through `generation/project-tools.ts`; core retains them privately with unsaved results, and main's storage adapters validate scope/baselines and publish them with the outline. Topic locality is enforced independently in worker, core and main storage. Main owns per-folder topic-plan mirrors and an interruption-recovery journal; renderer callers provide only a project/model/topic ID and learner changes.

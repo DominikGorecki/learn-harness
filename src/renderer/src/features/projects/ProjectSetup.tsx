@@ -35,7 +35,7 @@ export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate,
     </div>
     {!draft.trim() && <div className="topic-suggestions"><span>For example</span>{['Bayesian reasoning', 'How cities work', 'The science of sleep'].map(topic =>
       <button key={topic} onClick={() => onDraft(topic)} disabled={busy}>{topic}<Icon name="arrow" size={12} /></button>)}</div>}
-    <p className="generation-disclosure">Creating an outline sends your description and relevant text or Markdown from this folder to ChatGPT. Other formats and sensitive or hidden files are skipped. This uses your included plan allowance. We’ll fill in foundations and suggest a path through the subject.</p>
+    <p className="generation-disclosure">Creating an outline sends your description and relevant project text to ChatGPT. Pi can read files throughout this folder and save content changes you request alongside the outline. This uses your included plan allowance. We’ll fill in foundations and suggest a path through the subject.</p>
     <details className="project-folder"><summary><Icon name="folder" size={15} />Project folder<Icon name="down" size={12} /></summary><p>{project.folderPath}</p></details>
   </section>
 }

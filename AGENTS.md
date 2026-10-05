@@ -36,6 +36,7 @@ Before UI work, read the design system and UX patterns, then renderer rules and 
 - `src/renderer` uses React and the typed bridge; it imports no core/main/preload implementation.
 - Keep context isolation and renderer sandboxing enabled. Main validates every request's sender and every mutation's payload.
 - Project metadata is portable in `.edu`; recent locations and protected credentials belong in the application profile. Do not present protocol fixtures as live AI evidence or outline creation as mastery.
+- Under ADR-0019, Pi can browse/read the selected project and stage requested text-file creation/editing. Topic edits may write only their owned topic folder and replace only their stable lesson. Main validates paths, baselines and locality and owns recoverable publication with `.edu` state; no general shell or renderer filesystem API is exposed.
 
 ## Change workflow
 

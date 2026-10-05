@@ -59,6 +59,7 @@ export function App() {
   const [drafts, setDrafts] = useState<Record<string, string>>({})
   const [refining, setRefining] = useState<Record<string, string | null>>({})
   const [editProjectId, setEditProjectId] = useState<string | null>(null)
+  const [editTopicId, setEditTopicId] = useState<string | null>(null)
   const [editDrafts, setEditDrafts] = useState<Record<string, { outlineAt: string; text: string }>>({})
   const [submittingEdit, setSubmittingEdit] = useState(false)
   const [confirmReplace, setConfirmReplace] = useState(false)
@@ -145,6 +146,22 @@ export function App() {
   const loaded = workspace.snapshot !== null
   const savedRunId = outlineRun?.status === 'saved' ? outlineRun.id : null
   useEffect(() => {
+    const pending = new Set<string>()
+    return window.learning.onGenerationChanged(snapshot => {
+      const completed: string[] = []
+      for (const run of snapshot.runs) {
+        if (runIsBusy(run)) pending.add(run.id)
+        else {
+          if (run.status === 'saved' && pending.has(run.id)) completed.push(JSON.stringify([run.projectId, run.topicId ?? null]))
+          pending.delete(run.id)
+        }
+      }
+      if (completed.length) setEditDrafts(previous => {
+        const next = { ...previous }; for (const key of completed) delete next[key]; return next
+      })
+    })
+  }, [])
+  useEffect(() => {
     if (!savedRunId || lastPresentedRun.current === savedRunId) return
     lastPresentedRun.current = savedRunId
     if (accountOpen || settingsOpen || confirmReplace || document.activeElement?.matches('input, textarea, [contenteditable="true"]')) return
@@ -173,7 +190,10 @@ export function App() {
   const generatedUnsaved = outlineRun && ['unsaved', 'saving'].includes(outlineRun.status) ? outlineRun.result : null
   const displayedOutline = generatedUnsaved ?? project?.outline
   const isRefining = Boolean(project?.outline && refining[project.id] === project.outline.generatedAt)
-  const editDraft = project?.outline && editDrafts[project.id]?.outlineAt === project.outline.generatedAt ? editDrafts[project.id]!.text : ''
+  const editDraftKey = JSON.stringify([project?.id, editTopicId])
+  const editedTopic = project?.outline?.document.lessons.find(lesson => lesson.id === editTopicId)
+  const editRevision = editedTopic ? JSON.stringify(editedTopic) : project?.outline?.generatedAt ?? ''
+  const editDraft = project?.outline && editDrafts[editDraftKey]?.outlineAt === editRevision ? editDrafts[editDraftKey]!.text : ''
   const rewriteOutline = async () => {
     if (!project?.outline || submittingEdit || workspace.busy || anyGenerationBusy) return
     if (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || account.snapshot.modelTestStatus === 'testing') {
@@ -181,7 +201,8 @@ export function App() {
     }
     setSubmittingEdit(true)
     try {
-      const state = await generation.run(api => api.rewriteOutline({ projectId: project.id, modelId, changes: editDraft }))
+      const request = { projectId: project.id, modelId, changes: editDraft }
+      const state = await generation.run(api => editTopicId ? api.rewriteTopic({ ...request, topicId: editTopicId }) : api.rewriteOutline(request))
       if (state) setEditProjectId(null)
     } finally { setSubmittingEdit(false) }
   }
@@ -251,7 +272,8 @@ export function App() {
               onModel={modelId => void run(api => api.setProjectModel({ projectId: project.id, modelId }))} onConnect={openAccount} />}
             {currentModelUnavailable && <p className="model-recovery">Your saved model is unavailable. Choose another project model to create an outline.</p>}
             {displayedOutline && <OutlineView saved={displayedOutline} unsaved={Boolean(generatedUnsaved)}
-              onEdit={() => { generation.clearError(); setEditProjectId(project.id) }}
+              onEdit={() => { generation.clearError(); setEditTopicId(null); setEditProjectId(project.id) }}
+              onEditTopic={topicId => { generation.clearError(); setEditTopicId(topicId); setEditProjectId(project.id) }}
               editDisabled={!project.writable || workspace.busy || anyGenerationBusy || Boolean(generatedUnsaved) || submittingEdit} />}
           </>}
       </main>
@@ -259,11 +281,11 @@ export function App() {
     <AccountPanel open={accountOpen} onClose={() => { setAccountOpen(false); if (narrow) navigationToggle.current?.focus() }} account={account} locked={anyGenerationBusy} />
     <SettingsPanel open={settingsOpen} onClose={() => { setSettingsOpen(false); settingsTrigger.current?.focus() }}
       appearance={appearance.appearance} onAppearance={appearance.chooseAppearance} persistent={appearance.persistent} />
-    {project?.outline && <OutlineEditDialog open={editProjectId === project.id} outline={project.outline} draft={editDraft}
+    {project?.outline && <OutlineEditDialog open={editProjectId === project.id} outline={project.outline} topicId={editTopicId} draft={editDraft}
       modelName={account.snapshot?.models.find(model => model.id === modelId)?.name ?? project.selectedModel?.name ?? ''}
       canSubmit={project.writable && !workspace.busy && !anyGenerationBusy && !generatedUnsaved && !currentModelUnavailable && account.snapshot?.modelTestStatus !== 'testing'}
-      busy={submittingEdit} error={generation.error} question={outlineRun?.status === 'needs-details' ? outlineRun.question : null}
-      onDraft={text => setEditDrafts(previous => ({ ...previous, [project.id]: { outlineAt: project.outline!.generatedAt, text } }))}
+      busy={submittingEdit} error={generation.error} question={outlineRun?.status === 'needs-details' && (outlineRun.topicId ?? null) === editTopicId ? outlineRun.question : null}
+      onDraft={text => setEditDrafts(previous => ({ ...previous, [editDraftKey]: { outlineAt: editRevision, text } }))}
       onSubmit={() => void rewriteOutline()} onClose={() => setEditProjectId(null)} />}
     <dialog ref={replacementDialog} className="confirmation-dialog" aria-labelledby="replacement-heading" onCancel={() => setConfirmReplace(false)} onClose={() => setConfirmReplace(false)}>
       <h2 id="replacement-heading">Create a new learning outline?</h2>
@@ -276,12 +298,12 @@ export function App() {
       <div className="button-row"><button className="button secondary" autoFocus onClick={() => setPendingNavigation(null)}>Stay here</button><button className="button primary" disabled={activeRun?.status === 'saving'} onClick={() => void cancelAndNavigate()}>{activeRun ? 'Cancel and switch' : 'Continue'}</button></div>
     </dialog>
     <dialog ref={saveDialog} className="confirmation-dialog" aria-labelledby="save-conflict-heading" onCancel={() => setConfirmSave(false)} onClose={() => setConfirmSave(false)}>
-      <h2 id="save-conflict-heading">Save over the changed outline?</h2>
-      <p>The project changed since this outline was created. Saving will replace its current outline and learning goal with this generated result. Other project settings will be kept. No new AI request is needed.</p>
+      <h2 id="save-conflict-heading">{outlineRun?.topicId ? 'Save this topic into the changed outline?' : 'Save over the changed outline?'}</h2>
+      <p>{outlineRun?.topicId ? 'The project changed since this topic was revised. Saving replaces only this topic in the latest outline and preserves all other topics, outline sections and the learning goal. Files changed outside the app will be preserved and may still prevent saving.' : 'The project changed since this outline was created. Saving will replace its current outline and learning goal with this generated result. Other project settings will be kept.'} No new AI request is needed.</p>
       <div className="button-row"><button className="button secondary" autoFocus onClick={() => setConfirmSave(false)}>Keep reviewing</button><button className="button primary" onClick={() => {
         setConfirmSave(false)
         if (project && outlineRun) void generation.run(api => api.retryOutlineSave({ projectId: project.id, runId: outlineRun.id, replaceChanged: true }))
-      }}>Save generated outline</button></div>
+      }}>{outlineRun?.topicId ? 'Save revised topic' : 'Save generated outline'}</button></div>
     </dialog>
   </div>
 }

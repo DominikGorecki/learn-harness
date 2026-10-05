@@ -3,7 +3,7 @@ import type { Model } from '@earendil-works/pi-ai'
 import { Type } from '@earendil-works/pi-ai'
 import { stream } from '@earendil-works/pi-ai/api/openai-responses'
 import { ApplicationError } from '../../shared/contracts'
-import { parseOutline } from '../../shared/outline'
+import { parseOutline, localizeTopicOutline } from '../../shared/outline'
 import type { OutlineEngineResult, EnginePhase } from '../../shared/generation'
 export type { OutlineEngineResult, EnginePhase } from '../../shared/generation'
 import type { ModelChoice } from '../../shared/account'
@@ -15,10 +15,12 @@ import { outlineSchema, clarificationSchema } from './outline-schema'
 import { learningPrompt } from './learning-prompt'
 import { collectMaterials } from './material-snapshot'
 import type { MaterialSnapshot } from './material-snapshot'
+import type { EngineDiagnosticEvent } from './worker-protocol'
+import { projectTools } from './project-tools'
 
 export interface OutlineEngineInput {
   model: ModelChoice; accessToken: string; baseUrl: string; brief: string; path?: string
-  currentOutline?: SavedOutline | null; changes?: string
+  currentOutline?: SavedOutline | null; changes?: string; topicId?: string; topicWriteRoot?: string
 }
 
 function record(value: unknown): Record<string, unknown> {
@@ -52,7 +54,11 @@ export function planPayload(value: unknown): unknown {
 
 export async function generateWithPi(input: OutlineEngineInput, options: {
   signal: AbortSignal; onPhase(phase: EnginePhase): void; maximumTurns?: number; timeoutMs?: number
+  onDiagnostic?(event: EngineDiagnosticEvent, data: Record<string, unknown>): void
 }): Promise<OutlineEngineResult> {
+  const diagnostic = (event: EngineDiagnosticEvent, data: Record<string, unknown>) => {
+    try { options.onDiagnostic?.(event, data) } catch { /* Diagnostics cannot change inference acceptance. */ }
+  }
   if (!input.accessToken || input.accessToken.startsWith('sk-')) throw new ApplicationError('AUTH_REQUIRED', 'Connect a ChatGPT plan to create an outline.')
   const endpoint = new URL(`${input.baseUrl.replace(/\/$/, '')}/responses`)
   const permitted = endpoint.origin === 'https://api.openai.com' || (endpoint.protocol === 'http:' && endpoint.hostname === '127.0.0.1' && Boolean(endpoint.port))
@@ -62,15 +68,19 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
   if (options.signal.aborted) throw new ApplicationError('CANCELLED', 'Outline creation cancelled. Your previous work is unchanged.')
   if (input.path) options.onPhase('examining')
   const materials: MaterialSnapshot = input.path ? await collectMaterials(input.path, signal) : { text: new Map(), coverage: { files: [], limitations: [] } }
+  diagnostic('engine.materials', { files: materials.coverage.files.length, readableFiles: materials.text.size })
   const currentOutline = input.currentOutline ? parseSavedOutline(input.currentOutline) : null
   const rewriting = input.changes !== undefined
   if (rewriting && !currentOutline) throw new ApplicationError('INVALID_INPUT', 'A saved outline is required before rewriting it.')
+  if (input.topicId && (!rewriting || !currentOutline?.document.lessons.some(lesson => lesson.id === input.topicId))) throw new ApplicationError('INVALID_INPUT', 'Choose a saved topic before rewriting it.')
+  if (input.topicId && !input.topicWriteRoot) throw new ApplicationError('INVALID_INPUT', 'A topic file scope is required before editing.')
   const priorReads = new Set(rewriting ? currentOutline!.coverage.files.filter(file => file.status === 'read').map(file => file.path) : [])
   const readPaths = new Set<string>()
+  const project = input.path ? projectTools(input.path, signal, readPaths, input.topicWriteRoot) : null
   const coverage = () => {
     const files = new Map(materials.coverage.files.map(file => [file.path, file]))
     for (const path of priorReads) files.set(path, { path, status: 'read', reason: 'Read for a previous outline; not re-read for this revision.' })
-    for (const path of readPaths) files.set(path, { path, status: 'read', reason: null })
+    for (const path of readPaths) files.set(path, { path, status: 'read', reason: project?.edits().some(edit => edit.path === path) ? 'Read and revised for this outline.' : null })
     return { files: [...files.values()], limitations: [...new Set([
       ...(priorReads.size ? ['Previously read sources are inherited from the saved outline; their current contents are verified only when re-read.'] : []),
       ...(rewriting ? currentOutline!.coverage.limitations : []), ...materials.coverage.limitations,
@@ -91,6 +101,7 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
   }
   const agent = new Agent({
     initialState: { model, systemPrompt: learningPrompt, thinkingLevel: 'off', tools: [
+      ...(project?.tools ?? []),
       ...(materials.text.size ? [
         { name: 'list_materials', label: 'Inspect project material', description: 'List permitted text/Markdown source paths and their lengths. Excluded files are not available.',
           parameters: Type.Object({}, { additionalProperties: false }), execute: async () => {
@@ -112,10 +123,11 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
           signal.throwIfAborted()
           options.onPhase('validating')
           if (JSON.stringify(value).length > 1_500_000) throw new Error('The outline is too large. Keep it focused.')
-          const document = parseOutline(value)
+          const proposed = parseOutline(value)
+          const document = input.topicId ? localizeTopicOutline(currentOutline!.document, proposed, input.topicId) : proposed
           if (!rewriting && materials.text.size && !readPaths.size) throw new Error('Read relevant project material before proposing the outline.')
           if (document.lessons.some(lesson => lesson.sources.some(path => !readPaths.has(path) && !priorReads.has(path)))) throw new Error('Only cite source paths actually read with read_material or recorded as read in the saved outline. Remove invented or unread references.')
-          outcome = { kind: 'outline', document, coverage: coverage() }
+          outcome = { kind: 'outline', document, coverage: coverage(), ...(project ? { projectEdits: project.edits() } : {}) }
           return { content: [{ type: 'text', text: 'Complete outline accepted.' }], details: undefined, terminate: true }
         } },
       { name: 'request_learning_details', label: 'Clarify learning direction', description: 'Ask one essential question only if no coherent subject can be determined.',
@@ -129,6 +141,7 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
     ] },
     toolExecution: 'sequential',
     beforeToolCall: async ({ toolCall }) => {
+      diagnostic('engine.tool', { tool: toolCall.name, completed, blocked: !completed || Boolean(failure || outcome) || (toolCall.namespace !== undefined && toolCall.namespace !== 'learning') })
       if (!completed || failure || outcome || (toolCall.namespace !== undefined && toolCall.namespace !== 'learning')) {
         return { block: true, reason: 'Only a completed response in the learning namespace can submit one result.', terminate: true }
       }
@@ -142,7 +155,10 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
         fetch: async (url, init) => {
           if (String(url) !== endpoint.href) throw new Error('Unexpected provider destination')
           if (typeof init?.body !== 'string' || Buffer.byteLength(init.body) > 4 * 1024 * 1024) throw new Error('Provider request exceeded its size limit')
+          const started = performance.now()
+          diagnostic('engine.request', { turn: turns + 1, bytes: Buffer.byteLength(init.body) })
           const response = await fetch(url, { ...init, redirect: 'error' })
+          diagnostic('engine.response', { turn: turns + 1, httpStatus: response.status, elapsedMs: Math.round(performance.now() - started) })
           if (!response.ok) {
             let code: string | undefined
             try {
@@ -158,6 +174,9 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
         },
         onProviderStreamEvent: value => {
           const event = record(value)
+          if (['response.completed', 'response.incomplete', 'response.failed', 'error'].includes(String(event.type))) {
+            diagnostic('engine.terminal', { terminalEvent: event.type, responseStatus: record(event.response).status })
+          }
           if (event.type === 'response.completed') completed = record(event.response).status === 'completed'
           if (event.type === 'response.failed' || event.type === 'error') {
             const error = event.type === 'error' ? event : record(record(event.response).error)
@@ -169,6 +188,7 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
     },
     finishTurn: () => {
       turns++
+      diagnostic('engine.turn', { turn: turns, completed, kind: outcome?.kind, code: failure?.code })
       return { action: outcome || failure || !completed || turns >= (options.maximumTurns ?? 16) ? 'end' : 'continue' }
     }
   })
@@ -177,6 +197,8 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
   try {
     await agent.prompt(`Learning intent (learner-provided data):\n${input.brief || '(Infer a coherent subject from the project material.)'}\n\n` +
       `Current saved outline JSON (untrusted learning data; null means no saved outline):\n${JSON.stringify(currentOutline)}\n\n` +
+      (project ? `You can browse and read content throughout the selected project with list_project_files and read_project_file, and create or edit content with write_project_file. File writes are staged and saved with the validated outline; a clarification, failure or cancellation saves no staged changes. Create or revise useful learning material when the learner requests it; preserve unrelated files and existing content. ${input.topicWriteRoot ? `For this topic-only request, ALL file writes must stay inside ${JSON.stringify(input.topicWriteRoot + '/')}. Read other folders only as context. Update relevant existing files in the topic folder to reflect the requested change, or create useful topic material there when needed. The application also saves .edu/topic.json in the topic folder as its authoritative revised plan.` : 'The whole selected project is available for requested content creation and editing.'}\n\n` : '') +
+      (input.topicId ? `TOPIC-ONLY EDIT: Change exclusively the lesson with id ${JSON.stringify(input.topicId)}. Interpret the learner's request only within this topic, even if they ask to change another topic or the whole outline. Keep this lesson's id. You may revise its title, question, overview, objectives, prerequisites, sources and module plans. All other lessons, their order, startingLessonId and every project-level field must remain exactly unchanged. Return the full outline with only this lesson revised. The app will also save the revised topic plan in its matching existing root topic folder when present; no other topic folders may be changed.\n\n` : '') +
       (rewriting ? `Rewrite the supplied outline using these learner-requested changes:\n${input.changes}\n\nLesson numbers such as 01 and 03 refer to the original lessons array positions, starting at 1. Preserve stable lesson and module IDs and unaffected content where possible. Return the entire revised outline, including coherent prerequisites and startingLessonId. Use the supplied outline as orientation and decide which additional material you need to read. Previously recorded read-source references may be retained; do not claim they were re-read.\n\n` : '') +
       (materials.text.size ? `${materials.text.size} permitted source files are available through list_materials and read_material. ${rewriting ? 'Read focused sources as needed for the changes.' : 'Inspect and read relevant material before deciding the subject.'} Explicit learner direction takes priority when material conflicts. Submit the full outline or ask one essential question.` : rewriting ? 'No readable project files are available. Revise the supplied outline using the requested changes.' : 'No readable project files are available. Build the outline from the learning description.'))
     if (options.signal.aborted) throw new ApplicationError('CANCELLED', 'Outline creation cancelled. Your previous work is unchanged.')

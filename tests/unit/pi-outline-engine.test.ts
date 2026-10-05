@@ -135,7 +135,7 @@ describe('actual Pi agent and plan Responses transport', () => {
     expect(transmitted).toContain('Choose a permitted path')
     expect(transmitted).toContain('Explicit learner direction takes priority')
     const namespace = server.requests[0]!.payload.tools as { tools: { name: string }[] }[]
-    expect(namespace[0]!.tools.map(tool => tool.name)).toEqual(['list_materials', 'read_material', 'submit_outline', 'request_learning_details'])
+    expect(namespace[0]!.tools.map(tool => tool.name)).toEqual(['list_project_files', 'read_project_file', 'write_project_file', 'list_materials', 'read_material', 'submit_outline', 'request_learning_details'])
   })
   it('requests details locally when a folder has only unsupported material', async () => {
     const path = await realpath(await mkdtemp(join(tmpdir(), 'edu-pi-unsupported-')))

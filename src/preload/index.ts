@@ -50,6 +50,7 @@ const learning: AccountApi & WorkspaceApi & GenerationApi = {
   getGeneration: () => ipcRenderer.invoke(generationChannels.get),
   createOutline: request => ipcRenderer.invoke(generationChannels.start, request),
   rewriteOutline: request => ipcRenderer.invoke(generationChannels.rewrite, request),
+  rewriteTopic: request => ipcRenderer.invoke(generationChannels.rewriteTopic, request),
   cancelOutline: request => ipcRenderer.invoke(generationChannels.cancel, request),
   retryOutlineSave: request => ipcRenderer.invoke(generationChannels.save, request),
   onGenerationChanged: listener => {

@@ -1,7 +1,7 @@
 import type { SavedOutline } from '../../../../shared/workspace'
 import { Icon } from '../../components/Icon'
 
-export function OutlineView({ saved, unsaved = false, onEdit, editDisabled = false }: { saved: SavedOutline; unsaved?: boolean; onEdit?(): void; editDisabled?: boolean }) {
+export function OutlineView({ saved, unsaved = false, onEdit, onEditTopic, editDisabled = false }: { saved: SavedOutline; unsaved?: boolean; onEdit?(): void; onEditTopic?(topicId: string): void; editDisabled?: boolean }) {
   const outline = saved.document
   const sources = saved.coverage.files.filter(file => file.status === 'read')
   return <article className="outline-view workspace-enter" aria-labelledby="outline-heading">
@@ -13,7 +13,7 @@ export function OutlineView({ saved, unsaved = false, onEdit, editDisabled = fal
     <section className="lesson-path" aria-labelledby="lesson-path-heading"><div className="section-introduction"><div className="lesson-path-heading"><h2 id="lesson-path-heading">Your path through the subject</h2>
       {onEdit && <button className="icon-button" aria-label="Edit learning path" title={editDisabled ? 'Finish the current operation and save your outline before editing.' : 'Edit learning path'} disabled={editDisabled} onClick={onEdit}><Icon name="edit" size={16} /></button>}
     </div><p>A foundation to build on, one idea at a time.</p></div>
-      {outline.lessons.map((lesson, index) => <details className="lesson-disclosure" key={lesson.id}>
+      {outline.lessons.map((lesson, index) => <div className="lesson-row" key={lesson.id}><details className="lesson-disclosure">
         <summary><span className="lesson-number">{String(index + 1).padStart(2, '0')}</span><span className="lesson-summary"><span className="lesson-title">{lesson.title}</span><span>{lesson.question}</span></span>
           {lesson.id === outline.startingLessonId && <span className="starting-label">Start here</span>}<Icon name="down" size={16} /></summary>
         <div className="lesson-detail"><p className="lesson-overview">{lesson.overview}</p><h3>Learning objectives</h3>
@@ -22,7 +22,7 @@ export function OutlineView({ saved, unsaved = false, onEdit, editDisabled = fal
           <h3>Ways to explore this idea</h3><ol className="module-list">{lesson.modules.map(module => <li key={module.id}><span className="module-method">{module.method}</span><h4>{module.title}</h4><p>{module.purpose}</p><p className="module-task">{module.task}</p></li>)}</ol>
           {lesson.sources.length > 0 && <p className="lesson-sources"><strong>From your material</strong> {lesson.sources.join(' · ')}</p>}
         </div>
-      </details>)}
+      </details>{onEditTopic && <button className="icon-button topic-edit-button" aria-label={`Edit topic: ${lesson.title}`} title={editDisabled ? 'Finish the current operation and save your outline before editing.' : `Edit topic: ${lesson.title}`} disabled={editDisabled} onClick={() => onEditTopic(lesson.id)}><Icon name="edit" size={16} /></button>}</div>)}
     </section>
     <section className="outline-context" aria-label="Outline context">
       <details><summary>Scope and assumptions<Icon name="down" size={14} /></summary><p>{outline.scope}</p><ul className="plain-list">{outline.assumptions.map((assumption, index) => <li key={index}>{assumption}</li>)}</ul></details>

@@ -4,28 +4,36 @@ import type { LearningOutline, MaterialCoverage } from './outline'
 import { maximumBriefLength } from './workspace'
 import { boundedText, identifier, strictRecord } from './validation'
 import { ApplicationError } from './contracts'
+import type { ProjectFileEdit } from './project-files'
 
 export type GenerationStatus = 'preparing' | 'examining' | 'planning' | 'validating' | 'saving' | 'saved' | 'needs-details' | 'cancelled' | 'failed' | 'unsaved'
-export type OutlineEngineResult = ({ kind: 'outline'; document: LearningOutline } | { kind: 'needs-details'; question: string; reason: string }) & { coverage?: MaterialCoverage }
+export type OutlineEngineResult = ({ kind: 'outline'; document: LearningOutline } | { kind: 'needs-details'; question: string; reason: string }) & { coverage?: MaterialCoverage; projectEdits?: ProjectFileEdit[] }
 export type EnginePhase = 'examining' | 'planning' | 'validating'
 export interface OutlineRun {
   id: string; projectId: string; status: GenerationStatus; brief: string; modelId: string;
   message: string; errorCode: ErrorCode | null; result: SavedOutline | null; question: string | null; coverage: MaterialCoverage | null
+  topicId?: string
 }
 export interface GenerationSnapshot { runs: OutlineRun[]; activeRunId: string | null }
 export interface StartOutlineRequest { projectId: string; brief: string; modelId: string; replace: boolean }
 export interface RewriteOutlineRequest { projectId: string; modelId: string; changes: string }
+export interface RewriteTopicRequest extends RewriteOutlineRequest { topicId: string }
 export interface RunRequest { projectId: string; runId: string }
 export interface SaveOutlineRequest extends RunRequest { replaceChanged?: boolean }
 export interface GenerationApi {
   getGeneration(): Promise<ApiResult<GenerationSnapshot>>
   createOutline(request: StartOutlineRequest): Promise<ApiResult<GenerationSnapshot>>
   rewriteOutline(request: RewriteOutlineRequest): Promise<ApiResult<GenerationSnapshot>>
+  rewriteTopic(request: RewriteTopicRequest): Promise<ApiResult<GenerationSnapshot>>
   cancelOutline(request: RunRequest): Promise<ApiResult<GenerationSnapshot>>
   retryOutlineSave(request: SaveOutlineRequest): Promise<ApiResult<GenerationSnapshot>>
   onGenerationChanged(listener: (snapshot: GenerationSnapshot) => void): () => void
 }
-export const generationChannels = { get: 'outline:get', start: 'outline:start', rewrite: 'outline:rewrite', cancel: 'outline:cancel', save: 'outline:save', changed: 'outline:changed' } as const
+export const generationChannels = { get: 'outline:get', start: 'outline:start', rewrite: 'outline:rewrite', rewriteTopic: 'outline:rewrite-topic', cancel: 'outline:cancel', save: 'outline:save', changed: 'outline:changed' } as const
+export function parseRewriteTopic(value: unknown): RewriteTopicRequest {
+  const data = strictRecord(value, ['projectId', 'modelId', 'changes', 'topicId'])
+  return { ...parseRewriteOutline({ projectId: data.projectId, modelId: data.modelId, changes: data.changes }), topicId: identifier(data.topicId) }
+}
 export function parseRewriteOutline(value: unknown): RewriteOutlineRequest {
   const data = strictRecord(value, ['projectId', 'modelId', 'changes'])
   return { projectId: identifier(data.projectId), modelId: boundedText(data.modelId, 'Model', 128),

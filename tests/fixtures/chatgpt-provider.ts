@@ -24,6 +24,7 @@ export interface ProviderFixtureOptions {
   failRefresh?: boolean
   hideFastModel?: boolean
   outlineResult?: ReturnType<typeof learningOutline>
+  projectFileCalls?: { name: string; args: Record<string, unknown> }[]
   modelTestMode?: 'completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
   inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
@@ -116,6 +117,12 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
             ...(terminal === 'failed' ? { error: { code: 'model_not_found', message: 'RAW SECRET PROVIDER ERROR' } } : {})
           } })}\n\n`)
           response.end(); return
+        }
+        if (options.projectFileCalls) {
+          const input = payload.input as { type: string }[]
+          const turn = input.filter(item => item.type === 'function_call').length
+          const call = options.projectFileCalls[turn]
+          if (call) { writeToolResponse(response, call); return }
         }
         if (options.inferenceMode === 'hold') { pendingInference.push(response); response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
         if (options.inferenceMode === 'clarify') {

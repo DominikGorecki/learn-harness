@@ -2,6 +2,8 @@
 
 Status: Accepted — 2026-10-04
 
+The read-only filesystem scope is extended by [ADR-0019](ADR-0019-topic-edits-and-project-file-access.md) with explicit project-wide reads and staged content writes. The bounded material snapshot and actual-read evidence remain applicable.
+
 ## Context
 
 A learning project may begin with existing notes and no written goal. The assistant needs useful subject evidence without inheriting a coding agent’s permissions or presenting an inventory as proof that it read every file.
