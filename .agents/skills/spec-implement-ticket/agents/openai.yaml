@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learning Studio Ticket Implementation"
+  short_description: "Implement and validate one Learning Studio ticket"
+  default_prompt: "Use $spec-implement-ticket to implement this Learning Studio ticket, preserve Electron boundaries, and report required validation evidence."
