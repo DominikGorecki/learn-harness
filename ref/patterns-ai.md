@@ -4,7 +4,7 @@ Governed by [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md), retainin
 
 ## Implementation status
 
-The core coordinator, bounded shared DTOs/runtime parsers and named authorized activity bridge are implemented. Current producers still use their existing lifecycle/transport and existing UI; migration, receiving-byte inactivity, protocol-tail acceptance, worker health and the approved bottom panel remain pending in [the streaming bundle](work/02-ai-streaming/ai-streaming.spec.md). Do not release a mixed producer state or claim the foundation establishes streaming/live-provider acceptance. The rules below are adopted integration requirements for completing the migration and for every future model-output feature. OAuth/discovery/renewal/revocation are not inference operations.
+The core coordinator, bounded shared DTOs/runtime parsers, named authorized activity bridge, shared Pi transport/worker lifecycle and all three educational producers are implemented. Educational previews project ordinary text and partial structured outline fields, replace repairs and expose only the selected stable topic for topic edits. Model diagnostics still use their prior lifecycle, and the existing UI remains; diagnostic migration, the approved bottom panel and integrated acceptance remain pending in [the streaming bundle](work/02-ai-streaming/ai-streaming.spec.md). Do not release a mixed producer state or claim the foundation establishes streaming/live-provider acceptance. The rules below are adopted integration requirements for completing the migration and for every future model-output feature. OAuth/discovery/renewal/revocation are not inference operations.
 
 ## Ownership and producer recipe
 

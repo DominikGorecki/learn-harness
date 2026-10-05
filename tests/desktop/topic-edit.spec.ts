@@ -1,3 +1,4 @@
+import { aiActivity, aiFrames, observeAiActivity } from '../fixtures/ai-activity'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm, writeFile } from 'node:fs/promises'
@@ -34,6 +35,7 @@ test('topic dialog updates its outline branch and real topic files while preserv
       shell.openExternal = async url => { await fetch(url) }
     }, folder)
     let page = await desktop.firstWindow()
+    await observeAiActivity(page)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     const topicEdit = page.getByRole('button', { name: 'Edit topic: Beliefs before evidence', exact: true })
     const otherEdit = page.getByRole('button', { name: 'Edit topic: How evidence changes a belief', exact: true })
@@ -65,7 +67,7 @@ test('topic dialog updates its outline branch and real topic files while preserv
       { name: 'write_project_file', args: { path: `${topicFolder}/notes.md`, content: 'Learn how historical ideas about priors developed.' } },
       { name: 'write_project_file', args: { path: `${topicFolder}/history/timeline.md`, content: 'A timeline of Bayesian ideas.' } }
     ]
-    fixture.options.inferenceMode = 'hold'
+    fixture.options.inferenceMode = 'preview-hold'
     await topicEdit.click(); await expect(input).toHaveValue(changes)
     await input.dispatchEvent('keydown', { key: 'Enter', ctrlKey: true, isComposing: true })
     expect(fixture.inferenceRequests).toHaveLength(0)
@@ -74,7 +76,10 @@ test('topic dialog updates its outline branch and real topic files while preserv
     await expect(otherEdit).toBeDisabled()
     expect((await saved()).outline).toEqual(original.outline)
     expect(await readFile(join(folder, topicFolder, 'notes.md'), 'utf8')).toBe('Original history notes')
+    await expect.poll(async () => (await aiActivity(page)).active?.preview.kind).toBe('topic')
+    await expect.poll(async () => (await aiFrames(page)).some(frame => frame.active?.preview.kind === 'topic')).toBe(true)
     await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect.poll(async () => (await aiActivity(page)).settled?.outcome).toBe('cancelled')
     await expect(topicEdit).toBeEnabled()
     await expect(readFile(join(folder, topicFolder, 'history/timeline.md'))).rejects.toMatchObject({ code: 'ENOENT' })
     const proposal = learningOutline()
@@ -96,6 +101,11 @@ test('topic dialog updates its outline branch and real topic files while preserv
     await dialog.getByRole('button', { name: 'Rewrite topic' }).click()
     const expected = { ...original.outline!.document, lessons: [revisedTopic, original.outline!.document.lessons[1]] }
     await expect.poll(async () => (await saved()).outline?.document).toEqual(expected)
+    const activity = (await aiActivity(page)).settled!
+    expect(activity).toMatchObject({ kind: 'rewrite-topic', topicId: 'beliefs', outcome: 'saved', preview: { kind: 'topic', topicId: 'beliefs', lesson: { id: 'beliefs', title: revisedTopic.title } } })
+    expect(JSON.stringify(activity.preview)).not.toContain('Unrequested')
+    expect(JSON.stringify(await aiFrames(page))).not.toMatch(/Other topic context|Original history notes|fc_fixture|call_fixture|fixture-access/)
+    expect(activity.activity.some(entry => entry.label === 'Reading project material' && entry.state === 'completed')).toBe(true)
     expect((await saved()).brief).toBe(original.brief)
     expect(await readFile(join(folder, topicFolder, 'notes.md'), 'utf8')).toContain('historical ideas')
     expect(await readFile(join(folder, topicFolder, 'history/timeline.md'), 'utf8')).toContain('timeline')

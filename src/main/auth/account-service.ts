@@ -4,6 +4,8 @@ import type { AccountSnapshot, AccountStatus, ModelChoice, AdditionalModelId } f
 import { safeAccountError } from './provider-errors'
 import { planScope } from './types'
 import type { AccountCredential, AccountProvider, CredentialStore } from './types'
+import type { AiCoordinator, AiLease } from '../../core/ai/coordinator'
+import { observeNotification } from '../../core/notifications'
 
 const failureStates: Partial<Record<string, AccountStatus>> = {
   AUTH_REQUIRED: 'reconnect-required', PLAN_PERMISSION_REQUIRED: 'permission-required', ACCESS_RESTRICTED: 'restricted', USAGE_LIMIT: 'usage-limited'
@@ -18,7 +20,6 @@ export class AccountService {
   private refreshTask: Promise<void> | null = null
   private renewalTask: Promise<AccountCredential> | null = null
   private epoch = 0
-  private inferenceBusy = false
   private disconnecting = false
   private modelTest: AbortController | null = null
   private modelTestTask: Promise<void> | null = null
@@ -31,6 +32,7 @@ export class AccountService {
     openBrowser(url: string): Promise<void>
     copyToClipboard(url: string): Promise<void>
     now?: () => number
+    ai?: AiCoordinator
   }) {
     this.snapshot = {
       status: 'disconnected', name: null, email: null, message: null,
@@ -44,14 +46,17 @@ export class AccountService {
     this.listeners.add(listener)
     return () => { this.listeners.delete(listener) }
   }
-  private emit(): void { for (const listener of this.listeners) listener(this.get()) }
+  private emit(): void { for (const listener of this.listeners) observeNotification(() => listener(this.get())) }
   private update(value: Partial<AccountSnapshot>): void { this.snapshot = { ...this.snapshot, ...value }; this.emit() }
   private idleGuard(): void {
     if (this.disconnecting) throw new ApplicationError('BUSY', 'Wait for sign-out to finish before connecting again.')
-    if (this.inferenceBusy) throw new ApplicationError('BUSY', 'Finish or cancel the outline before changing your ChatGPT connection.')
+    if (this.options.ai?.get().active) throw new ApplicationError('BUSY', 'Finish or cancel the AI action before changing your ChatGPT connection.')
     if (this.modelTest) throw new ApplicationError('BUSY', 'Finish or cancel the model test before changing your ChatGPT connection.')
   }
-  setInferenceBusy(value: boolean): void { this.inferenceBusy = value }
+  /** Synchronous compatibility guard while legacy diagnostics await T04 migration. */
+  assertCanStartOutline(): void {
+    if (this.connection || this.disconnecting || this.modelTest) throw new ApplicationError('BUSY', 'Finish updating or testing the ChatGPT connection first.')
+  }
 
   private connectedState(credential: AccountCredential): Partial<AccountSnapshot> {
     const permission = credential.scopes.includes(planScope) && Boolean(credential.accessToken)
@@ -152,13 +157,16 @@ export class AccountService {
     return this.get()
   }
 
-  private async usableCredential(): Promise<AccountCredential> {
+  private async usableCredential(signal?: AbortSignal): Promise<AccountCredential> {
+    signal?.throwIfAborted()
     if (!this.credential) throw new ApplicationError('AUTH_REQUIRED', 'Connect ChatGPT to create an outline.')
     if (!this.credential.scopes.includes(planScope)) throw new ApplicationError('PLAN_PERMISSION_REQUIRED', 'Enable ChatGPT plan usage to create an outline.')
     if (this.credential.expiresAt > (this.options.now ?? Date.now)() + 180_000 && this.credential.accessToken) return this.credential
     if (!this.renewalTask) {
       const original = this.credential
       const epoch = this.epoch
+      // Rotation is a bounded account transaction: cancellation must not strand a
+      // newly issued refresh token. The caller awaits this commit, then checks its lease.
       this.renewalTask = this.options.provider.renew(original, AbortSignal.timeout(30_000)).then(async renewed => {
         if (epoch !== this.epoch) throw new ApplicationError('CANCELLED', 'The account connection changed.')
         await this.options.store.write(renewed)
@@ -171,19 +179,23 @@ export class AccountService {
     return this.renewalTask
   }
 
-  async refreshModels(): Promise<AccountSnapshot> {
+  async refreshModels(owner?: AiLease): Promise<AccountSnapshot> {
     if (this.connection || this.disconnecting || this.modelTest) return this.get()
+    if (this.options.ai?.get().active && (!owner || !this.options.ai.isOwner(owner))) return this.get()
+    owner?.signal.throwIfAborted()
     if (this.refreshTask) { await this.refreshTask; return this.get() }
     const epoch = this.epoch
     this.update({ modelsStatus: 'loading' })
     this.refreshTask = (async () => {
       try {
-        const credential = await this.usableCredential()
-        const models = this.withAdditionalModels(await this.options.provider.listModels(credential, AbortSignal.timeout(30_000)))
+        const credential = await this.usableCredential(owner?.signal)
+        owner?.signal.throwIfAborted()
+        const models = this.withAdditionalModels(await this.options.provider.listModels(credential, AbortSignal.any([AbortSignal.timeout(30_000), ...(owner ? [owner.signal] : [])])))
+        owner?.signal.throwIfAborted()
         if (epoch === this.epoch) this.update({ ...this.connectedState(credential), models, modelsStatus: 'ready',
           message: models.length ? null : 'No models are currently available for this account. Try refreshing or reconnecting.' })
       } catch (error) {
-        if (epoch === this.epoch) this.recordFailure(error)
+        if (epoch === this.epoch && !owner?.signal.aborted) this.recordFailure(error)
       } finally { this.refreshTask = null }
     })()
     await this.refreshTask
@@ -248,15 +260,28 @@ export class AccountService {
   }
 
   /** Privileged worker credential, deliberately excluded from every public snapshot. */
-  async authorizeModel(modelId: string): Promise<{ accessToken: string; model: { id: string; name: string } }> {
-    if (this.connection || this.disconnecting || this.modelTest) throw new ApplicationError('BUSY', 'Finish updating or testing the ChatGPT connection first.')
+  async authorizeModel(modelId: string, owner?: AiLease): Promise<{ accessToken: string; model: { id: string; name: string } }> {
+    const guard = () => {
+      owner?.signal.throwIfAborted()
+      this.assertCanStartOutline()
+      if (this.options.ai?.get().active && (!owner || !this.options.ai.isOwner(owner))) throw new ApplicationError('BUSY', 'Another AI action owns the connection.')
+      if (owner && this.options.ai && !this.options.ai.isOwner(owner)) throw new ApplicationError('CANCELLED', 'This AI action is no longer active.')
+    }
+    guard()
     try {
-      const credential = await this.usableCredential()
-      if (this.snapshot.modelsStatus !== 'ready') await this.refreshModels()
+      const credential = await this.usableCredential(owner?.signal)
+      guard()
+      if (this.snapshot.modelsStatus !== 'ready') await this.refreshModels(owner)
+      guard()
       const model = this.snapshot.models.find(model => model.id === modelId)
       if (!model || this.snapshot.modelsStatus !== 'ready') throw new ApplicationError('UNAVAILABLE', 'Refresh models and choose an available model before creating an outline.')
       return { accessToken: credential.accessToken!, model: { ...model } }
-    } catch (error) { this.recordFailure(error); throw safeAccountError(error) }
+    } catch (error) {
+      if (owner?.signal.aborted) throw new ApplicationError('CANCELLED', 'AI work cancelled. Your connection is unchanged.')
+      const safe = safeAccountError(error)
+      if (safe.code !== 'CANCELLED' && safe.code !== 'BUSY') this.recordFailure(safe)
+      throw safe
+    }
   }
 
   async disconnect(): Promise<AccountSnapshot> {

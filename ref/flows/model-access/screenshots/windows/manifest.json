@@ -47,13 +47,13 @@
       "sha256": "6d10afebf0acdd4fdcee439a0b2fee7921d1ee5fbbc52cd5a3d07fabbbd14107"
     }
   ],
-  "capturedAt": "2026-10-05T18:20:04.312Z",
+  "capturedAt": "2026-10-05T18:51:25.889Z",
   "testSha256": "22ff9e3137d42002824e2c94128af2b45505683f3e244588fb9df2040faccae7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "53db6b2aea91328c4342a671440db96c7de7874a",
+  "revision": "f20752ce0c84a915d7c1b10088a7b4233e5f2302",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

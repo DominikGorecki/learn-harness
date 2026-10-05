@@ -1,3 +1,4 @@
+import { AiCoordinator } from '../../src/core/ai/coordinator'
 import { describe, expect, it, vi } from 'vitest'
 import { AccountService } from '../../src/main/auth/account-service'
 import { ApplicationError } from '../../src/shared/contracts'
@@ -10,7 +11,7 @@ const credential: AccountCredential = {
 }
 const choices = [{ id: 'test-model' }, { id: 'gpt-6.1-sol' }, { id: 'gpt-6-luna' }]
 
-function setup(initial: AccountCredential | null = null) {
+function setup(initial: AccountCredential | null = null, now = () => 1000) {
   let stored = initial ? structuredClone(initial) : null
   const store: CredentialStore = {
     persistence: 'protected', read: vi.fn(async () => structuredClone(stored)),
@@ -25,8 +26,10 @@ function setup(initial: AccountCredential | null = null) {
   }
   const openBrowser = vi.fn(async () => {})
   const copyToClipboard = vi.fn<(url: string) => Promise<void>>(async () => {})
-  const service = new AccountService({ provider, store, openBrowser, copyToClipboard, now: () => 1000 })
-  return { service, store, provider, openBrowser, copyToClipboard, stored: () => stored }
+  let aiId = 0
+  const ai = new AiCoordinator({ now: () => performance.now(), createId: () => `ai-${++aiId}` })
+  const service = new AccountService({ ai, provider, store, openBrowser, copyToClipboard, now })
+  return { ai, service, store, provider, openBrowser, copyToClipboard, stored: () => stored }
 }
 
 describe('account lifecycle', () => {
@@ -86,8 +89,8 @@ describe('account lifecycle', () => {
   })
 
   it('blocks a model test while an outline owns the connection', async () => {
-    const { service, provider } = setup(credential)
-    await service.initialize(); service.setInferenceBusy(true)
+    const { ai, service, provider } = setup(credential)
+    await service.initialize(); ai.claim({ kind: 'create-outline', projectId: 'project', model: { id: 'test-model', name: 'Test' }, heading: 'Create', requestSummary: 'Learn' })
     await expect(service.testSolModel()).rejects.toMatchObject({ code: 'BUSY' })
     expect(provider.testSolModel).not.toHaveBeenCalled()
   })
@@ -224,8 +227,8 @@ describe('account lifecycle', () => {
   })
 
   it('blocks account replacement while an outline owns the connection', async () => {
-    const { service } = setup(credential)
-    await service.initialize(); service.setInferenceBusy(true)
+    const { ai, service } = setup(credential)
+    await service.initialize(); ai.claim({ kind: 'create-outline', projectId: 'project', model: { id: 'test-model', name: 'Test' }, heading: 'Create', requestSummary: 'Learn' })
     await expect(service.connect()).rejects.toMatchObject({ code: 'BUSY' })
     await expect(service.disconnect()).rejects.toMatchObject({ code: 'BUSY' })
   })
@@ -276,5 +279,37 @@ describe('account lifecycle', () => {
     vi.mocked(provider.testLunaModel).mockRejectedValue(new ApplicationError('UNAVAILABLE', 'This model is not available.'))
     await service.testLunaModel()
     expect(service.get()).toMatchObject({ modelTestStatus: 'failed', modelTestTarget: 'gpt-6-luna', verifiedModelIds: ['gpt-6.1-sol'], models: choices })
+  })
+})
+
+
+describe('outline account ownership', () => {
+  it('commits rotated credentials despite synchronous owner cancellation before renewal continuation', async () => {
+    let currentTime = 1000
+    const { ai, service, provider, store, stored } = setup({ ...credential, expiresAt: 181001 }, () => currentTime)
+    await service.initialize()
+    const { lease } = ai.claim({ kind: 'create-outline', projectId: 'project', model: { id: 'test-model', name: 'Test' }, heading: 'Create', requestSummary: 'Learn' })
+    let finish!: (value: AccountCredential) => void
+    vi.mocked(provider.renew).mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    currentTime = 2000
+    const authorization = service.authorizeModel('test-model', lease)
+    lease.setCancellation(async () => { await authorization.catch(() => {}) })
+    await vi.waitFor(() => expect(provider.renew).toHaveBeenCalledOnce())
+    const rotated = { ...credential, accessToken: 'rotated-access', refreshToken: 'rotated-refresh', expiresAt: 20_000_000 }
+    finish(rotated)
+    const cancellation = ai.cancel({ operationId: lease.operationId })
+    await expect(authorization).rejects.toMatchObject({ code: 'CANCELLED' }); await cancellation
+    expect(store.write).toHaveBeenCalledWith(rotated); expect(stored()?.refreshToken).toBe('rotated-refresh')
+    expect(service.get()).toMatchObject({ status: 'connected', modelsStatus: 'ready' })
+    expect(JSON.stringify(service.get())).not.toContain('rotated-')
+  })
+  it('permits owner authorization but blocks unowned callers and isolates notification rejections', async () => {
+    const { ai, service } = setup(credential)
+    service.subscribe(() => { throw new Error('Observer') }); service.subscribe(async () => { throw new Error('Async observer') })
+    await service.initialize()
+    const { lease } = ai.claim({ kind: 'rewrite-outline', projectId: 'project', model: { id: 'test-model', name: 'Test' }, heading: 'Rewrite', requestSummary: 'Learn' })
+    await expect(service.authorizeModel('test-model')).rejects.toMatchObject({ code: 'BUSY' })
+    await expect(service.authorizeModel('test-model', lease)).resolves.toMatchObject({ model: { id: 'test-model' } })
+    expect(service.get()).toMatchObject({ status: 'connected', modelsStatus: 'ready' }); lease.settle('failed')
   })
 })

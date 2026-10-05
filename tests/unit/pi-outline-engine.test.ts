@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { generateWithPi } from '../../src/main/generation/pi-outline-engine'
 import { learningOutline } from '../fixtures/learning-outline'
 import { writeToolResponse } from '../fixtures/responses-stream'
+import type { OutlineProjection } from '../../src/main/generation/outline-projector'
 import { parseOutline } from '../../src/shared/outline'
 
 const close: (() => Promise<void>)[] = []
@@ -41,7 +42,7 @@ describe('actual Pi agent and plan Responses transport', () => {
     const server = await fixture(response => writeToolResponse(response, { args: learningOutline() }))
     const reject = vi.fn(async () => { throw new Error('PRIVATE_OBSERVER_ERROR') })
     await expect(generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayes' }, { signal: new AbortController().signal,
-      onPhase: reject, onTransport: reject, onDiagnostic: reject })).resolves.toMatchObject({ kind: 'outline' })
+      onPhase: reject, onTransport: reject, onDiagnostic: reject, onProgress: reject })).resolves.toMatchObject({ kind: 'outline' })
     expect(reject).toHaveBeenCalled()
   })
   it('includes saved outline JSON on every Pi turn and lets rewrites retain recorded sources without unnecessary reads', async () => {
@@ -71,8 +72,8 @@ describe('actual Pi agent and plan Responses transport', () => {
   })
   it('uses the selected model, explicit token and namespaced educational tools, then accepts only the completed outline', async () => {
     const server = await fixture(response => writeToolResponse(response, { args: learningOutline() }))
-    const phases: string[] = []
-    const result = await generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayesian reasoning' }, { ...options(), onPhase: phase => phases.push(phase) })
+    const phases: string[] = [], progress: OutlineProjection[] = []
+    const result = await generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayesian reasoning' }, { ...options(), onPhase: phase => phases.push(phase), onProgress: frame => { progress.push(frame) } })
     expect(result).toMatchObject({ kind: 'outline', document: learningOutline(), coverage: { files: [] } })
     expect(server.requests).toHaveLength(1)
     expect(server.requests[0]).toMatchObject({ path: '/v1/responses', authorization: 'Bearer delegated-fixture', payload: { model: model.id, store: false, stream: true,
@@ -82,6 +83,9 @@ describe('actual Pi agent and plan Responses transport', () => {
     expect(input[0]!.role).toBe('developer')
     expect(JSON.stringify(input)).toContain('Bayesian reasoning')
     expect(phases).toEqual(['planning', 'validating'])
+    expect(progress.some(frame => frame.preview.kind === 'outline' && frame.preview.title === 'Bayesian reasoning')).toBe(true)
+    expect(progress.flatMap(frame => frame.activity ?? [])).toContainEqual({ id: 'tool-1', label: 'Checking the draft outline', state: 'completed' })
+    expect(JSON.stringify(progress)).not.toMatch(/delegated-fixture|fc_fixture|call_fixture/)
   })
   it.each(['missing', 'incomplete', 'failed'] as const)('rejects a %s terminal response even if the tool arguments look complete', async terminal => {
     const server = await fixture(response => writeToolResponse(response, { args: learningOutline(), terminal }))
@@ -150,6 +154,22 @@ describe('actual Pi agent and plan Responses transport', () => {
     expect(transmitted).toContain('Explicit learner direction takes priority')
     const namespace = server.requests[0]!.payload.tools as { tools: { name: string }[] }[]
     expect(namespace[0]!.tools.map(tool => tool.name)).toEqual(['list_project_files', 'read_project_file', 'write_project_file', 'list_materials', 'read_material', 'submit_outline', 'request_learning_details'])
+  })
+  it('bounds a large structured preview while accepting the complete validated outline', async () => {
+    const document = learningOutline()
+    for (const lesson of document.lessons) {
+      lesson.overview = 'o'.repeat(5000)
+      lesson.objectives = Array.from({ length: 12 }, (_, i) => `${i}:` + 'x'.repeat(1990))
+      for (const module of lesson.modules) module.task = 't'.repeat(5000)
+    }
+    const server = await fixture(response => writeToolResponse(response, { args: document }))
+    const progress: OutlineProjection[] = []
+    const result = await generateWithPi({ model, accessToken: 'delegated-fixture', baseUrl: server.baseUrl, brief: 'Bayes' }, { ...options(), onProgress: frame => { progress.push(frame); return new Promise<void>(() => {}) } })
+    expect(result).toMatchObject({ kind: 'outline', document })
+    expect(JSON.stringify(document).length).toBeGreaterThan(64 * 1024)
+    expect(progress.at(-1)?.abbreviated).toBe(true)
+    expect(JSON.stringify(progress.at(-1)?.preview).length).toBeLessThan(JSON.stringify(document).length)
+    expect(server.requests).toHaveLength(1)
   })
   it('requests details locally when a folder has only unsupported material', async () => {
     const path = await realpath(await mkdtemp(join(tmpdir(), 'edu-pi-unsupported-')))

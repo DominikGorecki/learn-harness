@@ -7,7 +7,7 @@ import { parseOutline, parseCoverage } from '../../shared/outline'
 import { parseSavedOutline } from '../../shared/workspace'
 import { maximumProjectEditCharacters, parseProjectFileEdits, projectFilePath } from '../../shared/project-files'
 import { aiLimits, parseAiPreview } from '../../shared/ai/activity'
-import type { AiPreview } from '../../shared/ai/activity'
+import type { AiPreview, AiActivityEntry } from '../../shared/ai/activity'
 import type { PiProtocolEvidence } from './pi-protocol-evidence'
 import { protocolCodes, protocolStatuses, safeReturnedModel } from './pi-protocol-evidence'
 import type { TransportState } from './pi-stream-liveness'
@@ -25,7 +25,7 @@ export type WorkerReply = { type: 'health'; sequence: number; phase: WorkerPhase
   { type: 'phase'; sequence: number; phase: EnginePhase } |
   { type: 'transport'; sequence: number; state: TransportState } |
   { type: 'model-evidence'; sequence: number; evidence: PiProtocolEvidence } |
-  { type: 'progress'; sequence: number; turn: number; revision: number; preview: AiPreview } |
+  { type: 'progress'; sequence: number; turn: number; revision: number; preview: AiPreview; abbreviated?: boolean; activity?: AiActivityEntry[] } |
   { type: 'result'; sequence: number; profile: 'outline'; result: OutlineEngineResult } |
   { type: 'result'; sequence: number; profile: 'model-access'; result: PiProtocolEvidence } |
   { type: 'error'; sequence: number; code: ErrorCode } |
@@ -91,7 +91,7 @@ function parseTransport(value: unknown): TransportState {
 export function parseWorkerReply(value: unknown, profile: WorkerProfile): WorkerReply {
   const type = value && typeof value === 'object' ? (value as Record<string, unknown>).type : null
   if (workerFrameBytes(value) > (type === 'result' && profile.profile === 'outline' ? maximumWorkerResultBytes : aiLimits.frameBytes)) invalid()
-  const data = strictRecord(value, ['type', 'sequence', 'phase', 'state', 'evidence', 'turn', 'revision', 'preview', 'profile', 'result', 'code', 'event', 'data'])
+  const data = strictRecord(value, ['type', 'sequence', 'phase', 'state', 'evidence', 'turn', 'revision', 'preview', 'abbreviated', 'activity', 'profile', 'result', 'code', 'event', 'data'])
   const sequence = natural(data.sequence)
   switch (data.type) {
     case 'health': strictRecord(value, ['type', 'sequence', 'phase']); return { type: 'health', sequence, phase: choice(data.phase, workerPhases) }
@@ -101,7 +101,23 @@ export function parseWorkerReply(value: unknown, profile: WorkerProfile): Worker
       strictRecord(value, ['type', 'sequence', 'evidence']); if (profile.profile !== 'model-access') invalid()
       return { type: 'model-evidence', sequence, evidence: parseProtocolEvidence(data.evidence) }
     }
-    case 'progress': strictRecord(value, ['type', 'sequence', 'turn', 'revision', 'preview']); return { type: 'progress', sequence, turn: natural(data.turn), revision: natural(data.revision), preview: parseAiPreview(data.preview) }
+    case 'progress': {
+      strictRecord(value, ['type', 'sequence', 'turn', 'revision', 'preview', 'abbreviated', 'activity'])
+      const preview = parseAiPreview(data.preview)
+      if (profile.profile === 'outline' ? preview.kind === 'model-test-evidence' || (profile.input.topicId ? preview.kind !== 'none' && (preview.kind !== 'topic' || preview.topicId !== profile.input.topicId) : preview.kind === 'topic') : !['none', 'model-test-evidence'].includes(preview.kind)) invalid()
+      let activity: AiActivityEntry[] | undefined
+      if (data.activity !== undefined) {
+        if (profile.profile !== 'outline' || !Array.isArray(data.activity) || data.activity.length > aiLimits.activityEntries) invalid()
+        activity = data.activity.map(value => {
+          const entry = strictRecord(value, ['id', 'label', 'state'])
+          const id = boundedText(entry.id, 'Activity', 100)
+          if (!/^tool-[1-9][0-9]*$/.test(id)) invalid()
+          return { id, label: boundedText(entry.label, 'Activity', aiLimits.labelCharacters), state: choice(entry.state, ['running', 'completed', 'failed']) }
+        })
+      }
+      return { type: 'progress', sequence, turn: natural(data.turn), revision: natural(data.revision), preview,
+        ...(data.abbreviated !== undefined ? { abbreviated: flag(data.abbreviated) } : {}), ...(activity ? { activity } : {}) }
+    }
     case 'error': strictRecord(value, ['type', 'sequence', 'code']); return { type: 'error', sequence, code: choice(data.code, workerErrorCodes) }
     case 'diagnostic': strictRecord(value, ['type', 'sequence', 'event', 'data']); return { type: 'diagnostic', sequence,
       event: choice(data.event, ['engine.materials', 'engine.request', 'engine.response', 'engine.terminal', 'engine.tool', 'engine.turn', 'engine.transport', 'console.output', 'process.unhandled']), data: data.data }

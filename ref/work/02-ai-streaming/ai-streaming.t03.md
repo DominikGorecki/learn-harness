@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T03 - Outline streaming projection and domain settlement
-Status: Open
+Status: Done
 
 ## Source
 
@@ -52,11 +52,11 @@ Core owns acceptance/recovery and uses ports; main/worker own Pi and privileged 
 
 ## Acceptance criteria
 
-- [ ] All three educational starts publish bounded text/structured previews tied to their owned scope.
-- [ ] Repairs supersede provisional candidates; only a completed, validated result can publish files/outline.
-- [ ] Cancel waits for settlement, saving guards are retained, and terminal domain outcomes release the lease correctly.
-- [ ] Unsaved output survives global presentation replacement; save retry consumes no AI allowance.
-- [ ] Adversarial topic proposals and failed streams cannot change unrelated outline fields/folders or previous files.
+- [x] All three educational starts publish bounded text/structured previews tied to their owned scope.
+- [x] Repairs supersede provisional candidates; only a completed, validated result can publish files/outline.
+- [x] Cancel waits for settlement, saving guards are retained, and terminal domain outcomes release the lease correctly.
+- [x] Unsaved output survives global presentation replacement; save retry consumes no AI allowance.
+- [x] Adversarial topic proposals and failed streams cannot change unrelated outline fields/folders or previous files.
 
 ## Manual verification
 
@@ -64,7 +64,13 @@ Exercise creation and both rewrite kinds against isolated structured-only/repair
 
 ## Completion evidence
 
-Pending authorized implementation: migrated entry points, preview/scope proofs, save/cancel test results and unresolved UI/diagnostic integration gates.
+Accepted on `master` after T01 `53db6b2` and T02 `f20752c`. Worker `t01_coordinator`, GPT-6.1 Sol / high; independent read-only reviewer `t01_review`, same model/effort. Primary reviewed the actual source/tests and final diff; worker edits were frozen before acceptance records and commit.
+
+All three educational starts now claim shared ownership before asynchronous preparation. Safe Pi projections copy tolerant text/structured fields, replace candidates, bind stable topic scope and report abbreviation without truncating accepted results. Main merges ordered progress and received-byte ages; failed reads and terminal validation/save histories are truthful. Exact cleanup promises, saving guards, stopped admission and drained retries preserve domain/publication ownership. Cancellation commits an already-renewed credential before preventing inference launch; shutdown defers account invalidation until owned cleanup. Unsaved results and staged topic edits/baselines survive a separate diagnostic lease and retry with no inference.
+
+Final `npm run check` passed: 269 tests / 3 skips across 22 files, lint, flow consistency, both type scopes and production build. Corrected full `npm run test:desktop` passed: 13 tests / one expected packaged skip. Primary independently ran `npm run test:flows` and `git diff --check`, both exit 0, and opened the sole changed PNG (reading/long-outline-zoom). Worker reviewed twelve relevant captures; no streaming panel exists yet. Initial post-click cancellation assertions were corrected to poll actual settlement, and stale failed-flow metadata was refreshed by the passing rerun. Exact focused commands and failure chronology are in [validation](validation.md).
+
+Diagnostic migration, approved panel, real timing/burst/packaged acceptance and final documentation remain T04–T07. No live-provider, new packaged-artifact or other-platform qualification is claimed by T03.
 
 ## Notes
 

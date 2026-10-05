@@ -1,3 +1,4 @@
+import { aiActivity, aiFrames, observeAiActivity } from '../fixtures/ai-activity'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm } from 'node:fs/promises'
@@ -30,6 +31,7 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
       shell.openExternal = async url => { await fetch(url) }
     }, folder)
     let page = await desktop.firstWindow()
+    await observeAiActivity(page)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     const edit = page.getByRole('button', { name: 'Edit learning path' })
     await edit.focus(); await page.keyboard.press('Enter')
@@ -79,12 +81,15 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     })
     await input.dispatchEvent('keydown', { key: 'Enter', ctrlKey: true, isComposing: true })
     expect(fixture.inferenceRequests).toHaveLength(0)
-    fixture.options.inferenceMode = 'hold'
+    fixture.options.inferenceMode = 'preview-hold'
     await input.press('ControlOrMeta+Enter')
     await expect.poll(() => fixture.inferenceRequests.length).toBe(1)
     await expect(edit).toBeDisabled()
     expect((await saved()).outline).toEqual(original.outline)
+    await expect.poll(async () => (await aiActivity(page)).active?.preview.kind).toBe('outline')
+    await expect.poll(async () => (await aiFrames(page)).some(frame => frame.active?.preview.kind === 'outline')).toBe(true)
     await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect.poll(async () => (await aiActivity(page)).settled?.outcome).toBe('cancelled')
     await expect(edit).toBeEnabled()
     expect((await saved()).outline).toEqual(original.outline)
     await edit.click(); await expect(input).toHaveValue(changes)
@@ -105,6 +110,7 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
       expect(prompt).toContain(JSON.stringify(original.outline).replaceAll('"', '\\"'))
       expect(prompt).toContain(changes)
     }
+    expect((await aiActivity(page)).settled).toMatchObject({ kind: 'rewrite-outline', outcome: 'saved', preview: { kind: 'outline', title: revised.title } })
     expect((await saved()).brief).toBe(original.brief)
     await edit.click(); await expect(input).toHaveValue(''); await page.keyboard.press('Escape')
     await desktop.close(); desktop = undefined

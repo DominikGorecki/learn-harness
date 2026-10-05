@@ -1,3 +1,4 @@
+import { aiActivity, aiFrames, observeAiActivity } from '../fixtures/ai-activity'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm } from 'node:fs/promises'
@@ -23,6 +24,7 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
       shell.openExternal = async url => { await fetch(url) }
     }, folder)
     let page = await desktop.firstWindow()
+    await observeAiActivity(page)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await page.getByRole('textbox').fill('Bayesian reasoning')
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
@@ -32,11 +34,17 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     await expect(page.getByRole('textbox')).toHaveValue('Bayesian reasoning')
     expect(fixture.inferenceRequests).toHaveLength(0)
     await page.getByLabel('Project model').selectOption('fixture-model-fast')
+    fixture.options.inferenceMode = 'preview-hold'
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
+    await expect.poll(async () => (await aiActivity(page)).active?.preview.kind).toBe('outline')
+    expect((await saved()).outline).toBeNull() // Completed-looking draft is provisional until clean EOF.
+    await expect.poll(async () => (await aiFrames(page)).some(frame => frame.active?.preview.kind === 'outline')).toBe(true)
+    fixture.completePending()
     await expect(page.getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
     await expect(page.getByText('Saved', { exact: true })).toBeVisible()
     expect(fixture.inferenceRequests).toHaveLength(1)
     expect(fixture.inferenceRequests[0]!.model).toBe('fixture-model-fast')
+    expect((await aiActivity(page)).settled).toMatchObject({ kind: 'create-outline', outcome: 'saved', preview: { kind: 'outline', title: 'Bayesian reasoning' } })
     const original = (await saved()).outline
     expect(original?.document.lessons).toHaveLength(2)
     expect(original?.coverage.files.filter(file => file.status === 'read')).toEqual([])
@@ -55,7 +63,7 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     expect(fixture.inferenceRequests).toHaveLength(1)
     expect((await saved()).outline).toEqual(original)
 
-    fixture.options.inferenceMode = 'hold'
+    fixture.options.inferenceMode = 'preview-hold'
     await page.getByRole('button', { name: 'Refine learning direction' }).click()
     await page.getByRole('textbox').fill('Bayesian reasoning with challenging practical examples and no calculus.')
     await page.getByRole('button', { name: 'Create new outline', exact: true }).click()
@@ -65,7 +73,9 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     await page.getByRole('button', { name: 'Create new outline', exact: true }).click()
     await page.getByRole('dialog').getByRole('button', { name: 'Create new outline', exact: true }).click()
     await expect.poll(() => fixture.inferenceRequests.length).toBe(2)
+    await expect.poll(async () => (await aiActivity(page)).active?.preview.kind).toBe('outline')
     await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect.poll(async () => (await aiActivity(page)).settled?.outcome).toBe('cancelled')
     await expect(page.getByText('Outline creation cancelled. Your previous outline is unchanged.', { exact: true })).toBeVisible()
     expect((await saved()).outline).toEqual(original)
     await expect(page.getByRole('textbox')).toHaveValue('Bayesian reasoning with challenging practical examples and no calculus.')

@@ -1,3 +1,4 @@
+import { aiActivity } from '../fixtures/ai-activity'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rename, rm, writeFile } from 'node:fs/promises'
@@ -58,6 +59,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     fixture.completePending()
     await expect(page.getByRole('button', { name: 'Retry save' })).toBeVisible()
     await expect(page.getByText('Not saved yet', { exact: true })).toBeVisible()
+    expect((await aiActivity(page)).settled?.outcome).toBe('unsaved')
     await flow.capture(desktop, page, 'generated-unsaved')
     await page.getByRole('button', { name: 'Projects', exact: true }).first().click()
     await page.getByRole('main').getByRole('button', { name: /First subject/ }).click()
@@ -69,6 +71,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await page.getByRole('button', { name: 'Retry save' }).click()
     await expect(page.getByText('Saved', { exact: true })).toBeVisible()
     expect(fixture.inferenceRequests).toHaveLength(1)
+    expect((await aiActivity(page)).active).toBeNull() // Retry is storage-only.
     const original = (await saved()).outline
 
     fixture.options.hideFastModel = true

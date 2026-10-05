@@ -1,3 +1,4 @@
+import { AiCoordinator } from '../../src/core/ai/coordinator'
 import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -29,14 +30,15 @@ async function setup() {
   await workspace.initialize()
   const projectId = (await workspace.open(path)).activeProject!.id
   const generate = vi.fn<ConstructorParameters<typeof GenerationService>[0]['generate']>(async () => ({ kind: 'outline', document: learningOutline() }))
-  const service = new GenerationService({ workspace, generate, createId: () => `run-${++id}`, now: () => new Date().toISOString(), onBusy: () => {}, onAccountFailure: () => {} })
+  const ai = new AiCoordinator({ now: () => performance.now(), createId: () => `ai-${++id}` })
+  const service = new GenerationService({ workspace, ai, generate, createId: () => `run-${++id}`, now: () => new Date().toISOString(), onAccountFailure: () => {} })
   service.start({ projectId, modelId: 'model', brief: 'Bayesian reasoning', replace: false }); await service.waitForIdle()
   await mkdir(join(path, 'beliefs')); await mkdir(join(path, 'evidence'))
   await writeFile(join(path, 'beliefs/notes.md'), 'Original topic notes')
   await writeFile(join(path, 'evidence/notes.md'), 'Other topic notes')
   const original = workspace.get().activeProject!.outline!
   const request = { projectId, modelId: 'model', topicId: 'beliefs', changes: 'Learn further history on this topic' }
-  return { root, path, workspace, storage, service, generate, original, request, failSave: (value: boolean) => { failSave = value } }
+  return { root, path, workspace, storage, service, ai, generate, original, request, failSave: (value: boolean) => { failSave = value } }
 }
 
 describe('topic edits and project file access', () => {
@@ -77,7 +79,7 @@ describe('topic edits and project file access', () => {
     expect(generate).toHaveBeenCalledTimes(3)
   })
   it('rolls back topic files after a failed outline save and retries the retained edits without inference', async () => {
-    const { path, storage, service, generate, request, original, failSave } = await setup()
+    const { path, storage, service, ai, generate, request, original, failSave } = await setup()
     const proposal = learningOutline(); proposal.lessons[0]!.overview = 'New historical coverage'
     generate.mockImplementationOnce(async () => {
       failSave(true)
@@ -89,6 +91,11 @@ describe('topic edits and project file access', () => {
     expect((await storage.load(path)).document?.outline).toEqual(original)
     expect(await readFile(join(path, 'beliefs/notes.md'), 'utf8')).toBe('Original topic notes')
     await expect(readFile(join(path, 'beliefs/.edu/topic.json'))).rejects.toMatchObject({ code: 'ENOENT' })
+    const retained = service.get()
+    const { lease } = ai.claim({ kind: 'test-sol', model: { id: 'gpt-6.1-sol', name: 'Sol' }, heading: 'Test', requestSummary: '' })
+    expect(() => service.start({ projectId: request.projectId, modelId: request.modelId, brief: 'Replace', replace: true })).toThrow(/Another AI/)
+    expect(service.get()).toEqual(retained)
+    lease.settle('verified') // Global presentation changed; staged edits and baselines remain domain-owned.
     failSave(false)
     await service.retrySave({ projectId: request.projectId, runId: run.id })
     expect(service.get().runs[0]?.status).toBe('saved')

@@ -5,7 +5,7 @@ import type { ErrorCode } from '../../shared/contracts'
 
 export interface AiProgress {
   operationId: string; projectId?: string; topicId?: string; turn: number; revision: number;
-  preview: AiPreview; activity?: AiActivityEntry[]; lastByteAt?: number
+  preview: AiPreview; activity?: AiActivityEntry[]; lastByteAt?: number; abbreviated?: boolean
 }
 export interface AiLease {
   readonly operationId: string
@@ -15,6 +15,7 @@ export interface AiLease {
   setCancellation(action: () => Promise<void>): void
   phase(phase: AiPhase, activity?: AiActivityEntry): boolean
   progress(update: AiProgress): boolean
+  receivedByteAge(ageMs: number): boolean
   settle(outcome: AiOutcome, errorCode?: ErrorCode): boolean
 }
 export interface AiCoordinatorOptions {
@@ -62,6 +63,12 @@ export class AiCoordinator {
       setCancellation: (action: () => Promise<void>) => { if (this.owner === owner && !owner.controller.signal.aborted) owner.cancelAction = action },
       phase: (phase: AiPhase, activity?: AiActivityEntry) => this.phase(owner, phase, activity),
       progress: (update: AiProgress) => this.progress(owner, update),
+      receivedByteAge: (ageMs: number) => {
+        if (this.owner !== owner || owner.controller.signal.aborted || !Number.isSafeInteger(ageMs) || ageMs < 0) return false
+        // Ages cross process boundaries; absolute utility timestamps never do.
+        owner.lastByteAt = Math.max(owner.lastByteAt ?? owner.started, owner.started, this.options.now() - ageMs)
+        return true
+      },
       settle: (outcome: AiOutcome, errorCode?: ErrorCode) => this.settle(owner, outcome, errorCode) })
     const owner: Owner = { lease, operation, controller, started, lastByteAt: null, finish, cancelAction: null, cancellation: null,
       cancelling: false, pending: null, lastPreviewAt: started, progressTurn: 0, progressRevision: -1 }
@@ -138,7 +145,7 @@ export class AiCoordinator {
       !Number.isSafeInteger(update.revision) || update.revision < 0 || update.turn < owner.progressTurn || update.turn === owner.progressTurn && update.revision <= owner.progressRevision) return false
     const bounded = boundAiPreview(update.preview)
     const previous = owner.operation
-    owner.operation = { ...previous, turn: update.turn, previewRevision: update.revision, preview: bounded.preview, abbreviated: bounded.abbreviated }
+    owner.operation = { ...previous, turn: update.turn, previewRevision: update.revision, preview: bounded.preview, abbreviated: bounded.abbreviated || update.abbreviated === true }
     if (update.activity) this.append(owner, update.activity)
     try { this.fit(owner); } catch (error) { owner.operation = previous; throw error }
     if (update.lastByteAt !== undefined) {
@@ -170,7 +177,9 @@ export class AiCoordinator {
       owner.operation.kind.startsWith('test-') && ['saved', 'unsaved', 'needs-details'].includes(outcome) ||
       owner.operation.phase === 'saving' && ['cancelled', 'needs-details'].includes(outcome)) throw new ApplicationError('INVALID_INPUT', 'Invalid AI settlement.')
     this.clearPending(owner)
-    const operation: AiOperation = { ...this.get().active!, outcome, errorCode: errorCode ?? null, canCancel: false, sequence: owner.operation.sequence + 1 }
+    const current = this.get().active!
+    const activity = current.activity.map(entry => entry.state === 'running' && (outcome === 'failed' || outcome === 'cancelled') ? { ...entry, state: 'failed' as const } : entry)
+    const operation: AiOperation = { ...current, activity, outcome, errorCode: errorCode ?? null, canCancel: false, sequence: owner.operation.sequence + 1 }
     parseAiActivitySnapshot({ revision: this.revision + 1, active: null, settled: operation })
     this.terminal = operation; this.owner = null; this.revision++; owner.finish(outcome); this.deliver()
     return true

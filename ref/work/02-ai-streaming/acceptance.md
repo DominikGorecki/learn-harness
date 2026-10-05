@@ -14,18 +14,18 @@ This matrix records verified implementation evidence, not design approval or pro
 | R04 — silence recovery/per-turn idle | T02 | T02 header-once/empty/silent-tail/fresh-turn idle and timer cleanup tests accepted; integrated panel recovery pending T06 |
 | R05 — independent worker health | T02 | T02 spawn/health/replay/cancellation/exit tests and real utility health/cancel/death journey accepted |
 | R06 — retained byte/turn/file bounds | T02 | T02 request/response caps, existing turn/topic tests and independently bounded large escaped/Unicode full-result proof accepted; producer/diagnostic integration pending T03/T04/T06 |
-| R07 — truthful text/structured activity | T03 | Pending |
-| R08 — tolerant provisional schema/candidate replacement | T03 | Pending |
+| R07 — truthful text/structured activity | T03 | T03 educational projection, actual Pi/tool activity, private-field filtering and terminal-history tests accepted; diagnostic/UI integration pending T04–T06 |
+| R08 — tolerant provisional schema/candidate replacement | T03 | T03 immutable partial/repair/abbreviation tests and actual Pi full accepted outline >64 KiB accepted; integrated panel evidence pending T06 |
 | R09 — ownership/revision/topic isolation | T01 | T01 foundation accepted: stale/duplicate/cancelled correlation and strict stable-topic preview tests; projector/UI evidence pending |
-| R10 — completed independent acceptance before publication | T03 | Pending |
+| R10 — completed independent acceptance before publication | T03 | T03 independent domain/source/topic acceptance and held completed-looking stream cancellation with saved-byte assertions accepted; integrated final audit pending T06 |
 | R11 — immediate lifecycle/bounded preview delivery | T01 | T01 foundation accepted: 100 ms latest-preview batching, immediate phases/terminal, immutable wire/history bounds and subscriber isolation; real reference-fixture latency pending |
 | R12 — locked bottom panel/connected icons | T05 | Pending actual Electron visual review |
 | R13 — all five panels/dashboard diagnostic privacy | T05 | Pending |
 | R14 — immediate accepted-overlay transition | T05 | Pending |
 | R15 — independent completed-model proof | T04 | Pending actual protocol/utility evidence |
-| R16 — awaited cancellation/publication guard | T03 | Pending |
-| R17 — drafts/unsaved/file baselines/storage-only retry | T03 | Pending |
-| R18 — accepted domain terminal/lease release | T03 | Pending |
+| R16 — awaited cancellation/publication guard | T03 | T03 exact task installation, validation cancellation, saving guard, real worker cleanup and shutdown retry draining accepted; diagnostic/panel integration pending |
+| R17 — drafts/unsaved/file baselines/storage-only retry | T03 | T03 unsaved/staged topic baselines survive global replacement and retry without inference; topic conflict/external-byte and Electron recovery assertions accepted; panel re-presentation pending T05/T06 |
+| R18 — accepted domain terminal/lease release | T03 | T03 educational saved/unsaved/clarification/failure/cancel settlement and observer isolation accepted; diagnostic verified settlement pending T04 |
 | R19 — theme/zoom/keyboard/motion/accessibility | T05 | Pending automated and actual review; OS accessibility qualifications separate |
 | R20 — reading/scroll/navigation/account ownership | T05 | Pending |
 | R21 — safe bounded liveness/health diagnostics | T02 | T02 safe byte/semantic-age/health/terminal summaries, privacy/observer tests and real correlated logs accepted; migrated model summaries/integrated audit pending |

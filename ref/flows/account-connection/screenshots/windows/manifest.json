@@ -17,13 +17,13 @@
       "sha256": "76e68543d1316063c1d02b76e7181c75f12dd7f3e825dfdbf0a1a33aa1b79dca"
     }
   ],
-  "capturedAt": "2026-10-05T18:19:34.118Z",
+  "capturedAt": "2026-10-05T18:50:56.058Z",
   "testSha256": "4e282aacee566aa9683aa5c6ae60df730031c97ead8bbbcfcbb229d275ccea7b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/account.spec.ts",
   "testTitle": "account panel restores and renews its connection after restart and signs out durably",
-  "revision": "53db6b2aea91328c4342a671440db96c7de7874a",
+  "revision": "f20752ce0c84a915d7c1b10088a7b4233e5f2302",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

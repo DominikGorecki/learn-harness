@@ -1,13 +1,13 @@
 {
   "flow": "diagnostics",
   "captures": [],
-  "capturedAt": "2026-10-05T18:19:40.781Z",
+  "capturedAt": "2026-10-05T18:51:01.866Z",
   "testSha256": "a01ec5d4e55916e12821a126fe1f2dd06d0cb5360ab966e1aaa298a952c46f2c",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/logging.spec.ts",
   "testTitle": "development logs collect main, renderer and preload telemetry without content or a public log API",
-  "revision": "53db6b2aea91328c4342a671440db96c7de7874a",
+  "revision": "f20752ce0c84a915d7c1b10088a7b4233e5f2302",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

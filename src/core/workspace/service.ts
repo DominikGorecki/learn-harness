@@ -4,6 +4,7 @@ import { parseSavedOutline } from '../../shared/workspace'
 import type { ProjectDocument, ProjectSnapshot, ProjectSummary, SavedOutline, WorkspaceSnapshot } from '../../shared/workspace'
 import type { LoadedProject, ProjectRegistry, ProjectStorage, RegisteredProject, TopicFolderState, ProjectChanges } from './ports'
 import { localizeTopicOutline } from '../../shared/outline'
+import { observeNotification } from '../notifications'
 
 export class WorkspaceService {
   private entries: RegisteredProject[] = []
@@ -36,7 +37,7 @@ export class WorkspaceService {
   subscribe(listener: (snapshot: WorkspaceSnapshot) => void): () => void {
     this.listeners.add(listener); return () => { this.listeners.delete(listener) }
   }
-  private emit(): void { for (const listener of this.listeners) listener(this.get()) }
+  private emit(): void { for (const listener of this.listeners) observeNotification(() => listener(this.get())) }
   private serial<T>(action: () => Promise<T>): Promise<T> {
     const next = this.queue.then(action, action)
     this.queue = next.then(() => undefined, () => undefined)

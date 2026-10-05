@@ -26,7 +26,7 @@ export interface ProviderFixtureOptions {
   outlineResult?: ReturnType<typeof learningOutline>
   projectFileCalls?: { name: string; args: Record<string, unknown> }[]
   modelTestMode?: 'completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
-  inferenceMode?: 'outline' | 'hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
+  inferenceMode?: 'outline' | 'hold' | 'preview-hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
 
 export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) {
@@ -36,6 +36,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   const tokens: URLSearchParams[] = []
   const inferenceRequests: Record<string, unknown>[] = []
   const pendingInference: ServerResponse[] = []
+  const previewPending = new WeakSet<ServerResponse>()
   const codes = new Map<string, { nonce: string; challenge: string; clientId: string }>()
   let baseUrl = ''
   let modelsRequested = 0
@@ -124,6 +125,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
           const call = options.projectFileCalls[turn]
           if (call) { writeToolResponse(response, call); return }
         }
+        if (options.inferenceMode === 'preview-hold') { pendingInference.push(response); previewPending.add(response); writeToolResponse(response, { args: options.outlineResult ?? learningOutline(), keepOpen: true }); return }
         if (options.inferenceMode === 'hold') { pendingInference.push(response); response.writeHead(200, { 'content-type': 'text/event-stream' }); response.write(': waiting\n\n'); return }
         if (options.inferenceMode === 'clarify') {
           writeToolResponse(response, { name: 'request_learning_details', args: { question: 'Which subject would you like to explore?', reason: 'The material does not point to one subject yet.' } }); return
@@ -159,7 +161,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   }
   return {
     baseUrl, endpoints, authorizations, tokens, inferenceRequests, options,
-    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) writeToolResponse(response, { args: learningOutline() }) },
+    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) { if (previewPending.has(response)) response.end(); else writeToolResponse(response, { args: learningOutline() }) } },
     modelsRequested: () => modelsRequested, revoked: () => revoked,
     close: () => new Promise<void>((resolve, reject) => { server.closeAllConnections(); server.close(error => error ? reject(error) : resolve()) })
   }

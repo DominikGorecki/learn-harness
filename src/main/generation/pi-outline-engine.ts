@@ -19,6 +19,8 @@ import { planEndpoint, streamPiTurn } from './pi-transport'
 export { planPayload } from './pi-transport'
 import type { MonotonicClock, TransportState } from './pi-stream-liveness'
 import { observe } from './observe'
+import { OutlineProjector } from './outline-projector'
+import type { OutlineProjection } from './outline-projector'
 
 export interface OutlineEngineInput {
   model: ModelChoice; accessToken: string; baseUrl: string; brief: string; path?: string
@@ -32,6 +34,7 @@ function record(value: unknown): Record<string, unknown> {
 export async function generateWithPi(input: OutlineEngineInput, options: {
   signal: AbortSignal; onPhase(phase: EnginePhase): void; maximumTurns?: number; timeoutMs?: number
   clock?: MonotonicClock; onTransport?(state: TransportState): void
+  onProgress?(frame: OutlineProjection): void
   onDiagnostic?(event: EngineDiagnosticEvent, data: Record<string, unknown>): void
 }): Promise<OutlineEngineResult> {
   const diagnostic = (event: EngineDiagnosticEvent, data: Record<string, unknown>) => {
@@ -144,7 +147,9 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
       return { action: outcome || failure || !completed || turns >= (options.maximumTurns ?? 16) ? 'end' : 'continue' }
     }
   })
-  const abort = () => agent.abort()
+  const projector = new OutlineProjector({ signal, topicId: input.topicId, clock: options.clock, onProgress: frame => options.onProgress?.(frame) })
+  const unsubscribe = agent.subscribe(event => observe(() => projector.event(event)))
+  const abort = () => { projector.dispose(); agent.abort() }
   signal.addEventListener('abort', abort, { once: true })
   try {
     await agent.prompt(`Learning intent (learner-provided data):\n${input.brief || '(Infer a coherent subject from the project material.)'}\n\n` +
@@ -156,9 +161,10 @@ export async function generateWithPi(input: OutlineEngineInput, options: {
     if (options.signal.aborted) throw new ApplicationError('CANCELLED', 'Outline creation cancelled. Your previous work is unchanged.')
     if (failure) throw failure
     if (!outcome || !completed || agent.state.errorMessage) throw new ApplicationError('UNAVAILABLE', 'A complete outline was not returned. Your previous work is unchanged; try again.')
+    projector.finish()
     return outcome
   } catch (error) {
     if (error instanceof ApplicationError) throw error
     throw new ApplicationError('NETWORK', 'Outline creation could not finish. Your previous work is unchanged; try again.')
-  } finally { signal.removeEventListener('abort', abort); agent.abort(); await agent.waitForIdle() }
+  } finally { unsubscribe(); projector.dispose(); signal.removeEventListener('abort', abort); agent.abort(); await agent.waitForIdle() }
 }

@@ -13,6 +13,7 @@ import { createProjectRegistry } from './storage/project-registry'
 import { createProjectStorage } from './storage/project-storage'
 import { registerWorkspaceHandlers } from './ipc/workspace-handlers'
 import { GenerationService } from '../core/generation/service'
+import { outlineActivity } from './generation/outline-activity'
 import { AiCoordinator } from '../core/ai/coordinator'
 import { registerAiHandlers } from './ipc/ai-handlers'
 import { registerGenerationHandlers } from './ipc/generation-handlers'
@@ -81,6 +82,7 @@ if (!app.requestSingleInstanceLock()) {
     const providerEndpoints = providerEnvironment({ packaged: app.isPackaged,
       testProfile: process.env.EDU_HARNESS_TEST_DATA_DIR, fixtureOrigin: process.env.EDU_HARNESS_TEST_PROVIDER_URL })
     account = new AccountService({
+      ai,
       provider: createChatGPTProvider({ endpoints: providerEndpoints }),
       store: createCredentialStore(join(app.getPath('userData'), 'connection'), {
         available: () => safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'),
@@ -104,12 +106,16 @@ if (!app.requestSingleInstanceLock()) {
     await workspace.initialize()
     registerWorkspaceHandlers(workspace, () => mainWindow, expectedOrigin)
     generation = new GenerationService({
-      workspace, createId: randomUUID, now: () => new Date().toISOString(),
-      onBusy: busy => account!.setInferenceBusy(busy), onAccountFailure: error => account!.recordFailure(error),
-      generate: async (input, signal, onPhase) => {
-        const authorized = await account!.authorizeModel(input.model.id)
+      workspace, ai, createId: randomUUID, now: () => new Date().toISOString(),
+      beforeStart: () => account!.assertCanStartOutline(), onAccountFailure: error => account!.recordFailure(error),
+      generate: async (input, signal, onPhase, lease) => {
+        const authorized = await account!.authorizeModel(input.model.id, lease)
         signal.throwIfAborted()
-        return runOutlineWorker({ ...input, model: authorized.model, accessToken: authorized.accessToken, baseUrl: providerEndpoints.resource }, { signal, onPhase })
+        if (!ai.isOwner(lease)) throw new Error('AI owner changed before launch')
+        const operation = ai.get().active!
+        return runOutlineWorker({ ...input, model: authorized.model, accessToken: authorized.accessToken, baseUrl: providerEndpoints.resource }, {
+          signal, onPhase, ...outlineActivity(lease, { projectId: operation.projectId!, ...(operation.topicId ? { topicId: operation.topicId } : {}) })
+        })
       }
     })
     registerGenerationHandlers(generation, () => mainWindow, expectedOrigin)
@@ -130,11 +136,14 @@ if (!app.requestSingleInstanceLock()) {
     if (stopping) return
     stopping = true
     logDiagnostic('info', 'main', 'app.stopping')
-    generation?.dispose(); account?.dispose()
-    // Give buffered diagnostics a bounded opportunity to reach disk on normal exit.
-    const deadline = setTimeout(() => { logsClosed = true; app.quit() }, 2000)
-    void ai.dispose().catch(() => { logDiagnostic('error', 'main', 'app.stopping', { code: 'INTERNAL' }) }).then(() => diagnostics.close()).finally(() => {
-      clearTimeout(deadline); logsClosed = true; app.quit()
-    })
+    generation?.dispose()
+    // Publication/owned worker cleanup precedes the bounded diagnostics flush.
+    void ai.dispose().then(async () => {
+      await generation?.waitForIdle() // Storage-only retry has no AI lease but still owns publication.
+      account?.dispose()
+      const deadline = setTimeout(() => { logsClosed = true; app.quit() }, 2000)
+      try { await diagnostics.close() }
+      finally { clearTimeout(deadline); logsClosed = true; app.quit() }
+    }).catch(() => { logDiagnostic('error', 'main', 'app.stopping', { code: 'INTERNAL' }) })
   })
 }

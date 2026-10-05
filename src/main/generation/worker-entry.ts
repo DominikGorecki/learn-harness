@@ -36,6 +36,7 @@ process.parentPort?.on('message', (event: { data: unknown }) => {
   const run = request.profile === 'outline'
     ? generateWithPi(request.input, { signal: controller.signal,
       onPhase: value => { phase = value; reply({ type: 'phase', phase: value }) }, onTransport: transport,
+      onProgress: frame => reply({ type: 'progress', ...frame }),
       onDiagnostic: (event, data) => reply({ type: 'diagnostic', event, data: safeLogData(data) }) })
       .then(result => reply({ type: 'result', profile: 'outline', result }))
     : runModelAccessProfile(request.input, { signal: controller.signal, onTransport: transport,
