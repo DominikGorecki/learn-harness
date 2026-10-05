@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learning Studio Spec"
+  short_description: "Write a grounded Learning Studio implementation spec"
+  default_prompt: "Use $spec to write this Learning Studio implementation plan under ref/work, following project guidance and accepted ADRs."
