@@ -37,4 +37,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0020](ADR-0020-playwright-flow-references.md) | Accepted | Per-flow explanations, platform-specific passing Playwright screenshots and generated capture indexes | Changing flow discovery, screenshot publication, freshness or AI maintenance |
 
+| [ADR-0021](ADR-0021-automatic-local-commits.md) | Accepted | Standing authorization for scoped, validated local commits on the active branch | Changing contributor commit defaults, task completion or preservation of unrelated work |
+
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

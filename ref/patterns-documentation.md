@@ -1,6 +1,6 @@
 # Documentation patterns
 
-Governed by [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
+Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
 
 ## Progressive discovery
 
@@ -15,5 +15,7 @@ Under [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [flow patterns](p
 ## Maintenance
 
 For a durable change, add the next ADR and update the ADR index, pattern index, and affected domain patterns together. Amend or supersede prior decisions explicitly. Routine features/refactors inside accepted boundaries do not require new ADRs. Keep links relative within the repository and verify they resolve.
+
+Completed documentation changes, including specs and tickets, follow [automatic local commits](patterns-development-testing.md#automatic-local-commits) under ADR-0021. Commit the scoped artifacts and related guidance after documentation validation, unless the user explicitly requests uncommitted work. Planning authorization still limits the task to planning; committing those artifacts does not authorize implementation.
 
 Record research with dates and direct primary-source links. Record validation separately, naming what ran and what remains unverified. Context Bank supplied portable documentation conventions; it does not own this app's local patterns and no bank write is required for app changes.

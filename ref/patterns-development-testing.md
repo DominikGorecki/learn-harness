@@ -1,6 +1,17 @@
 # Development and testing patterns
 
-Governed by [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md) and [ADR-0006](ADRs/ADR-0006-development-port-shutdown.md).
+Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md) and [ADR-0006](ADRs/ADR-0006-development-port-shutdown.md).
+
+## Automatic local commits
+
+The user's standing instruction authorizes a local commit for each completed, validated change on the branch active at task start. It includes code, documentation, planning artifacts and reviewed flow references. It overrides skill defaults that only suggest a commit or require separate commit authorization. An explicit request to leave changes uncommitted takes precedence. Read-only work with no changes needs no commit; this workflow adds no Git hook or CI commit behavior.
+
+1. Record the named active branch, HEAD and staged/unstaged/untracked changes before editing. Preserve unrelated work. Do not create or switch branches for automatic committing.
+2. Complete the scoped change and required validation. For documentation-only changes, review the diff, verify affected relative links and run `git diff --check`; code and desktop changes retain the gates below. Fix failures caused by the change. Record actual failures or environment limits; do not label unfinished work complete.
+3. Recheck branch and HEAD before committing. Reconcile unexpected changes without discarding another actor's work. A detached HEAD or changed branch requires resolution before committing; do not silently choose a destination.
+4. Review and stage only task-owned files or hunks, including related guidance and reviewed generated references. Avoid blanket staging. Preserve unrelated index entries and any unrelated hunks in shared files using selective staging and a scoped commit method.
+5. Create a local commit with a concise imperative subject, following an applicable ticket convention. Do not ask again for routine commit permission, amend existing commits, rewrite history or push under this authorization. In delegated work, the coordinator owns staging and commits; workers return scoped changes and evidence.
+6. Inspect the resulting commit and final status to confirm the intended changes were committed and unrelated work remains intact. Report the branch, commit SHA and validation results. If required validation or committing is blocked, preserve edits and report the exact blocker and remaining uncommitted work; never claim an unsuccessful commit succeeded.
 
 ## Commands and dependency ownership
 

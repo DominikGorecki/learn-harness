@@ -10,10 +10,10 @@ Read this map, select the area touched by the task, then read its focused rules 
 | Composition, visual tokens, typography, component states | [Design system](patterns-design-system.md) | ADR-0007, ADR-0013 |
 | Navigation, input, progress, recovery, keyboard/focus | [UX](patterns-ux.md) | ADR-0007, ADR-0012, ADR-0013, ADR-0015, ADR-0016, ADR-0017, ADR-0019 |
 | React organization, request state, safe rendering | [Renderer](patterns-renderer.md) | ADR-0001, ADR-0002, ADR-0003, ADR-0007, ADR-0013, ADR-0017, ADR-0018, ADR-0019 |
-| Documented journeys, screenshots and automatic reference refresh | [Flows](patterns-flow.md) | ADR-0004, ADR-0005, ADR-0020 |
-| Tooling, development shutdown, diagnostics, tests, CI checks | [Development and testing](patterns-development-testing.md) | ADR-0004, ADR-0006, ADR-0018, ADR-0020 |
+| Documented journeys, screenshots and automatic reference refresh | [Flows](patterns-flow.md) | ADR-0004, ADR-0005, ADR-0020, ADR-0021 |
+| Tooling, development shutdown, diagnostics, tests, CI checks, automatic local commits | [Development and testing](patterns-development-testing.md) | ADR-0004, ADR-0006, ADR-0018, ADR-0020, ADR-0021 |
 | Platform targets, packaging, release | [Distribution](patterns-distribution.md) | ADR-0004 |
-| Progressive discovery and ADR lifecycle | [Documentation](patterns-documentation.md) | ADR-0005, ADR-0007, ADR-0013, ADR-0020 |
+| Progressive discovery and ADR lifecycle | [Documentation](patterns-documentation.md) | ADR-0005, ADR-0007, ADR-0013, ADR-0020, ADR-0021 |
 
 Start with [AGENTS.md](../AGENTS.md) for task routing and authority. When a durable rule changes, update its focused file, this index, and [ADRs/INDEX.md](ADRs/INDEX.md) together.
 
