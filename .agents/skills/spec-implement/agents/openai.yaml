@@ -1,4 +1,4 @@
 interface:
   display_name: "Learning Studio Spec Implementation"
   short_description: "Coordinate and verify a complete Learning Studio spec"
-  default_prompt: "Use $spec-implement to implement this Learning Studio ref/work bundle with scoped workers, individual ticket commits, and final integration and acceptance evidence."
+  default_prompt: "Use $spec-implement to implement this Learning Studio spec or ref/work bundle, reusing existing tickets or first creating them with $spec-tickets, then using scoped workers, individual ticket commits, and final integration and acceptance evidence."

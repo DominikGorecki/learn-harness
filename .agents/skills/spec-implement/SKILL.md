@@ -1,17 +1,17 @@
 ---
 name: spec-implement
-description: Implement a complete Learning Studio ref/work bundle using scoped subagents, dependency scheduling, individual ticket commits, and coordinator-owned Electron integration/acceptance evidence. Use when the user requests whole-spec implementation.
+description: Implement a complete Learning Studio ref/work bundle, reusing existing tickets or first creating them with spec-tickets, then using scoped subagents, dependency scheduling, individual ticket commits, and coordinator-owned Electron integration/acceptance evidence. Use when the user requests whole-spec implementation.
 metadata:
   collection: "spec skills"
-  version: "2.0.0-project.1"
+  version: "2.0.0-project.2"
   project: "edu-harness"
 ---
 
 # Implement a spec bundle
 
-Take a project bundle such as `ref/work/NN-<slug>/` through its open tickets and final verification. The primary agent coordinates workers, accepts changes, commits to the branch active at invocation, and verifies the complete implementation. Installing or reading this skill does not execute that workflow.
+Take a source spec or project bundle such as `ref/work/NN-<slug>/` through ticket preparation, implementation and final verification. Reuse existing tickets; when none belong to the source spec, create them with `spec-tickets` before scheduling workers. The primary agent coordinates workers, accepts changes, commits to the branch active at invocation, and verifies the complete implementation. Installing or reading this skill does not execute that workflow.
 
-Invoking this skill authorizes subagent assignments, model selection within available capabilities, scoped implementation, and local commits. Continue through the whole bundle without asking again for routine ticket commits. Other external actions follow the user's existing authorization.
+Invoking this skill authorizes necessary ticket creation through `spec-tickets`, subagent assignments, model selection within available capabilities, scoped implementation, and local commits. Continue through ticket preparation and the whole bundle without asking again for routine stage transitions or ticket commits. Other external actions follow the user's existing authorization.
 
 Use `ref/work/NN-<slug>/`, `<slug>.spec.md`, and `<slug>.tNN.md`, preserving existing descriptive statuses and bundle names. Identify membership through stable ticket IDs and source-spec links, not file ordering. Do not move artifacts to `docs/work` or add `__DONE` by default. The `TNN-` local ticket-commit convention below applies unless the user or project specifies another one.
 
@@ -29,14 +29,22 @@ Use `ref/work/NN-<slug>/`, `<slug>.spec.md`, and `<slug>.tNN.md`, preserving exi
 
 ## 1. Discover the bundle and baseline
 
-1. Resolve the supplied directory by project naming and source links. Read its spec, tickets and validation/acceptance records fully. If stale, locate the same identity. Verify recorded closure against evidence before reporting completed work; do not reopen accepted scope unless the user requests it.
+1. Resolve the supplied spec or directory by project naming and source links. Read its spec, any existing tickets and validation/acceptance records fully. If stale, locate the same identity. Verify recorded closure against evidence before reporting completed work; do not reopen accepted scope unless the user requests it.
 2. Read applicable agent instructions, documentation indexes, implementation/testing guidance, relevant focused patterns and architecture decisions, and the companion [spec-implement-ticket](../spec-implement-ticket/SKILL.md). Resolve an available project-local copy when the harness uses a different skill location. The companion is required for delegated ticket work; if missing, obtain it from this collection before assigning workers. Inspect the implementation, tests, and package boundaries that affect the tickets.
 3. Record the named active branch, starting HEAD, staged/unstaged changes, untracked files, and any existing validation failures that matter. Preserve unrelated work. Do not change branches or reset the workspace to simplify the task.
 4. Check that Git commits and subagent tools are available. Inspect the runtime's advertised models, reasoning settings, and concurrency limit. Use supported choices; do not claim a requested model was used if the runtime could not select it. Report an actual missing capability and the needed alternative if delegation or commits cannot proceed.
 
-## 2. Validate and schedule the dependency graph
+## 2. Reuse or create the tickets
 
-1. Build a graph from each ticket's `Depends on` entries in its `Dependencies` section, resolving IDs, relative ticket links, and any explicit external prerequisites. `Unblocks` is a consistency hint, not another prerequisite list. Check unique ticket IDs, source-spec alignment, valid statuses, missing dependencies, cycles, and unresolved product blockers. Resolve structural errors from source evidence or a focused user decision before scheduling affected work; do not rewrite dependencies merely to make a ticket ready. Never infer that a blocked prerequisite is satisfied from ticket numbering.
+1. Identify all tickets belonging to the resolved source spec by stable IDs and source links, including relocated tickets. Other specs' tickets in the same directory do not count. Inspect existing contents and lifecycle state before deciding tickets are absent.
+2. If matching tickets exist, reuse them with their IDs, statuses, dependencies and completion evidence. Do not regenerate, overwrite, or renumber them. Validate their requirement coverage and readiness in the next section; a partial or blocked ticket set is not an empty one.
+3. If no matching tickets exist, load the project-local [spec-tickets](../spec-tickets/SKILL.md) and follow its complete procedure and [ticket template](../spec-tickets/references/template.md) for the resolved spec. Ticket creation requires a ready source spec with bounded scope, concrete acceptance criteria and resolved blocking product decisions. Resolve material gaps from project evidence or a focused user decision; do not invent requirements to produce tickets. If the companion is unavailable, obtain it from this collection before proceeding.
+4. Preserve the source slug and bundle path, and write the new tickets beside the spec using the project's conventions. Record every created file as coordinator-owned task work and include each ticket artifact in its eventual implementation commit. Inspect the generated tickets, requirement coverage, dependency references and validation paths before releasing any worker.
+5. Continue directly into dependency validation and implementation under this invocation's authorization. The standalone `spec-tickets` stage's restriction on implementation/commits does not revoke the enclosing `spec-implement` authorization. Ticket-writing success alone does not complete this workflow.
+
+## 3. Validate and schedule the dependency graph
+
+1. Build a graph from each ticket's `Depends on` entries in its `Dependencies` section, resolving IDs, relative ticket links, and any explicit external prerequisites. `Unblocks` is a consistency hint, not another prerequisite list. Check unique ticket IDs, source-spec alignment, full requirement coverage, valid statuses, missing dependencies, cycles, and unresolved product blockers. Resolve structural errors or coverage gaps from source evidence or a focused user decision before scheduling affected work; preserve accepted tickets and do not rewrite dependencies merely to make a ticket ready. Never infer that a blocked prerequisite is satisfied from ticket numbering.
 2. Treat a ticket marked completed (by default `Status: Done`) as a candidate completed dependency: verify its completion evidence, relevant implementation, and an existing commit reachable from the active branch. Reuse verified completed work. Reconcile missing evidence or uncommitted ticket work before releasing its dependents.
 3. Produce a concise plan with ticket, prerequisites, difficulty, agent role, model, reasoning effort, likely file ownership, and validation. Read [model-routing.md](references/model-routing.md) for selection guidance. Explain each choice in one sentence.
 4. Use a stable topological order, choosing the lowest ticket number, or stable local ticket ID when unnumbered, when several tickets are ready. A dependent becomes ready only after every prerequisite is accepted and committed on the active branch.
@@ -44,7 +52,7 @@ Use `ref/work/NN-<slug>/`, `<slug>.spec.md`, and `<slug>.tNN.md`, preserving exi
 
 Proceed with independent ready work while resolving a blocker elsewhere. Keep blocked tickets open and carry their exact remaining prerequisites in progress reports.
 
-## 3. Delegate each ready ticket
+## 4. Delegate each ready ticket
 
 Choose an agent role suited to the changed surface: domain/library, backend, frontend, CLI/packaging, data migration, infrastructure, or documentation. Spawn with the selected supported model and reasoning effort. If the runtime restricts model overrides for inherited context, use a supported fresh or bounded context handoff and provide the full contract below. Reuse an agent only when its model and role still fit; refresh its paths, branch revision, and dependency commits for the next ticket.
 
@@ -57,7 +65,7 @@ Every handoff must include:
 
 Workers send material questions and scope conflicts to the primary. Escalate the model or reassign the task when observed errors show that the chosen level is insufficient; give the replacement the current diff and failure evidence rather than restarting blindly.
 
-## 4. Accept and commit one ticket at a time
+## 5. Accept and commit one ticket at a time
 
 For each worker result, the primary must:
 
@@ -69,7 +77,7 @@ For each worker result, the primary must:
 
 Use the same sequence on resume. Consult completion records, code, and Git history to distinguish accepted/committed work from partial edits. Do not duplicate a completed ticket merely because the prior agent's working notes are unavailable.
 
-## 5. Verify the whole implementation as the primary agent
+## 6. Verify the whole implementation as the primary agent
 
 After all ticket implementation commits are present, stop or wait for all mutating workers. The primary then performs a fresh review from the spec:
 
@@ -79,7 +87,7 @@ After all ticket implementation commits are present, stop or wait for all mutati
 4. Use an additional agent for a focused review when the difficulty warrants it, but the primary must inspect the result, run the final checks, and own the acceptance decision. Resolve all required failures before claiming completion.
 5. Update affected maintained guidance and follow the project’s architecture-decision workflow for a new durable decision when warranted. Use a local `adr` skill if available; do not require that skill in projects with another decision workflow. Stop processes and remove temporary resources started by this workflow, preserving pre-existing services and user files.
 
-## 6. Record verification and close the bundle
+## 7. Record verification and close the bundle
 
 1. Append `## Implementation verification` to the spec with the branch and starting revision, ticket/model/commit mapping, requirement evidence, final commands and outcomes, follow-up fixes, and material limits. Record existing commit SHAs; do not try to embed a commit's own future SHA in its contents.
 2. Only after all ticket acceptance evidence and every mandatory whole-spec gate pass, record closure in `validation.md` and applicable `acceptance.md`. Keep the existing directory name and verify actual links. Missing external/live/native-platform evidence leaves the corresponding scope explicitly unresolved.
