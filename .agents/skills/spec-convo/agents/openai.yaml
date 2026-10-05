@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learning Studio Spec Conversation"
+  short_description: "Settle Learning Studio decisions before a spec"
+  default_prompt: "Use $spec-convo to discuss this Learning Studio change, inspect project guidance, and prepare a spec context brief."
