@@ -74,5 +74,11 @@ Real utility evidence covers health reports, cooperative cancellation, unexpecte
 
 ## Notes
 
+### Final integration follow-up
+
+Primary full-desktop verification at T07 `2b66eb0` found one worker-loss test failure: its default kill call returned, but no actual PID-absence/exit evidence was retained before the ten-second UI assertion failed. Read-only trace audit established an attempted kill, not a production lifecycle defect. Worker `pi_transport_audit`, GPT-6.1 Sol / high, made a scoped test-only repair: require exactly one owned positive non-main utility PID, assert explicit SIGKILL acceptance and poll that same PID's absence treating only ESRCH as death. The original ten-second failure assertion, saved-byte/privacy/correlated exit checks and production limits remain unchanged; safe lifecycle-only evidence is attached if the terminal assertion fails.
+
+Focused `npm.cmd run test:desktop -- tests/desktop/logging.spec.ts --grep '@inference-diagnostics'` (16002) passed exit 0, one journey in 14.0 seconds, with actual absence and terminal evidence. `npm.cmd run check` (4194) passed lint, 282 tests / three platform skips, flows, types and build. Primary inspected the actual diff; no runtime/security/reporter change was made. Configured publication refreshed only the nonvisual inference-diagnostics flow. No owned process or publication lock/stage/backup remained. Fresh primary complete gates follow its local repair commit; this follow-up does not claim bundle closure.
+
 - Requirements covered: primary R03, R04, R05, R06, R21; supporting R01, R07, R16.
 - Blockers: none. Keep pinned SDK versions unless compatibility evidence proves a necessary change. OAuth/discovery/revocation deadlines are unchanged.

@@ -113,12 +113,36 @@ test('model and utility diagnostics retain transport evidence and request correl
     await startRevision()
     await expect.poll(() => fixture.inferenceRequests.length).toBe(4)
     const beforeWorkerLoss = await readFile(savedPath, 'utf8')
-    await desktop.evaluate(({ app }) => {
-      const worker = app.getAppMetrics().find(metric => metric.name === 'Learning outline')
-      if (!worker) throw new Error('Expected the owned outline worker')
-      process.kill(worker.pid)
+    const termination = await desktop.evaluate(({ app }) => {
+      const workers = app.getAppMetrics().filter(metric => metric.name === 'Learning outline')
+      if (workers.length !== 1) throw new Error('Expected exactly one owned outline worker')
+      const pid = workers[0]!.pid
+      if (!Number.isInteger(pid) || pid <= 0 || pid === process.pid) throw new Error('Expected a positive owned utility PID distinct from main')
+      return { pid, mainPid: process.pid, accepted: process.kill(pid, 'SIGKILL') }
     })
-    await expect(page.getByText('The outline process stopped unexpectedly. Your previous work is unchanged.', { exact: true })).toBeVisible()
+    expect(termination.accepted).toBe(true)
+    expect(termination.pid).toBeGreaterThan(0)
+    expect(termination.pid).not.toBe(termination.mainPid)
+    await expect.poll(() => desktop!.evaluate((_, pid) => {
+      try { process.kill(pid, 0); return false }
+      catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ESRCH') return true
+        throw error
+      }
+    }, termination.pid)).toBe(true)
+    try {
+      await expect(page.getByText('The outline process stopped unexpectedly. Your previous work is unchanged.', { exact: true })).toBeVisible()
+    } catch (error) {
+      // Preserve only allowlisted lifecycle evidence before this owned fixture is removed.
+      const events = (await logText()).trim().split('\n').map(line => JSON.parse(line))
+        .filter(entry => /^(worker\.|engine\.(request|response|transport|terminal)$)/.test(entry.event))
+        .map(entry => ({ timestamp: entry.timestamp, sequence: entry.sequence, event: entry.event, data: Object.fromEntries(
+          ['workerId', 'requestId', 'pid', 'exitCode', 'code', 'phase', 'bytes', 'chunks', 'events', 'transportStage', 'terminalReason', 'elapsedMs']
+            .filter(key => entry.data?.[key] !== undefined).map(key => [key, entry.data[key]])
+        ) }))
+      await test.info().attach('owned-worker-loss-evidence', { body: Buffer.from(JSON.stringify({ termination, events })), contentType: 'application/json' })
+      throw error
+    }
     await expect.poll(() => desktop!.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Learning outline').length)).toBe(0)
     expect(await readFile(savedPath, 'utf8')).toBe(beforeWorkerLoss)
     await desktop.close(); desktop = undefined
