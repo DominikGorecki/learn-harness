@@ -12,6 +12,8 @@ const keyPair = generateKeyPair('RS256')
 const wrongKeyPair = generateKeyPair('RS256')
 
 export interface ProviderFixtureOptions {
+  /** Private desktop-fixture transport control; never exposed by application IPC. */
+  onInference?: (response: ServerResponse, payload: Record<string, unknown>, requestNumber: number) => boolean
   deny?: boolean
   permission?: boolean
   wrongNonce?: boolean
@@ -115,6 +117,7 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
         if (!request.headers.authorization?.startsWith('Bearer fixture-')) { json(response, 401, { error: 'invalid_token' }); return }
         const payload = JSON.parse(await body(request)) as Record<string, unknown>
         inferenceRequests.push(payload)
+        if (options.onInference?.(response, payload, inferenceRequests.length)) return
         if ((payload.model === 'gpt-6.1-sol' || payload.model === 'gpt-6-luna') && !payload.tools) {
           response.writeHead(200, { 'content-type': 'text/event-stream' })
           if (options.modelTestMode === 'hold') { pendingInference.push(response); diagnosticPending.set(response, payload.model as string); response.write(': waiting\n\n'); return }

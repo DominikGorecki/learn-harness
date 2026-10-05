@@ -1,0 +1,47 @@
+# Real long AI streaming
+
+[Test implementation](../../../tests/desktop/ai-streaming.spec.ts) · [Flow patterns](../../patterns-flow.md)
+
+## Starting conditions
+
+An isolated project/profile, synthetic learning content and the signed local provider fixture. Production idle, worker health, admission and publication policies remain unchanged.
+
+## Journey and assertions
+
+1. Accepted submission focuses the workbench in less than five seconds. A real SSE comment establishes waiting before any outline fields arrive.
+2. Genuine fragmented function arguments produce a structured provisional draft. Hundreds of burst events traverse Pi, the utility, main and the named bridge; a subscription installed before the request measures the unique latest marker within 250 milliseconds. Global revisions, escaped UTF-8 frame sizes and bounded preview/frame counts are checked.
+3. The response sends comments every five seconds and remains open for at least 200.5 real seconds. After 190 seconds, activity and Cancel remain available and authoritative project/source bytes remain unchanged. Light, Dark and reduced-motion captures supplement earlier minimum-window, zoom, focus and reading journeys.
+4. The independently validated outline pauses at its ordinary FileHandle write, scoped to this unique project ID and exact result. Saving disables cancellation and preserves the old bytes until the barrier releases the original write/sync/rename. Saved output exactly matches the complete result and the real worker has exited.
+5. A fixed Sol diagnostic receives genuine clean-EOF proof. Private main instrumentation retains only that worker's actual exit event, after its PID is absent. Admission remains held and the badge unverified while checking; replaying the real event allows independent main verification and completes every activity. No phase, snapshot or proof is fabricated. Both barriers restore themselves in finally.
+
+## Run and refresh
+
+```powershell
+npm run test:desktop -- tests/desktop/ai-streaming.spec.ts --grep "@ai-streaming( |$)"
+```
+
+Only this long journey has a 300-second test budget; the suite's 45-second default is unchanged. The configured reporter owns capture publication.
+
+## Evidence limits
+
+This is unaccelerated local protocol-fixture evidence through actual Electron processes and IPC. It does not qualify live provider allowance/eligibility, other native platforms, suspend/resume or OS screen readers. Earlier model-access, recovery, topic, reading and appearance journeys provide complementary behavior; screenshots alone do not establish acceptance or mastery. Temporary local paths are masked.
+
+<!-- flow-captures:start -->
+
+### windows
+
+Last successful run: 2026-10-05T21:15:31.489Z. Source revision: 2d3488f989e31dd263b0eff95524198442429946; source changes present: true.
+
+[Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
+
+| Screenshot | Observed checkpoint | Pixels |
+| --- | --- | --- |
+| [stream-waiting](screenshots/windows/stream-waiting.png) | Real comment bytes keep the waiting operation alive before structured output. | 1583 × 973 |
+| [stream-structured-light](screenshots/windows/stream-structured-light.png) | Fragmented structured arguments form a provisional Light draft after a bounded burst. | 1583 × 973 |
+| [stream-structured-dark](screenshots/windows/stream-structured-dark.png) | The same genuine provisional draft in Dark with reduced motion. | 1583 × 973 |
+| [stream-past-190](screenshots/windows/stream-past-190.png) | Active receiving draft and reachable Cancel after 190 real seconds; saved metadata is unchanged. | 1583 × 973 |
+| [stream-saving](screenshots/windows/stream-saving.png) | Validated output waits at the real scoped file write; Cancel is unavailable during publication. | 1583 × 973 |
+| [stream-saved](screenshots/windows/stream-saved.png) | The complete accepted outline is saved after more than 200 seconds of receiving. | 1583 × 973 |
+| [stream-checking](screenshots/windows/stream-checking.png) | Real clean-EOF diagnostic evidence awaits delivery of its actual process exit before independent verification. | 1583 × 973 |
+
+<!-- flow-captures:end -->

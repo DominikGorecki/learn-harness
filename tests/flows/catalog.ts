@@ -68,6 +68,20 @@ export const flows: Record<string, FlowDefinition> = {
   } },
   diagnostics: { title: 'Development diagnostic boundaries', testFile: 'logging.spec.ts', screenshots: {} },
   'inference-diagnostics': { title: 'Inference diagnostic correlation', testFile: 'logging.spec.ts', screenshots: {} },
+  'ai-streaming': { title: 'Real long stream and domain acceptance', testFile: 'ai-streaming.spec.ts', screenshots: {
+    'stream-waiting': 'Real comment bytes keep the waiting operation alive before structured output.',
+    'stream-structured-light': 'Fragmented structured arguments form a provisional Light draft after a bounded burst.',
+    'stream-structured-dark': 'The same genuine provisional draft in Dark with reduced motion.',
+    'stream-past-190': 'Active receiving draft and reachable Cancel after 190 real seconds; saved metadata is unchanged.',
+    'stream-saving': 'Validated output waits at the real scoped file write; Cancel is unavailable during publication.',
+    'stream-saved': 'The complete accepted outline is saved after more than 200 seconds of receiving.',
+    'stream-checking': 'Real clean-EOF diagnostic evidence awaits delivery of its actual process exit before independent verification.'
+  } },
+  'ai-streaming-repair': { title: 'Structured candidate repair', testFile: 'ai-streaming.spec.ts', screenshots: {
+    'repair-first-draft': 'A genuine first structured draft is provisional and has not entered saved project state.',
+    'repair-replacement': 'The second provider turn replaces the rejected candidate rather than appending it.',
+    'repair-saved': 'Only the independently valid replacement becomes the saved outline.'
+  } },
   'packaged-worker': { title: 'Packaged Pi worker', testFile: 'packaged-worker.spec.ts', screenshots: {} }
 }
 

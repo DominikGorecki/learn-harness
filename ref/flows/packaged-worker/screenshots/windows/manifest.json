@@ -1,13 +1,13 @@
 {
   "flow": "packaged-worker",
   "captures": [],
-  "capturedAt": "2026-10-05T19:25:10.996Z",
-  "testSha256": "a95ccfb6e1db82723c955ac9b4bc704bdbe6cc397c23b40b7b1d08efe89a15dd",
+  "capturedAt": "2026-10-05T21:20:07.910Z",
+  "testSha256": "1036e0ae3a100050f221a774f0f8e2b9380be9a00ba341cc9a7834d05844ebf9",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/packaged-worker.spec.ts",
-  "testTitle": "packaged ASAR worker loads its Pi dependencies and reads only scoped material",
-  "revision": "3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7",
+  "testTitle": "packaged ASAR worker runs scoped outline and both fixed tool-free diagnostic profiles",
+  "revision": "2d3488f989e31dd263b0eff95524198442429946",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

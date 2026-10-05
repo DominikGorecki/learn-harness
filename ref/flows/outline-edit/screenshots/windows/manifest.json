@@ -59,16 +59,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cf56331cc23754eb4e081c15e7077b4676ec279e527a2d0fb6e934cb2c2fccd3"
+      "sha256": "560b7bead312db56936652e114fefb72688bdc0bd2ecf5415f7bd9850371182c"
     }
   ],
-  "capturedAt": "2026-10-05T20:48:27.936Z",
+  "capturedAt": "2026-10-05T21:17:22.204Z",
   "testSha256": "7780f3d99837f285c3fb6fd5a7eb92222171e12309dee9bb21e72664efba4dee",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline-edit.spec.ts",
   "testTitle": "edit dialog rewrites the numbered path through Pi with the active model and persists it across restart",
-  "revision": "d7103ac828f33e9ea26483147f9eb5550564c8ee",
+  "revision": "2d3488f989e31dd263b0eff95524198442429946",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -84,6 +84,39 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     await expect(timeline).toBeInViewport()
     await preview.scrollIntoViewIfNeeded()
     expect(await preview.evaluate(element => { const bounds = element.getBoundingClientRect(), clip = element.closest('.ai-panel-body')!.getBoundingClientRect(), label = element.closest('.ai-preview-column')!.querySelector('.ai-body-label')!.getBoundingClientRect(); return Math.max(0, Math.min(bounds.bottom, clip.bottom, element.ownerDocument.defaultView!.innerHeight) - Math.max(bounds.top, clip.top, label.bottom, 0)) })).toBeGreaterThan(20)
+    // Align the actual preview column in the stacked body's scroll viewport.
+    // The region's rectangle alone cannot prove its prose is painted/uncovered.
+    await preview.evaluate(element => {
+      const body = element.closest('.ai-panel-body')!, column = element.closest('.ai-preview-column')!
+      body.scrollTop += column.getBoundingClientRect().top - body.getBoundingClientRect().top
+      const paragraph = element.querySelector('.ai-preview-content p')!
+      element.scrollTop += paragraph.getBoundingClientRect().top - element.getBoundingClientRect().top - 4
+    })
+    await expect.poll(() => preview.evaluate(element => {
+      const document = element.ownerDocument, view = document.defaultView!, paragraph = element.querySelector('.ai-preview-content p')!
+      const range = document.createRange(); range.selectNodeContents(paragraph)
+      const visibleHeight = (rect: ReturnType<typeof paragraph.getBoundingClientRect>, node: typeof paragraph) => {
+        let left = Math.max(0, rect.left), right = Math.min(view.innerWidth, rect.right)
+        let top = Math.max(0, rect.top), bottom = Math.min(view.innerHeight, rect.bottom)
+        for (let parent = node.parentElement; parent; parent = parent.parentElement) {
+          const style = view.getComputedStyle(parent), bounds = parent.getBoundingClientRect()
+          if (/(auto|scroll|hidden|clip)/.test(style.overflowX)) { left = Math.max(left, bounds.left); right = Math.min(right, bounds.right) }
+          if (/(auto|scroll|hidden|clip)/.test(style.overflowY)) { top = Math.max(top, bounds.top); bottom = Math.min(bottom, bounds.bottom) }
+        }
+        if (right <= left || bottom <= top) return 0
+        const hit = document.elementFromPoint((left + right) / 2, (top + bottom) / 2)
+        return hit && (hit === node || node.contains(hit)) ? bottom - top : 0
+      }
+      const label = element.closest('.ai-preview-column')!.querySelector('.ai-body-label')!
+      const prose = Math.max(0, ...Array.from(range.getClientRects()).map(rect => visibleHeight(rect, paragraph)))
+      const labelHeight = visibleHeight(label.getBoundingClientRect(), label)
+      return JSON.stringify({ visible: prose > 12 && labelHeight > 8, prose, labelHeight })
+    })).toContain('"visible":true')
+    await expect(panel.getByRole('button', { name: 'Cancel', exact: true })).toBeInViewport()
+    await preview.evaluate(element => new Promise<void>(resolve => {
+      const view = element.ownerDocument.defaultView!
+      view.requestAnimationFrame(() => view.requestAnimationFrame(() => resolve()))
+    }))
     await flow.capture(desktop, page, 'outline-streaming-zoom')
     await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.webContents.setZoomFactor(1); window.setContentSize(1280, 840) })
     expect((await saved()).outline).toBeNull() // Completed-looking draft is provisional until clean EOF.

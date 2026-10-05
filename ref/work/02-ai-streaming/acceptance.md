@@ -10,15 +10,15 @@ This matrix records verified implementation evidence, not design approval or pro
 | --- | --- | --- |
 | R01 — shared Pi path for all five starts | T04 | T04 source inventory/private profile and actual diagnostic utility evidence accepted; all five producers share admission/Pi and T05's accepted panel; final integration/source audit pending T06/T07 |
 | R02 — synchronous global admission/deduplication | T01 | T01 foundation and T03/T04 producer enforcement accepted; actual reciprocal bridge BUSY/count/byte and same-target reuse assertions pass; final integration pending T06 |
-| R03 — receiving stream has no elapsed cutoff | T02 | T02 deterministic receiving/comment/fragment tests past old cutoffs and pinned SDK timeout audit accepted; ≥200-second real elapsed evidence pending T06 |
+| R03 — receiving stream has no elapsed cutoff | T02 | Accepted T02 deterministic liveness plus T06 actual 200,502 ms receiving/active Cancel beyond 190 seconds/validated save; fresh primary integrated verification remains pending |
 | R04 — silence recovery/per-turn idle | T02 | T02 header-once/empty/silent-tail/fresh-turn idle and timer cleanup tests accepted; integrated panel recovery pending T06 |
 | R05 — independent worker health | T02 | T02 spawn/health/replay/cancellation/exit tests and real utility health/cancel/death journey accepted |
 | R06 — retained byte/turn/file bounds | T02 | T02 request/response caps, T03 outline/topic/full-result bounds and T04 fixed 256 KiB diagnostic profile accepted; final integration pending T06 |
 | R07 — truthful text/structured activity | T03 | T03 educational projection, actual Pi/tool activity, private-field filtering and terminal-history tests plus T04 boolean-only diagnostic/proof activity and T05 actual plaintext UI accepted; dedicated burst/repair integration pending T06 |
-| R08 — tolerant provisional schema/candidate replacement | T03 | T03 immutable partial/repair/abbreviation tests and actual Pi full accepted outline >64 KiB accepted; integrated panel evidence pending T06 |
+| R08 — tolerant provisional schema/candidate replacement | T03 | Accepted T03 immutable partial/abbreviation/full accepted outline >64 KiB and T06 actual two-turn candidate replacement with unchanged bytes until independently valid final save |
 | R09 — ownership/revision/topic isolation | T01 | T01/T03 correlation/topic projection and T05 actual-coordinator new-owner global-revision regression, stale-query/late-frame guard and trusted saved-topic UI accepted; final integration pending T06 |
 | R10 — completed independent acceptance before publication | T03 | T03 independent domain/source/topic acceptance and held completed-looking stream cancellation with saved-byte assertions accepted; integrated final audit pending T06 |
-| R11 — immediate lifecycle/bounded preview delivery | T01 | T01 foundation accepted: 100 ms latest-preview batching, immediate phases/terminal, immutable wire/history bounds and subscriber isolation; real reference-fixture latency pending |
+| R11 — immediate lifecycle/bounded preview delivery | T01 | Accepted T01 100 ms batching/immediate phases/terminal/immutable bounds/subscriber isolation and T06 actual latest marker delivery 118 ms, 56 bounded ordered bridge frames and one burst semantic preview |
 | R12 — locked bottom panel/connected icons | T05 | T05 accepted: actual Light/Dark split dock, connected real activity, selected-topic scope and persistent provisional label reviewed; final integration pending T06 |
 | R13 — all five panels/dashboard diagnostic privacy | T05 | T05 accepted: all five real starts share the dock; account-scoped diagnostic survives dashboard/project navigation with boolean-only evidence and no unrelated project preview/save controls |
 | R14 — immediate accepted-overlay transition | T05 | T05 accepted: prompt admission and focused panel, retained rejected editor/input, synchronous pending guard and explicit failed-query resync; real initial model admission <5 seconds |
@@ -30,7 +30,7 @@ This matrix records verified implementation evidence, not design approval or pro
 | R20 — reading/scroll/navigation/account ownership | T05 | T05 accepted: selectable plaintext, manual reading/preview position, reader focus through cancellation, project-owned awaited cancellation/saving guard and account-scoped navigation |
 | R21 — safe bounded liveness/health diagnostics | T02 | T02 safe byte/semantic-age/health/terminal summaries and T04 migrated model summaries/private reply filtering with real correlated logs accepted; final integrated audit pending T06/T07 |
 | R22 — mandatory future AI recipe/ADR/guidance | T07 | ADR-0022 and canonical AI/discovery foundation accepted; producer migration and final maintained-document/source audit pending T07 |
-| R23 — passing flow references/exact gate evidence | T06 | Pending |
+| R23 — passing flow references/exact gate evidence | T06 | T06 accepted: cataloged real long/repair journeys, reviewed Windows waiting/structured/checking/saving/terminal and actual clipped-prose 200% references; full fifteen desktop journeys, flows, package and ASAR outline/Sol/Luna passed; fresh primary whole-bundle verification remains pending |
 
 ## Integrated mandatory gates
 

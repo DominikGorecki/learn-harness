@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "ea86824c059b2a63223c6a8687173201f922740452aa9156c32c3bf8d6c6f428"
+      "sha256": "95f39f21e4179d50b6290b9450f794fbec528f8506700bb5e1575a47adfbf5ce"
     },
     {
       "id": "model-test-waiting-hint",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "0fbb533d66b1e235bce8538fc31c731c3dda7ccc63e436cf68d498ca477cb032"
+      "sha256": "9f94aa619136326dbaeba562513aad238b4dec54be871b291094ef325295f34d"
     },
     {
       "id": "model-test-verified-light",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "793896b92ad6f96d6a3397f7295e88b1beab9a58eb7fd78bcfe9d107f96ca342"
+      "sha256": "29db9926202262fb3e774fc4a54e3614bcf01878479bb76f9bfc1ad2d10c9609"
     },
     {
       "id": "model-test-verified-dark",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "22f1703476c75ce979ecb5aebd23849cea44fd97f5fd38242760e79390af0b89"
+      "sha256": "26fa29771368f8fdc7b6041633031e692ce70924cf04358c2d8d83d67b0a2969"
     }
   ],
-  "capturedAt": "2026-10-05T20:48:18.694Z",
+  "capturedAt": "2026-10-05T21:17:13.084Z",
   "testSha256": "0f71dc72d06a4185d31079cba36b77cb04dafd35f954423cacd18712a509e518",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "d7103ac828f33e9ea26483147f9eb5550564c8ee",
+  "revision": "2d3488f989e31dd263b0eff95524198442429946",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T06 - Long-stream Electron acceptance and reviewed flow references
-Status: Open
+Status: Done
 
 ## Source
 
@@ -51,11 +51,11 @@ Tests drive actual Electron and named bridge, not fabricated DOM state. Use isol
 
 ## Acceptance criteria
 
-- [ ] A real ≥200-second receiving stream survives both old outline cutoffs and completes a validated save with observable active UI past 190 seconds.
-- [ ] Shared model diagnostics survive their old cutoff and mutual admission/privacy hold across actual process boundaries.
-- [ ] Passing cataloged captures/narratives document actual states and adaptation; reference integrity checks pass.
-- [ ] Full code/desktop/flow and current-host package/packaged-worker gates have explicit results without security relaxation.
-- [ ] Bundle evidence names exact requirement coverage and all remaining qualification limits.
+- [x] A real ≥200-second receiving stream survives both old outline cutoffs and completes a validated save with observable active UI past 190 seconds.
+- [x] Shared model diagnostics survive their old cutoff and mutual admission/privacy hold across actual process boundaries.
+- [x] Passing cataloged captures/narratives document actual states and adaptation; reference integrity checks pass.
+- [x] Full code/desktop/flow and current-host package/packaged-worker gates have explicit results without security relaxation.
+- [x] Bundle evidence names exact requirement coverage and all remaining qualification limits.
 
 ## Manual verification
 
@@ -63,7 +63,13 @@ Watch the long local fixture once, confirm honest waiting/activity and reachable
 
 ## Completion evidence
 
-Pending authorized implementation: real elapsed measurements, flow/capture manifests, full gate results, packaged profile coverage and acceptance evidence. No tests or captures are claimed by this planning artifact.
+Accepted by the primary after actual source/test/diff and PNG review. Worker `pi_transport_audit`, GPT-6.1 Sol / high; prerequisite T05 `2d3488f989e31dd263b0eff95524198442429946` is reachable on `master`. No production code, timeout, reporter or security change was needed for this ticket.
+
+The focused real stream received for 200,504 ms with 114 ms marker delivery; the full strengthened journey received for 200,502 ms with 118 ms delivery, 82,348 provider bytes, 56 bridge frames and one burst semantic preview. Both passed actual >190-second active/Cancel, unchanged authoritative bytes, independently validated real write/save and actual utility exit assertions. Genuine diagnostic exit retention proves Checking/BUSY/unverified until exit acknowledgment, then independent verified settlement; diagnostics preserve exact saved bytes. A distinct second repair turn replaces the invalid candidate and only its independently valid result saves.
+
+Final code check (70035) passed lint, 282 tests / three platform skips, flows, both type scopes and build. Full desktop (40256) passed fifteen / one expected ASAR skip in 6.1 minutes; package (79100), actual ASAR outline/Sol/Luna worker check and post-package flows passed. The checkpoint-only outline follow-up (14426) passed one journey after replacing region-only visibility with actual paragraph/ancestor clipping, hit testing, ordinary scroll alignment and paint synchronization. Its actual 200% PNG shows prose, provisional label and Cancel. Earlier failed runs and their precise corrections are retained in [validation](validation.md); failed refreshes published no new references.
+
+Worker reviewed all changed/new images, including all five final outline captures; primary independently opened the 200% outline, >190-second draft, Saving, Checking and replacement images and reran flow integrity. Primary local-link review resolved 155 links in nineteen changed Markdown documents before completion records. All owned fixture processes, Temp roots and capture locks/stages/backups were absent at freeze. ASAR execution uses an automation-capable development host; hardened startup, installers/signing, live allowance/eligibility, native macOS/Linux, OS screen readers and suspend/resume are not claimed. T07 guidance and fresh primary whole-bundle gates remain open.
 
 ## Notes
 

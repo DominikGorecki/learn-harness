@@ -21,6 +21,8 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Model access](flows/model-access/index.md) | Extra model options, independent optional tests, session verification |
 | [Diagnostics](flows/diagnostics/index.md) | Nonvisual safe main/renderer/preload logging assertions |
 | [Inference diagnostics](flows/inference-diagnostics/index.md) | Nonvisual model/utility transport and request-correlation assertions |
+| [Long AI streaming](flows/ai-streaming/index.md) | Real ≥200-second receiving, bounded burst delivery, truthful checking and saving |
+| [Structured repair](flows/ai-streaming-repair/index.md) | Provisional candidate replacement across provider turns and independent acceptance |
 | [Packaged worker](flows/packaged-worker/index.md) | Nonvisual ASAR worker/dependency verification after packaging |
 
 ## Ownership and automatic refresh
