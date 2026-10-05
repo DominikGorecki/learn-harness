@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learning Studio Spec Tickets"
+  short_description: "Create scoped Learning Studio implementation tickets"
+  default_prompt: "Use $spec-tickets to turn this Learning Studio spec into stable, dependency-aware tickets with project validation gates."
