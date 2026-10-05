@@ -1,6 +1,6 @@
 # AI Streaming — Implementation Validation
 
-Status: In progress
+Status: Closed — local Windows implementation accepted; external qualification remains separate
 Implementation started: 2026-10-05
 Branch: `master`
 Starting revision: `a44abbb1ce3129128738ec046fa6df16e016bb37`
@@ -257,3 +257,15 @@ Final frozen PNG review found a first-candidate checkpoint gap: named bridge dat
 The package's existing default-icon/dependency warnings were nonfatal. A signtool progress line does not establish configured certificate signing or a public release. Packaged tests load the real `app.asar/out/main/outline-worker.js` and dependencies under an automation-capable development host, checking all five requests, tool-free diagnostic privacy, restricted environment, completed/model/text/clean-EOF evidence and actual exit/PID absence. Hardened packaged-window startup, installers/signing and other native platforms remain separately unqualified.
 
 Live-account streaming and Sol/Luna eligibility are separate from protocol fixtures. Deliberately expensive live timing requests are not required or authorized by fixture acceptance. Native macOS/Linux appearance, OS screen-reader/accessibility and suspend/resume require separate actual evidence. Record observed manual findings and unavailable gates explicitly; do not silently mark them passed.
+
+## Local implementation closure
+
+The primary accepts T01–T07, R01–R23 and all eight grouped local acceptance criteria after cumulative source/process/UI/guidance review and the passing integrated sequence above. T06 rendered-candidate follow-up is committed as `d048e8c757c104c13224430d53f2f91d39b52616`; exactly five reviewed paths were staged, commit paths matched, staging/untracked inventory remained empty, and only owned final generated references remained.
+
+The final post-follow-up `npm.cmd run test:flows` passed. Cumulative `git diff --check` from starting revision passed; the primary resolved **605 local links across 48 changed Markdown documents**, with no missing targets. Each ticket's actual worker/model/commit mapping appears in the spec's Implementation verification section. The source inventory confirms all five inference starts and both sanctioned profiles use shared admission/Pi, while non-inference account/resource timers retain their separate policy.
+
+Final read-only normal-host inventory found no matching workflow Electron/Node/test-runner process, inspected fixture Temp directory or configured reporter lock/next/previous/index staging artifact. Owned long-stream and ASAR roots were absent; no unknown user process or file was stopped or removed. All nineteen final changed images were actually opened, including the three repaired candidate captures; no failed refresh, concept image or fabricated state is claimed as passing evidence.
+
+The separate final closure commit selectively includes fifty reviewed task-owned paths: the four bundle closure records plus configured-reporter reference refreshes. No runtime/test source remains uncommitted after the T06 follow-up, and no unrelated staged/unstaged/untracked work was present at this checkpoint. The commit subject is `T07-Verify ai-streaming and close work bundle`; its future SHA is intentionally not embedded here. Final branch/HEAD, commit inventory and clean worktree are checked after the commit before reporting goal completion.
+
+This closes **local Windows implementation**, with the external/live/native/accessibility/hardened-release qualifications above explicitly unrun. No required local implementation or gate is unresolved.

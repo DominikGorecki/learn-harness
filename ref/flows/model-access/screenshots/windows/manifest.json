@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "9f94aa619136326dbaeba562513aad238b4dec54be871b291094ef325295f34d"
+      "sha256": "637c0adef455116fd2b36b05d0e99f98387cdf20e09b2aafa4d1600d5661b452"
     },
     {
       "id": "model-test-verified-light",
@@ -77,13 +77,13 @@
       "sha256": "26fa29771368f8fdc7b6041633031e692ce70924cf04358c2d8d83d67b0a2969"
     }
   ],
-  "capturedAt": "2026-10-05T21:17:13.084Z",
+  "capturedAt": "2026-10-05T22:02:00.294Z",
   "testSha256": "0f71dc72d06a4185d31079cba36b77cb04dafd35f954423cacd18712a509e518",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "2d3488f989e31dd263b0eff95524198442429946",
-  "sourceDirty": true,
+  "revision": "e83944bd36b59663b0995167046385fb25293b70",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

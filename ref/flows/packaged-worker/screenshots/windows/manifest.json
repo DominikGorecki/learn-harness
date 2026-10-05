@@ -1,13 +1,13 @@
 {
   "flow": "packaged-worker",
   "captures": [],
-  "capturedAt": "2026-10-05T21:20:07.910Z",
+  "capturedAt": "2026-10-05T22:04:50.124Z",
   "testSha256": "1036e0ae3a100050f221a774f0f8e2b9380be9a00ba341cc9a7834d05844ebf9",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/packaged-worker.spec.ts",
   "testTitle": "packaged ASAR worker runs scoped outline and both fixed tool-free diagnostic profiles",
-  "revision": "2d3488f989e31dd263b0eff95524198442429946",
-  "sourceDirty": true,
+  "revision": "e83944bd36b59663b0995167046385fb25293b70",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

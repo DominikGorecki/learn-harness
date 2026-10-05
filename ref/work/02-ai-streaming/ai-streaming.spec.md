@@ -1,6 +1,6 @@
 # Spec: Shared Pi Streaming and Generation Panel
 
-Status: Ready for implementation
+Status: Implemented — local Windows acceptance complete; external qualification remains separate
 Date: 2026-10-05
 Source: User request to keep receiving streams alive, implement the locked generation panel for every AI call, and establish this approach for future AI work.
 Goal: Every explicitly started AI call has visible, honest streaming feedback and cancellation; incoming stream data prevents elapsed-time cancellation; other AI calls remain unavailable until the operation settles.
@@ -9,9 +9,9 @@ Goal: Every explicitly started AI call has visible, honest streaming feedback an
 
 Introduce one application-wide AI operation lifecycle, using Pi in the existing utility-process boundary. Migrate outline creation, whole-outline rewrites, topic rewrites and both model-access diagnostics onto it. Replace absolute inference deadlines with resettable network-inactivity detection. Render all operations through the approved bottom panel, with connected activity icons, elapsed time, Cancel and a developing preview. Establish the same transport, ownership and presentation contract in contributor guidance for future AI features.
 
-This spec authorizes planning only. Tickets, implementation, accepted ADR changes and runtime documentation updates are subsequent work. The selected design is already approved; working streaming and its validation are not yet implemented.
+At authoring, this spec authorized planning only. Subsequent explicit `spec-implement` authorization completed the seven-ticket bundle, durable guidance and local verification. The proposal and original problem evidence below preserve the planning context; [Implementation verification](#implementation-verification) records the delivered behavior, commits, passing local gates and unrun external qualifications.
 
-## Problem / Context
+## Problem / Context (authoring baseline)
 
 - [Pi outline generation](../../../src/main/generation/pi-outline-engine.ts) has a 180-second overall abort signal and SDK request timeout. The [main worker client](../../../src/main/generation/worker-client.ts) independently kills its operation after 190 seconds. Receiving useful output cannot extend the overall deadline.
 - The reported October 5 topic edit received HTTP 200 promptly but failed after approximately three minutes without a completed stream. Existing diagnostics cannot establish whether body chunks were still arriving. This is evidence of the fixed deadline, not proof of a particular provider/network fault.
@@ -149,7 +149,7 @@ Concrete names may follow existing conventions; these semantics are required:
 
 ## Data Model / Storage
 
-No `.edu`, credential or recent-project format migration. Activity/preview state is session-memory only and is cleared or replaced after its owning task/terminal presentation is dismissed. On app exit, abort/terminate owned inference; reopening shows saved project state rather than inventing resumed activity.
+No `.edu`, credential or recent-project format migration. Activity/preview state is session-memory only. Dismissal hides the renderer presentation; main retains only the bounded latest settled snapshot until the next accepted operation or app exit. This retained terminal state owns no active lease and is separate from the domain's recoverable full unsaved result. On app exit, abort/terminate owned inference; reopening shows saved project state rather than inventing resumed activity.
 
 Preserve canonical `.edu/project.json`, topic `.edu/topic.json`, staged edit baselines and `.edu/file-transaction.json` recovery under ADR-0019. Raw partial drafts never enter these files. Keep full generated-but-unsaved results privately for storage-only retry. Account verification remains connection-session evidence, resets on reconnect/sign-out/restart, and does not persist an entitlement.
 
@@ -197,7 +197,7 @@ A storage retry is not an AI call. It still observes existing project/save guard
 5. **Integrated acceptance:** add a streaming journey, update existing outline/topic/model-access/recovery journeys, perform long-stream and burst tests, refresh/review flow references.
 6. **Durable guidance and evidence:** author the next ADR and update the constrained documents below; record final commands, acceptance coverage and external limits after integrated checks.
 
-Steps 2/3 depend on the contracts in step 1; the panel depends on stable projected state; final integration/documentation must describe the resulting implementation. These seeds are now elaborated in the existing [ticket map](ai-streaming.tickets.md). This spec review does not regenerate tickets or authorize implementation.
+Steps 2/3 depend on the contracts in step 1; the panel depends on stable projected state; final integration/documentation must describe the resulting implementation. These seeds are now elaborated in the existing [ticket map](ai-streaming.tickets.md). The authoring review did not regenerate tickets or authorize implementation; subsequent explicit implementation authorization and actual completion are recorded below.
 
 ## Documentation and Decision Work
 
@@ -254,14 +254,14 @@ External qualification: explicit live-account streaming, late/slow real inferenc
 
 ## Acceptance Criteria
 
-- [ ] Every inventoried inference path uses the shared coordinator and Pi utility profile; concurrent starts never issue a second provider request (R01–R02).
-- [ ] Receiving streams and multi-turn jobs survive old elapsed cutoffs; genuine inactivity and worker loss settle safely; existing byte/turn caps remain enforced (R03–R06).
-- [ ] Text/structured previews and truthful activity arrive promptly, remain bounded/provisional and cannot escape target-topic scope or update stale runs (R07–R11).
-- [ ] All five operation kinds visibly use the approved bottom panel, including dashboard model tests, with correct context/acceptance transition and diagnostic privacy (R12–R15).
-- [ ] Cancel, save, storage-only retry and confirmed conflicts retain prior guarantees; domain terminal states release ownership without losing recoverable output (R16–R18).
-- [ ] Theme, keyboard, zoom, narrow layout, reduced motion, scroll and navigation are reviewed on actual captures/interactions (R19–R20).
-- [ ] Safe diagnostic evidence distinguishes last received bytes, task progress and worker health without recording content (R21).
-- [ ] The new ADR/indexes and focused rules make this route mandatory for future inference; passing flow references and bundle evidence describe the actual implementation and limits (R22–R23).
+- [x] Every inventoried inference path uses the shared coordinator and Pi utility profile; concurrent starts never issue a second provider request (R01–R02).
+- [x] Receiving streams and multi-turn jobs survive old elapsed cutoffs; genuine inactivity and worker loss settle safely; existing byte/turn caps remain enforced (R03–R06).
+- [x] Text/structured previews and truthful activity arrive promptly, remain bounded/provisional and cannot escape target-topic scope or update stale runs (R07–R11).
+- [x] All five operation kinds visibly use the approved bottom panel, including dashboard model tests, with correct context/acceptance transition and diagnostic privacy (R12–R15).
+- [x] Cancel, save, storage-only retry and confirmed conflicts retain prior guarantees; domain terminal states release ownership without losing recoverable output (R16–R18).
+- [x] Theme, keyboard, zoom, narrow layout, reduced motion, scroll and navigation are reviewed on actual captures/interactions (R19–R20).
+- [x] Safe diagnostic evidence distinguishes last received bytes, task progress and worker health without recording content (R21).
+- [x] The new ADR/indexes and focused rules make this route mandatory for future inference; passing flow references and bundle evidence describe the actual implementation and limits (R22–R23).
 
 ## Rollout / Migration Plan
 
@@ -292,4 +292,45 @@ Primary SDK references checked October 5, 2026: [Pi agent event guide](https://g
 - The approved one-call policy is app-wide. There is no implicit queue or parallel-project exception.
 - “No timeout if the stream is open and things are coming in” means no absolute time cutoff while nonempty body data arrives within the inactivity interval. An open but silent socket remains recoverable. The 180-second idle, 30-second waiting hint and separate worker-health defaults are specified implementation choices, not provider promises.
 - The existing storage/persistence and accepted educational semantics are preserved. Preview limits affect presentation only.
-- **Material blockers: none.** The spec is ready for implementation through the existing ticket map. Live account/platform evidence remains a qualification gate and must be recorded separately. This review validated the planning document and its links; it ran no live request or code/desktop test.
+- **Material authoring blockers: none.** The original spec review established implementation readiness through the existing ticket map and validated the planning document/links without code, desktop or live inference. Subsequent implementation and local acceptance are recorded below; live account/platform evidence remains a separate qualification.
+
+## Implementation verification
+
+Local Windows implementation accepted on `master`, starting revision `a44abbb1ce3129128738ec046fa6df16e016bb37`. The worktree was clean at invocation; the source spec refinement was separately committed as `db0b22d1d2f511ef39ccf9d6f6086697e94a5f3e`. Existing tickets were reused in dependency order. Explicit `spec-implement` authorization covered scoped workers and local commits; the primary inspected actual diffs, accepted prerequisites and retained ownership of Git and closure. Workers were frozen before final integration.
+
+| Ticket | Actual worker | Model / reasoning | Accepted local commit | Outcome |
+| --- | --- | --- | --- | --- |
+| T01 | `t01_coordinator` | GPT-6.1 Sol / high | `53db6b2aea91328c4342a671440db96c7de7874a` | Shared global admission, bounded immutable activity and named bridge |
+| T02 | `pi_transport_audit` | GPT-6.1 Sol / high | `f20752ce0c84a915d7c1b10088a7b4233e5f2302` | Receiving-byte inactivity and actual worker cleanup |
+| T03 | `t01_coordinator` | GPT-6.1 Sol / high | `3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7` | Educational draft projection and independent publication/recovery |
+| T04 | `pi_transport_audit` | GPT-6.1 Sol / high | `d7103ac828f33e9ea26483147f9eb5550564c8ee` | Fixed Sol/Luna Pi profiles and independent session proof |
+| T05 | `t01_coordinator` | GPT-6.1 Sol / high | `2d3488f989e31dd263b0eff95524198442429946` | Approved global bottom dock and all-producer UX |
+| T06 | `pi_transport_audit` | GPT-6.1 Sol / high | `5b339aec5bb4cb75135242459705181ae51578db` | Actual long-stream/repair flows and ASAR profile qualification |
+| T07 | `t07_docs` | GPT-6.1 Sol / medium | `2b66eb038f1b0ec166ad2d2aea7a616f31f1cdbb` | Mandatory future producer recipe and maintained guidance |
+
+Reviewer `t01_review` (GPT-6.1 Sol / high) independently reviewed foundational T01–T04 behavior; the primary owns final cumulative acceptance. T02 integration follow-up `e83944bd36b59663b0995167046385fb25293b70` strengthens actual owned-worker termination evidence, preserving existing production/ten-second terminal limits. T06 primary follow-up `d048e8c757c104c13224430d53f2f91d39b52616` waits for actual rendered repair-candidate titles before visual capture. Neither follow-up changes runtime, security, package or production timeouts. Their precise failures, investigation and reruns remain in [validation](validation.md).
+
+Every R01–R23 and the eight grouped acceptance criteria above map to accepted code/process/UI/documentation evidence in [acceptance](acceptance.md). All five starts now share synchronous app-wide admission, sanctioned Pi utility profiles and the approved visible bottom panel. A receiving stream has no total elapsed cutoff; only 180 seconds of network inactivity is terminal, separately from worker health. Independent clean EOF, model/outline/topic/file validation and domain-confirmed publication still govern success. Cancellation waits for actual cleanup; recoverable full results remain domain-owned and storage retries consume no new AI request.
+
+| Final primary command | Actual evidence |
+| --- | --- |
+| `npm.cmd run check` at `e83944bd36b59663b0995167046385fb25293b70` (40189) | Exit 0; lint, 24 unit files / 282 passed / three existing platform skips, flow integrity, both type scopes and build |
+| Full `npm.cmd run test:desktop` (13758) | Exit 0; fifteen passed / one expected ASAR skip in 6.2 minutes, normal configured publication |
+| `npm.cmd run test:flows` after desktop | Exit 0 |
+| `npm.cmd run package` (24835) | Exit 0; Windows x64 / Electron 44.5.1, existing ASAR integrity/fuses retained |
+| `npm.cmd run test:packaged` | Exit 0; one passed, 1.7-second test / 2.4 seconds total; actual ASAR outline/Sol/Luna profiles and exit/PID assertions |
+| `npm.cmd run test:flows` after packaged | Exit 0 |
+| Post-capture-follow-up scoped `npm.cmd run test:desktop -- tests/desktop/ai-streaming.spec.ts --grep '@ai-streaming-repair'` (83908) | Exit 0; one passed in 4.7 seconds / 5.6 seconds total, all three actual PNGs reopened |
+| Post-capture-follow-up `npm.cmd run check` (19843) | Exit 0; 282 tests / three skips plus lint/flows/types/build |
+
+The complete primary gates ran after all implementation commits and the T02 repair; only owned generated flow references were dirty. The later T06 checkpoint-only assertion repair was checked and exercised separately; it does not imply another full desktop/package run. Commands used PowerShell, `npm.cmd` and `login:false` on the normal Windows host through automatic approval review, with the app sandbox/reporter/security intact.
+
+Actual unaccelerated receiving duration was **200,508 ms**, latest named-bridge burst delivery **130 ms**, provider bytes **82,348**, and bounded ordered bridge frames **56 / one burst semantic preview**. Active Cancel after 190 seconds, unchanged prior bytes, independently valid save, genuine Checking/exit proof and Saving guard all passed. The primary opened all nineteen final changed PNGs and reopened the three corrected repair images. Actual Light/Dark, keyboard/IME/focus, reading/scroll/navigation, minimum window and 200% clipped/hit-tested prose/label/Cancel were exercised. Representative contrast and named polite announcements have evidence; OS screen-reader certification does not.
+
+Implementation clarification: terminal dismissal hides the renderer's presentation. Main retains only its bounded latest settled snapshot until the next admitted operation or app exit; no transcript is persisted and no lease remains active. The separate full unsaved domain result survives later diagnostics and supports storage-only retry. Global snapshot revisions span operation changes; local operation sequence/revisions are compared within their operation identity.
+
+ADR-0022, both indexes, canonical AI patterns and the constrained contributor/product/renderer/security/design/UX guides now require every future inference producer to use profile → synchronous lease → main authorization → shared Pi liveness → bounded projection → common panel → independent domain settlement, with process/security/visual evidence. Scoped amendments retire only the old inference deadlines/direct diagnostic bypass; non-inference account deadlines and all file/security/session guarantees remain.
+
+All required local gates passed. Final local-link/diff/resource and selective-commit verification is recorded in [validation](validation.md); the separate closure commit follows these accepted implementation/follow-up commits and does not embed its own future SHA. No dependency upgrade, unrelated work, live allowance consumption, push, deployment or Context Bank change is included.
+
+**Unrun external qualifications:** live-account streaming/real Sol/Luna eligibility, native macOS/Linux, suspend/resume and OS screen-reader/accessibility. ASAR execution uses an automation-capable development host; it does not establish hardened packaged-window startup, installers/certificate signing or public release. Existing package icon/dependency warnings were nonfatal. Fixtures do not establish pedagogical quality or learner mastery. These limitations remain explicitly separate from completed local implementation.

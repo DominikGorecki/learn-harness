@@ -17,13 +17,13 @@
       "sha256": "4891fb105e5b41f9c4ccd871bf7692b8dd649ceb7db7b51430a92b9bec970476"
     }
   ],
-  "capturedAt": "2026-10-05T21:12:04.306Z",
+  "capturedAt": "2026-10-05T21:56:46.669Z",
   "testSha256": "4e282aacee566aa9683aa5c6ae60df730031c97ead8bbbcfcbb229d275ccea7b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/account.spec.ts",
   "testTitle": "manual sign-in link completes OAuth when the system browser cannot open",
-  "revision": "2d3488f989e31dd263b0eff95524198442429946",
-  "sourceDirty": true,
+  "revision": "e83944bd36b59663b0995167046385fb25293b70",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

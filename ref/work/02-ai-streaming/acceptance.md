@@ -1,45 +1,51 @@
 # AI Streaming — Requirement Acceptance
 
-Status: In progress
+Status: Closed — local Windows implementation accepted; external qualification remains separate
 Source: [Shared Pi streaming spec](ai-streaming.spec.md)
 Execution: `master`, starting revision `a44abbb1ce3129128738ec046fa6df16e016bb37`
 
-This matrix records verified implementation evidence, not design approval or projected test results. The locked [design reference](../../../docs/design/component-designs/01-generation-streaming/generation-streaming-selection.md) remains the UI target. See [validation](validation.md) for actual commands and [ticket map](ai-streaming.tickets.md) for dependencies. Until evidence below is accepted, the requirement remains unresolved.
+The primary reviewed the cumulative implementation, each ticket and R01–R23 against actual source, tests and captures. The locked [design reference](../../../docs/design/component-designs/01-generation-streaming/generation-streaming-selection.md) remains the UI target; concepts are separate from passing flow references. See [validation](validation.md) for exact commands and preserved failure history, and [ticket map](ai-streaming.tickets.md) for dependencies.
 
-| Requirement | Primary ticket | Current acceptance / evidence |
+| Requirement | Primary ticket | Accepted local evidence |
 | --- | --- | --- |
-| R01 — shared Pi path for all five starts | T04 | T04 source inventory/private profile and actual diagnostic utility evidence accepted; all five producers share admission/Pi and T05's accepted panel; final integration/source audit pending T06/T07 |
-| R02 — synchronous global admission/deduplication | T01 | T01 foundation and T03/T04 producer enforcement accepted; actual reciprocal bridge BUSY/count/byte and same-target reuse assertions pass; final integration pending T06 |
-| R03 — receiving stream has no elapsed cutoff | T02 | Accepted T02 deterministic liveness plus T06 actual 200,502 ms receiving/active Cancel beyond 190 seconds/validated save; fresh primary integrated verification remains pending |
-| R04 — silence recovery/per-turn idle | T02 | T02 header-once/empty/silent-tail/fresh-turn idle and timer cleanup tests accepted; integrated panel recovery pending T06 |
-| R05 — independent worker health | T02 | T02 spawn/health/replay/cancellation/exit tests and real utility health/cancel/death journey accepted |
-| R06 — retained byte/turn/file bounds | T02 | T02 request/response caps, T03 outline/topic/full-result bounds and T04 fixed 256 KiB diagnostic profile accepted; final integration pending T06 |
-| R07 — truthful text/structured activity | T03 | T03 educational projection, actual Pi/tool activity, private-field filtering and terminal-history tests plus T04 boolean-only diagnostic/proof activity and T05 actual plaintext UI accepted; dedicated burst/repair integration pending T06 |
-| R08 — tolerant provisional schema/candidate replacement | T03 | Accepted T03 immutable partial/abbreviation/full accepted outline >64 KiB and T06 actual two-turn candidate replacement with unchanged bytes until independently valid final save |
-| R09 — ownership/revision/topic isolation | T01 | T01/T03 correlation/topic projection and T05 actual-coordinator new-owner global-revision regression, stale-query/late-frame guard and trusted saved-topic UI accepted; final integration pending T06 |
-| R10 — completed independent acceptance before publication | T03 | T03 independent domain/source/topic acceptance and held completed-looking stream cancellation with saved-byte assertions accepted; integrated final audit pending T06 |
-| R11 — immediate lifecycle/bounded preview delivery | T01 | Accepted T01 100 ms batching/immediate phases/terminal/immutable bounds/subscriber isolation and T06 actual latest marker delivery 118 ms, 56 bounded ordered bridge frames and one burst semantic preview |
-| R12 — locked bottom panel/connected icons | T05 | T05 accepted: actual Light/Dark split dock, connected real activity, selected-topic scope and persistent provisional label reviewed; final integration pending T06 |
-| R13 — all five panels/dashboard diagnostic privacy | T05 | T05 accepted: all five real starts share the dock; account-scoped diagnostic survives dashboard/project navigation with boolean-only evidence and no unrelated project preview/save controls |
-| R14 — immediate accepted-overlay transition | T05 | T05 accepted: prompt admission and focused panel, retained rejected editor/input, synchronous pending guard and explicit failed-query resync; real initial model admission <5 seconds |
-| R15 — independent completed-model proof | T04 | T04 per-completion identity/text and full-EOF rejection, independent badges/refresh/restart, terminal reentrancy and actual 31-second utility response accepted; final integrated UI audit pending T06 |
-| R16 — awaited cancellation/publication guard | T03 | T03 task/validation/saving/cleanup/draining and T04 actual diagnostic exit, cancelled rotation/account disposal plus T05 owned controls/navigation/focus accepted; deterministic checking/saving capture and final integration pending T06 |
-| R17 — drafts/unsaved/file baselines/storage-only retry | T03 | T03 accepted domain/file preservation and T05 actual diagnostic replacement → cancel/dismiss → reopen unsaved → storage-only retry retain full result/preview/title with unchanged inference count; final integration pending T06 |
-| R18 — accepted domain terminal/lease release | T03 | T03 educational settlement/observer isolation, T04 independent verified settlement and T05 truthful terminal/storage-retry presentation accepted; final integration pending T06 |
-| R19 — theme/zoom/keyboard/motion/accessibility | T05 | T05 accepted: actual Light/Dark, named regions, keyboard/IME/focus, motion, long content and ancestor-clipped readable draft at 600×480/200% and 600×640/200%; representative token contrast reviewed; OS accessibility/live/native qualifications remain separate |
-| R20 — reading/scroll/navigation/account ownership | T05 | T05 accepted: selectable plaintext, manual reading/preview position, reader focus through cancellation, project-owned awaited cancellation/saving guard and account-scoped navigation |
-| R21 — safe bounded liveness/health diagnostics | T02 | T02 safe byte/semantic-age/health/terminal summaries and T04 migrated model summaries/private reply filtering with real correlated logs accepted; final integrated audit pending T06/T07 |
-| R22 — mandatory future AI recipe/ADR/guidance | T07 | T07 accepted: canonical mandatory profile/lease/Pi/panel/acceptance recipe, every constrained guide/product owner and scoped ADR/index amendments; all five starts/sole inference boundary and remaining non-inference timers audited; 338 documentation links and flows passed |
-| R23 — passing flow references/exact gate evidence | T06 | T06 accepted: cataloged real long/repair journeys, reviewed Windows waiting/structured/checking/saving/terminal and actual clipped-prose 200% references; full fifteen desktop journeys, flows, package and ASAR outline/Sol/Luna passed; fresh primary whole-bundle verification remains pending |
+| R01 — all five inference paths | T04 | Main composition, both Pi profiles and all five `App.ai.start` producers audited; model-access, outline/editor/topic and ASAR journeys exercise the shared path. |
+| R02 — synchronous global admission | T01 | Coordinator/producer races and same-target reuse tests; reciprocal desktop BUSY/request counts and held diagnostic-exit competing Luna rejection issue no extra request. |
+| R03 — no total receiving deadline | T02 | Byte liveness tests exceed former 180/190-second and SDK cutoffs; actual unaccelerated ≥200-second receiving stream remains active/cancellable past 190 seconds and saves. |
+| R04 — per-turn silence recovery | T02 | Silent request/header/body/tail, empty chunks, headers-once, per-turn reset/local tools and timer/reader cleanup regressions; explicit retry policy retains zero automatic inference retries. |
+| R05 — independent worker health | T02 | Spawn/health/replay/crash/cancel/actual-exit tests; real utility health/death/cancellation diagnostic journey; local heartbeats never reset provider idle. |
+| R06 — unchanged resource bounds | T02 | Request/response/turn limits, escaped private-result and topic/file bounds, streamed post-DONE response cap and fixed 256 KiB diagnostic profile tests. |
+| R07 — truthful safe activity | T03 | Ordinary-text/structured-only and tool activity projection tests, private-field sentinels, real waiting/draft/checking/saving captures; diagnostics expose boolean evidence. |
+| R08 — tolerant replaceable previews | T03 | Immutable partial/candidate/abbreviation tests and accepted output >64 KiB; real two-turn repair replaces its rejected draft and saves only the valid final document. |
+| R09 — correlation and topic isolation | T01 | Coordinator turn/revision/stale-owner guards, adversarial stable-topic projection, global-revision/new-owner regression and actual cancelled/new-owner UI journeys. |
+| R10 — independent completion/publication | T03 | Full-EOF/error-tail/tool withholding, independent outline/source/topic validation and held apparent-completion cancellation tests; real >190-second bytes remain unchanged before valid save. |
+| R11 — prompt bounded delivery | T01 | 100 ms latest coalescing/immediate lifecycle/terminal and subscriber-isolation regressions; real named-bridge burst marker ≤250 ms, bounded UTF-8 escaped frames and strict global ordering. |
+| R12 — approved bottom panel | T05 | Reviewed Light/Dark split dock with connected actual activity, wider readable preview, workbench scope/header/footer and unobstructed navigation; concept remains separate. |
+| R13 — all-producer/dashboard privacy | T05 | All five actual starts share the dock; account diagnostic survives view changes with no project owner, material/tools/raw reply or unrelated save controls. |
+| R14 — accepted overlay transition | T05 | Prompt focused panel after acceptance, <5-second initial diagnostic admission, rejected editor/input retention, synchronous pending guard, IME and safe failed-query resync tests. |
+| R15 — independent model proof | T04 | Per-completion exact/dated identity, delta/final text and clean-EOF proof; late-error/mismatch/empty rejection, independent Sol/Luna badges and session refresh/restart; actual >30-second response and ASAR profiles. |
+| R16 — cancellation and Saving guard | T03 | Reentrant awaited owner cleanup, no release before actual utility exit, abort/stale updates and validation races; Saving rejects cancellation and actual Cancel/navigation/focus assertions pass. |
+| R17 — recovery and prior bytes | T03 | Full unsaved result/staged edits/baselines remain domain-owned across later diagnostics; actual recovery/storage-only retry keeps provider count fixed and topic conflicts preserve unrelated latest content. |
+| R18 — domain-owned terminal release | T03 | Saved only after backend write; verified only after private account proof and genuine exit acknowledgment; ownership release and truthful unsaved/retry/Saved presentation tested. |
+| R19 — adaptation and accessibility evidence | T05 | Actual themes, keyboard/IME/named regions, reduced motion, selectable text, long topic/request and 600×480/200% clipped/hit-tested prose+label+Cancel; representative token contrast. OS screen-reader qualification remains unrun. |
+| R20 — reading/navigation ownership | T05 | Independent saved/preview scrolling, reader focus through cancellation, guarded project switching and account-scoped navigation exercised in actual Electron. |
+| R21 — safe bounded diagnostics | T02 | Allowlisted byte/semantic-age/health/terminal counters, secret/content sentinels, observer failure isolation and actual correlated logs; no paths/tokens/raw content/protocol/tool data. |
+| R22 — future producer requirements | T07 | AGENTS/README/indexes/ADR-0022 and all constrained focused/product owners require sanctioned profile→lease→main authorization→Pi→bounded projection→panel→domain settlement; scoped prior norms amended, five starts/remaining timers audited. |
+| R23 — reviewed flows and exact gates | T06 | Cataloged long/repair and producer/recovery references published by the configured reporter; actual PNG review, link/flow integrity and exact primary code/desktop/package/ASAR outcomes recorded with external limits. |
 
 ## Integrated mandatory gates
 
-Pending fresh code, real Electron, flow integrity, current-host package and packaged-worker verification after implementation. Baseline unit/build success does not prove streaming.
+Fresh primary gates at `e83944bd36b59663b0995167046385fb25293b70`, after all seven implementation commits and the T02 termination-test repair, passed: `npm.cmd run check` (282 unit tests / three existing platform skips), full `npm.cmd run test:desktop` (fifteen passed / one expected packaged-ASAR skip), `npm.cmd run test:flows`, Windows x64 `npm.cmd run package`, `npm.cmd run test:packaged` (one passed), and post-packaged flows.
+
+The unaccelerated receiving stream lasted 200,508 ms; its latest marker reached the named bridge in 130 ms, with 82,348 provider bytes, 56 bounded frames and one burst semantic preview. Real write/exit barriers, unchanged-byte and independent acceptance assertions passed. Primary reviewed all nineteen final changed PNGs, including actual clipped prose, provisional label and Cancel at 200% zoom.
+
+The final capture review found a repair checkpoint reaching the bridge before React rendered the first draft. T06 follow-up `d048e8c757c104c13224430d53f2f91d39b52616` adds actual rendered-title assertions. Its scoped repair journey and fresh `npm.cmd run check` passed; all three repair PNGs were reopened and accepted. This test-only follow-up changes no qualified runtime, package, security or timeout. Full-gate evidence above and later scoped evidence are distinguished explicitly.
 
 ## External qualification
 
-Signed protocol fixtures cannot establish live ChatGPT eligibility, real Sol/Luna access, pedagogical quality or mastery. Other native platforms, suspend/resume and OS accessibility require explicit actual evidence. Record unavailable or unauthorized qualification separately from delivered local behavior. Do not claim blanket accessibility certification from captures or DOM assertions.
+Signed protocol fixtures do not establish live ChatGPT eligibility, real Sol/Luna access, pedagogical quality or mastery. Live-account streaming, native macOS/Linux, suspend/resume and OS screen-reader/accessibility qualification remain **unrun**. Representative contrast, DOM announcements and keyboard/actual image evidence do not certify all accessibility states.
+
+The packaged test proves real ASAR worker/dependency loading, all three sanctioned profiles and actual process exit using an automation-capable development host. Hardened packaged-window startup, installers/certificate signing and public release qualification remain **unrun**. Nonfatal build warnings are recorded in validation. These limitations are explicit separate qualifications, not substituted by fixture evidence.
 
 ## Closure
 
-Not closed. The coordinator will audit every requirement, acceptance criterion, named deliverable and required gate against current files/runtime/test evidence before updating bundle status.
+T01–T07 and both test-only follow-ups are accepted locally. No required local gate or implementation criterion remains open. The primary owns final evidence, link/diff/resource review and the separate local verification/closure commit. The bundle directory is preserved; future capabilities and external qualification require their own actual evidence.

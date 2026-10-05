@@ -77,13 +77,13 @@
       "sha256": "05b8909e5a0ec00308c4f0e849c36b9ae907f97bec7f6626101a1472e5c4d303"
     }
   ],
-  "capturedAt": "2026-10-05T21:18:04.346Z",
+  "capturedAt": "2026-10-05T22:02:53.347Z",
   "testSha256": "7365366f9bf91aba285b5cc19f827f5e5e3c491ff9ea0697f433d4975c656ebe",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-edit.spec.ts",
   "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
-  "revision": "2d3488f989e31dd263b0eff95524198442429946",
-  "sourceDirty": true,
+  "revision": "e83944bd36b59663b0995167046385fb25293b70",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

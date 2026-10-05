@@ -1,10 +1,10 @@
 # Shared Pi Streaming — Ticket Map
 
-Status: In progress
-Source: [Ready spec](ai-streaming.spec.md)
+Status: Closed — local Windows implementation accepted; external qualification remains separate
+Source: [Implemented spec](ai-streaming.spec.md)
 Date: 2026-10-05
 
-The tickets were authored as planning artifacts with all seven Open. The active `spec-implement` goal authorizes their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01–T07 are accepted. Fresh primary whole-bundle verification and closure remain pending; accepted individual tickets alone do not establish release readiness.
+The tickets were authored as planning artifacts with all seven Open. Subsequent explicit `spec-implement` authorization completed their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01–T07 and the T02/T06 test-only follow-ups are accepted. Fresh primary code/desktop/flow/package/ASAR gates passed, and every requirement is mapped in [acceptance](acceptance.md). This closes local implementation; live/native/accessibility/release qualifications remain explicitly separate.
 
 ## Implementation order
 
@@ -58,4 +58,4 @@ Primary means implementation ownership; supporting tickets verify or consume the
 - Live-account eligibility/streaming, other native OS appearance, suspend/resume and manual accessibility require explicit actual evidence and remain separate from signed protocol fixtures. No deliberately expensive live timing call is required.
 - Material authoring blockers: none. Graphical/package availability and external qualifications must be recorded at execution. The bundle remains incomplete while implementation or required gates remain unresolved.
 
-Next authorized stage: use `spec-implement` for the whole bundle, or `spec-implement-ticket` for one ready ticket. Ticket authoring does not invoke either stage.
+Implementation and local verification are complete. See the spec's [implementation verification](ai-streaming.spec.md#implementation-verification) for actual worker/model/commit mapping and final evidence. Future features or external qualification require their own scope and evidence rather than reopening completed tickets by status alone.
