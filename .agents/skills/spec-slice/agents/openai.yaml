@@ -1,0 +1,4 @@
+interface:
+  display_name: "Learning Studio Spec Slices"
+  short_description: "Plan Learning Studio capabilities and linked specs"
+  default_prompt: "Use $spec-slice to divide this Learning Studio request into coherent capabilities and write every ready spec using the local spec workflow."
