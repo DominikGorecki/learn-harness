@@ -25,7 +25,7 @@ export interface ProviderFixtureOptions {
   hideFastModel?: boolean
   outlineResult?: ReturnType<typeof learningOutline>
   projectFileCalls?: { name: string; args: Record<string, unknown> }[]
-  modelTestMode?: 'completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
+  modelTestMode?: 'completed' | 'slow-completed' | 'failed' | 'incomplete' | 'missing' | 'wrong-model' | 'hold'
   inferenceMode?: 'outline' | 'hold' | 'preview-hold' | 'incomplete' | 'usage-limit' | 'clarify' | 'materials' | 'materials-clarify'
 }
 
@@ -37,6 +37,8 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   const inferenceRequests: Record<string, unknown>[] = []
   const pendingInference: ServerResponse[] = []
   const previewPending = new WeakSet<ServerResponse>()
+  const diagnosticPending = new WeakMap<ServerResponse, string>()
+  const diagnosticTimers = new Set<ReturnType<typeof setTimeout>>()
   const codes = new Map<string, { nonce: string; challenge: string; clientId: string }>()
   let baseUrl = ''
   let modelsRequested = 0
@@ -45,6 +47,10 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   function json(response: ServerResponse, status: number, value: unknown) {
     response.writeHead(status, { 'content-type': 'application/json' })
     response.end(JSON.stringify(value))
+  }
+  function completeDiagnostic(response: ServerResponse, model: string) {
+    response.end(`data: ${JSON.stringify({ type: 'response.completed', response: { status: 'completed', model,
+      output: [{ type: 'message', role: 'assistant', content: [{ type: 'output_text', text: 'OK' }] }] } })}\n\ndata: [DONE]\n\n`)
   }
   async function body(request: IncomingMessage): Promise<string> {
     const chunks: Buffer[] = []
@@ -110,7 +116,17 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
         inferenceRequests.push(payload)
         if ((payload.model === 'gpt-6.1-sol' || payload.model === 'gpt-6-luna') && !payload.tools) {
           response.writeHead(200, { 'content-type': 'text/event-stream' })
-          if (options.modelTestMode === 'hold') { pendingInference.push(response); response.write(': waiting\n\n'); return }
+          if (options.modelTestMode === 'hold') { pendingInference.push(response); diagnosticPending.set(response, payload.model as string); response.write(': waiting\n\n'); return }
+          if (options.modelTestMode === 'slow-completed') {
+            response.write('data: {"type":"response.output_text.delta","delta":"OK"}\n\n')
+            const heartbeat = setInterval(() => { if (!response.destroyed) response.write(': receiving\n\n') }, 5_000)
+            diagnosticTimers.add(heartbeat)
+            const finish = setTimeout(() => { clearInterval(heartbeat); diagnosticTimers.delete(heartbeat); diagnosticTimers.delete(finish);
+              if (!response.destroyed) completeDiagnostic(response, payload.model as string) }, 31_000)
+            diagnosticTimers.add(finish)
+            response.once('close', () => { clearInterval(heartbeat); clearTimeout(finish); diagnosticTimers.delete(heartbeat); diagnosticTimers.delete(finish) })
+            return
+          }
           const terminal = options.modelTestMode === 'failed' ? 'failed' : options.modelTestMode === 'incomplete' ? 'incomplete' : 'completed'
           if (options.modelTestMode !== 'missing') response.write(`data: ${JSON.stringify({ type: `response.${terminal}`, response: {
             status: terminal, model: options.modelTestMode === 'wrong-model' ? 'fixture-model' : payload.model,
@@ -161,8 +177,8 @@ export async function startChatGPTFixture(options: ProviderFixtureOptions = {}) 
   }
   return {
     baseUrl, endpoints, authorizations, tokens, inferenceRequests, options,
-    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) { if (previewPending.has(response)) response.end(); else writeToolResponse(response, { args: learningOutline() }) } },
+    completePending: () => { for (const response of pendingInference.splice(0)) if (!response.destroyed) { const target = diagnosticPending.get(response); if (target) completeDiagnostic(response, target); else if (previewPending.has(response)) response.end(); else writeToolResponse(response, { args: learningOutline() }) } },
     modelsRequested: () => modelsRequested, revoked: () => revoked,
-    close: () => new Promise<void>((resolve, reject) => { server.closeAllConnections(); server.close(error => error ? reject(error) : resolve()) })
+    close: () => new Promise<void>((resolve, reject) => { for (const timer of diagnosticTimers) clearTimeout(timer); diagnosticTimers.clear(); server.closeAllConnections(); server.close(error => error ? reject(error) : resolve()) })
   }
 }

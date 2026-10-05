@@ -5,8 +5,14 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { AccountApi } from '../../src/shared/account'
+import type { AiApi } from '../../src/shared/ai/activity'
+import type { WorkspaceApi } from '../../src/shared/workspace'
+import type { GenerationApi } from '../../src/shared/generation'
 
 test('extra choices survive restart while independent diagnostic evidence resets', { tag: '@model-access', annotation: { type: 'flow', description: 'model-access' } }, async ({ playwright, flow }) => {
+  // This journey includes a genuine 31-second receiving response and restart.
+  // Keep the suite's normal 45-second limit unchanged.
+  test.setTimeout(90_000)
   const fixture = await startChatGPTFixture({ modelTestMode: 'failed' })
   const root = await mkdtemp(join(tmpdir(), 'edu-model-test-'))
   const project = join(root, 'Learning project')
@@ -22,7 +28,6 @@ test('extra choices survive restart while independent diagnostic evidence resets
       dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [folder] })
     }, project)
     let page = await desktop.firstWindow()
-    await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await page.getByRole('button', { name: 'Account settings' }).click()
     await page.getByRole('button', { name: 'Continue with ChatGPT' }).click()
     await expect(page.getByText('4 model choices for your projects')).toBeVisible()
@@ -42,20 +47,54 @@ test('extra choices survive restart while independent diagnostic evidence resets
     await flow.capture(desktop, page, 'model-test-failed')
     expect(fixture.inferenceRequests).toHaveLength(1)
 
+    await page.keyboard.press('Escape')
+    await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
+    await page.getByRole('button', { name: 'Account settings' }).click()
+
     fixture.options.modelTestMode = 'hold'
+    const savedBytes = async () => readFile(join(project, '.edu', 'project.json'), 'utf8').catch(error => { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null; throw error })
+    const beforeDiagnostic = await savedBytes()
     await page.getByRole('button', { name: 'Test GPT-6.1 Sol', exact: true }).click()
     await expect(page.getByRole('button', { name: 'Cancel model test' })).toBeVisible()
     await expect.poll(() => fixture.inferenceRequests.length).toBe(2)
+    const pending = await page.evaluate(async () => {
+      const api = (globalThis as unknown as { learning: AccountApi & AiApi & WorkspaceApi & GenerationApi }).learning
+      const workspace = await api.getWorkspace()
+      if (!workspace.ok || !workspace.data.activeProject) throw new Error('Expected the open project')
+      return { duplicate: await api.testSolModel(), competing: await api.testLunaModel(), activity: await api.getAiActivity(),
+        outline: await api.createOutline({ projectId: workspace.data.activeProject.id, modelId: 'fixture-model', brief: 'Learn probability', replace: false }) }
+    })
+    expect(pending.duplicate).toMatchObject({ ok: true, data: { modelTestStatus: 'testing' } })
+    expect(pending.competing).toMatchObject({ ok: false, error: { code: 'BUSY' } })
+    expect(pending.outline).toMatchObject({ ok: false, error: { code: 'BUSY' } })
+    expect(pending.activity).toMatchObject({ ok: true, data: { active: { kind: 'test-sol' } } })
+    if (pending.activity.ok) expect(pending.activity.data.active).not.toHaveProperty('projectId')
+    expect(fixture.inferenceRequests).toHaveLength(2)
+    expect(await savedBytes()).toBe(beforeDiagnostic)
     await page.getByRole('button', { name: 'Cancel model test' }).click()
     await expect(page.getByText('Model test cancelled.', { exact: false })).toBeVisible()
     await expect(page.getByText('4 model choices for your projects')).toBeVisible()
+    await expect.poll(() => desktop!.evaluate(({ app }) => app.getAppMetrics().filter(metric => metric.name === 'Learning model access').length)).toBe(0)
 
-    fixture.options.modelTestMode = 'completed'
-    await page.getByRole('button', { name: 'Test GPT-6.1 Sol', exact: true }).click()
-    await expect(page.getByText('GPT-6.1 Sol replied successfully.', { exact: false })).toBeVisible()
+    fixture.options.modelTestMode = 'slow-completed'
+    const started = Date.now()
+    const accepted = await page.evaluate(async () => (globalThis as unknown as { learning: AccountApi }).learning.testSolModel())
+    expect(accepted).toMatchObject({ ok: true, data: { modelTestStatus: 'testing' } })
+    expect(Date.now() - started).toBeLessThan(5_000)
+    await expect.poll(() => fixture.inferenceRequests.length).toBe(3)
+    await expect.poll(async () => {
+      const state = await page.evaluate(async () => (globalThis as unknown as { learning: AiApi }).learning.getAiActivity())
+      return state.ok ? state.data.active?.preview : null
+    }).toMatchObject({ kind: 'model-test-evidence', hasReply: true, completed: false, modelMatched: false })
+    await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Account settings' }).click()
+    await expect(page.getByRole('button', { name: 'Cancel model test' })).toBeVisible()
+    await expect(page.getByText('GPT-6.1 Sol replied successfully.', { exact: false })).toBeVisible({ timeout: 45_000 })
+    expect(Date.now() - started).toBeGreaterThan(30_000)
     await expect(page.getByText('4 model choices for your projects')).toBeVisible()
     await expect(page.getByRole('button', { name: 'GPT-6.1 Sol verified', exact: true })).toBeDisabled()
     await expect(page.getByRole('button', { name: 'Test GPT-6 Luna', exact: true })).toBeEnabled()
+    fixture.options.modelTestMode = 'completed'
     await page.getByRole('button', { name: 'Test GPT-6 Luna', exact: true }).click()
     await expect(page.getByText('GPT-6 Luna replied successfully.', { exact: false })).toBeVisible()
     await expect(page.getByRole('button', { name: 'GPT-6 Luna verified', exact: true })).toBeDisabled()
@@ -75,6 +114,11 @@ test('extra choices survive restart while independent diagnostic evidence resets
       catch (error) { if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null; throw error }
     }).toBe('gpt-6.1-sol')
     expect(fixture.inferenceRequests).toHaveLength(4)
+    for (const request of fixture.inferenceRequests) {
+      expect(request).toMatchObject({ stream: true, store: false })
+      expect(request).not.toHaveProperty('tools')
+      expect(JSON.stringify(request)).not.toMatch(/Learning project|fixture-access|RAW SECRET/)
+    }
     await desktop.close(); desktop = undefined
     desktop = await launch()
     page = await desktop.firstWindow()

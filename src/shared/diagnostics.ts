@@ -38,11 +38,11 @@ const enumFields: Record<string, readonly string[]> = {
   responseStatus: ['completed', 'incomplete', 'failed', 'in_progress', 'queued', 'cancelled'],
   providerCode: ['invalid_grant', 'invalid_token', 'model_not_found', 'subscription_sharing_unsupported_capability', 'subscription_sharing_usage_limit_exceeded', 'subscription_sharing_usage_unavailable'],
   incompleteReason: ['max_output_tokens', 'content_filter'],
-  outcome: ['network_error', 'http_error', 'stream_error', 'missing_body', 'invalid_event', 'response_too_large', 'missing_completion', 'incomplete_response', 'unexpected_status', 'model_mismatch', 'missing_output', 'verified', 'cancelled', 'timeout'],
+  outcome: ['network_error', 'network_idle', 'http_error', 'stream_error', 'missing_body', 'invalid_event', 'response_too_large', 'missing_completion', 'incomplete_response', 'unexpected_status', 'model_mismatch', 'missing_output', 'verified', 'cancelled'],
   platform: ['win32', 'darwin', 'linux']
 }
 const numbers = new Set(['elapsedMs', 'exitCode', 'pid', 'windowId', 'line', 'column', 'arguments', 'omittedCharacters', 'projects', 'runs', 'files', 'readableFiles', 'turn', 'httpStatus', 'bytes', 'chunks', 'events', 'lastByteAgeMs', 'semanticAgeMs', 'textDeltaEvents', 'completedEvents', 'dropped'])
-const booleans = new Set(['hasStreamedText', 'hasFinalText', 'hasOutline', 'hasActiveProject', 'writable', 'rewriting', 'completed', 'blocked', 'waiting', 'packaged', 'development'])
+const booleans = new Set(['cleanEof', 'hasStreamedText', 'hasFinalText', 'hasOutline', 'hasActiveProject', 'writable', 'rewriting', 'completed', 'blocked', 'waiting', 'packaged', 'development'])
 const identifiers = new Set(['requestId', 'workerId', 'runId', 'projectId'])
 const versions = new Set(['appVersion', 'electronVersion', 'nodeVersion', 'chromeVersion'])
 

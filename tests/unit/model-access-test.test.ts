@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { testModelAccess, solModel, lunaModel } from '../../src/main/auth/model-access-test'
 import type { ModelAccessTestDiagnostic } from '../../src/main/auth/model-access-test'
+import { runModelAccessProfile } from '../../src/main/generation/pi-model-access-profile'
 
 const completed = { type: 'response.completed', response: { status: 'completed', model: 'gpt-6.1-sol',
   output: [{ type: 'message', content: [{ type: 'output_text', text: 'OK' }] }] } }
@@ -9,10 +10,35 @@ function probe(parts: string[], status = 200, onDiagnostic?: (diagnostic: ModelA
   const encoder = new TextEncoder()
   const body = new ReadableStream<Uint8Array>({ start(controller) { for (const part of parts) controller.enqueue(encoder.encode(part)); controller.close() } })
   const request = vi.fn<typeof fetch>(async () => new Response(body, { status }))
-  return testModelAccess({ resource: 'https://api.openai.com/v1', accessToken: 'private-token', signal: new AbortController().signal, request, model, onDiagnostic })
+  const signal = new AbortController().signal
+  return testModelAccess({ signal, model, onDiagnostic, run: callbacks => {
+    const result = runModelAccessProfile({ target: model.id, accessToken: 'private-token', baseUrl: 'https://api.openai.com/v1' },
+      { signal, request, onTransport: callbacks.onTransport, onEvidence: callbacks.onModelEvidence })
+    return { result, stop: async () => { await result.catch(() => {}) } }
+  } })
 }
 
 describe('bounded model verification stream', () => {
+  it.each([
+    ['gpt-6-astra', 'gpt-6.1-sol'], ['gpt-6.1-sol', 'gpt-6-astra']
+  ])('cannot repair conflicting completion identities (%s then %s)', async (first, last) => {
+    await expect(probe([event({ ...completed, response: { ...completed.response, model: first } }),
+      event({ ...completed, response: { ...completed.response, model: last } })])).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+  })
+  it('accepts a sanctioned dated identity but rejects arbitrary suffixes', async () => {
+    await expect(probe([event({ ...completed, response: { ...completed.response, model: 'gpt-6.1-sol-2026-10-01' } })])).resolves.toBeUndefined()
+    await expect(probe([event({ ...completed, response: { ...completed.response, model: 'gpt-6.1-sol-secret' } })])).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+  })
+  it('cannot repair an empty first completion with a later matching reply', async () => {
+    await expect(probe([event({ ...completed, response: { ...completed.response, output: [] } }), event(completed)]))
+      .rejects.toMatchObject({ code: 'UNAVAILABLE', message: expect.stringContaining('no reply text') })
+  })
+  it('classifies provider failures after DONE before considering completed proof', async () => {
+    const report = vi.fn()
+    await expect(probe([event(completed), 'data: [DONE]\n\n', 'event: error\ndata: {"code":"subscription_sharing_usage_limit_exceeded"}\n\n'], 200, report))
+      .rejects.toMatchObject({ code: 'USAGE_LIMIT' })
+    expect(report).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ outcome: 'stream_error', cleanEof: false }))
+  })
   it('verifies Luna against its own identity and rejects a Sol completion for the Luna request', async () => {
     const report = vi.fn()
     await expect(probe([event({ ...completed, response: { ...completed.response, model: 'gpt-6-luna' } })], 200, report, lunaModel)).resolves.toBeUndefined()

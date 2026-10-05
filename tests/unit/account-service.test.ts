@@ -21,18 +21,83 @@ function setup(initial: AccountCredential | null = null, now = () => 1000) {
   const provider: AccountProvider = {
     signIn: vi.fn(async ({ onAuthorizationUrl }) => { await onAuthorizationUrl('https://auth.openai.com/api/accounts/authorize'); return structuredClone(credential) }),
     renew: vi.fn(async value => ({ ...value, expiresAt: 20_000_000, accessToken: 'renewed-private' })),
-    listModels: vi.fn(async () => [{ id: 'test-model', name: 'Test Model' }]), testSolModel: vi.fn(async () => {}),
-    testLunaModel: vi.fn(async () => {}), revoke: vi.fn(async () => {})
+    listModels: vi.fn(async () => [{ id: 'test-model', name: 'Test Model' }]), revoke: vi.fn(async () => {})
   }
+  const probes = { testSolModel: vi.fn(async () => {}), testLunaModel: vi.fn(async () => {}) }
+  const testModel = vi.fn(async (input: { target: string; accessToken: string }) => {
+    if (input.target === 'gpt-6.1-sol') await probes.testSolModel()
+    else await probes.testLunaModel()
+  })
   const openBrowser = vi.fn(async () => {})
   const copyToClipboard = vi.fn<(url: string) => Promise<void>>(async () => {})
   let aiId = 0
   const ai = new AiCoordinator({ now: () => performance.now(), createId: () => `ai-${++aiId}` })
-  const service = new AccountService({ ai, provider, store, openBrowser, copyToClipboard, now })
-  return { ai, service, store, provider, openBrowser, copyToClipboard, stored: () => stored }
+  const service = new AccountService({ ai, provider, testModel, store, openBrowser, copyToClipboard, now })
+  return { ai, service, store, testModel, provider: Object.assign(provider, probes), openBrowser, copyToClipboard, stored: () => stored }
 }
 
 describe('account lifecycle', () => {
+  it('returns accepted start and duplicates promptly while ownership gates both other starts', async () => {
+    const { service, ai, provider } = setup(credential)
+    await service.initialize()
+    let finish!: () => void
+    provider.testSolModel.mockImplementation(() => new Promise<void>(resolve => { finish = resolve }))
+    const initial = await service.testSolModel()
+    expect(initial.modelTestStatus).toBe('testing')
+    expect(await service.testSolModel()).toEqual(initial)
+    await expect(service.testLunaModel()).rejects.toMatchObject({ code: 'BUSY' })
+    expect(() => ai.claim({ kind: 'create-outline', projectId: 'project', model: { id: 'test-model', name: 'Test' }, heading: 'Create', requestSummary: 'Learn' })).toThrowError('Another AI action')
+    await vi.waitFor(() => expect(provider.testSolModel).toHaveBeenCalledOnce())
+    finish(); await service.waitForModelTest()
+    expect(service.get().modelTestStatus).toBe('verified')
+  })
+  it('settles verified state before synchronous subscribers cancel or duplicate', async () => {
+    const { service, ai } = setup(credential)
+    await service.initialize()
+    let duplicate: ReturnType<typeof service.testSolModel> | undefined
+    let cancel: ReturnType<typeof service.cancelModelTest> | undefined
+    service.subscribe(snapshot => { if (snapshot.modelTestStatus === 'verified') {
+      expect(ai.get().active).toBeNull()
+      duplicate ??= service.testSolModel(); cancel ??= service.cancelModelTest()
+    } })
+    await service.testSolModel(); await service.waitForModelTest()
+    expect(await duplicate).toMatchObject({ modelTestStatus: 'verified' })
+    expect(await cancel).toMatchObject({ modelTestStatus: 'verified' })
+    expect(ai.get().settled?.outcome).toBe('verified')
+  })
+  it('settles failure before a synchronous subscriber starts a successor', async () => {
+    const { service, ai, provider } = setup(credential)
+    await service.initialize()
+    provider.testSolModel.mockRejectedValueOnce(new ApplicationError('UNAVAILABLE', 'Unverified.'))
+    let successor: ReturnType<typeof service.testSolModel> | undefined
+    service.subscribe(snapshot => { if (snapshot.modelTestStatus === 'failed' && !successor) {
+      expect(ai.get().active).toBeNull()
+      successor = service.testSolModel()
+    } })
+    await service.testSolModel(); await service.waitForModelTest()
+    expect(await successor).toMatchObject({ modelTestStatus: 'testing' })
+    await service.waitForModelTest()
+    expect(service.get()).toMatchObject({ modelTestStatus: 'verified' })
+    expect(provider.testSolModel).toHaveBeenCalledTimes(2)
+  })
+  it('owns delayed renewal, durably saves cancelled rotation and never launches inference', async () => {
+    let now = 1000
+    const { service, ai, provider, stored } = setup(credential, () => now)
+    await service.initialize()
+    now = credential.expiresAt + 1
+    vi.mocked(provider.renew).mockClear()
+    let finish!: (value: AccountCredential) => void
+    vi.mocked(provider.renew).mockImplementation(() => new Promise(resolve => { finish = resolve }))
+    expect(await service.testSolModel()).toMatchObject({ modelTestStatus: 'testing' })
+    await vi.waitFor(() => expect(provider.renew).toHaveBeenCalledOnce())
+    await expect(service.testLunaModel()).rejects.toMatchObject({ code: 'BUSY' })
+    const cancel = service.cancelModelTest()
+    finish({ ...credential, accessToken: 'rotated-private', expiresAt: 20_000_000 })
+    await cancel
+    expect(stored()?.accessToken).toBe('rotated-private')
+    expect(provider.testSolModel).not.toHaveBeenCalled()
+    expect(ai.get().settled?.outcome).toBe('cancelled')
+  })
   it('keeps Sol and Luna as extra choices, verifies each independently, and clears proof after reconnect', async () => {
     const { service, provider, store } = setup(credential)
     await service.initialize()
@@ -41,14 +106,14 @@ describe('account lifecycle', () => {
     expect(service.get().models.map(model => model.id)).toEqual(['test-model', 'gpt-6.1-sol', 'gpt-6-luna'])
     expect(service.get().verifiedModelIds).toEqual([])
     expect(await service.authorizeModel('gpt-6-luna')).toMatchObject({ model: { id: 'gpt-6-luna' } })
-    await service.testSolModel()
+    await service.testSolModel(); await service.waitForModelTest()
     expect(service.get()).toMatchObject({ modelTestStatus: 'verified', modelTestTarget: 'gpt-6.1-sol', verifiedModelIds: ['gpt-6.1-sol'], modelsStatus: 'ready', models: choices })
     expect(await service.authorizeModel('gpt-6.1-sol')).toMatchObject({ model: { id: 'gpt-6.1-sol' } })
-    await service.testSolModel()
+    await service.testSolModel(); await service.waitForModelTest()
     expect(provider.testSolModel).toHaveBeenCalledOnce()
-    await service.testLunaModel()
+    await service.testLunaModel(); await service.waitForModelTest()
     expect(service.get()).toMatchObject({ modelTestTarget: 'gpt-6-luna', verifiedModelIds: ['gpt-6.1-sol', 'gpt-6-luna'] })
-    await service.testLunaModel()
+    await service.testLunaModel(); await service.waitForModelTest()
     expect(provider.testLunaModel).toHaveBeenCalledOnce()
     await service.refreshModels()
     expect(service.get().models.map(model => model.id)).toEqual(['test-model', 'gpt-6.1-sol', 'gpt-6-luna'])
@@ -61,7 +126,7 @@ describe('account lifecycle', () => {
     const { service, provider } = setup(credential)
     await service.initialize()
     vi.mocked(provider.testSolModel).mockRejectedValue(new Error('private-access'))
-    await service.testSolModel()
+    await service.testSolModel(); await service.waitForModelTest()
     expect(service.get()).toMatchObject({ status: 'connected', modelsStatus: 'ready', modelTestStatus: 'failed', models: choices })
     expect(JSON.stringify(service.get())).not.toContain('private-access')
     expect(await service.authorizeModel('test-model')).toBeDefined()
@@ -99,7 +164,7 @@ describe('account lifecycle', () => {
     const { service, provider } = setup(credential)
     await service.initialize()
     vi.mocked(provider.testSolModel).mockRejectedValue(new ApplicationError('AUTH_REQUIRED', 'Please reconnect.'))
-    await service.testSolModel()
+    await service.testSolModel(); await service.waitForModelTest()
     expect(service.get()).toMatchObject({ status: 'reconnect-required', modelTestStatus: 'failed', models: choices })
   })
   it('copies only the active authorization link and sanitizes clipboard failures', async () => {
@@ -156,12 +221,18 @@ describe('account lifecycle', () => {
   })
 
   it('shows signed-in identity without claiming plan permission', async () => {
-    const { service, provider } = setup({ ...credential, scopes: ['openid'], accessToken: null })
+    const { service, provider, ai, testModel } = setup({ ...credential, scopes: ['openid'], accessToken: null })
     await service.initialize()
     expect(service.get().status).toBe('permission-required')
     expect(service.get().models).toEqual([])
     expect(provider.listModels).not.toHaveBeenCalled()
     await expect(service.authorizeModel('test-model')).rejects.toMatchObject({ code: 'PLAN_PERMISSION_REQUIRED' })
+    await expect(service.testSolModel()).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+    await expect(service.testLunaModel()).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+    expect(testModel).not.toHaveBeenCalled()
+    expect(provider.testSolModel).not.toHaveBeenCalled()
+    expect(provider.testLunaModel).not.toHaveBeenCalled()
+    expect(ai.get().active).toBeNull()
   })
 
   it('connects through the browser and persists only after sign-in succeeds', async () => {
@@ -275,13 +346,12 @@ describe('account lifecycle', () => {
 
   it('keeps successful Sol evidence when a Luna test fails without changing either choice', async () => {
     const { service, provider } = setup(credential)
-    await service.initialize(); await service.testSolModel()
+    await service.initialize(); await service.testSolModel(); await service.waitForModelTest()
     vi.mocked(provider.testLunaModel).mockRejectedValue(new ApplicationError('UNAVAILABLE', 'This model is not available.'))
-    await service.testLunaModel()
+    await service.testLunaModel(); await service.waitForModelTest()
     expect(service.get()).toMatchObject({ modelTestStatus: 'failed', modelTestTarget: 'gpt-6-luna', verifiedModelIds: ['gpt-6.1-sol'], models: choices })
   })
 })
-
 
 describe('outline account ownership', () => {
   it('commits rotated credentials despite synchronous owner cancellation before renewal continuation', async () => {

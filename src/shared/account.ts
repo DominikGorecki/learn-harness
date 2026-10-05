@@ -30,6 +30,7 @@ export interface AccountApi {
   reopenAccountBrowser(): Promise<ApiResult<AccountSnapshot>>
   copyAccountSignInLink(): Promise<ApiResult<AccountSnapshot>>
   refreshModels(): Promise<ApiResult<AccountSnapshot>>
+  /** Accepted starts return testing state; account/activity events deliver later proof. */
   testSolModel(): Promise<ApiResult<AccountSnapshot>>
   testLunaModel(): Promise<ApiResult<AccountSnapshot>>
   cancelModelTest(): Promise<ApiResult<AccountSnapshot>>

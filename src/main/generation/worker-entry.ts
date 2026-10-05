@@ -40,6 +40,7 @@ process.parentPort?.on('message', (event: { data: unknown }) => {
       onDiagnostic: (event, data) => reply({ type: 'diagnostic', event, data: safeLogData(data) }) })
       .then(result => reply({ type: 'result', profile: 'outline', result }))
     : runModelAccessProfile(request.input, { signal: controller.signal, onTransport: transport,
+      onEvidenceProgress: evidence => reply({ type: 'model-evidence', evidence }),
       onEvidence: evidence => reply({ type: 'model-evidence', evidence }) })
       .then(result => reply({ type: 'result', profile: 'model-access', result }))
   void run.catch(error => {

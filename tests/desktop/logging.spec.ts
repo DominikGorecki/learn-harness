@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, readdir, realpath, rm } from 'node:fs/promise
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
+import type { AccountApi } from '../../src/shared/account'
 
 test('development logs collect main, renderer and preload telemetry without content or a public log API', { tag: '@diagnostics', annotation: { type: 'flow', description: 'diagnostics' } }, async ({ playwright }) => {
   const profile = await mkdtemp(join(tmpdir(), 'edu-logging-desktop-'))
@@ -91,6 +92,13 @@ test('model and utility diagnostics retain transport evidence and request correl
     await expect.poll(() => fixture.inferenceRequests.length).toBe(3)
     // Refining the brief is an intentional existing save before generation starts.
     const original = await readFile(savedPath, 'utf8')
+    const busyDiagnostics = await page.evaluate(async () => {
+      const api = (globalThis as unknown as { learning: AccountApi }).learning
+      return [await api.testSolModel(), await api.testLunaModel()]
+    })
+    expect(busyDiagnostics).toMatchObject([{ ok: false, error: { code: 'BUSY' } }, { ok: false, error: { code: 'BUSY' } }])
+    expect(fixture.inferenceRequests).toHaveLength(3)
+    expect(await readFile(savedPath, 'utf8')).toBe(original)
     await expect.poll(async () => {
       const entries = (await logText()).trim().split('\n').map(line => JSON.parse(line))
       const worker = entries.filter(entry => entry.event === 'worker.started').at(-1)
@@ -116,7 +124,8 @@ test('model and utility diagnostics retain transport evidence and request correl
     for (const secret of ['LOG_PRIVATE_', 'fixture-access', 'fixture-refresh', 'learner@example.test', 'Test Learner', 'Bayesian reasoning', fixture.baseUrl]) expect(text).not.toContain(secret)
     const entries = text.trim().split('\n').map(line => JSON.parse(line))
     expect(entries.find(entry => entry.event === 'model.test').data).toMatchObject({ requestedModel: 'gpt-6.1-sol', httpStatus: 200, outcome: 'verified' })
-    const worker = entries.find(entry => entry.event === 'worker.started')
+    const outlineWorker = entries.find(entry => entry.event === 'worker.completed' && entry.data.kind === 'outline')
+    const worker = entries.find(entry => entry.event === 'worker.started' && entry.data.workerId === outlineWorker?.data.workerId)
     expect(worker.data.workerId).toBeTruthy()
     expect(worker.data.requestId).toBeTruthy()
     expect(entries.some(entry => entry.event === 'ipc.started' && entry.data.requestId === worker.data.requestId)).toBe(true)

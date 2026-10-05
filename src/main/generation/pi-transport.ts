@@ -6,7 +6,7 @@ import { ApplicationError } from '../../shared/contracts'
 import { providerFailure } from '../auth/provider-errors'
 import { PiProtocolFailure, PiProtocolObserver, protocolCodes, safeProtocolValue } from './pi-protocol-evidence'
 import type { PiProtocolEvidence } from './pi-protocol-evidence'
-import { PiStreamLiveness } from './pi-stream-liveness'
+import { PiStreamLiveness, systemClock } from './pi-stream-liveness'
 import type { MonotonicClock, TransportState, TransportReason } from './pi-stream-liveness'
 import { observe } from './observe'
 
@@ -44,6 +44,8 @@ export interface PiTransportOptions {
   onRequest?(bytes: number): void
   onResponse?(status: number, elapsedMs: number): void
   onEvidence?(evidence: PiProtocolEvidence): void
+  onEvidenceProgress?(evidence: PiProtocolEvidence): void
+  validateCompleted?(evidence: PiProtocolEvidence): void
 }
 
 /** One request, two bounded consumers. Pi success is withheld until the private reader sees clean EOF. */
@@ -61,8 +63,19 @@ export function streamPiTurn(model: Model<'openai-responses'>, context: Context,
   let cancellation: Promise<void> | null = null
   let observer: PiProtocolObserver | null = null
   let httpRejection = false
+  let metadataTimer: unknown | null = null, metadataAt = -Infinity
+  const clock = options.clock ?? systemClock
   const now = () => options.clock?.now() ?? performance.now()
   const fail = (error: ApplicationError, why: TransportReason) => { if (!failure) { failure = error; reason = why } }
+  const emitMetadata = () => {
+    metadataTimer = null; metadataAt = now()
+    if (observer) observe(() => options.onEvidenceProgress?.({ ...observer!.evidence }))
+  }
+  const metadata = () => {
+    if (!options.onEvidenceProgress || metadataTimer !== null) return
+    if (now() - metadataAt >= 100) emitMetadata()
+    else metadataTimer = clock.schedule(emitMetadata, 100 - (now() - metadataAt))
+  }
   const cancelReaders = (): Promise<void> => {
     if (!rawReader && !privateReader && !bodyController) return Promise.resolve()
     if (!cancellation) {
@@ -95,7 +108,7 @@ export function streamPiTurn(model: Model<'openai-responses'>, context: Context,
     if (signal.aborted) { await response.body?.cancel().catch(() => {}); signal.throwIfAborted() }
     liveness.headers(); observe(() => options.onResponse?.(response.status, Math.max(0, Math.round(now() - started))))
     if (signal.aborted) { await response.body?.cancel().catch(() => {}); signal.throwIfAborted() }
-    observer = new PiProtocolObserver(response, options.maximumResponseBytes, semantic => liveness?.event(semantic))
+    observer = new PiProtocolObserver(response, options.maximumResponseBytes, semantic => liveness?.event(semantic), options.validateCompleted)
     if (!response.body) {
       const error = response.ok ? new PiProtocolFailure('missing-completion', 'UNAVAILABLE', 'The provider returned no response body. Try again.') : providerFailure(response.status)
       fail(error, response.ok ? 'missing-completion' : 'provider-error')
@@ -150,10 +163,11 @@ export function streamPiTurn(model: Model<'openai-responses'>, context: Context,
       while (true) {
         const value = await privateReader!.read()
         if (value.done) return observer!.eof()
-        observer!.chunk(value.value)
+        try { observer!.chunk(value.value) } finally { metadata() }
       }
     })().catch(error => {
       if (error instanceof PiProtocolFailure) fail(error, error.reason)
+      else if (error instanceof ApplicationError) fail(error, 'invalid-event')
       else if (!signal.aborted) fail(new ApplicationError('NETWORK', 'The provider connection could not finish. Try again.'), 'transport-error')
       controller.abort(); return null
     }).finally(() => { privateReader?.releaseLock() })
@@ -189,6 +203,8 @@ export function streamPiTurn(model: Model<'openai-responses'>, context: Context,
       // All terminal paths await every owned consumer; no old turn survives into local tools/new admission.
       if (!accepted) { controller.abort(); await cancelReaders() }
       await Promise.allSettled([pump, observation, source.result()])
+      if (metadataTimer !== null) clock.cancel(metadataTimer)
+      metadataTimer = null
       signal.removeEventListener('abort', abort)
       const finalLiveness = liveness as PiStreamLiveness | null
       finalLiveness?.stop(accepted ? 'completed' : reason)

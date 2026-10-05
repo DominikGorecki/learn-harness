@@ -23,15 +23,17 @@ export function useAccount() {
   }, [])
 
   const run = useCallback(async (action: (api: AccountApi) => Promise<ApiResult<AccountSnapshot>>) => {
-    if (busyRef.current) return
+    if (busyRef.current) return null
     busyRef.current = true
     setBusy(true); setError(null)
     const initialRevision = eventRevision.current
     try {
       const value = await request(action(window.learning))
       if (eventRevision.current === initialRevision) setSnapshot(value)
+      // A diagnostic reply is acceptance only; later subscription events verify access.
+      return value
     }
-    catch (error) { setError(errorMessage(error)) }
+    catch (error) { setError(errorMessage(error)); return null }
     finally { busyRef.current = false; setBusy(false) }
   }, [])
   const cancelModelTest = useCallback(async () => {

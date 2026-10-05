@@ -17,7 +17,10 @@ import { outlineActivity } from './generation/outline-activity'
 import { AiCoordinator } from '../core/ai/coordinator'
 import { registerAiHandlers } from './ipc/ai-handlers'
 import { registerGenerationHandlers } from './ipc/generation-handlers'
-import { runOutlineWorker } from './generation/worker-client'
+import { runOutlineWorker, runPiWorker } from './generation/worker-client'
+import { testModelAccess, solModel, lunaModel } from './auth/model-access-test'
+import { modelTestActivity } from './generation/model-test-activity'
+import { safeLogData } from '../shared/diagnostics'
 import { initializeDiagnostics, observeWindow, registerRendererDiagnostics } from './logging/runtime'
 import { errorDiagnostic, logDiagnostic, silentLogger } from './logging/logger'
 
@@ -83,6 +86,13 @@ if (!app.requestSingleInstanceLock()) {
       testProfile: process.env.EDU_HARNESS_TEST_DATA_DIR, fixtureOrigin: process.env.EDU_HARNESS_TEST_PROVIDER_URL })
     account = new AccountService({
       ai,
+      testModel: (input, lease) => testModelAccess({ model: input.target === solModel.id ? solModel : lunaModel, signal: lease.signal,
+        ...modelTestActivity(lease, input.target),
+        run: callbacks => runPiWorker({ profile: 'model-access', input: { ...input, baseUrl: providerEndpoints.resource } }, { signal: lease.signal, ...callbacks }),
+        onDiagnostic: diagnostic => {
+          logDiagnostic('info', 'main', 'model.test', diagnostic)
+          console.info(input.target === solModel.id ? '[Sol model test]' : '[Luna model test]', JSON.stringify(safeLogData(diagnostic)))
+        } }),
       provider: createChatGPTProvider({ endpoints: providerEndpoints }),
       store: createCredentialStore(join(app.getPath('userData'), 'connection'), {
         available: () => safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'),
@@ -140,7 +150,7 @@ if (!app.requestSingleInstanceLock()) {
     // Publication/owned worker cleanup precedes the bounded diagnostics flush.
     void ai.dispose().then(async () => {
       await generation?.waitForIdle() // Storage-only retry has no AI lease but still owns publication.
-      account?.dispose()
+      await account?.dispose()
       const deadline = setTimeout(() => { logsClosed = true; app.quit() }, 2000)
       try { await diagnostics.close() }
       finally { clearTimeout(deadline); logsClosed = true; app.quit() }

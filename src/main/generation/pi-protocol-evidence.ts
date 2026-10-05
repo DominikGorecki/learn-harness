@@ -33,7 +33,8 @@ export class PiProtocolObserver {
   private data: string[] = []
   private eventName = ''
   private frameCharacters = 0
-  constructor(response: Response, private readonly maximumBytes: number, private readonly onEvent?: (semantic: boolean) => void) {
+  constructor(response: Response, private readonly maximumBytes: number, private readonly onEvent?: (semantic: boolean) => void,
+    private readonly validateCompleted?: (evidence: PiProtocolEvidence) => void) {
     const type = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()
     this.evidence = { httpStatus: response.status, contentType: !type ? 'missing' : type === 'text/event-stream' ? 'sse' : type === 'application/json' ? 'json' : 'other',
       bytes: 0, events: 0, textDeltaEvents: 0, completedEvents: 0, hasStreamedText: false, hasFinalText: false,
@@ -117,6 +118,7 @@ export class PiProtocolObserver {
           const part = record(value); return part.type === 'output_text' && typeof part.text === 'string' && Boolean(part.text.trim())
         })
       })
+      this.validateCompleted?.({ ...this.evidence })
     }
   }
 }

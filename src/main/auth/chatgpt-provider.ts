@@ -10,9 +10,7 @@ import type { ModelChoice } from '../../shared/account'
 import { createLoopback } from './loopback'
 import { providerFailure } from './provider-errors'
 import { planScope } from './types'
-import { testModelAccess, solModel, lunaModel } from './model-access-test'
 import type { AccountCredential, AccountProvider } from './types'
-import { logDiagnostic } from '../logging/logger'
 
 export const chatgptEndpoints = {
   issuer: 'https://auth.openai.com',
@@ -162,22 +160,6 @@ export function createChatGPTProvider(options: {
     async listModels(credential, signal) {
       if (!credential.accessToken || !credential.scopes.includes(planScope)) throw new ApplicationError('PLAN_PERMISSION_REQUIRED', 'Enable ChatGPT plan usage to choose a model.')
       return parseModelCatalogue(await json(endpoints.models, { headers: { authorization: `Bearer ${credential.accessToken}` } }, signal))
-    },
-    async testSolModel(credential, signal) {
-      if (!credential.accessToken || !credential.scopes.includes(planScope)) throw new ApplicationError('PLAN_PERMISSION_REQUIRED', 'Enable ChatGPT plan usage to test a model.')
-      await testModelAccess({ resource: endpoints.resource, accessToken: credential.accessToken, signal, request, model: solModel,
-        onDiagnostic: diagnostic => {
-          logDiagnostic('info', 'main', 'model.test', diagnostic)
-          console.info('[Sol model test]', JSON.stringify(diagnostic))
-        } })
-    },
-    async testLunaModel(credential, signal) {
-      if (!credential.accessToken || !credential.scopes.includes(planScope)) throw new ApplicationError('PLAN_PERMISSION_REQUIRED', 'Enable ChatGPT plan usage to test a model.')
-      await testModelAccess({ resource: endpoints.resource, accessToken: credential.accessToken, signal, request, model: lunaModel,
-        onDiagnostic: diagnostic => {
-          logDiagnostic('info', 'main', 'model.test', diagnostic)
-          console.info('[Luna model test]', JSON.stringify(diagnostic))
-        } })
     },
     async revoke(credential, signal) {
       if (!credential.refreshToken) return

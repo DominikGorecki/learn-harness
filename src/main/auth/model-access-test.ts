@@ -1,171 +1,69 @@
 import { ApplicationError } from '../../shared/contracts'
-import { providerFailure } from './provider-errors'
 import { additionalAccountModels } from '../../shared/account'
+import { providerFailure } from './provider-errors'
+import type { PiProtocolEvidence } from '../generation/pi-protocol-evidence'
+import type { PiWorkerTask, WorkerRunOptions } from '../generation/worker-lifecycle'
+import type { TransportReason } from '../generation/pi-stream-liveness'
+import { observe } from '../generation/observe'
 
-// A diagnostic target, never evidence of availability by itself.
-export const solModel = additionalAccountModels[0]
-export const lunaModel = additionalAccountModels[1]
+export const solModel = additionalAccountModels[0], lunaModel = additionalAccountModels[1]
 type DiagnosticModel = typeof additionalAccountModels[number]
-
-function record(value: unknown): Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
+export interface ModelAccessTestDiagnostic extends Omit<PiProtocolEvidence, 'httpStatus'> {
+  requestedModel: DiagnosticModel['id']; httpStatus: number | null; outcome: string; elapsedMs: number
 }
-function errorCode(value: unknown): string | undefined {
-  return typeof value === 'string' ? value : typeof record(value).code === 'string' ? record(value).code as string : undefined
+export function modelMatches(target: DiagnosticModel['id'], actual: string | null): boolean {
+  return actual === target || actual !== null && actual.startsWith(target + '-') && /^\d{4}-\d{2}-\d{2}$/.test(actual.slice(target.length + 1))
 }
-export interface ModelAccessTestDiagnostic {
-  requestedModel: DiagnosticModel['id']
-  httpStatus: number | null
-  contentType: 'sse' | 'json' | 'other' | 'missing'
-  bytes: number
-  events: number
-  textDeltaEvents: number
-  completedEvents: number
-  hasStreamedText: boolean
-  hasFinalText: boolean
-  terminalEvent: 'response.completed' | 'response.incomplete' | 'response.failed' | 'error' | null
-  returnedModel: string | null
-  responseStatus: string | null
-  providerCode: string | null
-  incompleteReason: string | null
-  outcome: string
-  elapsedMs: number
+/** Applied to every completion, so a later event cannot repair invalid access proof. */
+export function verifyCompletedModelEvidence(model: DiagnosticModel, evidence: PiProtocolEvidence): void {
+  const fail = (message: string): never => { throw new ApplicationError('UNAVAILABLE', message + ' ' + model.name + ' access remains unverified. Your model choices have not changed.') }
+  if (evidence.responseStatus !== 'completed') fail('The completion event did not report completed status.')
+  if (!modelMatches(model.id, evidence.returnedModel)) fail('The completion event ' + (evidence.returnedModel === null ? 'did not identify a model' : evidence.returnedModel === 'unrecognized' ? 'identified an unexpected model' : 'identified ' + evidence.returnedModel) + '.')
+  if (!evidence.hasStreamedText && !evidence.hasFinalText) fail('The stream and completion event contained no reply text.')
 }
-
-// Only known protocol values enter diagnostics; arbitrary provider strings never do.
-function known(value: unknown, choices: readonly string[]): string | null {
-  return value == null ? null : typeof value === 'string' && choices.includes(value) ? value : 'unrecognized'
-}
-function diagnosticModel(value: unknown): string | null {
-  if (value == null) return null
-  return typeof value === 'string' && /^gpt-(?:5\.5|5\.6-(?:sol|terra|luna)|6(?:\.1)?-(?:sol|astra|luna))(?:-\d{4}-\d{2}-\d{2})?$/.test(value) ? value : 'unrecognized'
-}
-
-/** One tiny, bounded request. Never sends project material or exposes provider output. */
+/** Privileged evidence adapter. It neither performs fetch nor accepts a prompt/destination. */
 export async function testModelAccess(options: {
-  resource: string; accessToken: string; signal: AbortSignal; request: typeof fetch
-  model: DiagnosticModel
-  onDiagnostic?: (diagnostic: ModelAccessTestDiagnostic) => void
+  model: DiagnosticModel; signal: AbortSignal; run(callbacks: Pick<WorkerRunOptions, 'onTransport' | 'onModelEvidence'>): PiWorkerTask
+  onTransport?: WorkerRunOptions['onTransport']; onEvidence?(evidence: PiProtocolEvidence): void
+  onDiagnostic?(diagnostic: ModelAccessTestDiagnostic): void; now?: () => number
+  onVerified?(): void
 }): Promise<void> {
-  const model = options.model
-  const signal = AbortSignal.any([options.signal, AbortSignal.timeout(30_000)])
-  const started = Date.now()
-  const diagnostic: ModelAccessTestDiagnostic = {
-    requestedModel: model.id, httpStatus: null, contentType: 'missing', bytes: 0,
-    events: 0, textDeltaEvents: 0, completedEvents: 0, hasStreamedText: false, hasFinalText: false, terminalEvent: null,
-    returnedModel: null, responseStatus: null, providerCode: null, incompleteReason: null,
-    outcome: 'network_error', elapsedMs: 0
-  }
-  const unverified = (reason: string, message: string) => {
-    diagnostic.outcome = reason
-    return new ApplicationError('UNAVAILABLE', `${message} ${model.name} access remains unverified. Your model choices have not changed.`)
-  }
-  const rejection = (status: number, code: string | undefined, stream = false) => {
-    diagnostic.outcome = stream ? 'stream_error' : 'http_error'
-    diagnostic.providerCode = known(code, ['invalid_grant', 'invalid_token', 'model_not_found',
-      'subscription_sharing_unsupported_capability', 'subscription_sharing_usage_limit_exceeded', 'subscription_sharing_usage_unavailable'])
-    const failure = providerFailure(status, code)
-    return new ApplicationError(failure.code, `${stream ? 'The response stream reported an error.' : `The model test returned HTTP ${status}.`} ${failure.message}`)
-  }
-  let reader: ReadableStreamDefaultReader<Uint8Array> | undefined
+  const now = options.now ?? (() => performance.now()), started = now()
+  const diagnostic: ModelAccessTestDiagnostic = { requestedModel: options.model.id, httpStatus: null, contentType: 'missing', bytes: 0, events: 0,
+    textDeltaEvents: 0, completedEvents: 0, hasStreamedText: false, hasFinalText: false, terminalEvent: null, returnedModel: null,
+    responseStatus: null, providerCode: null, incompleteReason: null, cleanEof: false, outcome: 'network_error', elapsedMs: 0 }
+  let reason: TransportReason | null = null
   try {
-    const response = await options.request(`${options.resource}/responses`, {
-      method: 'POST', redirect: 'error', signal,
-      headers: { authorization: `Bearer ${options.accessToken}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ model: model.id, input: [{ role: 'user', content: 'Reply with exactly OK.' }], store: false, stream: true })
+    options.signal.throwIfAborted()
+    const task = options.run({
+      onTransport: state => { diagnostic.bytes = Math.max(diagnostic.bytes, state.bytes); if (state.stage === 'ended') reason = state.reason; observe(() => options.onTransport?.(state)) },
+      onModelEvidence: evidence => { Object.assign(diagnostic, evidence, { bytes: Math.max(diagnostic.bytes, evidence.bytes) }); observe(() => options.onEvidence?.(evidence)) }
     })
-    diagnostic.httpStatus = response.status
-    const contentType = response.headers.get('content-type')?.split(';')[0]?.trim().toLowerCase()
-    diagnostic.contentType = !contentType ? 'missing' : contentType === 'text/event-stream' ? 'sse' : contentType === 'application/json' ? 'json' : 'other'
-    if (!response.body) throw response.ok ? unverified('missing_body', 'The server returned no response body.') : rejection(response.status, undefined)
-    reader = response.body.getReader()
-    const decoder = new TextDecoder()
-    let bytes = 0, pending = '', completed = false
-    const consume = (frame: string) => {
-      const data = frame.split(/\r?\n/).filter(line => line.startsWith('data:')).map(line => line.slice(5).trimStart()).join('\n')
-      if (!data || data === '[DONE]') return
-      let event: Record<string, unknown>
-      try { event = record(JSON.parse(data)) } catch {
-        diagnostic.outcome = 'invalid_event'
-        throw new ApplicationError('NETWORK', 'The model test received an unreadable stream event. Try again.')
-      }
-      diagnostic.events++
-      if (event.type === 'response.output_text.delta') {
-        diagnostic.textDeltaEvents++
-        // Some plan streams deliver the reply only in deltas, without repeating it in response.output.
-        // Retain evidence of nonempty text, never the reply itself.
-        if (typeof event.delta === 'string' && event.delta.trim()) diagnostic.hasStreamedText = true
-      }
-      const result = record(event.response)
-      if (event.type === 'response.failed' || event.type === 'error' || event.type === 'response.incomplete' || event.type === 'response.completed') {
-        diagnostic.terminalEvent = event.type
-        diagnostic.returnedModel = diagnosticModel(result.model)
-        diagnostic.responseStatus = known(result.status, ['queued', 'in_progress', 'completed', 'failed', 'incomplete', 'cancelled'])
-      }
-      if (event.type === 'response.failed' || event.type === 'error') throw rejection(400, errorCode(result.error ?? event.error ?? event), true)
-      if (event.type === 'response.incomplete') {
-        diagnostic.incompleteReason = known(record(result.incomplete_details).reason, ['max_output_tokens', 'content_filter'])
-        throw unverified('incomplete_response', 'The server reported an incomplete response.')
-      }
-      if (event.type === 'response.completed') {
-        diagnostic.completedEvents++
-        const returnedModel = result.model
-        const matching = typeof returnedModel === 'string' && (returnedModel === model.id || returnedModel.startsWith(`${model.id}-`))
-        const output = Array.isArray(result.output) ? result.output : []
-        const hasText = output.some(value => {
-          const item = record(value)
-          return item.type === 'message' && Array.isArray(item.content) && item.content.some(value => {
-            const content = record(value)
-            return content.type === 'output_text' && typeof content.text === 'string' && Boolean(content.text.trim())
-          })
-        })
-        diagnostic.hasFinalText = hasText
-        if (result.status !== 'completed') throw unverified('unexpected_status', 'The completion event did not report completed status.')
-        if (!matching) throw unverified('model_mismatch', `The completion event ${diagnostic.returnedModel === null ? 'did not identify a model' : diagnostic.returnedModel === 'unrecognized' ? 'identified an unexpected model' : `identified ${diagnostic.returnedModel}`}.`)
-        if (!hasText && !diagnostic.hasStreamedText) throw unverified('missing_output', 'The stream and completion event contained no reply text.')
-        completed = true
-      }
-    }
-    while (true) {
-      signal.throwIfAborted()
-      const chunk = await reader.read()
-      if (chunk.done) break
-      bytes += chunk.value.byteLength
-      diagnostic.bytes = bytes
-      if (bytes > 256 * 1024) throw unverified('response_too_large', 'The response exceeded the diagnostic size limit.')
-      pending += decoder.decode(chunk.value, { stream: true })
-      if (!response.ok) continue
-      let boundary: RegExpExecArray | null
-      while ((boundary = /\r?\n\r?\n/.exec(pending))) {
-        consume(pending.slice(0, boundary.index))
-        pending = pending.slice(boundary.index + boundary[0].length)
-      }
-    }
-    pending += decoder.decode()
-    if (!response.ok) {
-      let code: string | undefined
-      try { code = errorCode(record(JSON.parse(pending)).error) } catch { /* Classify HTTP failures without exposing raw text. */ }
-      throw rejection(response.status, code)
-    }
-    if (pending.trim()) consume(pending)
-    if (!completed) throw unverified('missing_completion', 'The stream ended without a response.completed event.')
-    signal.throwIfAborted()
+    const result = await task.result
+    if ('kind' in result) throw new ApplicationError('INTERNAL', 'The model test returned an unexpected task result.')
+    Object.assign(diagnostic, result)
+    options.signal.throwIfAborted()
+    if (!result.cleanEof || result.terminalEvent !== 'response.completed' || !result.completedEvents) throw new ApplicationError('UNAVAILABLE', 'The stream ended without a response.completed event.')
+    verifyCompletedModelEvidence(options.model, result)
     diagnostic.outcome = 'verified'
+    observe(() => options.onVerified?.())
   } catch (error) {
-    if (options.signal.aborted) {
-      diagnostic.outcome = 'cancelled'
-      throw new ApplicationError('CANCELLED', 'Model test cancelled. Your available models have not changed.')
+    if (options.signal.aborted) { diagnostic.outcome = 'cancelled'; throw new ApplicationError('CANCELLED', 'Model test cancelled. Your available models have not changed.') }
+    if (reason === 'provider-error') diagnostic.outcome = diagnostic.httpStatus !== null && diagnostic.httpStatus >= 400 ? 'http_error' : 'stream_error'
+    else if (reason === 'network-idle') diagnostic.outcome = 'network_idle'
+    else if (reason === 'response-limit') diagnostic.outcome = 'response_too_large'
+    else if (diagnostic.completedEvents && !modelMatches(options.model.id, diagnostic.returnedModel)) diagnostic.outcome = 'model_mismatch'
+    else if (diagnostic.terminalEvent === 'response.completed' && diagnostic.responseStatus !== 'completed') diagnostic.outcome = 'unexpected_status'
+    else if (diagnostic.completedEvents && !diagnostic.hasStreamedText && !diagnostic.hasFinalText) diagnostic.outcome = 'missing_output'
+    else diagnostic.outcome = reason === 'network-idle' ? 'network_idle' : reason === 'response-limit' ? 'response_too_large' : reason === 'invalid-event' ? 'invalid_event' :
+      reason === 'incomplete' ? 'incomplete_response' : reason === 'missing-completion' ? 'missing_completion' : reason === 'provider-error' ? diagnostic.httpStatus !== null && diagnostic.httpStatus >= 400 ? 'http_error' : 'stream_error' : 'network_error'
+    if (reason === 'provider-error') {
+      const failure = providerFailure(diagnostic.httpStatus ?? 0, diagnostic.providerCode ?? undefined)
+      throw new ApplicationError(failure.code, (diagnostic.outcome === 'http_error' ? 'The model test returned HTTP ' + diagnostic.httpStatus + '.' : 'The response stream reported an error.') + ' ' + failure.message)
     }
-    if (signal.aborted) {
-      diagnostic.outcome = 'timeout'
-      throw new ApplicationError('NETWORK', `The model test timed out after 30 seconds. ${model.name} access remains unverified; try again.`)
-    }
+    if (['model_mismatch', 'missing_output'].includes(diagnostic.outcome)) verifyCompletedModelEvidence(options.model, { ...diagnostic, httpStatus: diagnostic.httpStatus ?? 0 })
+    if (reason === 'missing-completion') throw new ApplicationError('UNAVAILABLE', 'The stream ended without a response.completed event. Your model access remains unverified.')
     if (error instanceof ApplicationError) throw error
     throw new ApplicationError('NETWORK', 'The model test could not complete. Check your connection and try again.')
-  } finally {
-    await reader?.cancel().catch(() => {})
-    reader?.releaseLock()
-    diagnostic.elapsedMs = Date.now() - started
-    try { options.onDiagnostic?.(diagnostic) } catch { /* Logging cannot change verification. */ }
-  }
+  } finally { diagnostic.elapsedMs = Math.max(0, Math.round(now() - started)); observe(() => options.onDiagnostic?.(diagnostic)) }
 }

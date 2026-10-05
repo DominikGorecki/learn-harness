@@ -92,6 +92,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await expect(page.getByRole('main').getByText(/Your ChatGPT usage limit has been reached/)).toBeVisible()
     expect((await saved()).outline).toEqual(original)
     await expect(page.getByRole('textbox')).toHaveValue('A deeper look at evidence and base rates')
+    await page.getByRole('main').getByText(/Your ChatGPT usage limit has been reached/).scrollIntoViewIfNeeded()
     await flow.capture(desktop, page, 'usage-recovery')
     await page.getByRole('button', { name: 'Review ChatGPT connection' }).click()
     await page.getByRole('button', { name: 'Check availability' }).click()

@@ -47,13 +47,13 @@
       "sha256": "56b1df0680d7f120c1529f3ef1dc97680d67c61ce645498b2a88ddc9ce6e187c"
     }
   ],
-  "capturedAt": "2026-10-05T18:51:33.944Z",
+  "capturedAt": "2026-10-05T19:28:44.245Z",
   "testSha256": "18906dbf4bc217419caf1a44ccc73f8ed61d5a283bdfb4d6a2d5e5edbcef949a",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline-edit.spec.ts",
   "testTitle": "edit dialog rewrites the numbered path through Pi with the active model and persists it across restart",
-  "revision": "f20752ce0c84a915d7c1b10088a7b4233e5f2302",
+  "revision": "3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

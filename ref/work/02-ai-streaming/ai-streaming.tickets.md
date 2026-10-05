@@ -4,7 +4,7 @@ Status: In progress
 Source: [Ready spec](ai-streaming.spec.md)
 Date: 2026-10-05
 
-The tickets were authored as planning artifacts with all seven Open. The active `spec-implement` goal now authorizes their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01–T03 are accepted; T04–T07 remain open. Implement the complete bundle before release so no diagnostic or educational inference bypass remains.
+The tickets were authored as planning artifacts with all seven Open. The active `spec-implement` goal now authorizes their implementation; accepted outcomes and actual evidence are recorded in each ticket and [validation](validation.md). T01–T04 are accepted; T05–T07 remain open. Implement the complete bundle before release so every inference uses the shared lifecycle and approved panel.
 
 ## Implementation order
 
@@ -52,7 +52,7 @@ Primary means implementation ownership; supporting tickets verify or consume the
 
 ## Decision and evidence notes
 
-- The source spec named ADR-0021 as a provisional next number. The current index now assigns it to automatic local commits. T01 must recheck numbering; ADR-0022 is currently next. This allocation update does not change streaming scope or overwrite another decision.
+- The initial spec reserved ADR-0021 provisionally; that number belongs to automatic local commits. T01 adopted ADR-0022 for streaming, and the reviewed source spec uses that allocated decision. This preserves the existing decision and streaming scope.
 - During implementation, each ticket records actual focused checks in this bundle's `validation.md` and requirement evidence in `acceptance.md`. These records are not authored now as speculative success reports.
 - Required implementation gates: `npm run check`, `npm run test:desktop`, `npm run test:flows`, current-host `npm run package` then `npm run test:packaged`; meaningful focused checks belong to their owner tickets. Preserve sandboxing and configured capture reporter.
 - Live-account eligibility/streaming, other native OS appearance, suspend/resume and manual accessibility require explicit actual evidence and remain separate from signed protocol fixtures. No deliberately expensive live timing call is required.

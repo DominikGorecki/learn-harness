@@ -115,32 +115,12 @@ describe('account catalogue', () => {
   })
 })
 
-describe('explicit GPT-6.1 Sol test', () => {
-  it('tests Luna through the same bounded transport with its own fixed target', async () => {
+describe('authentication provider boundary', () => {
+  it('exposes no model-output inference methods and discovery consumes no reply request', async () => {
     const { fixture, provider, signIn } = await setup()
     const credential = await signIn()
-    await provider.testLunaModel(credential, new AbortController().signal)
-    expect(fixture.inferenceRequests).toEqual([{ model: 'gpt-6-luna', input: [{ role: 'user', content: 'Reply with exactly OK.' }], store: false, stream: true }])
-  })
-  it('uses the delegated token and one tiny request without changing the catalogue', async () => {
-    const { fixture, provider, signIn } = await setup()
-    const credential = await signIn()
-    await provider.testSolModel(credential, new AbortController().signal)
-    expect(fixture.inferenceRequests).toEqual([{ model: 'gpt-6.1-sol', input: [{ role: 'user', content: 'Reply with exactly OK.' }], store: false, stream: true }])
-    expect(await provider.listModels(credential, new AbortController().signal)).not.toContainEqual({ id: 'gpt-6.1-sol', name: 'GPT-6.1 Sol' })
-  })
-
-  it.each(['failed', 'incomplete', 'missing', 'wrong-model'] as const)('does not verify a %s response', async modelTestMode => {
-    const { provider, signIn } = await setup({ modelTestMode })
-    const credential = await signIn()
-    await expect(provider.testSolModel(credential, new AbortController().signal)).rejects.toMatchObject({ code: 'UNAVAILABLE' })
-  })
-
-  it('requires plan permission and never submits a request without it', async () => {
-    const { fixture, provider, signIn } = await setup({ permission: false })
-    const credential = await signIn()
-    await expect(provider.testSolModel(credential, new AbortController().signal)).rejects.toMatchObject({ code: 'PLAN_PERMISSION_REQUIRED' })
-    await expect(provider.testLunaModel(credential, new AbortController().signal)).rejects.toMatchObject({ code: 'PLAN_PERMISSION_REQUIRED' })
+    await provider.listModels(credential, new AbortController().signal)
+    expect(Object.keys(provider).sort()).toEqual(['listModels', 'renew', 'revoke', 'signIn'])
     expect(fixture.inferenceRequests).toHaveLength(0)
   })
 })

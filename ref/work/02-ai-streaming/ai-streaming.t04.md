@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T04 - Sol and Luna diagnostics through the shared Pi lifecycle
-Status: Open
+Status: Done
 
 ## Source
 
@@ -51,11 +51,11 @@ Main account service owns credentials/session proof; utility owns Pi; core coord
 
 ## Acceptance criteria
 
-- [ ] All five production inference kinds use shared admission and sanctioned Pi utility profiles; no direct diagnostic fetch remains.
-- [ ] Actual completed identity/text evidence determines independent session verification, including rejection after apparent completion.
-- [ ] Tests receive no project data/tools; public state contains status/count evidence only.
-- [ ] Accepted starts return promptly; account events report later outcome and same-target duplicates consume one request.
-- [ ] Streams beyond the old 30-second deadline succeed; cancellation/connection guards and safe diagnostics remain intact.
+- [x] All five production inference kinds use shared admission and sanctioned Pi utility profiles; no direct diagnostic fetch remains.
+- [x] Actual completed identity/text evidence determines independent session verification, including rejection after apparent completion.
+- [x] Tests receive no project data/tools; public state contains status/count evidence only.
+- [x] Accepted starts return promptly; account events report later outcome and same-target duplicates consume one request.
+- [x] Streams beyond the old 30-second deadline succeed; cancellation/connection guards and safe diagnostics remain intact.
 
 ## Manual verification
 
@@ -63,7 +63,13 @@ From an isolated dashboard/account fixture, start Sol, dismiss/reopen settings, 
 
 ## Completion evidence
 
-Pending authorized implementation: inference inventory, initial-start contract migration, identity/privacy/race evidence and the actual >30-second fixture result.
+Accepted by the primary after actual source/test review and independent read-only review. Worker `pi_transport_audit`, GPT-6.1 Sol / high; prerequisites T02 `f20752ce0c84a915d7c1b10088a7b4233e5f2302` and T03 `3e0da43f488fc4a1bfe53cb71ac113a7f69fcaf7` are reachable on `master`.
+
+Both fixed tests use synchronous global admission, tool-free Pi utility execution, private per-completion guards and independent main verification through clean EOF. Captured initial testing snapshots return promptly; duplicate starts reuse one request and competing educational/diagnostic calls consume zero additional requests. Success/failure ownership settles before synchronous account notifications. Cancellation awaits actual process exit; cancelled credential rotation persists before inference is prevented. Public previews/logs exclude reply, project and credential content.
+
+Focused five-file command passed 84 tests; final `npm run check` passed 273 tests / three platform skips with lint, flows, both typechecks and build. The full desktop gate first passed 13 tests / one expected packaged skip. Its final rerun passed all 13 tests but exited 1 on a Windows reporter rename; configured topic-only rerun repaired publication with exit 0, and flow integrity passed. The real model response receives for 31 seconds, with elapsed >30,000 ms and accepted-start <5,000 ms assertions. Packaging and the outline-profile ASAR worker check passed; both-profile packaged evidence remains T06. Primary independently confirmed flow integrity/diff checks and opened all four changed PNGs, including now-visible usage feedback. Exact commands, failures, repair and limits are in [validation](validation.md).
+
+No panel or live-account qualification is claimed here; T05–T07 and fresh final integration remain open. Worker edits/captures were frozen before coordinator acceptance and commit.
 
 ## Notes
 

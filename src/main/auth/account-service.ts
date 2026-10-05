@@ -21,7 +21,7 @@ export class AccountService {
   private renewalTask: Promise<AccountCredential> | null = null
   private epoch = 0
   private disconnecting = false
-  private modelTest: AbortController | null = null
+  private modelTest: { lease: AiLease; target: AdditionalModelId; initial: AccountSnapshot } | null = null
   private modelTestTask: Promise<void> | null = null
   private verifiedModels = new Set<AdditionalModelId>()
   private listeners = new Set<(snapshot: AccountSnapshot) => void>()
@@ -32,7 +32,8 @@ export class AccountService {
     openBrowser(url: string): Promise<void>
     copyToClipboard(url: string): Promise<void>
     now?: () => number
-    ai?: AiCoordinator
+    ai: AiCoordinator
+    testModel(input: { target: AdditionalModelId; accessToken: string }, lease: AiLease): Promise<void>
   }) {
     this.snapshot = {
       status: 'disconnected', name: null, email: null, message: null,
@@ -50,12 +51,11 @@ export class AccountService {
   private update(value: Partial<AccountSnapshot>): void { this.snapshot = { ...this.snapshot, ...value }; this.emit() }
   private idleGuard(): void {
     if (this.disconnecting) throw new ApplicationError('BUSY', 'Wait for sign-out to finish before connecting again.')
-    if (this.options.ai?.get().active) throw new ApplicationError('BUSY', 'Finish or cancel the AI action before changing your ChatGPT connection.')
-    if (this.modelTest) throw new ApplicationError('BUSY', 'Finish or cancel the model test before changing your ChatGPT connection.')
+    if (this.options.ai.get().active) throw new ApplicationError('BUSY', 'Finish or cancel the AI action before changing your ChatGPT connection.')
   }
-  /** Synchronous compatibility guard while legacy diagnostics await T04 migration. */
+  /** Connection changes cannot race any inference admission. The coordinator owns inference contention. */
   assertCanStartOutline(): void {
-    if (this.connection || this.disconnecting || this.modelTest) throw new ApplicationError('BUSY', 'Finish updating or testing the ChatGPT connection first.')
+    if (this.connection || this.disconnecting) throw new ApplicationError('BUSY', 'Finish updating the ChatGPT connection first.')
   }
 
   private connectedState(credential: AccountCredential): Partial<AccountSnapshot> {
@@ -180,8 +180,8 @@ export class AccountService {
   }
 
   async refreshModels(owner?: AiLease): Promise<AccountSnapshot> {
-    if (this.connection || this.disconnecting || this.modelTest) return this.get()
-    if (this.options.ai?.get().active && (!owner || !this.options.ai.isOwner(owner))) return this.get()
+    if (this.connection || this.disconnecting) return this.get()
+    if (this.options.ai.get().active && (!owner || !this.options.ai.isOwner(owner))) return this.get()
     owner?.signal.throwIfAborted()
     if (this.refreshTask) { await this.refreshTask; return this.get() }
     const epoch = this.epoch
@@ -210,49 +210,73 @@ export class AccountService {
   testLunaModel(): Promise<AccountSnapshot> { return this.testModel(additionalAccountModels[1]) }
 
   private async testModel(model: typeof additionalAccountModels[number]): Promise<AccountSnapshot> {
-    if (this.modelTest) {
-      if (this.snapshot.modelTestTarget !== model.id) throw new ApplicationError('BUSY', 'Finish or cancel the current model test first.')
-      await this.modelTestTask; return this.get()
+    this.assertCanStartOutline()
+    const active = this.options.ai.get().active
+    if (active) {
+      const { lease, reused } = this.options.ai.claim({ kind: model.id === 'gpt-6.1-sol' ? 'test-sol' : 'test-luna', model,
+        heading: `Testing ${model.name}`, requestSummary: 'Check access with a short reply.' })
+      if (reused && this.modelTest?.lease === lease) return structuredClone(this.modelTest.initial)
+      throw new ApplicationError('BUSY', 'Another AI action is still running.')
     }
-    this.idleGuard()
-    if (this.connection) throw new ApplicationError('BUSY', 'Finish signing in before testing a model.')
-    if (this.refreshTask) await this.refreshTask
-    this.idleGuard()
-    if (this.connection) throw new ApplicationError('BUSY', 'Finish signing in before testing a model.')
-    if (this.snapshot.status !== 'connected' || this.snapshot.modelsStatus !== 'ready') throw new ApplicationError('UNAVAILABLE', `Connect ChatGPT and refresh models before testing ${model.name}.`)
+    if (this.snapshot.status !== 'connected' || this.snapshot.modelsStatus !== 'ready' && !this.refreshTask) throw new ApplicationError('UNAVAILABLE', `Connect ChatGPT and refresh models before testing ${model.name}.`)
     if (this.verifiedModels.has(model.id)) return this.get()
-    const controller = new AbortController()
-    const epoch = this.epoch
-    this.modelTest = controller
-    this.update({ modelTestStatus: 'testing', modelTestTarget: model.id, modelTestMessage: `Testing ${model.name} with a short reply…` })
-    this.modelTestTask = (async () => {
+    const { lease } = this.options.ai.claim({ kind: model.id === 'gpt-6.1-sol' ? 'test-sol' : 'test-luna', model,
+      heading: `Testing ${model.name}`, requestSummary: 'Check access with a short reply.' })
+    const epoch = this.epoch, signal = lease.signal
+    let begin!: () => void
+    const ready = new Promise<void>(resolve => { begin = resolve })
+    const task = ready.then(async () => {
+      let outcome: 'verified' | 'failed' | 'cancelled' = 'failed'
+      let code: ApplicationError['code'] | undefined
       try {
-        const credential = await this.usableCredential()
-        controller.signal.throwIfAborted()
-        if (model.id === 'gpt-6.1-sol') await this.options.provider.testSolModel(credential, controller.signal)
-        else await this.options.provider.testLunaModel(credential, controller.signal)
-        controller.signal.throwIfAborted()
+        signal.throwIfAborted()
+        if (this.refreshTask) await this.refreshTask
+        signal.throwIfAborted()
+        const credential = await this.usableCredential(signal)
+        signal.throwIfAborted()
+        if (!this.options.ai.isOwner(lease)) throw new ApplicationError('CANCELLED', 'The model test is no longer active.')
+        await this.options.testModel({ target: model.id, accessToken: credential.accessToken! }, lease)
+        signal.throwIfAborted()
+        if (!this.options.ai.isOwner(lease)) throw new ApplicationError('CANCELLED', 'The model test is no longer active.')
         if (epoch !== this.epoch) return
+        outcome = 'verified'
         this.verifiedModels.add(model.id)
-        this.update({ modelTestStatus: 'verified', verifiedModelIds: [...this.verifiedModels],
-          modelTestMessage: `${model.name} replied successfully. Access is verified for this connection session.` })
+        // Commit private/session state and release the cleaned-up owner before any
+        // synchronous subscriber can cancel or start another diagnostic.
+        this.snapshot = { ...this.snapshot, modelTestStatus: 'verified', verifiedModelIds: [...this.verifiedModels],
+          modelTestMessage: `${model.name} replied successfully. Access is verified for this connection session.` }
+        this.modelTest = null
+        lease.settle('verified')
+        this.emit()
       } catch (error) {
-        if (epoch !== this.epoch) return
-        const safe = safeAccountError(error)
-        const status = controller.signal.aborted ? undefined : failureStates[safe.code]
-        this.update({ ...(status ? { status } : {}), modelTestStatus: controller.signal.aborted ? 'idle' : 'failed',
-          modelTestMessage: controller.signal.aborted ? 'Model test cancelled. Your available models have not changed.' : safe.message })
-      } finally { this.modelTest = null; this.modelTestTask = null }
-    })()
-    await this.modelTestTask
-    return this.get()
+        if (epoch !== this.epoch || this.modelTest?.lease !== lease) return
+        const safe = signal.aborted ? new ApplicationError('CANCELLED', 'Model test cancelled. Your available models have not changed.') : safeAccountError(error)
+        code = safe.code; outcome = safe.code === 'CANCELLED' ? 'cancelled' : 'failed'
+        const status = signal.aborted ? undefined : failureStates[safe.code]
+        this.snapshot = { ...this.snapshot, ...(status ? { status } : {}), modelTestStatus: outcome === 'cancelled' ? 'idle' : 'failed', modelTestMessage: safe.message }
+        this.modelTest = null
+        lease.settle(outcome, code)
+        this.emit()
+      } finally {
+        if (this.modelTest?.lease === lease) this.modelTest = null
+        lease.settle(outcome, code)
+      }
+    })
+    lease.setCancellation(() => task)
+    const initial = { ...this.get(), modelTestStatus: 'testing' as const, modelTestTarget: model.id, modelTestMessage: `Testing ${model.name} with a short reply…` }
+    this.modelTest = { lease, target: model.id, initial }
+    this.modelTestTask = task
+    begin(); this.update(initial)
+    return structuredClone(initial)
   }
 
   async cancelModelTest(): Promise<AccountSnapshot> {
-    this.modelTest?.abort()
-    await this.modelTestTask
+    const lease = this.modelTest?.lease
+    if (lease && this.options.ai.isOwner(lease)) await this.options.ai.cancel({ operationId: lease.operationId })
     return this.get()
   }
+
+  async waitForModelTest(): Promise<void> { await this.modelTestTask }
 
   recordFailure(error: unknown): void {
     const safe = safeAccountError(error)
@@ -264,8 +288,8 @@ export class AccountService {
     const guard = () => {
       owner?.signal.throwIfAborted()
       this.assertCanStartOutline()
-      if (this.options.ai?.get().active && (!owner || !this.options.ai.isOwner(owner))) throw new ApplicationError('BUSY', 'Another AI action owns the connection.')
-      if (owner && this.options.ai && !this.options.ai.isOwner(owner)) throw new ApplicationError('CANCELLED', 'This AI action is no longer active.')
+      if (this.options.ai.get().active && (!owner || !this.options.ai.isOwner(owner))) throw new ApplicationError('BUSY', 'Another AI action owns the connection.')
+      if (owner && !this.options.ai.isOwner(owner)) throw new ApplicationError('CANCELLED', 'This AI action is no longer active.')
     }
     guard()
     try {
@@ -310,5 +334,11 @@ export class AccountService {
     }
   }
 
-  dispose(): void { this.epoch++; this.connection?.abort(); this.modelTest?.abort(); this.listeners.clear() }
+  async dispose(): Promise<void> {
+    const lease = this.modelTest?.lease
+    if (lease && this.options.ai.isOwner(lease)) await this.options.ai.cancel({ operationId: lease.operationId })
+    await this.modelTestTask
+    if (this.renewalTask) await this.renewalTask.catch(() => {})
+    this.epoch++; this.connection?.abort(); this.listeners.clear()
+  }
 }
