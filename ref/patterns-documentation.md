@@ -4,7 +4,7 @@ Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADR
 
 ## Progressive discovery
 
-[AI operations](patterns-ai.md) is the canonical route for inference under [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md). Keep its adopted integration requirements distinct from current runtime migration status; foundational contracts alone do not establish producer/transport/panel acceptance. Scoped supersession notes preserve endpoint, secrecy, verification and publication decisions and historical evidence.
+[AI operations](patterns-ai.md) is the canonical route for inference under [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md). All five producers and the panel are implemented; link actual [acceptance](work/02-ai-streaming/acceptance.md) and [validation](work/02-ai-streaming/validation.md), preserving separate live/native/accessibility qualifications. Future features must follow the sanctioned profile → synchronous lease → authorized Pi transport → bounded projection → panel → independent domain settlement and verification route. Scoped supersession notes preserve endpoint, secrecy, verification and publication decisions and historical evidence.
 
 `AGENTS.md` routes contributors to `README.md`, then `ref/patterns.md`, a relevant focused `ref/patterns-<area>.md`, and `ref/ADRs/INDEX.md` plus the applicable records. The indexes describe when to read each file; avoid dumping every detailed rule into the entry point. Use concrete paths rather than shell-style filename shorthand.
 

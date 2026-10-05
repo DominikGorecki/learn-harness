@@ -1,12 +1,12 @@
 # ADR-0022: Shared Pi streaming lifecycle and generation presentation
 
-- Status: Accepted; coordinator/activity/bridge foundation implemented, transport, producer migration and panel pending in [the streaming bundle](../work/02-ai-streaming/ai-streaming.spec.md).
+- Status: Accepted; shared coordinator/transport, all five producers and panel implemented. Windows fixture and packaged-profile evidence is recorded in [streaming validation](../work/02-ai-streaming/validation.md); fresh bundle closure and external qualifications are recorded separately.
 - Date: 2026-10-05
 - Scope: all explicit model-output operations and future inference integration. OAuth, model discovery, renewal and revocation remain outside inference.
 
 ## Context
 
-Outline requests have fixed elapsed deadlines and model diagnostics use a separate direct-main inference adapter. Receiving output cannot extend those deadlines; feature-specific busy flags do not establish application-wide ownership. Pi's structured outline tool arguments also need a provisional projection rather than a text-only progress view. The learner approved a bottom split panel and one active AI call across the app.
+Before this decision, outline requests had fixed elapsed deadlines and model diagnostics used a separate direct-main inference adapter. Receiving output could not extend those deadlines; feature-specific busy flags did not establish application-wide ownership. Pi's structured outline tool arguments also need a provisional projection rather than a text-only progress view. The learner approved a bottom split panel and one active AI call across the app.
 
 ## Decision
 
@@ -22,16 +22,16 @@ Publish immutable, correlated provisional DTOs with five operation kinds and `no
 
 Cancel aborts immediately and awaits actual owner/worker cleanup before release; installing the shared cancellation promise precedes abort dispatch. Late updates cannot revive aborted or settled owners. Keep ownership through validation and publication; saving disables cancellation. Settle only on saved, verified, unsaved, needs-details, failed or cancelled domain outcomes. Domain owners retain full accepted/unsaved output and staged edits for storage-only retry. A terminal preview owns no active admission.
 
-Use the approved bottom panel within the workbench for all inference, including account tests without a project. Show actual activity, elapsed observation, Cancel, provisional readable preview and scope; other AI actions remain paused. Saved reading, themes and ordinary disclosure remain usable. Preserve drafts, focus, reading position and explicit navigation cancellation. UI implementation and its actual flow captures remain pending at foundation adoption.
+Use the approved bottom panel within the workbench for all inference, including account tests without a project. Show actual activity, elapsed observation, Cancel, provisional readable preview and scope; other AI actions remain paused. Saved reading, themes and ordinary disclosure remain usable. Preserve drafts, focus, reading position and explicit navigation cancellation. Actual [long-stream captures](../flows/ai-streaming/index.md) and [repair captures](../flows/ai-streaming-repair/index.md) document the implemented Windows fixture behavior. `AiActivitySnapshot.revision` orders the entire app session, including owner changes; local `AiOperation.sequence` is comparable only for the same operation ID. Dismiss hides a terminal panel in the renderer; the coordinator retains one bounded latest settled snapshot until another lease or exit, with no main dismissal API and no admission ownership.
 
 ## Scoped supersession
 
-This decision replaces only ADR-0010's fixed elapsed inference/watchdog policy and ADR-0015/ADR-0016's direct-main diagnostic transport and 30-second inference deadline. Existing runtime paths retain their earlier implementation until the streaming bundle migrates them; foundation adoption does not claim the migration has run. Preserve their public plan endpoint, sanctioned credentials, fixed diagnostic targets, allowance disclosure, independent model identity/completed/text proof and zero automatic retries.
+This decision replaces only ADR-0010's fixed elapsed inference/watchdog policy and ADR-0015/ADR-0016's direct-main diagnostic transport and 30-second inference deadline. The three educational operations and both diagnostics are migrated. Historical validation in the earlier ADRs still describes the implementation tested on its stated date. Preserve their public plan endpoint, sanctioned credentials, fixed diagnostic targets, allowance disclosure, independent model identity/completed/text proof and zero automatic retries.
 
 ADR-0012 and ADR-0019 still govern cancellation during saving, independent acceptance, topic/file authority, recoverable publication and save conflicts. ADR-0018 still prohibits content/credentials/paths/raw provider or tool data in logs. Activity remains ephemeral session memory, never `.edu` learning evidence or a persisted transcript.
 
 ## Consequences
 
-A heartbeat-only provider stream can continue within existing byte limits; the panel must show honest waiting and retain Cancel. One ownership mechanism reduces competing requests but requires every producer to migrate before release. Utility isolation remains a process boundary, not permission for arbitrary code. Fixtures and design images do not establish live-account eligibility, curriculum quality, accessibility or untested platform behavior.
+A heartbeat-only provider stream can continue within existing byte limits; the panel must show honest waiting and retain Cancel. One ownership mechanism reduces competing requests and requires every future producer to use the same route. Utility isolation remains a process boundary, not permission for arbitrary code. Fixtures and design images do not establish live-account eligibility, curriculum quality, accessibility or untested platform behavior.
 
 Current rules and integration recipe: [AI patterns](../patterns-ai.md). Domain, security and UI owners remain linked there.

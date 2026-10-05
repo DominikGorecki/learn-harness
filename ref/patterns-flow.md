@@ -2,7 +2,7 @@
 
 Governed by [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), extending [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md) and [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md); local contributor commits follow [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md).
 
-For behavior or UI work, choose the relevant journey below, read its `index.md`, and open only the screenshots needed for the task. Follow its test/source links for implementation evidence. [Design system](patterns-design-system.md), [UX](patterns-ux.md) and [renderer](patterns-renderer.md) remain the governing UI rules. A screenshot shows an observed state, not permission to add a feature or proof of live-provider access.
+For behavior or UI work, choose the relevant journey below, read its `index.md`, and open only the screenshots needed for the task. Follow its test/source links for implementation evidence. [Design system](patterns-design-system.md), [UX](patterns-ux.md) and [renderer](patterns-renderer.md) remain the governing UI rules. A screenshot shows an observed state, not permission to add a feature or proof of live-provider access. Under [ADR-0022](ADRs/ADR-0022-shared-pi-streaming-lifecycle.md), all inference uses the same workbench panel. The [real long-stream](flows/ai-streaming/index.md), [candidate repair](flows/ai-streaming-repair/index.md), producer/recovery journeys and [packaged profiles](flows/packaged-worker/index.md) supply complementary evidence; use the [bundle validation](work/02-ai-streaming/validation.md) for exact timing, commands and limits. Preserve reporter ownership of generated tables and keep approved design images separate.
 
 ## Flow index
 

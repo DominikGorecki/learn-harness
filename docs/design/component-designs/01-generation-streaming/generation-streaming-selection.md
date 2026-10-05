@@ -78,3 +78,7 @@ This reference establishes visual direction, not working streaming, tested inter
 - [Revision 03](generation-streaming-revision-03.png): one enlarged standalone bottom split panel with connected activity icons. User approved this exact image as the final reference.
 - [Exploration notes](generation-streaming-exploration.md): scope, tradeoffs and inspection limits.
 - Method: built-in image generation using actual reference images. Prompts: [01](generation-streaming-prompt-01.txt), [02](generation-streaming-prompt-02.txt), [02 boundary repair](generation-streaming-prompt-02-repair.txt), [03](generation-streaming-prompt-03.txt).
+
+## Subsequent implementation evidence — 2026-10-05
+
+The locked design above remains the approved concept and records its original design-task inspection. Subsequent implementation is governed by [ADR-0022](../../../../ref/ADRs/ADR-0022-shared-pi-streaming-lifecycle.md) and [AI operations](../../../../ref/patterns-ai.md). Actual [long-stream](../../../../ref/flows/ai-streaming/index.md), [candidate repair](../../../../ref/flows/ai-streaming-repair/index.md), [outline adaptation](../../../../ref/flows/outline/index.md) and [model-access](../../../../ref/flows/model-access/index.md) journeys show the implemented panel. [Validation](../../../../ref/work/02-ai-streaming/validation.md) records exact checks and limitations; these links do not turn the design images into runtime or accessibility evidence.

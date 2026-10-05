@@ -321,3 +321,7 @@ The following decisions remain outside the settled starting-point requirements:
 - Final product name and branding beyond the current Learning Studio working name.
 
 File schemas, storage mechanisms, process integration, and implementation sequencing belong in subsequent technical planning. They must preserve this PRD's product behavior and the explicit Pi, ChatGPT-plan, and `.edu` constraints.
+
+## Implemented progress extension — 2026-10-05
+
+[ADR-0022](../ADRs/ADR-0022-shared-pi-streaming-lifecycle.md) extends the implementation with one shared coordinator/Pi lifecycle and bottom workbench panel for outline creation, outline/topic rewriting and both explicit model tests. Readable drafts are provisional; completed-stream/clean-EOF and independent validation precede saved or verified success. Received-byte inactivity replaces elapsed inference cutoffs, with awaited cancellation and unchanged storage-only retry/topic locality. This subsequent extension preserves the historical milestone requirements and teaching scope. Its [actual flow references](../flows/ai-streaming/index.md), [acceptance](../work/02-ai-streaming/acceptance.md) and [validation](../work/02-ai-streaming/validation.md) distinguish Windows signed-fixture/package results from live-account, other-native-platform, accessibility and suspend/resume qualifications.

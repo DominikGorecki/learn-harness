@@ -4,7 +4,7 @@
 - Date: 2026-10-04
 - Scope: user-requested GPT-6.1 Sol and GPT-6 Luna picker additions. Supersedes ADR-0015's requirement to verify Sol each session before selection; keeps its diagnostic boundaries.
 
-[ADR-0022](ADR-0022-shared-pi-streaming-lifecycle.md) supersedes the reused direct-main diagnostic transport/30-second inference deadline with the shared lease/Pi route. Migration remains pending at foundation adoption. Extra choices, fixed targets, independent connection-session proof, endpoint and secrecy remain unchanged.
+[ADR-0022](ADR-0022-shared-pi-streaming-lifecycle.md) supersedes the reused direct-main diagnostic transport/30-second inference deadline with the shared lease/Pi route. Both fixed diagnostics are migrated; dated validation below describes the earlier tested implementation. Extra choices, fixed targets, independent connection-session proof, endpoint and secrecy remain unchanged.
 
 ## Context
 
@@ -16,7 +16,7 @@ After a successful account-specific catalogue query, append the fixed, serializa
 
 Allow explicit project selection and normal outline authorization for these choices using the existing connected credentials, membership check, public Responses endpoint and provider recovery. Never substitute a model, use an ambient API key, change authentication routes, or start inference on discovery/selection. The provider authorizes every actual request.
 
-Offer separate named, no-input Sol and Luna test actions. The privileged adapter selects each fixed target; the renderer cannot supply a slug, destination, prompt or credentials. Reuse the bounded HTTP/SSE verifier and sanitized console summaries from ADR-0015. Require nonempty reply evidence and completed status with the requested model identity; Sol evidence cannot verify Luna. Show independent successful-test badges for the current connection only. Reconnect/sign-out/restart clear proof, while refresh retains it. Failure or cancellation preserves choices and the other model's proof.
+Offer separate named, no-input Sol and Luna test actions. The privileged adapter selects each fixed target; the renderer cannot supply a slug, destination, prompt or credentials. Under ADR-0022, reuse the global lease, tool-free Pi utility profile, shared byte-inactivity/full-EOF transport and independent private verifier, with the sanitized console summaries from ADR-0015. The reused direct-main transport and 30-second elapsed inference deadline are superseded. Require nonempty reply evidence and completed status with the requested model identity; Sol evidence cannot verify Luna. Show independent successful-test badges for the current connection only. Reconnect/sign-out/restart clear proof, while refresh retains it. Failure or cancellation preserves choices and the other model's proof.
 
 Only one test owns the account at a time. Deduplicate repeated calls for the same target; reject a competing target as busy. Continue blocking account replacement and outline authorization while testing. Cancel aborts the owned test; closing settings only dismisses it.
 

@@ -5,16 +5,16 @@ Read this map, select the area touched by the task, then read its focused rules 
 | Domain | File | Governing decisions |
 | --- | --- | --- |
 | AI admission, streaming lifecycle, provisional activity and future producers | [AI operations](patterns-ai.md) | ADR-0022; retains ADR-0010/0012/0015/0016/0018/0019 outside scoped supersession |
-| Process model and dependency direction | [Architecture](patterns-architecture.md) | ADR-0001, ADR-0003, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0015, ADR-0016, ADR-0017, ADR-0018, ADR-0019 |
-| Preload API, IPC, validation, asset protocol | [IPC and security](patterns-ipc-security.md) | ADR-0002, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014, ADR-0015, ADR-0016, ADR-0017, ADR-0018, ADR-0019 |
-| Projects, outlines, account connection, storage | [Learning and data](patterns-learning-data.md) | ADR-0003, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0015, ADR-0016, ADR-0017, ADR-0019 |
-| Composition, visual tokens, typography, component states | [Design system](patterns-design-system.md) | ADR-0007, ADR-0013 |
-| Navigation, input, progress, recovery, keyboard/focus | [UX](patterns-ux.md) | ADR-0007, ADR-0012, ADR-0013, ADR-0015, ADR-0016, ADR-0017, ADR-0019 |
-| React organization, request state, safe rendering | [Renderer](patterns-renderer.md) | ADR-0001, ADR-0002, ADR-0003, ADR-0007, ADR-0013, ADR-0017, ADR-0018, ADR-0019 |
-| Documented journeys, screenshots and automatic reference refresh | [Flows](patterns-flow.md) | ADR-0004, ADR-0005, ADR-0020, ADR-0021 |
-| Tooling, development shutdown, diagnostics, tests, CI checks, automatic local commits | [Development and testing](patterns-development-testing.md) | ADR-0004, ADR-0006, ADR-0018, ADR-0020, ADR-0021 |
+| Process model and dependency direction | [Architecture](patterns-architecture.md) | ADR-0001, ADR-0003, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0015, ADR-0016, ADR-0017, ADR-0018, ADR-0019, ADR-0022 |
+| Preload API, IPC, validation, asset protocol | [IPC and security](patterns-ipc-security.md) | ADR-0002, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0012, ADR-0013, ADR-0014, ADR-0015, ADR-0016, ADR-0017, ADR-0018, ADR-0019, ADR-0022 |
+| Projects, outlines, account connection, storage | [Learning and data](patterns-learning-data.md) | ADR-0003, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0012, ADR-0014, ADR-0015, ADR-0016, ADR-0017, ADR-0019, ADR-0022 |
+| Composition, visual tokens, typography, component states | [Design system](patterns-design-system.md) | ADR-0007, ADR-0013, ADR-0022 |
+| Navigation, input, progress, recovery, keyboard/focus | [UX](patterns-ux.md) | ADR-0007, ADR-0012, ADR-0013, ADR-0015, ADR-0016, ADR-0017, ADR-0019, ADR-0022 |
+| React organization, request state, safe rendering | [Renderer](patterns-renderer.md) | ADR-0001, ADR-0002, ADR-0003, ADR-0007, ADR-0013, ADR-0017, ADR-0018, ADR-0019, ADR-0022 |
+| Documented journeys, screenshots and automatic reference refresh | [Flows](patterns-flow.md) | ADR-0004, ADR-0005, ADR-0020, ADR-0021, ADR-0022 |
+| Tooling, development shutdown, diagnostics, tests, CI checks, automatic local commits | [Development and testing](patterns-development-testing.md) | ADR-0004, ADR-0006, ADR-0018, ADR-0020, ADR-0021, ADR-0022 |
 | Platform targets, packaging, release | [Distribution](patterns-distribution.md) | ADR-0004 |
-| Progressive discovery and ADR lifecycle | [Documentation](patterns-documentation.md) | ADR-0005, ADR-0007, ADR-0013, ADR-0020, ADR-0021 |
+| Progressive discovery and ADR lifecycle | [Documentation](patterns-documentation.md) | ADR-0005, ADR-0007, ADR-0013, ADR-0020, ADR-0021, ADR-0022 |
 
 Start with [AGENTS.md](../AGENTS.md) for task routing and authority. When a durable rule changes, update its focused file, this index, and [ADRs/INDEX.md](ADRs/INDEX.md) together.
 

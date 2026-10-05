@@ -39,7 +39,7 @@ Before UI work, read the design system and UX patterns, then renderer rules and 
 - Keep context isolation and renderer sandboxing enabled. Main validates every request's sender and every mutation's payload.
 - Project metadata is portable in `.edu`; recent locations and protected credentials belong in the application profile. Do not present protocol fixtures as live AI evidence or outline creation as mastery.
 - Under ADR-0019, Pi can browse/read the selected project and stage requested text-file creation/editing. Topic edits may write only their owned topic folder and replace only their stable lesson. Main validates paths, baselines and locality and owns recoverable publication with `.edu` state; no general shell or renderer filesystem API is exposed.
-- Under ADR-0022, every future inference producer must use the shared coordinator, sanctioned Pi utility profile and workbench panel. Read [AI operations](ref/patterns-ai.md) for the integration recipe and the implemented foundation versus pending producer/transport/UI migration.
+- Under ADR-0022, every future inference producer must use the shared coordinator, sanctioned Pi utility profile and workbench panel. Read [AI operations](ref/patterns-ai.md) for the integration recipe and the implemented five-producer lifecycle, approved panel and separate live/platform qualification limits.
 
 ## Change workflow
 

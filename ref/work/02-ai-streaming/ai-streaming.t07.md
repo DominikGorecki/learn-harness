@@ -1,5 +1,5 @@
 # Ticket: ai-streaming.T07 - Mandatory future AI integration guidance and closure audit
-Status: Open
+Status: Done
 
 ## Source
 
@@ -50,11 +50,11 @@ Progressive discovery and scoped supersession, truthful implemented-versus-propo
 
 ## Acceptance criteria
 
-- [ ] AGENTS/indexes route future AI work to the canonical producer recipe and approved panel.
-- [ ] All listed focused/product documents describe the actual migrated implementation; old conflicting normative rules are explicitly amended.
-- [ ] No current inference bypass or hidden total deadline remains in the source inventory.
-- [ ] Historical/design evidence remains identified separately from actual passing app captures.
-- [ ] R01–R23 evidence and gate limitations are auditable without unsupported live/platform/accessibility claims; local links and flow integrity pass.
+- [x] AGENTS/indexes route future AI work to the canonical producer recipe and approved panel.
+- [x] All listed focused/product documents describe the actual migrated implementation; old conflicting normative rules are explicitly amended.
+- [x] No current inference bypass or hidden total deadline remains in the source inventory.
+- [x] Historical/design evidence remains identified separately from actual passing app captures.
+- [x] R01–R23 evidence and gate limitations are auditable without unsupported live/platform/accessibility claims; local links and flow integrity pass.
 
 ## Manual verification
 
@@ -62,7 +62,13 @@ Follow the contributor discovery route as if adding a new AI feature; identify w
 
 ## Completion evidence
 
-Pending authorized implementation: document checklist, source/timeout audit, resolved links, exact documentation/flow checks and final requirement/evidence limits. The bundle remains incomplete until required implementation gates and coordinator closure are satisfied.
+Accepted by the primary after actual diff/claim/source review. Worker `t07_docs`, GPT-6.1 Sol / medium; prerequisite T06 `5b339aec5bb4cb75135242459705181ae51578db` is reachable on `master`. Twenty-one granted contributor/product/ADR/design documents are updated; no runtime, test, catalog, capture or historical generated block was changed.
+
+AGENTS, README, both indexes and every constrained focused/product owner route future AI features through the canonical sanctioned profile → synchronous lease → main authorization → shared Pi byte liveness/full EOF → bounded projection → bottom panel → independent domain settlement and verification recipe. ADR-0022 is implemented; scoped ADR-0010/0015/0016 amendments retire total inference/direct-main diagnostic rules while preserving endpoint, credentials, targets, allowance, proof, size/turn and publication guarantees. Approved design history is unchanged, with subsequent actual flow/validation links appended.
+
+Both worker and primary source inventories find all five starts behind shared admission/Pi/panel and only one production Responses stream boundary, `pi-transport.ts`. OAuth/JWKS/renewal/discovery/revocation/login/static-resource deadlines are non-inference. Internal outline `timeoutMs` is byte idle, not cumulative duration. Global snapshot revision versus same-operation local sequence and renderer-only dismissal with bounded latest settled session retention are explicit.
+
+Worker checked 338 relative links in twenty-one documents and ran `npm.cmd run test:flows` with `login:false`, exit 0. Primary inspected every actual documentation diff and confirmed diff checks/source consistency. No mirrored unit tests are needed for prose maintenance. Actual runtime/capture and external limits remain in [acceptance](acceptance.md) and [validation](validation.md). Whole-bundle closure still requires fresh primary check/desktop/flows/package/packaged gates and the final requirement audit; this ticket does not claim those have run.
 
 ## Notes
 

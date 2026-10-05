@@ -180,3 +180,7 @@ The [first milestone](../ref/prds/01-project-setup-and-outline.md) establishes f
 Subsequent product discussions can define outline editing and richer ordering, lesson authoring, Socratic sessions, research workflows, learner artifacts, and revisiting concepts. Their order and acceptance criteria require separate PRDs.
 
 Questions still open include the primary audience, subject-specific learning expectations, lesson depth, evidence of understanding, research capabilities, and the exact authoring experience. They do not prevent defining the focused first milestone.
+
+## Implemented streaming extension — 2026-10-05
+
+The current outline creation, whole-path/topic rewrite and fixed model-access tests share one Pi/coordinator lifecycle and the approved bottom panel. It presents provisional work and actual activity, permits supported cancellation and pauses competing AI actions while saved reading remains available. Receiving bytes extend network liveness without establishing completion or saved learning evidence. This extension adds progress and recovery behavior to the first milestone; lesson delivery, assessment and mastery remain product direction. See [AI operations](../ref/patterns-ai.md), [actual long-stream flow](../ref/flows/ai-streaming/index.md) and [streaming validation/limits](../ref/work/02-ai-streaming/validation.md).
