@@ -1,6 +1,6 @@
 # Generation streaming: design exploration
 
-Status: focused third revision; bottom split panel preferred with connected activity icons. Final reference acceptance and implementation remain pending.
+Status: user accepted revision 03 on October 5, 2026. See the [final design selection](generation-streaming-selection.md). Application implementation remains a separate task.
 
 ![Six streaming layouts](generation-streaming-sheet-01.png)
 
@@ -69,4 +69,4 @@ Inspection confirms connected activity steps and correct panel containment. As w
 - [Revision 03](generation-streaming-revision-03.png)
 - [Exact revision prompt](generation-streaming-prompt-03.txt)
 
-Method: built-in image generation using sheet 02 as the actual reference and explicitly selecting its options 4 and 3. No application code changed. The next decision is whether this focused revision matches the intended final direction; no final selection handoff has been produced yet.
+Method: built-in image generation using sheet 02 as the actual reference and explicitly selecting its options 4 and 3. No application code changed. The user subsequently approved this exact standalone image. It is preserved unchanged as [the final reference](generation-streaming-final.png), with the [selection handoff](generation-streaming-selection.md) alongside it.
