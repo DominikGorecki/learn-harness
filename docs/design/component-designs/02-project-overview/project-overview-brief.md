@@ -1,12 +1,12 @@
 # Project overview — design exploration
 
 Date: 2026-10-06
-Status: Exploration, sheet 01; no selected direction or implementation approval.
-Method: Built-in image generation, using the current saved-outline and expanded-topic flow screenshots as visual references.
+Status: Refinement, sheet 02; no final direction selected or implementation approval.
+Method: Built-in image generation. Sheet 01 used current saved-outline/expanded-topic flow screenshots; sheet 02 uses the actual sheet 01 image as its refinement reference.
 
 ## Brief
 
-Make the first page of an opened saved project beautiful and clearly interactive. Give whole-outline editing, individual topic editing and opening a topic distinct discoverable actions. The user clarified that “main theme” means **Light/Dark visual appearance**, so expose an Appearance choice directly in the page chrome. Do not add a new main-subject editing action as a substitute.
+Make the first page of an opened saved project beautiful and clearly interactive. Give whole-outline editing, individual topic editing and opening a topic distinct discoverable actions. The initial round explored an inline Light/Dark appearance control after clarification of “main theme.” The latest user feedback **removes that selector from the page**. Preserve ordinary Settings access through the rail; no change to the existing appearance capability is authorized by this exploration.
 
 Preserve Learning Studio's compact rail/project sidebar, inset workspace, neutral system typography and restrained purple accent. Compare all six directions in Dark mode, at the same scale, with the same two-topic Bayesian reasoning sample. The sheet illustrates a saved, idle project without an active or retained generation dock. Actual AI calls continue using the already approved shared bottom panel.
 
@@ -25,9 +25,28 @@ Preserve Learning Studio's compact rail/project sidebar, inset workspace, neutra
 
 Recommendation for discussion: **4** offers the strongest visual presence; **1** is the calmer, spacious alternative. These are recommendations, not user selections.
 
+## Sheet 02 — refinements of 2, 3 and 4
+
+The user liked sheet 01 options **2, 3 and 4**, requested alternatives or a combination, asked for a subtler glow in 4 and removed the Light/Dark selector. These are accepted exploration constraints, not a final selection.
+
+![Six refined project-overview concepts](project-overview-sheet-02.png)
+
+| Option | Direction | Relationship to sheet 01 |
+| --- | --- | --- |
+| 1 | Brief + airy cards | Refines old 2 with a quieter context column and roomy topic cards |
+| 2 | Brief + connected cards | Combines old 2's brief column and old 3's ordered topic spine |
+| 3 | Minimal connected path | Refines old 3 with open rows and restrained circular order markers |
+| 4 | Editorial connected path | Refines old 3 with large ordinals and typographic rows |
+| 5 | Soft subject hero | Refines old 4 with a visibly reduced purple wash and clear first-topic/edit actions |
+| 6 | Combined project hub | Shows the hero and connected path; the requested brief column was omitted by generation |
+
+All six remove the inline theme selector and retain visible Edit outline, Open topic and separate Edit topic controls. The user has not selected one. Suggested next discussion: option **2** for the brief/path combination, or **5** for the subdued subject hero. New option numbers refer to sheet 02.
+
+**Known refinement drift:** option 6 was prompted to combine all three older directions, but the generated result omitted the left learning-focus/objective column. Its caption describes the intended combination more fully than the actual image. Treat it as a hero/path hybrid; restore that column if selected. No additional round was generated before feedback.
+
 ## Action meanings and capability boundaries
 
-- **Light / Dark:** appearance only, no project-data change or AI call. The explicit inline switch is a proposed presentation of the existing appearance setting.
+- **Appearance:** existing Light/Dark behavior remains available through Settings. The inline switch shown in sheet 01 is withdrawn by user feedback and absent from sheet 02.
 - **Edit outline:** open the existing whole-path rewrite interaction; actual submission follows the global admission/streaming/recovery rules.
 - **Edit topic:** a separate action targeting only that stable topic and its owned folder; it must not trigger topic navigation or a whole-outline rewrite.
 - **Open topic / Open first topic:** navigate into or display the saved topic plan, including objectives and module outlines. A dedicated topic destination is proposed; current implementation reads it through inline disclosure. No tutoring, lesson delivery, new AI generation, completion or mastery claim is implied.
@@ -35,11 +54,11 @@ Recommendation for discussion: **4** offers the strongest visual presence; **1**
 
 ## Visual inspection and unresolved details
 
-The saved 1536 × 1024 sheet has six numbered comparable frames, visible Light/Dark controls and distinct topic open/edit affordances. Copy is readable at full size; exact spacing, tokens, keyboard behavior and accessibility remain implementation work.
+Both saved sheets are 1536 × 1024, with six numbered comparable frames and distinct topic open/edit affordances. Sheet 02 has no inline theme selector and visibly softens the old option 4 glow in new option 5. Copy is readable at full size; exact spacing, tokens, keyboard behavior and accessibility remain implementation work.
 
-**Known generated defect:** option 5 omits the whole-outline Edit outline action. Restore it in its project/section header if that direction is selected. Do not interpret its absence as an agreed scope change. No additional refinement was generated before user feedback.
+**Known sheet 01 defect:** its option 5 omits the whole-outline Edit outline action. Restore it in its project/section header if that direction is later revisited. Do not interpret its absence as an agreed scope change. The current sheet 02 options all include Edit outline.
 
-The subtle gradient in option 4 is an exploration, not an adopted palette change. Light-state examples, responsive/200% behavior, long titles, empty/unsaved states, AI-disabled states and focus/hover treatment have not been visually selected. Preserve the existing live panel and recovery rules in any later implementation.
+The hero gradient in sheet 01 option 4 and its quieter sheet 02 option 5 refinement are explorations, not adopted palette changes. Light-state examples, responsive/200% behavior, long titles, empty/unsaved states, AI-disabled states and focus/hover treatment have not been visually selected. Preserve the existing live panel and recovery rules in any later implementation.
 
 ## References and generation record
 
@@ -50,7 +69,8 @@ The subtle gradient in option 4 is an exploration, not an adopted palette change
 - [Design system](../../../../ref/patterns-design-system.md)
 - [Approved generation-panel handoff](../01-generation-streaming/generation-streaming-selection.md)
 - [Exact sheet 01 prompt](project-overview-sheet-01-prompt.md)
+- [Exact sheet 02 prompt](project-overview-sheet-02-prompt.md)
 
-The exact output of this generation call was copied into this project folder; the original generated cache image was preserved. No application source or flow reference was modified.
+The exact outputs of both generation calls were copied into this project folder; the original generated cache images and earlier sheet/prompt were preserved. No application source or flow reference was modified.
 
 Next decision: select one option or specify qualities to combine. A final reference and selection handoff will follow explicit selection; this brief is not that handoff.
