@@ -1,0 +1,32 @@
+# Project overview — Sheet 03 generation prompt
+
+Built-in image generation using sheet 01 option 4 and sheet 02 option 5 as actual image references. User explicitly requested another contact sheet after expressing continued preference for those two directions. Subtle glow, no inline theme selector, six variations of the same hero/topic-row family. Exploration only.
+
+Use case: ui-mockup
+Asset type: Learning Studio project landing-page contact sheet, refinement round 03.
+Actual reference images: Image 1 is sheet 01; its option 4 is the BOTTOM LEFT frame titled "Immersive subject index". Image 2 is sheet 02; its option 5 is the BOTTOM MIDDLE frame titled "Soft subject hero". These are the user's FAVORITES. Use their actual full-width hero layout, typography, focus/objective metadata, explicit CTA pair and oversized-ordinal topic rows as the invariant family. This round must explore six alternatives inside that family, not return to a left brief sidebar, a split topic browser, or the other old directions.
+User request: another contact sheet to choose from, NOT a single final design. Keep the original #4's attractive subject-first hierarchy, but the newer #5's quieter barely perceptible purple glow. The inline Light/Dark selector is REMOVED throughout.
+Composition: exactly six equally sized landscape desktop app mockups, 3 columns x 2 rows, numbered 1 through 6 in outer gutters with short accurate titles. Match app scale, backdrop, sample content and saved/idle state. Use the full sheet area, crisp readable text, no clipped app frames. All six Dark theme; no theme selector, Appearance label, sun/moon or replacement theme CTA. Small original Settings gear in left rail remains.
+Preserve shell: slim vertical icon rail, compact project navigation sidebar, inset charcoal workbench. "Learning Studio", "Projects", "Open project", "Your projects", selected "Bayesian reasoning", footer "Test Learner". Breadcrumb "Projects / Bayesian reasoning", compact "Learning model" menu upper right. Workspace #181818, raised #232323, shell #1C2424, navigation #1B1E1E, primary #F3F3F3, secondary #B3B6B8, accent #B58AF8. System sans-serif, restrained thin borders, generous breathing room, elegant high-quality desktop composition.
+Same exact main content:
+"Your learning outline" eyebrow.
+"Bayesian reasoning" as large beautiful subject title, small check + "Saved".
+"Learn to update beliefs as evidence arrives."
+"Learning focus" / "Reason clearly about uncertainty."
+"Learning objectives" / "Describe a prior in ordinary language." / "Distinguish observation from explanation."
+"Your learning path", "2 topics".
+01 "Beliefs before evidence"; "What do you believe before the next clue?"
+02 "How evidence changes a belief"; "When should a new clue change your mind?"
+Optional quiet "Start here" at first topic indicates outline order only.
+Distinct action requirements: visible pencil + "Edit outline" in EVERY frame. Each of the two topics has clearly labeled separate "Open topic" + arrow and pencil + "Edit topic". Topic navigation/title area must be separate from edit control. Most versions have one dominant purple hero "Open first topic" alongside secondary "Edit outline"; option 6 intentionally moves the dominant open action to the first topic and whole-outline editing to section header. Never omit any edit scope or make edits hover-only. Reading a topic shows its saved plan; no lesson-play/tutoring promise.
+
+Six real variations around the two favorites:
+1 — "Quiet immersive hero": closest to ORIGINAL sheet 01 #4, preserving its roomy large-title hero, side-by-side focus/objectives and CTA pair. Purple wash is greatly reduced to a very soft broad tint on charcoal, with no bright hotspot. Two low-contrast rounded topic rows have big 01/02 inside their left edge; purple text Open topic link and outlined Edit topic at right.
+2 — "Soft editorial": closest to NEWER sheet 02 #5. Barely tinted title area, full-width focus/objective two-column band, hero CTA pair. Open unboxed topic rows separated by thin horizontal rules, large muted ordinals. Clean editorial feel with the maximum breathing room.
+3 — "Compact hero + generous topics": same family with a shallower subject header and shorter vertical metadata block; CTA pair directly under overview. Two larger, inviting topic row surfaces below, generous row height and questions, large open-chevron region plus separately labeled Open topic link/Edit topic. Do not invent extra detail text. Glow extremely soft just behind title, body flat charcoal.
+4 — "Inset subject panel": the subject header, focus/objectives and CTA pair sit within ONE softly rounded near-borderless hero surface, subtly lighter charcoal with a very faint purple tint. Outside it, two open large-ordinal topic rows on flat workspace. This creates one intentional subject group, not a dashboard of boxed metadata.
+5 — "Editorial title + action strip": expansive beautiful title and very subtle top lilac wash, focus/objective columns, then a restrained horizontal action strip with Open first topic and Edit outline. Topic rows have big lightweight ordinals, almost invisible separators, and generous text/action alignment; prefer quiet outline/edit buttons. It feels polished and decisive without a heavy hero box.
+6 — "Topic-first action": inviting large subject typography with barely perceptible wash, same focus/objective band. No duplicate top Open first topic button. Move Edit outline to Your learning path heading. The first topic has one dominant purple "Open topic" button and separate quiet outlined Edit topic; second topic has secondary Open topic and Edit topic. Slightly raised topic surfaces and generous ordinal treatment make navigation the clearest next action.
+
+Keep differences recognizable in hierarchy, density, grouping and CTA location while staying faithful to the two preferred references. All headers use full workbench width; no side brief column or split preview. Controls must fit comfortably and keep readable labels. Purple hero illumination must stay as subtle as sheet 02 option 5 or even quieter; primary button can still be vivid.
+Avoid: bright neon glow, glowing outlines, huge colored gradient fields, stock art, charts, progress bars/percentages, earned badges, mastery/completion labels, invented lesson content/tutoring, play-session promises, fake tabs/search/pinning, active generation dock, filesystem/provider details, theme controls, watermarks, extra frames, tiny filler text. This is a design exploration image, not a working app claim.

@@ -1,8 +1,8 @@
 # Project overview — design exploration
 
 Date: 2026-10-06
-Status: Refinement, sheet 02; no final direction selected or implementation approval.
-Method: Built-in image generation. Sheet 01 used current saved-outline/expanded-topic flow screenshots; sheet 02 uses the actual sheet 01 image as its refinement reference.
+Status: Refinement, sheet 03; no final direction selected or implementation approval.
+Method: Built-in image generation. Sheet 01 used current saved-outline/expanded-topic flow screenshots; sheet 02 uses the actual sheet 01 image, and sheet 03 uses both earlier sheets as refinement references.
 
 ## Brief
 
@@ -44,6 +44,23 @@ All six remove the inline theme selector and retain visible Edit outline, Open t
 
 **Known refinement drift:** option 6 was prompted to combine all three older directions, but the generated result omitted the left learning-focus/objective column. Its caption describes the intended combination more fully than the actual image. Treat it as a hero/path hybrid; restore that column if selected. No additional round was generated before feedback.
 
+## Sheet 03 — preferred hero family
+
+The user continued to prefer **sheet 01 option 4** and **sheet 02 option 5**, then explicitly requested another contact sheet rather than a standalone design. This round keeps their full-width subject-first hero, side-by-side learning context, large topic ordinals and labeled actions. It varies grouping, density and action placement; the glow remains soft and the theme selector remains removed.
+
+![Six hero-family refinements](project-overview-sheet-03.png)
+
+| Option | Direction | Useful distinction |
+| --- | --- | --- |
+| 1 | Quiet immersive hero | Closest to original 4, with softer glow and subtly raised topic rows |
+| 2 | Soft editorial | Airy unboxed rows and thin dividers beneath the subject hero |
+| 3 | Compact hero + generous topics | Shallower header gives more room to topic rows |
+| 4 | Inset subject panel | One restrained surface groups title, context and top actions |
+| 5 | Editorial title + action strip | Clear action band separates subject context from the topic index |
+| 6 | Topic-first action | Dominant Open topic on the first row; Edit outline at the path heading |
+
+The saved copy was visually reviewed: six complete frames, subtle purple treatment, no inline theme selector, visible whole-outline editing and separate open/edit actions for both topics. No material missing-action defect was observed in this round. Recommendation for comparison: **1** most closely preserves the original favorite; **2** is more editorial; **6** tests placing the primary action directly on its topic. These are recommendations, not a final selection.
+
 ## Action meanings and capability boundaries
 
 - **Appearance:** existing Light/Dark behavior remains available through Settings. The inline switch shown in sheet 01 is withdrawn by user feedback and absent from sheet 02.
@@ -54,7 +71,7 @@ All six remove the inline theme selector and retain visible Edit outline, Open t
 
 ## Visual inspection and unresolved details
 
-Both saved sheets are 1536 × 1024, with six numbered comparable frames and distinct topic open/edit affordances. Sheet 02 has no inline theme selector and visibly softens the old option 4 glow in new option 5. Copy is readable at full size; exact spacing, tokens, keyboard behavior and accessibility remain implementation work.
+All three saved sheets are 1536 × 1024, with six numbered comparable frames and distinct topic open/edit affordances. Sheets 02 and 03 have no inline theme selector; sheet 03 stays within the preferred softly illuminated hero family. Copy is readable at full size; exact spacing, tokens, keyboard behavior and accessibility remain implementation work.
 
 **Known sheet 01 defect:** its option 5 omits the whole-outline Edit outline action. Restore it in its project/section header if that direction is later revisited. Do not interpret its absence as an agreed scope change. The current sheet 02 options all include Edit outline.
 
@@ -70,7 +87,8 @@ The hero gradient in sheet 01 option 4 and its quieter sheet 02 option 5 refinem
 - [Approved generation-panel handoff](../01-generation-streaming/generation-streaming-selection.md)
 - [Exact sheet 01 prompt](project-overview-sheet-01-prompt.md)
 - [Exact sheet 02 prompt](project-overview-sheet-02-prompt.md)
+- [Exact sheet 03 prompt](project-overview-sheet-03-prompt.md)
 
-The exact outputs of both generation calls were copied into this project folder; the original generated cache images and earlier sheet/prompt were preserved. No application source or flow reference was modified.
+The exact outputs of all three generation calls were copied into this project folder; the original generated cache images and earlier sheets/prompts were preserved. No application source or flow reference was modified.
 
 Next decision: select one option or specify qualities to combine. A final reference and selection handoff will follow explicit selection; this brief is not that handoff.
