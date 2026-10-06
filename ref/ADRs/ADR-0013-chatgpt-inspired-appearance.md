@@ -1,6 +1,6 @@
 # ADR-0013: Screenshot-led ChatGPT styling and local appearance settings
 
-- Status: Accepted
+- Status: Accepted; native-title-bar/overlay scope amended by [ADR-0024](ADR-0024-integrated-title-strip-with-native-controls.md)
 - Date: 2026-10-04
 - Scope: renderer presentation, persistent UI session, appearance preference and documentation. Amends ADR-0007's visual palette and theme scope; application services and security boundaries are unchanged.
 
@@ -9,6 +9,8 @@
 The user supplied light and dark screenshots of the current ChatGPT application, asked that they guide the UI and documentation, and explicitly requested light/dark switching in settings. The screenshots replace the earlier generic Codex reference as the primary visual reference for this change. They show a narrow icon rail, a tinted project sidebar, an inset workspace, spacious composition, rounded controls, and a restrained purple accent. The dark reference also demonstrates grouped appearance controls and visual mode previews. The original images were subsequently excluded from the current public source for privacy; the [appearance review](../research/chatgpt-app-appearance.md) retains the observations and isolated application captures.
 
 ## Decision
+
+The native-title-bar and native appearance restrictions below describe the original decision. [ADR-0024](ADR-0024-integrated-title-strip-with-native-controls.md) supersedes only those restrictions for the integrated application strip with native window controls and bounded Light/Dark overlay presentation; runtime activation and host qualification are tracked separately. All other appearance, preference and security rules remain in force.
 
 Use the supplied composition with Learning Studio's existing project, account, and outline vocabulary. Provide only working navigation controls. Keep native window chrome. Use a pale cool shell and white workspace in Light; use a dark tinted shell, `#181818` workspace and `#232323` raised surfaces in Dark. Apply a complete semantic token palette to every renderer surface, including dialogs, errors, forms, native select menus, outlines and focus indicators. The palette is a product adaptation, not a claim to reproduce undocumented ChatGPT tokens.
 

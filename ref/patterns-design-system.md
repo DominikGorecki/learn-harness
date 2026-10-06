@@ -43,7 +43,7 @@ Use semantic CSS variables so components consume purpose-based values. Keep stat
 
 Primary buttons use `text-primary` as their fill and `surface-canvas` as their label color. Purple accents support orientation and focus; ordinary surfaces remain neutral. Use text and shape alongside state colors. A saved result, a completed activity, and a selected item have different meanings even when all appear positive.
 
-Light and Dark are implemented through Settings → Appearance. Show visual previews with native radio semantics, apply changes immediately and remember the explicit choice on this device. With no saved choice, initialize from OS appearance; this is not a continuously following System mode. Themes cover every renderer surface, including account/recovery dialogs, selects and focus states. Custom palettes, theme import/export and font editing remain out of scope. Native window chrome follows the OS.
+Light and Dark are implemented through Settings → Appearance. Show visual previews with native radio semantics, apply changes immediately and remember the explicit choice on this device. With no saved choice, initialize from OS appearance; this is not a continuously following System mode. Themes cover every renderer surface, including account/recovery dialogs, selects and focus states. Custom palettes, theme import/export and font editing remain out of scope. Current native window chrome follows the OS; [ADR-0024](ADRs/ADR-0024-integrated-title-strip-with-native-controls.md) authorizes bounded Light/Dark native overlay presentation during later integrated-strip activation.
 
 ## Typography and spacing
 
@@ -78,7 +78,9 @@ Interactive targets should usually be at least 32 px high in desktop chrome, wit
 
 ## Adaptation and motion
 
-Collapse optional details before shrinking the primary working column. Narrow the sidebar or provide a labelled toggle when the viewport cannot fit navigation and work comfortably. Provide a route to every hidden action. Preserve native window controls and normal platform window behavior; custom title bars need a separate implementation decision.
+Collapse optional details before shrinking the primary working column. Narrow the sidebar or provide a labelled toggle when the viewport cannot fit navigation and work comfortably. Provide a route to every hidden action. Preserve native window controls and normal platform window behavior.
+
+Under [ADR-0024](ADRs/ADR-0024-integrated-title-strip-with-native-controls.md), the integrated title strip is an accepted implementation target, with runtime activation/native qualification pending. Windows/Linux arrange Back, Forward, sidebar toggle and File/Edit/View/Help above the workspace; macOS keeps system menus and native traffic lights. Use Light/Dark tokens, draggable empty space, non-draggable controls and actual native control safe metrics. At narrow widths/200% zoom keep arrows and a labelled compact Menu reachable without overlap. Main owns native controls/overlay/menu behavior. Actual renderer captures and separate host checks are required before claiming compliance.
 
 Use one primary scroll region for the active document/activity. Navigation and a genuinely independent detail document may scroll separately. Reflow long input, outlines, and text zoom without clipping controls or overlaying the primary action.
 

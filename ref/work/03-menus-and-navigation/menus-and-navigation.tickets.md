@@ -1,6 +1,6 @@
 # Application menus and navigation — ticket map
 
-Source: [spec](menus-and-navigation.spec.md). All four tickets belong to this spec; no implementation has been accepted yet.
+Source: [spec](menus-and-navigation.spec.md). All four tickets belong to this spec. T01's pure foundation and decision are accepted; T02-T04 remain open. The ticket plan was committed at user request in `67165c0` before the separate T01 implementation commit.
 
 | Ticket | Depends on | Outcome | Difficulty/role | Worker assignment | Primary requirement coverage |
 | --- | --- | --- | --- | --- | --- |

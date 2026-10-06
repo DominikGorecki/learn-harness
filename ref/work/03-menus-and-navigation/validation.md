@@ -13,7 +13,17 @@ Read spec and current source/guidance. No existing tickets belonged to this bund
 
 ## Actual checks and accepted commits
 
-Pending ticket execution and coordinator review.
+Preparation commit: `67165c0` (`docs: plan menus and navigation implementation tickets`). The explicit user request to commit existing changes includes the complete ticket set now; later implementation commits retain their own ticket completion evidence.
+
+T01 accepted after coordinator review of the pure modules, tests, ADR-0024 and affected indexes/patterns. Worker: `/root/history_foundation`, GPT-6.1 Sol, high reasoning. Runtime activation is still pending.
+
+- Initial worker check encountered `EPERM` while Vite created a temporary config file; no failed application test was reported. The permitted elevated retry passed.
+- Worker `npm.cmd run check`: 26 test files passed; 300 tests passed, 3 skipped. Lint, flow references, both type scopes and production build passed.
+- Coordinator `npm.cmd exec -- vitest run tests/unit/navigation-history.test.ts tests/unit/navigation-transaction.test.ts`: 2 files, 18 tests passed.
+- Coordinator fresh `npm.cmd run check` on 2026-10-06 before the T01 commit: passed with the same 26 files / 300 passed / 3 skipped; lint, flow references, both type scopes and production bundles passed.
+- Coordinator relative-link check: 185 links verified across ticket/acceptance/validation documents and affected guidance. `git diff --check` passed.
+
+No desktop gate was run for unused pure modules and documentation; process/UI activation in later tickets requires it. The unrelated project-overview work advanced master through `8eaa710` and was preserved. The T01 implementation commit carries this evidence; its exact SHA is available from the branch history.
 
 ## Remaining qualification
 

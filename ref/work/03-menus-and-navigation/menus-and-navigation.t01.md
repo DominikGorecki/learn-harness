@@ -1,5 +1,5 @@
 # Ticket: menus-and-navigation.T01 - Define history and title-strip boundaries
-Status: Open
+Status: Done — pure foundation and decision accepted; runtime activation belongs to T02-T04
 
 ## Source
 
@@ -40,9 +40,9 @@ Renderer owns presentation history; shared/main/core remain authoritative for pr
 
 ## Acceptance criteria
 
-- [ ] Pure state handles all transitions/bounds and does not record failed/canceled/stale intent.
-- [ ] Current identity uses project handles; future identity is extensible without shipped placeholder kinds.
-- [ ] ADR/index/pattern amendments preserve all security/window-button/theme/AI rules and distinguish pending runtime.
+- [x] Pure state handles all transitions/bounds and does not record failed/canceled/stale intent.
+- [x] Current identity uses project handles; future identity is extensible without shipped placeholder kinds.
+- [x] ADR/index/pattern amendments preserve all security/window-button/theme/AI rules and distinguish pending runtime.
 
 ## Manual verification
 
@@ -50,7 +50,16 @@ Review pure API consumers against current source and spec; no visual runtime cla
 
 ## Completion evidence
 
-Coordinator fills after review and validation.
+Accepted by the coordinator on 2026-10-06 after reviewing the actual modules, tests, ADR-0024 and constrained guidance changes. Worker: `/root/history_foundation`, GPT-6.1 Sol, high reasoning. No prerequisite implementation commit was required.
+
+The unused foundation implements dashboard/project profile-handle identity, 100-entry bounded history, explicit history effects and one token-correlated transaction. Eighteen focused tests cover initialization, branching, bounds, traversal, cancellation/rejection/stale outcomes, late settlements and test-only future destination values. ADR-0024 amends only integrated title chrome and preserves native buttons, process ownership, security, theme and AI constraints.
+
+- Worker `npm.cmd run check`: passed after a sandbox Vite temporary-config write restriction required permitted elevation; 26 test files, 300 passed tests and 3 skipped, with lint, flow references, type checks and production builds passing.
+- Coordinator focused Vitest confirmation: 2 files, 18 tests passed.
+- Coordinator fresh `npm.cmd run check` before commit: passed, 26 files / 300 tests passed / 3 skipped; remaining gates passed.
+- Coordinator verified 185 relative documentation links across ticket records and affected guidance; `git diff --check` passed.
+
+No desktop check is required for these unused pure modules. Menu/chrome/controller runtime and native-platform qualification remain open under T02-T04. Ticket artifacts were committed together at user request in preparation commit `67165c0`; the T01 implementation and this evidence are committed separately with the required T01 subject.
 
 ## Notes
 
