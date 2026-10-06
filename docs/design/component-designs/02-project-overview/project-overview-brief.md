@@ -1,8 +1,8 @@
 # Project overview — design exploration
 
 Date: 2026-10-06
-Status: Refinement, sheet 03; no final direction selected or implementation approval.
-Method: Built-in image generation. Sheet 01 used current saved-outline/expanded-topic flow screenshots; sheet 02 uses the actual sheet 01 image, and sheet 03 uses both earlier sheets as refinement references.
+Status: CTA refinement, sheet 04; sheet 03 option 5 anchors the preferred layout, with no final CTA selection or implementation approval.
+Method: Built-in image generation. Sheet 01 used current flow screenshots; subsequent sheets use their actual predecessors as references. Sheet 04 references sheet 03 option 5, followed by one targeted correction of its generated output.
 
 ## Brief
 
@@ -61,6 +61,27 @@ The user continued to prefer **sheet 01 option 4** and **sheet 02 option 5**, th
 
 The saved copy was visually reviewed: six complete frames, subtle purple treatment, no inline theme selector, visible whole-outline editing and separate open/edit actions for both topics. No material missing-action defect was observed in this round. Recommendation for comparison: **1** most closely preserves the original favorite; **2** is more editorial; **6** tests placing the primary action directly on its topic. These are recommendations, not a final selection.
 
+## Sheet 04 — quieter CTAs on the preferred layout
+
+The user likes **sheet 03 option 5** and its subtle glass effect, but dislikes the CTA treatment and explicitly requested another sheet with subtler alternatives. This round preserves that full-width editorial subject header, faint lilac illumination, context columns and glass-like topic rows. It varies the controls rather than reopening the layout direction. The theme selector remains removed.
+
+![Six subtle CTA alternatives](project-overview-sheet-04.png)
+
+| Option | CTA treatment | Useful difference |
+| --- | --- | --- |
+| 1 | Soft tint | Muted lavender primary surface, with lightweight text actions on topics |
+| 2 | Fine outline | Neutral hairline button boundaries and quiet text edits |
+| 3 | Editorial links | Unboxed open/edit links, with a restrained underline for navigation |
+| 4 | Frosted pills | Rounded low-contrast glass controls, coordinated across hero and rows |
+| 5 | Quiet action groups | Two clearly distinct actions share a subtle frosted group |
+| 6 | Topic-led actions | Removes duplicate hero navigation and emphasizes opening individual topics |
+
+Suggestion for discussion: **3** is the quietest editorial treatment; **5** preserves a tactile glass feel without the original saturated buttons. The user has not chosen a CTA option.
+
+One targeted correction removed a duplicate Edit outline from option 3. **Remaining generated defect:** option 2's long second-topic title still crowds its action area; give the title proper wrapping/space if that treatment is selected. Do not claim the corrected image resolves every layout detail. The other controls, independent topic edit/navigation actions and removal of the theme selector were visually reviewed in the saved copy.
+
+The preferred glass-like appearance is a visual exploration, not an adopted rendering implementation. Future work must resolve contrast, focus/hover states and an opaque fallback through the design-system rules; bitmap appearance alone does not establish accessibility or exact blur/opacity values.
+
 ## Action meanings and capability boundaries
 
 - **Appearance:** existing Light/Dark behavior remains available through Settings. The inline switch shown in sheet 01 is withdrawn by user feedback and absent from sheet 02.
@@ -71,7 +92,7 @@ The saved copy was visually reviewed: six complete frames, subtle purple treatme
 
 ## Visual inspection and unresolved details
 
-All three saved sheets are 1536 × 1024, with six numbered comparable frames and distinct topic open/edit affordances. Sheets 02 and 03 have no inline theme selector; sheet 03 stays within the preferred softly illuminated hero family. Copy is readable at full size; exact spacing, tokens, keyboard behavior and accessibility remain implementation work.
+All four saved sheets are 1536 × 1024, with six numbered comparable frames and distinct topic open/edit affordances. Sheets 02–04 have no inline theme selector; sheet 04 focuses on quieter CTAs within the preferred sheet 03 option 5 layout. Exact spacing, tokens, keyboard behavior and accessibility remain implementation work; unresolved generated defects are recorded per round above.
 
 **Known sheet 01 defect:** its option 5 omits the whole-outline Edit outline action. Restore it in its project/section header if that direction is later revisited. Do not interpret its absence as an agreed scope change. The current sheet 02 options all include Edit outline.
 
@@ -88,7 +109,8 @@ The hero gradient in sheet 01 option 4 and its quieter sheet 02 option 5 refinem
 - [Exact sheet 01 prompt](project-overview-sheet-01-prompt.md)
 - [Exact sheet 02 prompt](project-overview-sheet-02-prompt.md)
 - [Exact sheet 03 prompt](project-overview-sheet-03-prompt.md)
+- [Sheet 04 generation and correction prompts](project-overview-sheet-04-prompt.md)
 
-The exact outputs of all three generation calls were copied into this project folder; the original generated cache images and earlier sheets/prompts were preserved. No application source or flow reference was modified.
+The exact selected outputs for all four rounds were copied into this project folder; original generated cache images and earlier sheets/prompts were preserved. Sheet 04 saves the targeted-correction output. No application source or flow reference was modified.
 
 Next decision: select one option or specify qualities to combine. A final reference and selection handoff will follow explicit selection; this brief is not that handoff.
