@@ -61,7 +61,7 @@ Review corrections restore focus after same-identity recovery, preserve repeated
 
 All owned test apps, provider servers and profiles were cleaned, including two precisely verified failed-probe roots. The user's existing app was preserved. The initial clipboard-dependent probe was replaced with zero clipboard access; its exact earlier mutation is unconfirmed and possible nontext clipboard effects remain disclosed in validation.
 
-The first criterion remains open for actual native window/menu safe-area and OS qualification. Windows renderer/bridge success does not close native Windows/macOS/Linux or screen-reader gates. T04 and whole-bundle acceptance remain open. This scoped implementation commit carries the local evidence; its exact SHA is in branch history.
+Implementation commit: `59ad994`. Subsequent coordinator [native Windows observations](evidence/windows/index.md) confirm title double-click maximize/restore, selected native popup keyboard actions, native minimize/activation restore/Close, appearance overlay and full-screen entry/exit. Drag/resize, clean restore-button input, minimum-window/200% native safe areas, complete native menu/editing checks, screen-reader and matching macOS/Linux qualification remain open. The first criterion therefore remains unresolved. Windows renderer/bridge and partial native success do not close these gates. T04 and whole-bundle acceptance remain open.
 
 ## Notes
 

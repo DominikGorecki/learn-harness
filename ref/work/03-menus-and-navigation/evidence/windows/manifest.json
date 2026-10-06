@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-06",
+  "sourceHead": "59ad99469569ed1044a635f422dd9381a016ffe8",
+  "platform": "windows",
+  "electron": "44.5.1",
+  "displayScaleFactor": 1.25,
+  "captureMethod": "Windows @oai/sky get_window_state; native full window or transient menu surface",
+  "qualification": "partial; exact scope and unverified checks in index.md",
+  "images": [
+    {
+      "file": "native-light.jpg",
+      "height": 842,
+      "width": 1282,
+      "sha256": "978f3a40aeb988192534a400d35f6e38008d3d5743c35105e4be68bb0547ef34"
+    },
+    {
+      "file": "native-maximized.jpg",
+      "height": 1104,
+      "width": 2752,
+      "sha256": "d7d4a7a28fb23b92082d3ac639ad374ade89e65d48b472905bd4bf9269b37ff6"
+    },
+    {
+      "file": "native-file-popup.jpg",
+      "height": 174,
+      "width": 217,
+      "sha256": "7f9a9b6584b6c6480c97e582141409a1a248dcfceb827bfe42023106901014db"
+    },
+    {
+      "file": "native-view-popup.jpg",
+      "height": 348,
+      "width": 308,
+      "sha256": "64a8a228391ff51de650d58034665085fa086c42624f5dee7d952de3d8b93269"
+    },
+    {
+      "file": "native-dark.jpg",
+      "height": 842,
+      "width": 1282,
+      "sha256": "f215bfe969e303bb4f1cb5ad75f66370e231e9410d398571db88b19726f7d69e"
+    },
+    {
+      "file": "native-fullscreen.jpg",
+      "height": 1152,
+      "width": 2752,
+      "sha256": "63a01c145e1260fae9bc65622866b0240f9165e524e20c2feaba57f8d11a1ae2"
+    }
+  ]
+}

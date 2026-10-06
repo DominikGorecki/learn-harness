@@ -1,8 +1,8 @@
 # ADR-0023: Navigation changes account for shared history
 
-- Status: Accepted — contributor integration discipline; runtime history remains planned
+- Status: Accepted — contributor integration discipline and initial session history implemented; native qualification and bundle acceptance remain open
 - Date: 2026-10-06
-- Scope: navigation feature planning, implementation review and evidence. No menu/history/topic-screen runtime change or amendment of ADR-0013's native window chrome.
+- Original adoption scope: navigation feature planning, implementation review and evidence. That adoption made no menu/history/topic-screen runtime change or amendment of ADR-0013's native window chrome; subsequent implementation evidence is recorded below.
 
 ## Context
 
@@ -23,12 +23,16 @@ Every feature that adds, removes or changes navigation must explicitly account f
 
 Future genuine in-project topic/activity destinations must join the same navigation pipeline and history when implemented. Ordinary disclosure, dialogs, preference changes and progress updates need an explicit no-history classification rather than accidental recording. Do not ship placeholder routes to demonstrate extensibility or create independent feature history stacks. An intentional deviation requires a separately reviewed decision.
 
-Apply this discipline immediately to contributor work. The initial runtime target is defined by the [menus/navigation spec](../work/03-menus-and-navigation/menus-and-navigation.spec.md): session history for dashboard/project visits, a renderer-owned bounded model and current service/AI guards. These implementation details remain planned until their required gates pass. Future destination behavior is specified by its own feature rather than guessed now.
+Apply this discipline immediately to contributor work. The initial runtime target is defined by the [menus/navigation spec](../work/03-menus-and-navigation/menus-and-navigation.spec.md): session history for dashboard/project visits, a renderer-owned bounded model and current service/AI guards. At adoption, these implementation details were planned and required separate implementation gates. Future destination behavior is specified by its own feature rather than guessed now.
+
+## Current implementation evidence
+
+T01-T03 implemented the shared renderer controller, session history of at most 100 dashboard/project visits, guarded commands and current-content restoration. Project identity uses the profile handle, not a title, path or portable `.edu` project ID. Drafts and recoverable results remain feature/domain-owned; history stores destinations and bounded presentation mementos. The [navigation flow](../flows/navigation/index.md), [acceptance](../work/03-menus-and-navigation/acceptance.md) and [validation](../work/03-menus-and-navigation/validation.md) record local Windows source, code/desktop fixture and reviewed renderer evidence. Required native window/menu/accessibility qualifications on Windows/macOS/Linux and remaining bundle acceptance are separate and unresolved. Only dashboard/project destinations ship; future topic/activity destinations still require their own feature and integration evidence.
 
 ## Consequences
 
 Navigation remains part of feature acceptance as the app grows, instead of a one-time toolbar addition. UX owns visit/restoration semantics; renderer guidance owns integration and state boundaries; development/testing owns evidence. Pattern updates accompany changes to the actual navigation contract, with planned and implemented status distinguished.
 
-History does not authorize new learning features, persist project/account data in the renderer, bypass privileged capability validation or alter AI cancellation/publication. This adoption does not implement menus/history and does not approve custom window chrome through a guidance-only amendment. ADR-0013 stays in force until an explicit implementation-stage decision changes its scoped rule.
+History does not authorize new learning features, persist project/account data in the renderer, bypass privileged capability validation or alter AI cancellation/publication. The original guidance-only adoption did not implement menus/history or approve custom window chrome. [ADR-0024](ADR-0024-integrated-title-strip-with-native-controls.md) subsequently amended only ADR-0013's title-bar/overlay scope during the authorized implementation.
 
 Current guidance: [UX](../patterns-ux.md#navigation-history-integration), [renderer](../patterns-renderer.md#navigation-feature-integration), [development/testing](../patterns-development-testing.md#required-evidence), [documentation](../patterns-documentation.md#maintenance), [pattern index](../patterns.md).

@@ -59,6 +59,24 @@ All fixture apps, servers and profiles were cleaned. Two precisely verified fail
 
 ## Remaining qualification
 
-T03 started with `/root/navigation_integration` (GPT-6.1 Sol, high), after accepted prerequisite commits `a123ed6` and `e220926`. The coordinator confirmed the Windows computer-use runtime can enumerate windows; no native input/capture has targeted the existing user app. Native interaction evidence will use a separate isolated fixture window after integration. Matching-host/manual-record availability for macOS/Linux and screen-reader qualification has been requested while independent Windows work continues.
+### Partial native Windows evidence after T03
+
+T03 is committed as `59ad994`. On 2026-10-06 the coordinator used the installed computer-use skill and `@oai/sky` for actual Windows input/capture against a uniquely titled isolated production-build window (Electron 44.5.1, 125% display scaling). No input targeted the existing user app. The [native Windows record](evidence/windows/index.md) retains six reviewed JPEGs, their dimensions/digests/source revision, exact actions and limits separately from renderer flow references.
+
+Confirmed: full-width Light/Dark strip and native controls; title-space double-click maximize/restore; native File popup via F10/Down and Escape focus return; View mnemonic and actual Down/Enter popup-row activation of Toggle sidebar; Ctrl+comma Appearance and Dark overlay update; native maximize/minimize, activation restore, F11 full-screen entry/exit and native Close followed by verified process exit. Only settled synthetic fixture images were retained. No clipboard API/role or inference was used.
+
+Drag attempts yielded no reliable position-change proof; native resize/system-menu movement, clean restore-button input, focused Edit row selection/all accelerators/About, minimum-window/200% native control safe areas and OS screen-reader behavior remain unverified. An occluded restore-button input reported an error; a subsequently restored state does not establish that action's clean success. The initial Node REPL launch timed out with no owned Electron process remaining; a normal Node desktop-fixture environment launched successfully. An initial capture approval timeout recovered through fresh selection/retry. These are explicit observation limits, not passed checks.
+
+All owned processes/helper files and both exact temporary profile roots were cleaned; Temp containment and reparse-point checks preceded recursive removal. Process inspection confirmed the original user app and its children were preserved.
+
+### T04 maintained-contract audit
+
+Read-only `/root/t04_audit`, GPT-6.1 Sol/high, inspected R01-R16 against actual source/tests at `59ad994`. It found no demonstrated source defect, but identified focused remaining evidence gaps: controller-integrated API rejection/rapid/stale command handling, relink/rename through retained history, held cancellation cleanup through traversal, explicit no-history save/model/editor assertions, diagnostic history traversal and immediate saved-byte stability after traversal. Those regressions and fresh cumulative gates remain T04 work; unit/platform-option evidence alone does not close them.
+
+The same worker completed a bounded maintained-documentation assignment across 15 files describing already implemented behavior and existing tested flows. The coordinator inspected the actual diff/source, preserved ADR adoption context, reviewed all six retained native images and updated the task-owned ledgers. README, both indexes and constrained patterns now agree on runtime implementation and unresolved qualification; flow prose describes the actual Select All callback, Saving barrier and inference-count assertions without inventing stronger checks.
+
+Coordinator `npm.cmd run test:flows` passed (exit 0). A task-scoped check verified 316 relative file links in 21 Markdown documents and all six native JPEG digests/file formats. `git diff --check` passed; source/tests and generated flow-capture blocks were unchanged. Code/full desktop gates were not rerun for this documentation/evidence-only change; T04 regression changes and fresh final cumulative gates remain required. The coordinator owns this record, native evidence and ticket lifecycle. Updating current capability wording does not mark T04 or the bundle complete.
+
+Matching-host/manual-record availability for macOS/Linux and screen-reader qualification has been requested while independent Windows work continues.
 
 Native Windows/macOS/Linux window controls, drag/resize/menu/keyboard and OS screen-reader checks are separate from renderer screenshot and fixture evidence. Record exact available-host outcomes during implementation; unexecuted mandatory scope remains unresolved.

@@ -12,7 +12,7 @@ Two temporary projects and a provider fixture with held, completed and usage-lim
 
 1. Cancel connection recovery and verify the goal draft survives; reconnect, select a model and test IME-safe explicit submission.
 2. Hold the real utility request, capture pending state and verify sign-out is disabled.
-3. Cause an actual filesystem save failure, complete inference and capture the retained unsaved result. Dismiss/reopen it, then let an account diagnostic replace the global terminal without receiving unrelated project previews/save controls. After cancelling/dismissing that diagnostic, review the domain-owned unsaved result again, restore metadata and retry storage without another inference or active AI lease. Verify the retained recovery preview/title now describes the saved result.
+3. Cause an actual filesystem save failure, complete inference and capture the retained unsaved result. Dismiss/reopen it, then let an account diagnostic replace the global terminal without receiving unrelated project previews/save controls. After cancelling/dismissing that diagnostic, review the domain-owned unsaved result again, navigate away and return to its unavailable project recovery view, then restore metadata. Hold the ordinary validated retry write and attempt Back: Saving rejects departure with no queued continuation. Dismiss the notice and release the write; the current project remains visible, retry consumes no new inference or active AI lease, and the retained recovery preview/title now describes the saved result.
 4. Remove the saved model from fixture discovery and verify explicit model recovery; request replacement, return a usage limit and capture draft-preserving feedback.
 5. Terminate the owned worker and verify prior work survives; exercise Stay here and Cancel and switch before navigation.
 6. Change metadata externally during another request; decline replacement once, then explicitly confirm saving over the conflict.
@@ -28,6 +28,8 @@ The flow ID is also a test tag (`@recovery`); use `--grep "@recovery( |$)"` to s
 ## Evidence limits
 
 These are deterministic induced failures with real storage/worker behavior. The captures cover pending, unsaved and usage-limit states, not every recovery branch.
+
+The cancellation branch uses direct Open project and verifies the switched destination after cancellation. It does not hold owned cleanup while traversing history. The Saving branch rejects Back during storage-only retry; the [navigation acceptance](../../work/03-menus-and-navigation/acceptance.md) and [validation](../../work/03-menus-and-navigation/validation.md) retain cumulative and native qualification limits.
 
 Captures show Electron renderer content, without native title bars/menus. Any visible temporary absolute project paths are masked. Fixture account labels and learning text are synthetic. Visual references supplement the assertions and do not establish learning mastery or live-account access.
 

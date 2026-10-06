@@ -1,6 +1,6 @@
 # Application menus and navigation — ticket map
 
-Source: [spec](menus-and-navigation.spec.md). All four tickets belong to this spec. T01 (`a123ed6`) and T02 (`e220926`) are accepted. T03 implementation has passed local code/desktop review; its native qualification and T04's maintained-contract/whole-bundle verification remain open. The ticket plan was committed at user request in `67165c0` before the separate implementation commits.
+Source: [spec](menus-and-navigation.spec.md). All four tickets belong to this spec. T01 (`a123ed6`) and T02 (`e220926`) are accepted. T03 (`59ad994`) has passed local code/desktop review; partial native Windows evidence and maintained-contract alignment are recorded. Full native qualification, T04's remaining regressions and fresh whole-bundle verification remain open. The ticket plan was committed at user request in `67165c0` before the separate implementation commits.
 
 | Ticket | Depends on | Outcome | Difficulty/role | Worker assignment | Primary requirement coverage |
 | --- | --- | --- | --- | --- | --- |

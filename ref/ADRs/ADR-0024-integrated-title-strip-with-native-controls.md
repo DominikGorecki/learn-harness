@@ -1,6 +1,6 @@
 # ADR-0024: Integrated application title strip with native window controls
 
-- Status: Accepted — implementation decision; runtime strip/menu activation and native qualification pending
+- Status: Accepted — title strip/menu runtime active; native qualification and bundle acceptance remain open
 - Date: 2026-10-06
 - Scope: application title area, native menus and bounded chrome presentation. Amends only ADR-0013's native-title-bar and native-overlay appearance restriction.
 
@@ -22,6 +22,6 @@ Main owns BrowserWindow options, native menus/roles, popup positioning, overlay 
 
 This replaces ADR-0013's requirement for an ordinary OS title bar and its prohibition on native appearance updates only for this integrated strip/native overlay. All palette, Settings, local preference, persistent partition, focus, project/draft/account preservation and security rules remain in force. No generic IPC, URL/path/clipboard/process/window-control API, router, history persistence, future topic screen or new close/quit recovery guarantee is authorized. ADR-0012/0019/0022 continue to govern AI admission, cleanup, Saving and recoverable publication.
 
-The decision is accepted now. T01 adds unused pure renderer navigation primitives; it does not activate chrome or menus. Later tickets require code/desktop gates and reviewed Light/Dark, narrow/zoomed renderer captures. Native drag, resize, system controls, menus and accessibility need actual Windows/macOS/Linux host checks recorded separately. Renderer screenshots and fixture success do not establish native qualification or live inference.
+At adoption, T01 introduced unused pure renderer navigation primitives without activating chrome or menus. T02-T03 subsequently activated the named native adapters, integrated title strip and guarded navigation owner. Local Windows code/desktop fixture and reviewed Light/Dark, narrow/zoomed renderer evidence are recorded in [acceptance](../work/03-menus-and-navigation/acceptance.md) and [validation](../work/03-menus-and-navigation/validation.md); the [navigation flow](../flows/navigation/index.md) describes the observed interaction scope. Native drag, resize, system controls, menu interaction and accessibility still need separately recorded Windows/macOS/Linux host qualification. Those required qualifications and bundle acceptance remain open; renderer screenshots and fixture success do not establish native qualification or live inference.
 
 Current rules: [design](../patterns-design-system.md), [renderer](../patterns-renderer.md), [architecture](../patterns-architecture.md), [IPC/security](../patterns-ipc-security.md). Shared-history contributor discipline remains [ADR-0023](ADR-0023-navigation-history-integration.md).
