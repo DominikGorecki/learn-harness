@@ -1,0 +1,45 @@
+# Learning Studio logo — exploration
+
+Date: 2026-10-06
+Status: Sheet 01 for comparison; no selected logo or implementation.
+Method: Built-in image generation, new logo-brand contact sheet without image references.
+
+## Brief
+
+Explore six logos for Learning Studio that can become recognizable app icons and compact in-app brand marks. Use the established charcoal/lilac direction and the selected main-workspace design's restrained glass feel for presentation tiles. Keep the actual symbol simple enough to work in one color. The project name remains **Learning Studio**.
+
+The current [Mark component](../../../../src/renderer/src/components/Mark.tsx) uses a radial spark. This is an exploration of replacement identities, not an edit to that SVG or to application branding. No panels, workspace UI, icon packaging or source files are changed.
+
+## Sheet 01
+
+![Six Learning Studio logo directions](learning-studio-logo-sheet-01.png)
+
+| Option | Direction | Useful distinction |
+| --- | --- | --- |
+| 1 | Open horizon | Open book and insight/sun dot: the clearest direct learning association |
+| 2 | Learning path | One broad bending ribbon and endpoint: compact, abstract exploration |
+| 3 | Folded L | Strong L silhouette with a page-like fold: the simplest letter-based icon |
+| 4 | Shared question | Two facing speech forms: conversation and examination of ideas |
+| 5 | Growing idea | Three connected broad tips: growth and connected understanding |
+| 6 | Insight aperture | Three curved blades around negative space: abstract discovery/clarity |
+
+Each panel uses comparable presentation: large app tile, symbol + Learning Studio wordmark, light purple/dark-symbol miniature and dark/white-symbol miniature. These previews are generated concepts, not measured 16/24/32px rasterization tests.
+
+Recommendation for feedback: **3** has the strongest compact silhouette; **1** communicates learning most immediately; **6** offers the most abstract direction. Recommendations are not selections.
+
+## Inspection and remaining work
+
+The saved 1536 × 1024 sheet was inspected: all six numbered directions, complete tiles, exact brand wordmarks and two alternate miniature treatments are present. Symbols are distinct and generally preserve their form across presentations. The light preview is pale lilac rather than the white workspace background; chosen geometry should later be checked on the actual Light canvas. Main glyphs show slight tonal shading; the white miniatures demonstrate the intended one-color treatment.
+
+There is no final selection, transparent standalone asset, editable vector, platform icon bundle or native small-size qualification yet. After a selection/refinement, use this actual sheet as the image reference. A later implementation can translate the chosen construction into a clean vector and verify actual small sizes, padding and platform icon requirements; this contact sheet is not that implementation.
+
+## References and generation record
+
+- [Exact sheet 01 prompt](learning-studio-logo-sheet-01-prompt.md)
+- [Design system](../../../../ref/patterns-design-system.md)
+- [Locked main-workspace direction](../02-project-overview/project-overview-selection.md)
+- [Main-workspace design contract](../../../../ref/work/04-main-workspace-design/main-workspace-design.design.md)
+
+The exact image returned by this generation call was copied here; its original generated cache image remains preserved. No prior exploration was overwritten.
+
+Next decision: choose a numbered direction or qualities to refine. No additional sheet or final reference is generated before feedback.
