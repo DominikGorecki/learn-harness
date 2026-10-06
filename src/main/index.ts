@@ -25,6 +25,7 @@ import { initializeDiagnostics, observeWindow, registerRendererDiagnostics } fro
 import { errorDiagnostic, logDiagnostic, silentLogger } from './logging/logger'
 import { ApplicationMenus } from './menus/application-menus'
 import { registerApplicationMenuHandlers } from './ipc/application-menu-handlers'
+import { integratedChromeOptions } from './menus/chrome'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -53,6 +54,7 @@ async function createWindow(): Promise<void> {
   mainWindow = new BrowserWindow({
     width: 1280, height: 840, minWidth: 600, minHeight: 480,
     title: 'Learning Studio', backgroundColor: '#ffffff', show: false,
+    ...integratedChromeOptions(process.platform, 'light'),
     webPreferences: {
       preload: join(import.meta.dirname, '../preload/index.cjs'),
       partition: 'persist:edu-harness', contextIsolation: true, sandbox: true,
@@ -61,6 +63,7 @@ async function createWindow(): Promise<void> {
   })
   observeWindow(mainWindow)
   menus?.attach(mainWindow)
+  if (process.platform !== 'darwin') mainWindow.setMenuBarVisibility(false)
   mainWindow.once('ready-to-show', () => mainWindow?.show())
   mainWindow.on('closed', () => { mainWindow = null })
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))

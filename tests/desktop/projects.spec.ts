@@ -71,7 +71,9 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     await expect(page.getByRole('button', { name: 'Show navigation' })).toBeFocused()
     await flow.capture(desktop, page, 'project-narrow')
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(2))
-    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
+    // Hidden native title chrome may round the Windows content edge by one CSS pixel.
+    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeLessThanOrEqual(301)
+    expect(await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeGreaterThanOrEqual(300)
     await page.getByRole('button', { name: 'Save learning goal' }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('button', { name: 'Save learning goal' })).toBeInViewport()
     expect(await page.getByRole('main').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)

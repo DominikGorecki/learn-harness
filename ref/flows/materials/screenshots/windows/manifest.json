@@ -4,56 +4,56 @@
     {
       "id": "material-setup",
       "caption": "Folder-only setup with an optional learning goal.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c26ce8af86a33edd52fc904146d15003c311d21299a169e06fd412a1a061391c"
+      "sha256": "9d130b33f3c7b4485f19d7b58c2890bfc22788436d69407a9c8e63ceff526847"
     },
     {
       "id": "material-coverage",
       "caption": "Saved outline with supported and unsupported source coverage disclosed.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2ee6091722e2bbcc3b9ac2e191fa411eaf68c4365709a42e14de270d3ba9a383"
+      "sha256": "93cb93078a2449b5f2905bdff81197ea021620fa815fcf2b1c770890d7671a22"
     },
     {
       "id": "unsupported-material",
       "caption": "Recovery for a folder containing only unsupported learning files.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "7fe1ad3aa0521877270a99a38173787551ae0013c28c37d2668ce3e2f5c1298e"
+      "sha256": "cee3e75b83cbb62fcea71525d4ba6424898ecc733f8392b826d636600f211ee7"
     }
   ],
-  "capturedAt": "2026-10-06T12:36:38.416Z",
+  "capturedAt": "2026-10-06T13:38:52.471Z",
   "testSha256": "09f6c743ce26da2c7970c966b809219abb2f637313e6cf80bfdc4ac6ac906f71",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/materials.spec.ts",
   "testTitle": "folder-only learning, verified source coverage, ambiguity and unsupported recovery",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

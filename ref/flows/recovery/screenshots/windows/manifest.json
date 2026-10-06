@@ -4,56 +4,56 @@
     {
       "id": "generation-pending",
       "caption": "A real utility-process request held by the local provider fixture.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "34005ae7715ef7cded02c24e3a1c8d7aa1bf1dbd8cbbb4deae81d4fef7061c70"
+      "sha256": "8d7523099020f10ad7e3a5672c34796a59658b67ed2fdc8eb62e87ce57c6f88d"
     },
     {
       "id": "generated-unsaved",
       "caption": "A generated outline retained after an actual filesystem save failure.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "f64a366188592106cfddbefcf6fcbe90a86705f1e7f64aba9e9d1a75d67d475e"
+      "sha256": "73b37ad3d0a6008fb2a5d4dbce9674451bae274c62aa6957aa043ad05ed9e81a"
     },
     {
       "id": "usage-recovery",
       "caption": "Provider usage-limit feedback with the learner draft preserved.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "db5a95ce9926e7641c7426656a352bd751a5463cfef858d275530f1684f6e4d6"
+      "sha256": "8dad23a95e3cd4e4029d6fcf0121e54ffa97345d8b46c58351454aa3da1d397a"
     }
   ],
-  "capturedAt": "2026-10-06T12:38:33.998Z",
-  "testSha256": "ccaabd64c5750ce17f0fec8df6bb690c9985fe42d17ada2e502980541a2e096a",
+  "capturedAt": "2026-10-06T13:40:46.656Z",
+  "testSha256": "a2bd32d087baeb8b42038fc1758718644e714eb83d853c3a746dacf2beccfb58",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/recovery.spec.ts",
   "testTitle": "save retry, model recovery, usage limits, and explicit cancellation before switching preserve work",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

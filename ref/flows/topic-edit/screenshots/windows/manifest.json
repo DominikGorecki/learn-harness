@@ -4,86 +4,86 @@
     {
       "id": "topic-edit-light",
       "caption": "Topic editor with its own change draft in Light mode.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "896690b251f15415121b737437c8d1c704553559e3cd0316d58278e2bd2f1aec"
+      "sha256": "3e84c1e96be488db1d2823b639409ac08f133e80a21297928c8a26b53a6fac91"
     },
     {
       "id": "topic-streaming-light",
       "caption": "Selected-topic-only provisional draft with a trusted saved topic title and connected actual activities.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "33425ebf2a0e15288d0c00835c848ebc2df4a9400a4a240742451b09e375d14c"
+      "sha256": "26bb47a2a47a9319012ff2141677b6a589803850ecb5065536b9d5b68899f17e"
     },
     {
       "id": "topic-edit-dark",
       "caption": "The retained topic draft after cancellation, in Dark mode.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "3e10e6f8027fe104cbd2017c856106e433351746008b8588945ce173f8b753a1"
+      "sha256": "584fbf3745a1ad968bfe725b40e660bcd5ed364eabb5e1dae5cfea56b7327e72"
     },
     {
       "id": "topic-edit-zoom",
       "caption": "Topic rewrite action remains reachable at 200% zoom.",
-      "width": 750,
-      "height": 800,
+      "width": 752,
+      "height": 802,
       "theme": "dark",
       "viewport": {
-        "width": 300,
-        "height": 320
+        "width": 301,
+        "height": 321
       },
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "2fc87771ce991269cb5cda91bed0d3dd97de02ac4ff2380073124a417a3ca028"
+      "sha256": "e909804d54a542b107783e4fe745eb899c290e2ee8e5282b29cb88a72b4e897d"
     },
     {
       "id": "topic-streaming-zoom",
       "caption": "Long topic request and reachable independent draft/activity regions at narrow width and 200% zoom.",
-      "width": 750,
-      "height": 800,
+      "width": 752,
+      "height": 802,
       "theme": "dark",
       "viewport": {
-        "width": 300,
-        "height": 320
+        "width": 301,
+        "height": 321
       },
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "6b5ce11f6697b0a4ba4720a51734918ba10155bc15f241e6d19f1973102ed15f"
+      "sha256": "c087d81765fd16d9a521600568e820e905364b23225a471cbcc5f36d9cb4d1b6"
     }
   ],
-  "capturedAt": "2026-10-06T12:38:44.202Z",
+  "capturedAt": "2026-10-06T13:40:56.471Z",
   "testSha256": "7365366f9bf91aba285b5cc19f827f5e5e3c491ff9ea0697f433d4975c656ebe",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-edit.spec.ts",
   "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

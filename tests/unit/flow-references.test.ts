@@ -1,14 +1,38 @@
-import { afterEach, expect, it } from 'vitest'
+import { afterEach, expect, it, vi } from 'vitest'
 import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { digest, pngSize, publishFlow, renderCaptures } from '../flows/artifacts'
+import { digest, pngSize, publishFlow, renameFlowPath, renderCaptures } from '../flows/artifacts'
 import type { CaptureManifest, CapturePlatform } from '../flows/artifacts'
 import { flowDefinition } from '../flows/catalog'
 
 const roots: string[] = []
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aD1sAAAAASUVORK5CYII=', 'base64')
 const prose = '# Appearance\n\nAuthored journey and assertions.\n\n<!-- flow-captures:start -->\nPending.\n<!-- flow-captures:end -->\n\nAuthored limitations.\n'
+it('retries transient Windows sharing failures with a bounded delay and succeeds', async () => {
+  const move = vi.fn().mockRejectedValueOnce(Object.assign(new Error('scanner'), { code: 'EPERM' })).mockRejectedValueOnce(Object.assign(new Error('sharing'), { code: 'EBUSY' })).mockResolvedValue(undefined)
+  const wait = vi.fn().mockResolvedValue(undefined)
+  await renameFlowPath('owned-next', 'owned-current', { platform: 'win32', move, wait })
+  expect(move).toHaveBeenCalledTimes(3)
+  expect(move).toHaveBeenLastCalledWith('owned-next', 'owned-current')
+  expect(wait.mock.calls).toEqual([[50], [100]])
+})
+
+it('rethrows sustained sharing failures after six attempts', async () => {
+  const error = Object.assign(new Error('still locked'), { code: 'EPERM' })
+  const move = vi.fn().mockRejectedValue(error), wait = vi.fn().mockResolvedValue(undefined)
+  await expect(renameFlowPath('owned-next', 'owned-current', { platform: 'win32', move, wait })).rejects.toBe(error)
+  expect(move).toHaveBeenCalledTimes(6)
+  expect(wait.mock.calls).toEqual([[50], [100], [150], [200], [250]])
+})
+
+it.each([['win32', 'EACCES'], ['linux', 'EPERM'], ['darwin', 'EBUSY']] as const)('does not retry %s %s failures', async (platform, code) => {
+  const error = Object.assign(new Error('not retryable'), { code })
+  const move = vi.fn().mockRejectedValue(error), wait = vi.fn().mockResolvedValue(undefined)
+  await expect(renameFlowPath('owned-next', 'owned-current', { platform, move, wait })).rejects.toBe(error)
+  expect(move).toHaveBeenCalledTimes(1)
+  expect(wait).not.toHaveBeenCalled()
+})
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
 
 async function setup() {

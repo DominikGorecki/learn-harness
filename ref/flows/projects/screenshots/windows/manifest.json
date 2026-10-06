@@ -4,71 +4,71 @@
     {
       "id": "dashboard-empty",
       "caption": "Empty dashboard before choosing a project folder.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "465983816a272a80ea2de18ab867be4faaad28b1bc30333b68c1652fe1b89901"
+      "sha256": "a804c9870a10f5cde9466ad3b17cbc0c127cbb03caecbc4d89b23cd9ad33f6af"
     },
     {
       "id": "project-workspace",
       "caption": "Project-specific goal draft and saved model preference.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "42ce542def1961c2e320713519b200ec04b93e9a65aee53a1e1d9c0919d6af8f"
+      "sha256": "2b71855e4897c8b1001aff0e9d786cc557689c141a2eec4e8f8f464e32e0c475"
     },
     {
       "id": "project-narrow",
       "caption": "600-pixel content width after dismissing the navigation drawer.",
-      "width": 750,
-      "height": 800,
+      "width": 753,
+      "height": 803,
       "theme": "light",
       "viewport": {
-        "width": 600,
-        "height": 640
+        "width": 602,
+        "height": 642
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "f4b765769ca831e27fda2b0b90c16d6f780d85ed7463daaf2d6fbfddf7a2db47"
+      "sha256": "cbb64eb3b74299bc7b49350a9187131c99a5dcf9b5058f556f3de0a833c6b09b"
     },
     {
       "id": "project-zoom-200",
       "caption": "Narrow project composer at 200% Electron zoom.",
-      "width": 750,
-      "height": 800,
+      "width": 752,
+      "height": 802,
       "theme": "light",
       "viewport": {
-        "width": 300,
-        "height": 320
+        "width": 301,
+        "height": 321
       },
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "d8438e49c0c4cc05358d74e5864bfeca6806e08adfe0453a80c8ac4c5fd389f9"
+      "sha256": "a6dc8f2633a640e63ea2f6fdb08cf1b7179f557bd7457c6467189de3019f8770"
     }
   ],
-  "capturedAt": "2026-10-06T12:43:25.054Z",
-  "testSha256": "c3dbd46ed50033942ba463b4f53bfd1073cc28f3ead125fc2bb15f1d4fa80b14",
+  "capturedAt": "2026-10-06T13:40:28.893Z",
+  "testSha256": "d5b8da4ec551cd8fd634990ad36a644dffa826920497c33bff1b75c12add08ac",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

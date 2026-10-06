@@ -4,86 +4,86 @@
     {
       "id": "settings-light",
       "caption": "Light selected in the Appearance dialog.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "43a9cd2a29dd9c43780f645a23663788f330ad5069f1ee9ebb335f4c4c5a012d"
+      "sha256": "56a7b0747b13420491f637debd53612ee708ab8144c417aaa1bb44a571e45cf2"
     },
     {
       "id": "workspace-light",
       "caption": "Light project composer with its existing learning draft.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "d6a64ad4f2b747e849db02a705992af569368a60fc18d096bc6f50b1c027a856"
+      "sha256": "11f965b5a9463c9b8d19e656788b9c6ad70a7b4b7b44cfb0fb41475d1beec8b9"
     },
     {
       "id": "settings-dark",
       "caption": "Dark selected through radio keyboard navigation.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c3139c1d013615e1c8078087e6c56495404e5dadd3d67d2cbdb3558145477d6a"
+      "sha256": "271b655a2a04bce24e95a34b81712ade88baad10b1a7e2524010477a284c6c76"
     },
     {
       "id": "workspace-dark",
       "caption": "Dark project composer with the same draft.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "73d6282d4f927230cd1a41cb8e6add9d32e9aa51ceaa82cf86f04a5f484acdda"
+      "sha256": "0f8ac9065713e1eca32913b24951680797060c6c57c9fa405ca5388bde961a69"
     },
     {
       "id": "account-dark",
       "caption": "Disconnected account panel in Dark mode.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "3c8b9767cd53b25f36c22bba25b47cdb6bf2d596e2965643048a6762d0505992"
+      "sha256": "8dea0828bc6f846b4e0c1262b19b836eb0436804b76a8827f1d64835631c9144"
     }
   ],
-  "capturedAt": "2026-10-06T12:36:15.848Z",
-  "testSha256": "c8d0962387f7c9c96549e161953c2269b70ed311d38f8170cee43aa47ac5ae59",
+  "capturedAt": "2026-10-06T13:38:29.819Z",
+  "testSha256": "89d3ce20620b946c26c3e37a307b8c8879de92297f580ab60ab1dbe41f1d0cd4",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/appearance.spec.ts",
   "testTitle": "appearance changes every surface, preserves drafts, and survives a desktop restart",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

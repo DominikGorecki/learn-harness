@@ -28,14 +28,14 @@ Actual Electron/Pi/bridge and storage behavior is exercised using synthetic loca
 
 ### windows
 
-Last successful run: 2026-10-06T12:36:11.834Z. Source revision: 4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7; source changes present: true.
+Last successful run: 2026-10-06T13:38:26.611Z. Source revision: 2169435211413ceb985de2557e52e76baacdb497; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 
 | Screenshot | Observed checkpoint | Pixels |
 | --- | --- | --- |
-| [repair-first-draft](screenshots/windows/repair-first-draft.png) | A genuine first structured draft is provisional and has not entered saved project state. | 1583 × 973 |
-| [repair-replacement](screenshots/windows/repair-replacement.png) | The second provider turn replaces the rejected candidate rather than appending it. | 1583 × 973 |
-| [repair-saved](screenshots/windows/repair-saved.png) | Only the independently valid replacement becomes the saved outline. | 1583 × 973 |
+| [repair-first-draft](screenshots/windows/repair-first-draft.png) | A genuine first structured draft is provisional and has not entered saved project state. | 1603 × 1053 |
+| [repair-replacement](screenshots/windows/repair-replacement.png) | The second provider turn replaces the rejected candidate rather than appending it. | 1603 × 1053 |
+| [repair-saved](screenshots/windows/repair-saved.png) | Only the independently valid replacement becomes the saved outline. | 1603 × 1053 |
 
 <!-- flow-captures:end -->

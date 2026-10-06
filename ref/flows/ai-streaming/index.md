@@ -30,18 +30,18 @@ This is unaccelerated local protocol-fixture evidence through actual Electron pr
 
 ### windows
 
-Last successful run: 2026-10-06T12:36:07.421Z. Source revision: 4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7; source changes present: true.
+Last successful run: 2026-10-06T13:38:22.070Z. Source revision: 2169435211413ceb985de2557e52e76baacdb497; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 
 | Screenshot | Observed checkpoint | Pixels |
 | --- | --- | --- |
-| [stream-waiting](screenshots/windows/stream-waiting.png) | Real comment bytes keep the waiting operation alive before structured output. | 1583 × 973 |
-| [stream-structured-light](screenshots/windows/stream-structured-light.png) | Fragmented structured arguments form a provisional Light draft after a bounded burst. | 1583 × 973 |
-| [stream-structured-dark](screenshots/windows/stream-structured-dark.png) | The same genuine provisional draft in Dark with reduced motion. | 1583 × 973 |
-| [stream-past-190](screenshots/windows/stream-past-190.png) | Active receiving draft and reachable Cancel after 190 real seconds; saved metadata is unchanged. | 1583 × 973 |
-| [stream-saving](screenshots/windows/stream-saving.png) | Validated output waits at the real scoped file write; Cancel is unavailable during publication. | 1583 × 973 |
-| [stream-saved](screenshots/windows/stream-saved.png) | The complete accepted outline is saved after more than 200 seconds of receiving. | 1583 × 973 |
-| [stream-checking](screenshots/windows/stream-checking.png) | Real clean-EOF diagnostic evidence awaits delivery of its actual process exit before independent verification. | 1583 × 973 |
+| [stream-waiting](screenshots/windows/stream-waiting.png) | Real comment bytes keep the waiting operation alive before structured output. | 1603 × 1053 |
+| [stream-structured-light](screenshots/windows/stream-structured-light.png) | Fragmented structured arguments form a provisional Light draft after a bounded burst. | 1603 × 1053 |
+| [stream-structured-dark](screenshots/windows/stream-structured-dark.png) | The same genuine provisional draft in Dark with reduced motion. | 1603 × 1053 |
+| [stream-past-190](screenshots/windows/stream-past-190.png) | Active receiving draft and reachable Cancel after 190 real seconds; saved metadata is unchanged. | 1603 × 1053 |
+| [stream-saving](screenshots/windows/stream-saving.png) | Validated output waits at the real scoped file write; Cancel is unavailable during publication. | 1603 × 1053 |
+| [stream-saved](screenshots/windows/stream-saved.png) | The complete accepted outline is saved after more than 200 seconds of receiving. | 1603 × 1053 |
+| [stream-checking](screenshots/windows/stream-checking.png) | Real clean-EOF diagnostic evidence awaits delivery of its actual process exit before independent verification. | 1603 × 1053 |
 
 <!-- flow-captures:end -->

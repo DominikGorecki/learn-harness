@@ -353,3 +353,25 @@ svg.icon { display: inline-block; flex-shrink: 0; vertical-align: middle; }
   .rail-button { width: 36px; height: 36px; border-radius: 10px; }
   .studio-workspace, .without-sidebar .studio-workspace { grid-row: 1; border: 0; border-radius: 0; }
 }
+
+/* One full-width title row precedes all workspace columns. Native buttons own
+   their safe area; empty chrome remains draggable and controls remain ordinary. */
+.studio-shell { grid-template-rows: 40px minmax(0, 1fr); padding-top: 0; }
+.application-strip { grid-column: 1 / -1; display: flex; align-items: center; gap: 2px; min-width: 0; width: env(titlebar-area-width, 100%); margin-left: env(titlebar-area-x, 0px); height: 40px; padding: 4px 8px; background: var(--surface-shell); -webkit-app-region: drag; }
+.application-strip button, .application-menu-labels { -webkit-app-region: no-drag; }
+.application-strip .icon-button { min-width: 32px; width: 32px; padding: 6px; }
+.application-menu-labels { display: flex; gap: 2px; flex-shrink: 0; }
+.application-menu-label { min-height: 32px; padding: 4px 9px; border: 0; border-radius: 6px; background: transparent; font-size: 13px; }
+.application-menu-label:hover, .application-menu-label[aria-expanded="true"] { background: var(--surface-selected); }
+.title-drag-space { flex: 1; align-self: stretch; min-width: 4px; }
+.compact-menu { display: none; }
+.mac-title-strip { padding-left: 80px; width: 100%; }
+@media (max-width: 700px) { .full-menu { display: none; } .compact-menu { display: inline-block; } }
+@media (max-width: 600px) { .studio-shell, .studio-shell.without-sidebar { grid-template-rows: 40px minmax(0, 1fr) 46px; } .studio-shell .studio-workspace, .studio-shell.without-sidebar .studio-workspace { grid-row: 2; grid-column: 1; } .studio-rail { grid-row: 3; } }
+@media (max-width: 600px) and (max-height: 420px) {
+  .studio-shell, .studio-shell.without-sidebar { grid-template-rows: 32px minmax(0, 1fr) 36px; }
+  .application-strip { height: 32px; padding-top: 0; padding-bottom: 0; }
+  .workspace-topbar { min-height: 32px; padding: 0 12px; }
+  .studio-rail { padding: 1px 12px; }
+  .rail-button { width: 32px; height: 32px; }
+}

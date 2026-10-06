@@ -71,7 +71,9 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
       const window = BrowserWindow.getAllWindows()[0]!
       window.setContentSize(600, 640); window.webContents.setZoomFactor(2)
     })
-    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
+    // Windows hidden-title content edges can round by one CSS pixel at zoom 2.
+    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeLessThanOrEqual(301)
+    expect(await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeGreaterThanOrEqual(300)
     expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     expect(await dialog.evaluate(element => {
       const bounds = element.getBoundingClientRect()

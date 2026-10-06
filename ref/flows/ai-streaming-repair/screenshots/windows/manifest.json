@@ -4,56 +4,56 @@
     {
       "id": "repair-first-draft",
       "caption": "A genuine first structured draft is provisional and has not entered saved project state.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2bc800c4c7572f8f1ae27d3e51ec175c8b37961295e4c8711d64487c7e037631"
+      "sha256": "912294b6ea38b6a8369eca9ed78f6dc468f1908a278c8b0cd344ddbaf30286e3"
     },
     {
       "id": "repair-replacement",
       "caption": "The second provider turn replaces the rejected candidate rather than appending it.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "807ab674175762a23a6b14528fd92fa25a2720601644c32dc792a41014b0aac0"
+      "sha256": "9820150337db56e0040a9741a492dd2b43af8b2c3b91a4bf12c4cf3c50382d75"
     },
     {
       "id": "repair-saved",
       "caption": "Only the independently valid replacement becomes the saved outline.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c5323566a6d9a23ae685464bf8fde39ef643d54677593bcd955fc217458e9722"
+      "sha256": "e200ea56ff187e16aeac61bb3d39a5041e73cc2065cdd54a006bf28e30f58af8"
     }
   ],
-  "capturedAt": "2026-10-06T12:36:11.834Z",
-  "testSha256": "5f962112dba2e9e46f6e91e507a2a0203d7ee16d3db72ff76cd9a256f4df7156",
+  "capturedAt": "2026-10-06T13:38:26.611Z",
+  "testSha256": "ef19a097254b5d5242a628b931a48d2f0888190f4328ad4ef24fbd3ebf1c6bf2",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "structured repair replaces the candidate and accepts only the independently valid second turn",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

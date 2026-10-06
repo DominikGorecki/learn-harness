@@ -49,7 +49,9 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
       const window = BrowserWindow.getAllWindows()[0]!
       window.setContentSize(600, 640); window.webContents.setZoomFactor(2)
     })
-    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
+    // Windows hidden-title content edges can round by one CSS pixel at zoom 2.
+    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeLessThanOrEqual(301)
+    expect(await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeGreaterThanOrEqual(300)
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('radio', { name: 'Dark', exact: true })).toBeInViewport()

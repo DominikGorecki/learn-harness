@@ -4,41 +4,41 @@
     {
       "id": "long-outline-zoom",
       "caption": "Long offline outline at narrow width and 200% Electron zoom.",
-      "width": 750,
-      "height": 800,
+      "width": 752,
+      "height": 802,
       "theme": "dark",
       "viewport": {
-        "width": 300,
-        "height": 320
+        "width": 301,
+        "height": 321
       },
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "779c56b6c57d6c2c527c3efa71f3f2f7916940d8a8a103eec4e06adfc204a689"
+      "sha256": "526a6220636489355f7aa4910a4437c827beac777a2f3878e21246bb9659ae3d"
     },
     {
       "id": "unreadable-project",
       "caption": "Corrupt project recovery without replacing its metadata.",
       "width": 1600,
-      "height": 1050,
+      "height": 1053,
       "theme": "light",
       "viewport": {
         "width": 1280,
-        "height": 840
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "3bbc1f3ec4511b1701b7009a34986a09d7a3743a4c4e9fb60b544ae794d0d909"
+      "sha256": "e2309eeabae713fae79f84c3a8983e51041565529389ff7f75e7aabf6a1d0175"
     }
   ],
-  "capturedAt": "2026-10-06T12:38:18.576Z",
-  "testSha256": "223ff46cff8dcc3f0aa6a4018289986405baaca3344ba3ded21a93f9177a85bf",
+  "capturedAt": "2026-10-06T13:40:30.933Z",
+  "testSha256": "47a32978379a30e4e48ec0edbecc18fdf92d4b119ed3bbc7baee084387d3f972",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/reading.spec.ts",
   "testTitle": "long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -11,6 +11,7 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Account connection](flows/account-connection/index.md) | Authorization, credential renewal, model discovery, sign-out and restart |
 | [Manual sign-in](flows/manual-sign-in/index.md) | Browser-opening failure and copied sign-in link |
 | [Appearance](flows/appearance/index.md) | Light/Dark settings, surfaces, radio keyboard behavior, preference persistence |
+| [Navigation](flows/navigation/index.md) | Shared history, restoration, application commands and compact title strip |
 | [Projects](flows/projects/index.md) | Folder opening, goals/models, drafts, navigation, relinking and responsive setup |
 | [Outline generation](flows/outline/index.md) | Explicit inference, saved outline, disclosure, cancellation and restart |
 | [Outline editing](flows/outline-edit/index.md) | Whole-path requests, editor drafts, rewrite cancellation and replacement |

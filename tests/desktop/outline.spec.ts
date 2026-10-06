@@ -74,7 +74,9 @@ test('Pi utility process creates, validates, saves and reopens an outline; cance
     expect(await preview.evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).animationName)).toBe('none')
     await flow.capture(desktop, page, 'outline-streaming-dark')
     await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.setContentSize(600, 480); window.webContents.setZoomFactor(2) })
-    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
+    // Windows hidden-title content edges can round by one CSS pixel at zoom 2.
+    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeLessThanOrEqual(301)
+    expect(await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeGreaterThanOrEqual(300)
     await expect(panel.getByRole('button', { name: 'Cancel', exact: true })).toBeInViewport()
     expect(await panel.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     expect(await reading.evaluate(element => element.clientHeight)).toBeGreaterThan(25)

@@ -6,6 +6,8 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { ProjectDocument } from '../../src/shared/workspace'
+import type { GenerationApi } from '../../src/shared/generation'
+import { barrierState, holdValidatedWrite, releaseBarrier } from '../fixtures/desktop-ai-barriers'
 
 test('save retry, model recovery, usage limits, and explicit cancellation before switching preserve work', { tag: '@recovery', annotation: { type: 'flow', description: 'recovery' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture({ inferenceMode: 'hold' })
@@ -87,8 +89,20 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await rm(file, { recursive: true })
     await rename(file + '.backup', file)
     await page.getByRole('button', { name: 'Try again', exact: true }).click()
+    const retained = await page.evaluate(async () => (globalThis as unknown as { learning: GenerationApi }).learning.getGeneration())
+    if (!retained.ok) throw new Error('Expected retained save result')
+    const unsaved = retained.data.runs.find(run => run.status === 'unsaved')!
+    await holdValidatedWrite(desktop, join(root, 'retry-write-sample'), (await saved()).projectId, unsaved.result!.document)
     await page.getByRole('button', { name: 'Retry save' }).click()
+    await expect.poll(() => barrierState(desktop!, 'saveBarrier')).toMatchObject({ held: true })
+    expect((await aiActivity(page)).active).toBeNull()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.getByRole('dialog', { name: 'Please wait for the operation to settle' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Continue', exact: true })).toHaveCount(0)
+    await page.getByRole('button', { name: 'Stay here', exact: true }).click()
+    await releaseBarrier(desktop, 'saveBarrier')
     await expect(page.getByText('Saved', { exact: true })).toBeVisible()
+    await expect(page.locator('#outline-heading')).toBeVisible()
     expect(fixture.inferenceRequests).toHaveLength(2)
     expect((await aiActivity(page)).active).toBeNull() // Retry is storage-only.
     await expect(page.locator('.ai-panel')).toHaveAttribute('data-outcome', 'saved')

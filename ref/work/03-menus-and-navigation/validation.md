@@ -38,6 +38,27 @@ Worker: `/root/native_menu_bridge`, GPT-6.1 Sol, high. Prerequisite T01: `a123ed
 
 Native title-strip options remain unused until T03. Fixed command subscriptions strip events/filter malformed values and unsubscribe. New-document load clears menu readiness; skip-link fragment and child-frame navigation preserve it. All fixture apps, servers, extra webContents and profiles were cleaned; the user app was untouched. Branch master advanced independently through documentation-only `4b2a59e`; those additions were inspected and preserved. The T02 commit carries this evidence; record its SHA in later integration evidence rather than embedding its future SHA here.
 
+## T03 locally verified implementation
+
+Worker: `/root/navigation_integration`, GPT-6.1 Sol, high; prerequisites `a123ed6` and `e220926`. Coordinator and `/root/integration_review` reviewed the actual diff and all 52 published Windows PNGs. Review found and resolved same-identity recovery focus, repeated menu-entry origin and keyboard native-editor focus issues. No actionable source/visual finding remained in that review.
+
+- Final frozen-source `npm.cmd run check`, session 27446: exit 0; 28 files / 321 tests passed / 3 skipped, lint, flow references, both type scopes and production build pass.
+- Final frozen-source full `npm.cmd run test:desktop`, session 78527: exit 0; 16 passed / 1 packaged-worker skip in 6.1 minutes. Publication and reference integrity passed. Actual receiving lasted 200,513 ms; latest bridge delivery was 133 ms, with 57 bridge frames and one burst preview. Fixture evidence does not establish live account eligibility.
+- Coordinator `npm.cmd exec -- vitest run tests/unit/navigation-controller.test.ts tests/unit/navigation-history.test.ts tests/unit/navigation-transaction.test.ts tests/unit/flow-references.test.ts`: exit 0; 4 files / 33 passed. Initial sandbox execution of the earlier navigation-only run hit Vite temporary-config EPERM; the permitted elevated retry passed 24 tests.
+- Coordinator post-publication `npm.cmd run test:flows`: exit 0. Relative-link check verified 170 links in 21 task Markdown files; final image review covered all 52 published PNGs. `git diff --check` passed before staging.
+- Actual navigation proves traversal/branch/current no-op/chooser cancellation, project-isolated stable disclosures and main scroll/focus, retained oversized goal drafts, current-content fallback, repaired same-identity recovery, modal/IME/editing scope and compact control hit tests in both themes. Native owning popup Select All callback and single keyboard edit/Undo pass; OS row selection is not inferred.
+- Inference Saving and storage-only retry Saving reject the departure and do not resume it after settlement; fresh navigation succeeds. The long-stream traversal leaves the fixture inference count at one, while save retry stays storage-only.
+
+The initial integrated suite exposed a real minimum-window reading-region regression; focused validation also found inadequate preview space. Compact 32-pixel title/context rows and a 36-pixel bottom rail retain 32-pixel controls and pass the existing reading, preview, painted-prose and overflow checks without weakening them. Failed focused editing probes were corrected for Electron's normalized role/callback signature and Undo grouping before final verification.
+
+Two passing capture publications hit transient Windows EPERM renames. The test-only publisher now retries only Windows EPERM/EBUSY, six attempts and 750 ms total, and preserves its ownership/link/lock checks, complete-set replacement and rollback. Five injected transient-success/exhaustion/nonretryable cases pass; final publication required no manual stale-reference substitution.
+
+An early editing probe attempted text-only clipboard read/restore. It recorded no prior formats and its exact mutation is unconfirmed, so possible nontext clipboard effects cannot be excluded; no clipboard contents were emitted. The final test contains no clipboard API access. The coordinator disclosed this limitation to the user.
+
+All fixture apps, servers and profiles were cleaned. Two precisely verified failed-probe roots were removed individually; no test-owned Electron process, navigation profile or capture lock remained. The existing user app and its children were preserved. Independent master commit `2169435` contains only logo design artifacts and was inspected/preserved. T03 is a locally verified implementation, not whole-bundle closure; T04 and required native/manual scope remain open.
+
 ## Remaining qualification
+
+T03 started with `/root/navigation_integration` (GPT-6.1 Sol, high), after accepted prerequisite commits `a123ed6` and `e220926`. The coordinator confirmed the Windows computer-use runtime can enumerate windows; no native input/capture has targeted the existing user app. Native interaction evidence will use a separate isolated fixture window after integration. Matching-host/manual-record availability for macOS/Linux and screen-reader qualification has been requested while independent Windows work continues.
 
 Native Windows/macOS/Linux window controls, drag/resize/menu/keyboard and OS screen-reader checks are separate from renderer screenshot and fixture evidence. Record exact available-host outcomes during implementation; unexecuted mandatory scope remains unresolved.

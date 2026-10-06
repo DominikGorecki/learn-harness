@@ -42,7 +42,9 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await expect(page.locator('.lesson-disclosure').first()).toHaveAttribute('open', '')
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.setContentSize(600, 640))
     await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(2))
-    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBe(300)
+    // Hidden native title chrome may round the Windows content edge by one CSS pixel.
+    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeLessThanOrEqual(301)
+    expect(await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeGreaterThanOrEqual(300)
     expect(await page.locator('.studio-workspace').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     expect(await page.getByRole('main').evaluate(element => element.clientHeight)).toBeGreaterThan(150)
     await page.getByRole('button', { name: 'Refine learning direction' }).scrollIntoViewIfNeeded()
@@ -63,7 +65,10 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
 
     if (process.platform !== 'win32' && process.geteuid?.() !== 0) {
       await chmod(folder, 0o500); await chmod(join(folder, '.edu'), 0o500)
-      await page.getByRole('navigation', { name: 'Projects', exact: true }).getByRole('button').click()
+      // Current sidebar selection is deliberately a no-op; reopening resolves
+      // the same profile handle and refreshes storage permissions without a visit.
+      await choose(folder)
+      await page.getByRole('button', { name: 'Choose project folder' }).click()
       await expect(page.getByText('This project is read-only. You can read saved work; saving needs a writable folder.', { exact: true })).toBeVisible()
       await expect(page.getByRole('heading', { name: outline.title, exact: true })).toBeVisible()
       await page.getByRole('button', { name: 'Refine learning direction' }).click()

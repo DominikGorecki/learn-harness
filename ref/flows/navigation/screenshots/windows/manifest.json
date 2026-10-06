@@ -1,0 +1,74 @@
+{
+  "flow": "navigation",
+  "captures": [
+    {
+      "id": "reading-restored-light",
+      "caption": "Restored Light reading context after traversing real project history.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "f56a4bb1c7bb0329571dd4f49c4cd0f8d732b4bcb6cc4ba0361f7b00f462b3b8"
+    },
+    {
+      "id": "reading-current-dark",
+      "caption": "Current Dark outline after removing a remembered stable topic.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "06e84138469a1033b9d67fcf4a4f1d3044f526cdda1f8d0c44b9b12407849b2c"
+    },
+    {
+      "id": "compact-light",
+      "caption": "Reachable title-strip controls at 600 by 480 and 200% zoom in Light.",
+      "width": 752,
+      "height": 603,
+      "theme": "light",
+      "viewport": {
+        "width": 301,
+        "height": 241
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "abb2f8042077145fef0c747bb59bafc728ebc0a9a016dd1621cb1dbaccb330fa"
+    },
+    {
+      "id": "compact-dark",
+      "caption": "Reachable title-strip controls at 600 by 480 and 200% zoom in Dark.",
+      "width": 752,
+      "height": 603,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 241
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "1533e0b5182f24dddd2b12d9f24a1df80d97d3b14cf48f0a7c314274ce24f828"
+    }
+  ],
+  "capturedAt": "2026-10-06T13:40:05.798Z",
+  "testSha256": "b1c6ee2e601c831252f424424f00eead4f1a8372c6cb779032bc12823cdce882",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/navigation.spec.ts",
+  "testTitle": "shared navigation restores current reading and drafts, preserves branches and scopes commands",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

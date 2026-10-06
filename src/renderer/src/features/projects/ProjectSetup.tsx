@@ -12,12 +12,12 @@ export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate,
   const tooLong = draft.length > maximumBriefLength
   return <section className="project-setup workspace-enter" aria-labelledby="project-heading">
     <div className="project-setup-intro"><span className="subject-emblem"><Icon name="spark" size={24} /></span>
-      <p className="eyebrow">{refining ? 'Refine your direction' : 'Learning project'}</p><h1 id="project-heading" tabIndex={-1}>{refining ? 'Where should your learning go next?' : 'What would you like to learn?'}</h1>
+      <p className="eyebrow">{refining ? 'Refine your direction' : 'Learning project'}</p><h1 id="project-heading" tabIndex={-1} data-focus-anchor="heading">{refining ? 'Where should your learning go next?' : 'What would you like to learn?'}</h1>
       <p>{needsDetails ? 'Add a little direction to help shape your outline. A short description is enough.' : project.sourceHint === 'files' ? 'Start with the material in this folder. Add a direction if you have one, or let your notes shape the learning path.' : 'A topic, a question, or a bigger ambition. Start with as much or as little as you like.'}</p>
     </div>
     <form className="learning-composer" onSubmit={event => { event.preventDefault(); if (canCreate && !busy && !tooLong) onCreate() }}>
       <label htmlFor="learning-details">Your learning goal{project.sourceHint === 'files' && !needsDetails ? ' (optional)' : ''}</label>
-      <textarea id="learning-details" value={draft} onChange={event => onDraft(event.target.value)}
+      <textarea id="learning-details" data-focus-anchor="goal" value={draft} onChange={event => onDraft(event.target.value)}
         rows={5} placeholder="I want to understand…" disabled={busy} aria-invalid={tooLong || undefined} aria-describedby={tooLong ? 'learning-details-error' : undefined}
         onKeyDown={event => {
           if ((event.metaKey || event.ctrlKey) && event.key === 'Enter' && !event.nativeEvent.isComposing && canCreate && !busy && !tooLong) {
@@ -36,6 +36,6 @@ export function ProjectSetup({ project, account, draft, busy, onDraft, onCreate,
     {!draft.trim() && <div className="topic-suggestions"><span>For example</span>{['Bayesian reasoning', 'How cities work', 'The science of sleep'].map(topic =>
       <button key={topic} onClick={() => onDraft(topic)} disabled={busy}>{topic}<Icon name="arrow" size={12} /></button>)}</div>}
     <p className="generation-disclosure">Creating an outline sends your description and relevant project text to ChatGPT. Pi can read files throughout this folder and save content changes you request alongside the outline. This uses your included plan allowance. We’ll fill in foundations and suggest a path through the subject.</p>
-    <details className="project-folder"><summary><Icon name="folder" size={15} />Project folder<Icon name="down" size={12} /></summary><p>{project.folderPath}</p></details>
+    <details className="project-folder" data-disclosure="folder"><summary data-focus-anchor="folder"><Icon name="folder" size={15} />Project folder<Icon name="down" size={12} /></summary><p>{project.folderPath}</p></details>
   </section>
 }

@@ -1,6 +1,6 @@
 # Application menus and navigation — requirement acceptance
 
-Status: In progress; implementation and native qualification unverified
+Status: In progress; T03 local implementation verified, native qualification and T04 audit open
 Source: [spec](menus-and-navigation.spec.md)
 Execution: master, starting revision 9e2bb14904da1849b8497e64e1694b5d337d3ab2
 
@@ -8,22 +8,22 @@ The primary owns acceptance from actual source, test outputs and rendered eviden
 
 | Requirement | Owner | Current evidence / remaining scope |
 | --- | --- | --- |
-| R01 — top strip composition and themes | T03, T04 | Pending implemented UI, actual Light/Dark screenshots and DOM behavior. |
-| R02 — native integrated window chrome | T01, T02, T03, T04 | ADR-0024 and constrained amendments accepted under T01. Startup/overlay implementation and actual native-window evidence pending; macOS/Linux and manual OS checks separate. |
+| R01 — top strip composition and themes | T03, T04 | Integrated strip order/placement and Light/Dark renderer captures pass T03 review; cumulative T04 audit remains. |
+| R02 — native integrated window chrome | T01, T02, T03, T04 | ADR-0024 and startup/overlay activation implemented. Windows startup/renderer hit tests pass; actual native controls/drag/window and matching macOS/Linux/manual evidence remain open. |
 | R03 — specified native commands | T02, T04 | T02 templates and native roles pass platform/unit review; actual Electron callback/command delivery passes. Native focused-role/menu keyboard activation remains T04 evidence. |
-| R04 — one command route, native editing | T02, T03, T04 | T02 callbacks emit fixed commands and revalidate availability/membership; no workspace mutation bypass. Renderer guard integration and native role/equivalence evidence pending. |
-| R05 — bounded session visits/cursor | T01, T03, T04 | Pure initialization/traversal/branching/100-entry bounds pass focused tests. Actual integrated round-trip/branch evidence pending. |
-| R06 — stable profile-handle identity | T01, T03, T04 | Pure adapter uses `ProjectSnapshot.id`; tests cover changed names/paths and known recovery views. Runtime relink/rename evidence pending. |
-| R07 — accepted-only transaction commit | T01, T03, T04 | Pure token/cancel/rejection/stale/serialization tests pass. Authoritative event/reply correlation and runtime recovery evidence pending. |
-| R08 — current-content/draft reading restoration | T03, T04 | Pending real disclosures/scroll/focus/drafts and changed-content fallback evidence. |
-| R09 — owned cancellation/Saving/recovery | T03, T04 | Pending actual cleanup/save barriers, retained unsaved result and cross-view account diagnostics. |
-| R10 — extensible shared typed model | T01, T03 | Generic pure model passes test-only future-destination coverage; shipped variants remain dashboard/project. App owner integration pending. |
-| R11 — explicit unchanged-history actions | T03, T04 | Pending settings/model/disclosure/progress/refresh and no replay assertions. |
-| R12 — keyboard/modals/IME/native menus | T02, T03, T04 | Pending real keyboard/focus/menu operation and native host qualifications. |
-| R13 — narrow/zoom/reduced-motion safe areas | T03, T04 | Pending actual hit-tested 600x480/200% controls in both themes, without native overlap. |
-| R14 — strict named authorized capabilities | T02, T03, T04 | T02 strict parser/authorization tests and actual Electron sender/frame rejection, command filtering/unsubscribe, unknown-handle and popup bridge checks pass. Integrated renderer consumer scope pending. |
+| R04 — one command route, native editing | T02, T03, T04 | Fixed main commands and guarded renderer owner implemented. Real owning popup Select All callback and keyboard edit/Undo pass; OS popup-row activation and other focused roles need native qualification. |
+| R05 — bounded session visits/cursor | T01, T03, T04 | Pure 100-entry bounds and real desktop round-trip/current no-op/chooser cancellation/branching pass. |
+| R06 — stable profile-handle identity | T01, T03, T04 | Adapter uses `ProjectSnapshot.id`; identity tests and actual projects relink/restart journey pass. Known unavailable destinations remain traversable. |
+| R07 — accepted-only transaction commit | T01, T03, T04 | Controller tests cover target subscription before reply, newer unowned identity and stale/rapid/rejected settlement; real chooser cancellation, no-op and recovery pass. |
+| R08 — current-content/draft reading restoration | T03, T04 | Actual project-isolated disclosures/scroll/focus and oversized drafts pass; removed stable topic falls back to current heading and repaired refresh preserves Forward/focus. |
+| R09 — owned cancellation/Saving/recovery | T03, T04 | Existing cancellation/recovery/diagnostic journeys pass. Actual inference and storage-only Saving reject departure without queued resumption; fresh navigation succeeds. |
+| R10 — extensible shared typed model | T01, T03 | Generic pure model and integrated renderer owner pass; shipped destinations remain dashboard/project and future variants remain test-only. |
+| R11 — explicit unchanged-history actions | T03, T04 | Settings/disclosures/current refresh retain intended branch/context; long-stream traversal keeps one inference and retry stays storage-only. T04 retains cumulative classification/no-write audit. |
+| R12 — keyboard/modals/IME/native menus | T02, T03, T04 | Actual renderer keyboard/mnemonic/Escape/focus, IME and modal checks pass; native callback/owning-popup boundary passes. OS keyboard-row and accessibility qualifications remain open. |
+| R13 — narrow/zoom/reduced-motion safe areas | T03, T04 | Both-theme 600x480/200% control hit tests, overflow and existing reduced-motion/painted-preview checks pass. Actual OS control safe-area review remains open. |
+| R14 — strict named authorized capabilities | T02, T03, T04 | Strict parser/authorization and actual Electron sender/frame rejection/filtering/unsubscribe/unknown-handle/popup checks pass. Integrated consumer scopes commands and stale advisory state uses an acknowledged owning revision. |
 | R15 — continuing feature integration discipline | T01, T04 | ADR-0023 and authoring patterns exist at cdc57a7; T01 adds pure-contract and ADR-0024 guidance with explicit pending runtime. Final maintained-contract alignment pending. |
-| R16 — cataloged current flow/evidence | T04, primary | Pending navigation registration, actual passing/refreshed/reviewed captures and fresh cumulative gates. |
+| R16 — cataloged current flow/evidence | T04, primary | Navigation registered; all 52 Windows PNGs reviewed, 16 flow sets refreshed, final T03 code/desktop gates pass. T04 maintained narratives and coordinator whole-spec/native audit remain open. |
 
 ## Qualification boundaries
 
@@ -31,4 +31,4 @@ Native window behavior, OS keyboard/menu interaction and screen-reader qualifica
 
 ## Closure audit
 
-Not complete. T01's pure foundation/decision and T02's native adapters pass scoped acceptance; T03-T04 integrated UI/history and native qualification gates remain open. Foundation/bridge tests do not satisfy integrated menu/history/UI acceptance.
+Not complete. T01's pure foundation/decision and T02's native adapters pass scoped acceptance. T03's integrated implementation has passed the final Windows code/desktop gates and source/52-capture review recorded in [validation](validation.md); required native/window/accessibility qualifications remain unresolved. The table records local evidence and remaining T04 scope, not whole-bundle closure. T04's maintained-contract alignment and fresh coordinator whole-spec verification remain open.

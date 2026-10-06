@@ -4,116 +4,116 @@
     {
       "id": "stream-waiting",
       "caption": "Real comment bytes keep the waiting operation alive before structured output.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "33332ed9148f3c590b94001b479f22cf508853aacb2e2ad8ceaf9c2ccd1dc60c"
+      "sha256": "1fab0e84c6b5547d53eb0781f1464e390b1bbb521671070a8babcfde789033ec"
     },
     {
       "id": "stream-structured-light",
       "caption": "Fragmented structured arguments form a provisional Light draft after a bounded burst.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2d76712d158f485f5a42da2399d481e755b881f1aa28a75208ac4f0b9f8bd5cb"
+      "sha256": "d79247e761b8609571a80738514f4ac41910199b2a5de7f6804ef8345d2c1cf4"
     },
     {
       "id": "stream-structured-dark",
       "caption": "The same genuine provisional draft in Dark with reduced motion.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "6f1f2bfa9db606fdd1b94ef655c54d5676d0a512c8cae279407078ae5f9fec7a"
+      "sha256": "89705529fbab0088c164133d23ed8fc3a88f16469f44c83c1710b396b725db20"
     },
     {
       "id": "stream-past-190",
       "caption": "Active receiving draft and reachable Cancel after 190 real seconds; saved metadata is unchanged.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "21cdc989c70d16b35c7f3ff5dea2d34d64da888f7f64af2acd320cdfdb8bbae8"
+      "sha256": "d50aab699917c710c8d0310810bacf630e77539313c194a18b93d66419e7dbfa"
     },
     {
       "id": "stream-saving",
       "caption": "Validated output waits at the real scoped file write; Cancel is unavailable during publication.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "5276ff61bb645e889b7d0fac58e24b42a37b3008d940d796b853214ed59297e7"
+      "sha256": "558c486db94a014d61f911f5b4bb6df81f1ef8d7649b96200bf76f6047dfb29e"
     },
     {
       "id": "stream-saved",
       "caption": "The complete accepted outline is saved after more than 200 seconds of receiving.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "9d5f83d91f99d7470a4dd4c9468c989e85ff578b8b7a238b94b3363b72c7508c"
+      "sha256": "8f77659290de6d2266c72d95510b2e7e097cb76596e1a6ad944c1fc9aae5258a"
     },
     {
       "id": "stream-checking",
       "caption": "Real clean-EOF diagnostic evidence awaits delivery of its actual process exit before independent verification.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "e7c5e89faafdf8dbef483d17df5b9412752092b1efe6d47c66c3538029cc745c"
+      "sha256": "310babfd42d40210db7739b19419406b0f7963b8968919816fb4505ab85c6966"
     }
   ],
-  "capturedAt": "2026-10-06T12:36:07.421Z",
-  "testSha256": "5f962112dba2e9e46f6e91e507a2a0203d7ee16d3db72ff76cd9a256f4df7156",
+  "capturedAt": "2026-10-06T13:38:22.070Z",
+  "testSha256": "ef19a097254b5d5242a628b931a48d2f0888190f4328ad4ef24fbd3ebf1c6bf2",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "receiving for 200.5 real seconds keeps draft provisional before genuine checking and saving",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

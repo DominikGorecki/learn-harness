@@ -19,6 +19,12 @@ export const flows: Record<string, FlowDefinition> = {
     'workspace-dark': 'Dark project composer with the same draft.',
     'account-dark': 'Disconnected account panel in Dark mode.'
   } },
+  navigation: { title: 'Shared application navigation', testFile: 'navigation.spec.ts', screenshots: {
+    'reading-restored-light': 'Restored Light reading context after traversing real project history.',
+    'reading-current-dark': 'Current Dark outline after removing a remembered stable topic.',
+    'compact-light': 'Reachable title-strip controls at 600 by 480 and 200% zoom in Light.',
+    'compact-dark': 'Reachable title-strip controls at 600 by 480 and 200% zoom in Dark.'
+  } },
   projects: { title: 'Project lifecycle and navigation', testFile: 'projects.spec.ts', screenshots: {
     'dashboard-empty': 'Empty dashboard before choosing a project folder.',
     'project-workspace': 'Project-specific goal draft and saved model preference.',

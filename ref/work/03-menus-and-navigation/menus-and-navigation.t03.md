@@ -1,5 +1,5 @@
 # Ticket: menus-and-navigation.T03 - Integrate title strip and guarded navigation
-Status: Open
+Status: Locally verified implementation — native manual qualification pending
 
 ## Source
 
@@ -42,10 +42,10 @@ React and the typed bridge only; core/main retain identity/AI/save ownership. Me
 ## Acceptance criteria
 
 - [ ] Strip order/placement, native control safe areas and theme/narrow/zoom behavior match R01/R02/R13.
-- [ ] Every existing destination entry point shares history semantics; rejection/cancellation/stale events leave cursor/branch unchanged.
-- [ ] Drafts/current-content disclosures/scroll/focus are restored; no writes/inference replay occurs.
-- [ ] Project guard/Saving/recovery and cross-view account diagnostics remain correct.
-- [ ] Menus/shortcuts/buttons agree, obey modal/IME/editing scope and have keyboard dismissal/focus restoration.
+- [x] Every existing destination entry point shares history semantics; rejection/cancellation/stale events leave cursor/branch unchanged.
+- [x] Drafts/current-content disclosures/scroll/focus are restored; no writes/inference replay occurs.
+- [x] Project guard/Saving/recovery and cross-view account diagnostics remain correct.
+- [x] Menus/shortcuts/buttons agree, obey modal/IME/editing scope and have keyboard dismissal/focus restoration in the verified renderer/bridge journeys.
 
 ## Manual verification
 
@@ -53,7 +53,15 @@ Review real Light/Dark shell, narrow/200% controls, keyboard behavior and native
 
 ## Completion evidence
 
-Coordinator fills after review and validation.
+Worker: `/root/navigation_integration`, GPT-6.1 Sol, high reasoning. Prerequisites T01 (`a123ed6`) and T02 (`e220926`) are accepted and committed on master. The coordinator reviewed source, independently reran 33 navigation/publication tests, and reviewed the eight navigation/projects PNGs; the read-only reviewer verified the other 44 actual Windows captures.
+
+Final frozen-source `npm.cmd run check` (session 27446) passed lint, 28 unit files / 321 tests passed / 3 skipped, flow integrity, both type scopes and production build. Full `npm.cmd run test:desktop` (session 78527) passed 16 / 1 packaged-only skip in 6.1 minutes, including genuine receiving for 200,513 ms and both inference-owned and storage-only Saving barriers. The navigation journey verifies real traversal/branching, retained oversized drafts, current-content disclosures/scroll/focus, removed-anchor fallback, same-identity recovery refresh, editing/IME/modal scope, keyboard menu focus and both-theme compact control hit tests. The bridge helper now derives its stale advisory revision from an actual owning command.
+
+Review corrections restore focus after same-identity recovery, preserve repeated menu-entry origin, restore the original editor before keyboard native popups, and retain readable workspace/preview regions at the actual minimum window and zoom. The native Select All callback uses the owning WebContents; a single keyboard edit/Undo passes. This does not prove OS keyboard selection of popup rows. Windows capture publication now retries only transient EPERM/EBUSY renames, with six attempts / 750 ms total, preserving locks, path checks and rollback; meaningful retry/exhaustion/nonretryable tests pass.
+
+All owned test apps, provider servers and profiles were cleaned, including two precisely verified failed-probe roots. The user's existing app was preserved. The initial clipboard-dependent probe was replaced with zero clipboard access; its exact earlier mutation is unconfirmed and possible nontext clipboard effects remain disclosed in validation.
+
+The first criterion remains open for actual native window/menu safe-area and OS qualification. Windows renderer/bridge success does not close native Windows/macOS/Linux or screen-reader gates. T04 and whole-bundle acceptance remain open. This scoped implementation commit carries the local evidence; its exact SHA is in branch history.
 
 ## Notes
 

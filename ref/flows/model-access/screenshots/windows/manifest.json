@@ -4,86 +4,86 @@
     {
       "id": "model-test-failed",
       "caption": "Fixture rejection of a model test without removing the extra choices.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2b330c6e91e47b2cddc9e507dc30c450f5e3b96deb6af84cd3688b8c9a43db0e"
+      "sha256": "5265d33873bbb657d4d7cfd83cdc8e02b10f2c0ba24db480cdd429f50ad9d66f"
     },
     {
       "id": "model-test-waiting-hint",
       "caption": "A real 30-second silent response remains cancellable with a nonterminal waiting explanation.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2c2a920c05133c3709f585f9228f599b22825b703fce2bd47bf5faca50b27290"
+      "sha256": "01a90d3ed0928c95266fce208d747d37538f9c8902dab2b7cd394053825b80f0"
     },
     {
       "id": "model-test-dashboard-waiting",
       "caption": "Global diagnostic panel remains discoverable after navigation to the project-free dashboard.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "9f94aa619136326dbaeba562513aad238b4dec54be871b291094ef325295f34d"
+      "sha256": "4f053cb6dbe05846d21e4111f6f389f6285df5cdf578e520c6675f487735c528"
     },
     {
       "id": "model-test-verified-light",
       "caption": "Independent successful Sol and Luna checks in Light mode.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "793896b92ad6f96d6a3397f7295e88b1beab9a58eb7fd78bcfe9d107f96ca342"
+      "sha256": "a3aca436500b457a2a3f95a9483333bc17233c1e72d7022d310eef4d5dd85ce8"
     },
     {
       "id": "model-test-verified-dark",
       "caption": "The same fixture verification state rendered in Dark mode.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "dark",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "22f1703476c75ce979ecb5aebd23849cea44fd97f5fd38242760e79390af0b89"
+      "sha256": "8428b8b2d083448df6b5c893e424f59d43bb18490f5452bb14981e96d6a15a0b"
     }
   ],
-  "capturedAt": "2026-10-06T12:37:53.760Z",
+  "capturedAt": "2026-10-06T13:40:02.077Z",
   "testSha256": "0f71dc72d06a4185d31079cba36b77cb04dafd35f954423cacd18712a509e518",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

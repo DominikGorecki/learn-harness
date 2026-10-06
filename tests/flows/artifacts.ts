@@ -82,6 +82,24 @@ async function rejectLink(path: string): Promise<void> {
   if (await exists(path) && (await lstat(path)).isSymbolicLink()) throw new Error('Flow output must not contain symbolic links')
 }
 
+// Windows scanners can briefly retain a completed capture directory. Retry
+// only transient sharing failures; sustained errors still trigger rollback.
+export async function renameFlowPath(source: string, destination: string, options: {
+  platform?: NodeJS.Platform;
+  move?: (source: string, destination: string) => Promise<void>;
+  wait?: (milliseconds: number) => Promise<void>
+} = {}): Promise<void> {
+  const move = options.move ?? rename
+  const wait = options.wait ?? (milliseconds => new Promise(resolveWait => setTimeout(resolveWait, milliseconds)))
+  for (let attempt = 0; ; attempt++) {
+    try { await move(source, destination); return }
+    catch (error) {
+      if ((options.platform ?? process.platform) !== 'win32' || !['EPERM', 'EBUSY'].includes((error as NodeJS.ErrnoException).code ?? '') || attempt >= 5) throw error
+      await wait(50 * (attempt + 1))
+    }
+  }
+}
+
 // Publish only a fully captured, passing journey. A lock prevents overlapping runs
 // from losing another platform's index block. Retained backup permits crash recovery.
 export async function publishFlow(root: string, staged: string, manifest: CaptureManifest): Promise<void> {
@@ -104,7 +122,7 @@ export async function publishFlow(root: string, staged: string, manifest: Captur
     // An interrupted prior publication restores its last complete set first.
     if (await exists(backup)) {
       if (await exists(current)) await rm(backup, { recursive: true })
-      else await rename(backup, current)
+      else await renameFlowPath(backup, current)
     }
     const index = await readFile(indexPath, 'utf8')
     await mkdir(next)
@@ -126,14 +144,14 @@ export async function publishFlow(root: string, staged: string, manifest: Captur
       }
     }
     await writeFile(nextIndex, renderCaptures(index, manifests))
-    if (await exists(current)) { await rename(current, backup); moved = true }
-    await rename(next, current); installed = true
-    await rename(nextIndex, indexPath); committed = true
+    if (await exists(current)) { await renameFlowPath(current, backup); moved = true }
+    await renameFlowPath(next, current); installed = true
+    await renameFlowPath(nextIndex, indexPath); committed = true
     if (moved) await rm(backup, { recursive: true })
   } catch (error) {
     if (!committed) {
       if (installed) await rm(current, { recursive: true })
-      if (moved) await rename(backup, current)
+      if (moved) await renameFlowPath(backup, current)
     }
     throw error
   } finally {

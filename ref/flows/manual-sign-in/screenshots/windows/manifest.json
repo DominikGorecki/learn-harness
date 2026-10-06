@@ -4,26 +4,26 @@
     {
       "id": "manual-sign-in-link",
       "caption": "Browser-opening recovery after copying the fixture sign-in link.",
-      "width": 1583,
-      "height": 973,
+      "width": 1603,
+      "height": 1053,
       "theme": "light",
       "viewport": {
-        "width": 1266,
-        "height": 778
+        "width": 1282,
+        "height": 842
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "4891fb105e5b41f9c4ccd871bf7692b8dd649ceb7db7b51430a92b9bec970476"
+      "sha256": "1c55c7281b8f924c3ef31e4f6d3204a1bc0d81cb6f743187bc07555f7aa8ec2e"
     }
   ],
-  "capturedAt": "2026-10-06T12:32:41.029Z",
+  "capturedAt": "2026-10-06T13:34:55.600Z",
   "testSha256": "4e282aacee566aa9683aa5c6ae60df730031c97ead8bbbcfcbb229d275ccea7b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/account.spec.ts",
   "testTitle": "manual sign-in link completes OAuth when the system browser cannot open",
-  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "revision": "2169435211413ceb985de2557e52e76baacdb497",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }
