@@ -66,5 +66,7 @@ The expanded recovery journey exposed a real queued dialog-close race: after Sta
 
 ## Notes
 
+Coordinator follow-up: fresh `npm.cmd run check` (47832) and full `npm.cmd run test:desktop` (36998) passed on committed bcdea3f after workers froze: 321 unit tests / 3 skips and 16 desktop tests / 1 packaged-worker skip. The coordinator reviewed all 14 changed PNGs, verified all 52 capture hashes and committed refreshed references and exact outcomes in `d3f4f04`. Local cumulative verification is complete; the required native/window/menu/safe-area and actual OS screen-reader gates remain open. The spec now contains the required implementation-verification appendix. A subsequent isolated Windows fixture was closed and cleaned after an unidentified persistent system error dialog prevented native input; that attempt supplies no new passed native checks.
+
 - Requirements covered: R16 primary; R01-R14 cumulative evidence and regressions; R15 maintained guidance.
 - Assumptions/open questions: external matching-host qualification may remain unavailable; continue all independent implementation and checks first.

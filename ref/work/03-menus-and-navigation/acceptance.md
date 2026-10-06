@@ -1,6 +1,6 @@
 # Application menus and navigation — requirement acceptance
 
-Status: In progress; T04 local regression follow-up verified, whole-spec/native qualification open
+Status: In progress; local cumulative verification passed, mandatory native qualification open
 Source: [spec](menus-and-navigation.spec.md)
 Execution: master, starting revision 9e2bb14904da1849b8497e64e1694b5d337d3ab2
 
@@ -8,7 +8,7 @@ The primary owns acceptance from actual source, test outputs and rendered eviden
 
 | Requirement | Owner | Current evidence / remaining scope |
 | --- | --- | --- |
-| R01 — top strip composition and themes | T03, T04 | Integrated strip order/placement and Light/Dark renderer captures pass T03 review; cumulative T04 audit remains. |
+| R01 — top strip composition and themes | T03, T04 | Integrated strip order/placement and Light/Dark renderer captures pass review. Fresh coordinator check/full desktop gates at bcdea3f pass; reviewed references are committed in d3f4f04. |
 | R02 — native integrated window chrome | T01, T02, T03, T04 | ADR-0024 and startup/overlay activation implemented. Windows startup/renderer hit tests pass. [Partial native Windows observations](evidence/windows/index.md) confirm specific double-click/button/minimize/restore/Close/full-screen/theme behavior; drag/resize, clean restore-button input, full control safe-area and matching macOS/Linux/accessibility qualification remain open. |
 | R03 — specified native commands | T02, T04 | T02 templates and native roles pass platform/unit review; actual Electron callback/command delivery passes. Native Windows File/View popups and keyboard-row Toggle sidebar activation were observed separately. Full focused roles/About/accelerator/menu matrix remains open. |
 | R04 — one command route, native editing | T02, T03, T04 | Fixed main commands and guarded renderer owner implemented. Real owning popup Select All callback and keyboard edit/Undo pass; OS popup-row activation and other focused roles need native qualification. |
@@ -23,7 +23,7 @@ The primary owns acceptance from actual source, test outputs and rendered eviden
 | R13 — narrow/zoom/reduced-motion safe areas | T03, T04 | Both-theme 600x480/200% control hit tests, overflow and existing reduced-motion/painted-preview checks pass. Actual OS control safe-area review remains open. |
 | R14 — strict named authorized capabilities | T02, T03, T04 | Strict parser/authorization and actual Electron sender/frame rejection/filtering/unsubscribe/unknown-handle/popup checks pass. Integrated consumer scopes commands and stale advisory state uses an acknowledged owning revision. |
 | R15 — continuing feature integration discipline | T01, T04 | ADR-0023 and authoring patterns exist at cdc57a7; T01 adds pure-contract/ADR-0024 guidance. README, both indexes and constrained UX/renderer/design/architecture/IPC/testing/documentation guidance now describe delivered runtime and preserve the mandatory future-feature history/identity/restoration/guard/evidence recipe. |
-| R16 — cataloged current flow/evidence | T04, primary | Navigation registered; T04 frozen code and full desktop gates pass with 16 refreshed flow sets. Five affected narratives describe current assertions and injection/synthetic/native limits. All 21 changed PNGs reviewed, 31 unchanged reviewed references reused and all 52 hashes verified; no actionable finding. Post-publication flow/link/diff checks pass. Six native Windows JPEGs remain separately recorded; coordinator whole-spec/native audit remains open. |
+| R16 — cataloged current flow/evidence | T04, primary | Navigation registered; T04 and fresh coordinator code/full desktop gates pass with 16 refreshed flow sets. Five affected narratives describe current assertions and injection/synthetic/native limits. Coordinator review covers all 14 newly changed PNGs and 38 unchanged reviewed captures, all 52 hashes, test digests and 122 relative links. Post-publication flow/diff checks pass; references are committed in d3f4f04. Six native Windows JPEGs remain separately recorded. Native qualification is incomplete. |
 
 ## Qualification boundaries
 
@@ -31,4 +31,6 @@ Native window behavior, OS keyboard/menu interaction and screen-reader qualifica
 
 ## Closure audit
 
-Not complete. T01/T02 and T03 local implementation retain their accepted evidence. T04 now adds passed actual-integration regressions for rejected/duplicate/stale commands, history-aware relink/rename, held cleanup traversal, diagnostic traversal and explicit no-history/no-write effects, plus the stale dialog-close repair, frozen code/full desktop gates and reviewed refreshed captures. Required native/window/accessibility qualifications and coordinator whole-spec verification remain unresolved; this follow-up does not close the bundle.
+Not complete. T01/T02 and T03 local implementation retain their accepted evidence. T04 adds passed actual-integration regressions for rejected/duplicate/stale commands, history-aware relink/rename, held cleanup traversal, diagnostic traversal and explicit no-history/no-write effects, plus the stale dialog-close repair. The primary independently completed fresh cumulative code/full desktop gates and reviewed the committed references at bcdea3f, recorded in d3f4f04. The spec's implementation-verification appendix maps delivered code and evidence without rewriting authoring history. Required native/window/accessibility qualification remains unresolved, so whole-spec acceptance and closure remain open.
+
+The subsequent isolated native Windows attempt reached the app but was blocked by a persistent system-owned “electron.exe — Application Error” dialog (Breakpoint, 0x80000003). Fixture inspection remained responsive, and the dialog remained after the owned fixture exited; ownership/cause was not established. No new native action was counted as passed. See [validation](validation.md) for the exact attempt and cleanup.
