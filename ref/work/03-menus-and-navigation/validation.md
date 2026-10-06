@@ -94,3 +94,14 @@ After all mutating workers froze, the coordinator reviewed the actual source/tes
 Three sandbox launch orphans were rebound to exact owned Playwright loader paths and creation times before termination. Only those owned processes and their three exact temporary roots were removed; the existing user app was preserved. Stop-Process failed on this host; same-shell .NET process termination completed the cleanup. No application security setting was changed.
 
 Native Windows/macOS/Linux window controls, drag/resize/menu/keyboard and OS screen-reader checks are separate from renderer screenshot and fixture evidence. Record exact available-host outcomes during implementation; unexecuted mandatory scope remains unresolved.
+
+### Coordinator verification at bcdea3f
+
+After the regression implementation was committed and mutating workers froze, the coordinator ran fresh cumulative checks on master at `bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0` with a clean source tree.
+
+- `npm.cmd run check` (47832): exit 0; 28 unit files / 321 passed / 3 skipped, lint, flow references, both TypeScript scopes and all production bundles passed.
+- `npm.cmd run test:desktop` (36998): exit 0; 16 passed / 1 packaged-worker skip in 6.2 minutes. Real receiving lasted 200,511 ms; latest bridge delivery was 139 ms, with 82,348 provider bytes, 56 bridge frames and one burst preview. All 16 ordinary Windows flow sets published successfully.
+- Coordinator post-publication `npm.cmd run test:flows`: exit 0. The coordinator opened all 14 changed PNGs and reviewed their layout, fixture state and capture captions; no actionable new visual mismatch was found. The other 38 PNGs retain their previously reviewed bytes. All refreshed manifests identify the committed source revision and `sourceDirty: false`.
+- The scoped review verified all 52 capture hashes, owning test digests and 122 relative links, and confirmed that the 16 generated index/manifest pairs changed only run provenance and image digests. `git diff --check` passed. An initial review-script comparison flagged existing CRLF differences; normalizing line endings resolved that tooling-only mismatch.
+
+These checks accept the refreshed Windows fixture references and cumulative local regression evidence. The packaged-only skip, mandatory native platform/menu/safe-area checks and actual OS screen-reader qualification remain explicit open gates; this record does not mark T04 or the whole bundle complete.

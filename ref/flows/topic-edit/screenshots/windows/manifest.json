@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "26bb47a2a47a9319012ff2141677b6a589803850ecb5065536b9d5b68899f17e"
+      "sha256": "b3f6ab9822d449bce1a3c9614b2760034e3b13d826b9250a881f4e546a479d1a"
     },
     {
       "id": "topic-edit-dark",
@@ -77,13 +77,13 @@
       "sha256": "56c330e6e2c61b61a977139ec3833178427370188919d586691ce36397e1794f"
     }
   ],
-  "capturedAt": "2026-10-06T17:54:53.922Z",
+  "capturedAt": "2026-10-06T18:08:21.341Z",
   "testSha256": "7365366f9bf91aba285b5cc19f827f5e5e3c491ff9ea0697f433d4975c656ebe",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-edit.spec.ts",
   "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
-  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
-  "sourceDirty": true,
+  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

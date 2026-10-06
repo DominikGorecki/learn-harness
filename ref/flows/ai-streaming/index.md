@@ -32,7 +32,7 @@ The saved navigation round trip asserts destination rendering, unchanged inferen
 
 ### windows
 
-Last successful run: 2026-10-06T17:52:17.510Z. Source revision: 3327888ac631b8de43e61203bedc80ed41bbdd3d; source changes present: true.
+Last successful run: 2026-10-06T18:05:44.799Z. Source revision: bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0; source changes present: false.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

@@ -59,16 +59,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "40e179b0be97fca00dd4c0a9446f4460aa996ddd790fe3e51ac8e6fc607329bc"
+      "sha256": "3aaaf1f0622a2fdc85e48453414ae474fe3603e8bc20656bd5c49f4d2de487a2"
     }
   ],
-  "capturedAt": "2026-10-06T17:54:26.087Z",
+  "capturedAt": "2026-10-06T18:07:53.206Z",
   "testSha256": "9c0f9926714fef1a436712a32a4cf37d3c5e4861dd20192976afedc1ea2cd938",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
-  "sourceDirty": true,
+  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }
