@@ -1,7 +1,7 @@
 # Project overview — design exploration
 
 Date: 2026-10-06
-Status: CTA refinement, sheet 04; sheet 03 option 5 anchors the preferred layout, with no final CTA selection or implementation approval.
+Status: Selected — sheet 04, option 5 (Quiet action groups), locked by the user. Standalone reference and selection handoff saved; implementation is a separate task.
 Method: Built-in image generation. Sheet 01 used current flow screenshots; subsequent sheets use their actual predecessors as references. Sheet 04 references sheet 03 option 5, followed by one targeted correction of its generated output.
 
 ## Brief
@@ -76,7 +76,7 @@ The user likes **sheet 03 option 5** and its subtle glass effect, but dislikes t
 | 5 | Quiet action groups | Two clearly distinct actions share a subtle frosted group |
 | 6 | Topic-led actions | Removes duplicate hero navigation and emphasizes opening individual topics |
 
-Suggestion for discussion: **3** is the quietest editorial treatment; **5** preserves a tactile glass feel without the original saturated buttons. The user has not chosen a CTA option.
+The user explicitly selected and locked **sheet 04, option 5 — Quiet action groups**. Preserve its subtle frosted groups, with separate navigation and editing commands, within the preferred editorial/glass layout.
 
 One targeted correction removed a duplicate Edit outline from option 3. **Remaining generated defect:** option 2's long second-topic title still crowds its action area; give the title proper wrapping/space if that treatment is selected. Do not claim the corrected image resolves every layout detail. The other controls, independent topic edit/navigation actions and removal of the theme selector were visually reviewed in the saved copy.
 
@@ -113,4 +113,6 @@ The hero gradient in sheet 01 option 4 and its quieter sheet 02 option 5 refinem
 
 The exact selected outputs for all four rounds were copied into this project folder; original generated cache images and earlier sheets/prompts were preserved. Sheet 04 saves the targeted-correction output. No application source or flow reference was modified.
 
-Next decision: select one option or specify qualities to combine. A final reference and selection handoff will follow explicit selection; this brief is not that handoff.
+## Locked selection
+
+The user selected **sheet 04, option 5**. The [standalone final reference](project-overview-final.png) preserves the selected layout and grouped CTAs at a readable scale, with space for the full second-topic title. The saved copy was visually inspected against the selected option. See the [selection and implementation handoff](project-overview-selection.md) and [exact final prompt](project-overview-final-prompt.md). No further visual choice is pending; unshown states and implementation validation are recorded in the handoff.
