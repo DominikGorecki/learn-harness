@@ -1,6 +1,6 @@
 # Documentation patterns
 
-Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md).
+Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0005](ADRs/ADR-0005-progressive-pattern-and-adr-discovery.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md) and [ADR-0023](ADRs/ADR-0023-navigation-history-integration.md).
 
 ## Progressive discovery
 
@@ -15,6 +15,8 @@ UI guidance has three owners: [design system](patterns-design-system.md) for app
 Under [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [flow patterns](patterns-flow.md) own journey discovery and reference maintenance. Keep AI-maintained explanations in `ref/flows/<flow-id>/index.md` and passing Playwright captures in its platform screenshot directories. The runner owns generated tables/manifests; contributors own semantic prose and visual review. Preserve dated historical research and distinguish proposal mockups.
 
 ## Maintenance
+
+The [ADR-0023 navigation discipline](ADRs/ADR-0023-navigation-history-integration.md) applies whenever a feature adds, removes or changes navigation. Specs/reviews must account for destinations and entry points, history effects, restoration, unavailable-target fallback, ownership guards and evidence, including future in-project navigation. Keep the [UX](patterns-ux.md#navigation-history-integration), [renderer](patterns-renderer.md#navigation-feature-integration) and [testing](patterns-development-testing.md#required-evidence) guidance aligned with contract changes. Distinguish adopted contributor obligations from the [planned menu/history runtime](work/03-menus-and-navigation/menus-and-navigation.spec.md); do not revise current capability claims or native-chrome rules merely because a spec proposes them.
 
 For a durable change, add the next ADR and update the ADR index, pattern index, and affected domain patterns together. Amend or supersede prior decisions explicitly. Routine features/refactors inside accepted boundaries do not require new ADRs. Keep links relative within the repository and verify they resolve.
 

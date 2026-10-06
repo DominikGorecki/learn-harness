@@ -1,6 +1,6 @@
 # Renderer patterns
 
-Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0002](ADRs/ADR-0002-sandboxed-capability-ipc.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), and [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md).
+Governed by [ADR-0001](ADRs/ADR-0001-typescript-electron-process-layout.md), [ADR-0002](ADRs/ADR-0002-sandboxed-capability-ipc.md), [ADR-0003](ADRs/ADR-0003-core-learning-services-and-demo-state.md), [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md) and the contributor integration discipline in [ADR-0023](ADRs/ADR-0023-navigation-history-integration.md).
 
 Read [design system](patterns-design-system.md) for appearance and [UX](patterns-ux.md) for interaction contracts before changing a screen. This file owns renderer implementation rules.
 
@@ -11,6 +11,16 @@ Before renderer UI work, choose the relevant [flow explanation and screenshots](
 `app/App.tsx` composes project navigation, the learning workspace, and account settings. Put project views under `features/projects`, account views under `features/account`, appearance views/state under `features/settings`, reusable visual primitives under `components`, and transport result handling under `lib`. Use plain React state until complexity demonstrates a need for a state library or router. No SSR/Next.js backend runs in this desktop app.
 
 UI reads `window.learning` through typed result handling. Backend snapshots own project/account state; local state owns project-keyed goal drafts, overlay visibility, loading, busy, and recoverable error display. Guard repeated mutations, disable conflicting controls during writes, and render the returned authoritative result. Async boot work ignores results after effect cleanup.
+
+## Navigation feature integration
+
+Under [ADR-0023](ADRs/ADR-0023-navigation-history-integration.md), each feature that adds, removes or changes a destination or navigation entry point must integrate with the shared navigation/history approach and the [UX history contract](patterns-ux.md#navigation-history-integration). This is contributor guidance now; the initial controller/history/menu implementation remains [planned](work/03-menus-and-navigation/menus-and-navigation.spec.md).
+
+Keep one navigation owner in renderer app composition. Route buttons, breadcrumbs, sidebar rows, menus and shortcuts through its destination resolution and ownership guards; features must not maintain independent visit stacks or mutate backend selection behind the common route. Declare stable destination equality and explicit visit/replace/traverse/no-history effects. Future in-project destinations supply stable object IDs, owning project identity, restoration and unavailable-target fallback when their feature is implemented; ship only implemented destination variants.
+
+Record accepted transitions rather than clicks or arbitrary backend subscription updates. Preserve cursor/forward state on rejection, cancellation and stale completion, and serialize competing intents. Main/core remain authoritative for project identity and operations; distinguish profile project handles from portable .edu IDs. History and view mementos are presentation state, separate from drafts, saved content and domain-owned recovery. Restoration resolves current content and safely drops obsolete anchors. Do not change web-navigation restrictions or add privileged renderer imports to implement history.
+
+Feature review must name the affected entry points, history effect, resolution/error policy, context restoration, active-operation guard and focused test/flow coverage. Update these rules when the contract changes; a no-history choice is explicit evidence, not an omission.
 
 ## Design implementation
 

@@ -1,6 +1,6 @@
 # Development and testing patterns
 
-Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md) and [ADR-0006](ADRs/ADR-0006-development-port-shutdown.md).
+Governed by [ADR-0021](ADRs/ADR-0021-automatic-local-commits.md), [ADR-0020](ADRs/ADR-0020-playwright-flow-references.md), [ADR-0004](ADRs/ADR-0004-quality-gates-and-native-packaging.md), [ADR-0006](ADRs/ADR-0006-development-port-shutdown.md) and the contributor integration discipline in [ADR-0023](ADRs/ADR-0023-navigation-history-integration.md).
 
 ## Automatic local commits
 
@@ -28,6 +28,8 @@ Preload is bundled into one `.cjs` file with `externalizeDeps: false`; sandboxed
 The script never signals PID 0/1, itself, or its ancestors. It rechecks PID/start-time/name identity before signals, ignores exited/zombie processes, requests SIGTERM before bounded SIGKILL on Unix, and verifies the listener and loopback bind are gone. Windows uses PowerShell for listener/process discovery and Node's immediate termination semantics. Linux uses `ss` with `lsof` fallback; macOS uses `lsof`. Discovery/permission failures produce a nonzero exit rather than claiming cleanup succeeded. Keep this tool outside application bundles.
 
 ## Required evidence
+
+Under [ADR-0023](ADRs/ADR-0023-navigation-history-integration.md), every navigation feature/change requires evidence for its history effect, stable identity, authoritative resolution and failure/cancellation behavior, context restoration and operation guards. Cover direct entry and Back/Forward through the same pipeline when history is implemented; include future in-project destinations when their feature is added. Verify that disclosure/dialog/preference/progress actions classified as no-history do not fabricate visits. Update relevant flow explanations/captures and constrained patterns with contract changes. The initial [menus/navigation spec](work/03-menus-and-navigation/menus-and-navigation.spec.md) is planned, not runtime acceptance. Renderer captures omit native chrome, so actual window/menu platform checks require separate host evidence.
 
 The [ADR-0022 AI integration](patterns-ai.md) requires deterministic admission, cancellation/cleanup, stale-correlation, immutable preview, frame/history bounds and 100 ms batching regressions, plus real named bridge rejection/subscription tests. Every producer must also prove received streams beyond old deadlines, silence/worker health separately, valid protocol tail/EOF acceptance, independent model proof and bounded safe diagnostics. The [long-stream journey](flows/ai-streaming/index.md) proves at least 200 seconds of real receiving and bounded bridge delivery; [repair](flows/ai-streaming-repair/index.md) proves candidate replacement; [packaged-worker](flows/packaged-worker/index.md) verifies actual ASAR outline and both fixed model profiles under a development host. Preserve these regressions and global-revision/new-owner ordering tests. Exact Windows commands and qualification limits are in [streaming validation](work/02-ai-streaming/validation.md); no fixture establishes live-provider eligibility or hardened packaged-window startup. Keep all existing code/desktop gates and flow reporters.
 

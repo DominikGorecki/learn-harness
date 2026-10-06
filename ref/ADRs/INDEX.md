@@ -39,5 +39,6 @@ Read the records selected by the task's focused patterns. Records describe adopt
 
 | [ADR-0021](ADR-0021-automatic-local-commits.md) | Accepted | Standing authorization for scoped, validated local commits on the active branch | Changing contributor commit defaults, task completion or preservation of unrelated work |
 | [ADR-0022](ADR-0022-shared-pi-streaming-lifecycle.md) | Accepted; five producers and panel implemented | Shared AI lease, Pi streaming/inactivity and workbench panel; supersedes only ADR-0010 elapsed deadlines and ADR-0015/0016 direct diagnostic transport/deadline | Changing inference ownership, transport acceptance/liveness, previews, cancellation or adding future AI producers |
+| [ADR-0023](ADR-0023-navigation-history-integration.md) | Accepted; contributor discipline, runtime planned | Every navigation feature/change accounts for shared history, restoration, recovery and evidence; future in-project destinations join it when implemented | Adding, removing or changing destinations, navigation entry points or history behavior |
 
 Current rules live in [the pattern index](../patterns.md). Add the next sequential ADR for a new durable decision and update all affected references in the same change. An accepted packaging approach does not mean every platform installer has been built or certified; see [validation](../research/validation.md).

@@ -1,6 +1,6 @@
 # UX patterns
 
-Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md) and [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md). Pair with [design system](patterns-design-system.md) for appearance and [renderer](patterns-renderer.md) for implementation.
+Governed by [ADR-0007](ADRs/ADR-0007-codex-inspired-design-and-ux.md), [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md) and the contributor integration discipline in [ADR-0023](ADRs/ADR-0023-navigation-history-integration.md). Pair with [design system](patterns-design-system.md) for appearance and [renderer](patterns-renderer.md) for implementation.
 
 **Status:** adopted interaction rules. Current runtime capabilities remain those in [learning/data](patterns-learning-data.md). Project setup and outline creation are implemented; acceptance evidence is tracked for milestone behavior in [PRD 01](prds/01-project-setup-and-outline.md); richer Socratic activities remain product direction in [the overview](../docs/overview.md).
 
@@ -15,6 +15,16 @@ At any point the learner can identify the current subject/project, the current a
 Start with compact navigation and a spacious task area. Add a contextual detail pane for the selected lesson, source, or result only when it helps the current decision. Keep support information close to the part of the activity it explains. Broad tutorials and account configuration should not interrupt an already-understood learning action.
 
 Group navigation by meaningful learner objects. The product hierarchy remains project → lesson → module → session. Show only the levels implemented and useful for the current task. Pinning, search, grouping, tabs, and recent-item navigation require working behavior before their controls appear.
+
+## Navigation history integration
+
+**Status:** required feature-planning/review discipline, adopted under ADR-0023. Back/Forward and application menus remain planned in the [menus/navigation spec](work/03-menus-and-navigation/menus-and-navigation.spec.md); current topic disclosures are not topic destinations.
+
+Whenever a feature adds, removes or changes navigation, explicitly track its effect on the shared navigation/history approach. Identify the destination, its stable identity and owning project, all entry points, and whether each action adds a visit, replaces/canonicalizes a location, traverses history or leaves history unchanged. Future real topic/activity destinations inside a project join the same history when implemented; no independent feature stack or placeholder route is justified by this guidance.
+
+Specify restoration of drafts, reading position, disclosure and focus, including safe fallbacks when content is renamed, rewritten, moved or deleted. Titles, filesystem paths and content revisions are not stable destination identity. Resolve destinations against current authoritative state; traversal does not undo writes, restore older content or restart inference. Define failed/cancelled transitions and missing-target recovery before calling the feature complete.
+
+Account for operation ownership at every entry point: preserve current Stay here / Cancel and switch behavior, awaited project cleanup, Saving restrictions and recoverable unsaved output. Ordinary disclosures, dialogs, preference changes and progress updates have an explicit no-history effect. Update constrained patterns and documented flow coverage when the navigation contract changes, and verify direct visits and Back/Forward through the same supported behavior. [Renderer integration](patterns-renderer.md#navigation-feature-integration) and [required evidence](patterns-development-testing.md#required-evidence) own the implementation and verification obligations.
 
 ## Input and next action
 
