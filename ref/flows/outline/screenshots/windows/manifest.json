@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c0336db42230e001615479ede6a193c87f90b661b8e99bb822117132e598692c"
+      "sha256": "4ff80b834e2e3b674254abbc604ccb116e76eb055ae2dbc035c9f3e916892ea6"
     },
     {
       "id": "outline-streaming-dark",
@@ -77,13 +77,13 @@
       "sha256": "7360a2ecdbf24a1b59f3eb57b65a090af1bd03dba621767d3532c79648c2f7cd"
     }
   ],
-  "capturedAt": "2026-10-06T13:40:24.107Z",
+  "capturedAt": "2026-10-06T17:54:21.140Z",
   "testSha256": "5907a8bef5b0bb3e9147bd9c6e84962df8f2e7c6cc3f2cc647f59c38d999c052",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline.spec.ts",
   "testTitle": "Pi utility process creates, validates, saves and reopens an outline; cancellation preserves prior work",
-  "revision": "2169435211413ceb985de2557e52e76baacdb497",
+  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

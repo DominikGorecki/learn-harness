@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "f56a4bb1c7bb0329571dd4f49c4cd0f8d732b4bcb6cc4ba0361f7b00f462b3b8"
+      "sha256": "5b0e20f034a6a7346327ff934bb921f9b23e655e034363862e9cb8e6fe8106b4"
     },
     {
       "id": "reading-current-dark",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "06e84138469a1033b9d67fcf4a4f1d3044f526cdda1f8d0c44b9b12407849b2c"
+      "sha256": "b616f6046b70cda1af0e8551eec3a5046c08a118c4aa92f36ec56a662f7ed487"
     },
     {
       "id": "compact-light",
@@ -44,7 +44,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "abb2f8042077145fef0c747bb59bafc728ebc0a9a016dd1621cb1dbaccb330fa"
+      "sha256": "8b6fbd79c475c481832675459a79d37d68a0c200d54734cc0b90dc98bc8527f4"
     },
     {
       "id": "compact-dark",
@@ -59,16 +59,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "1533e0b5182f24dddd2b12d9f24a1df80d97d3b14cf48f0a7c314274ce24f828"
+      "sha256": "7c92de7ff391de31cef9dc972b3234dc9c8043ccae4420bd2151af76f5902f35"
     }
   ],
-  "capturedAt": "2026-10-06T13:40:05.798Z",
-  "testSha256": "b1c6ee2e601c831252f424424f00eead4f1a8372c6cb779032bc12823cdce882",
+  "capturedAt": "2026-10-06T17:54:02.994Z",
+  "testSha256": "cce72343b7e1a5f3aa67073609ac5476dc4eb14585441386aa86fb95ff3d85d7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/navigation.spec.ts",
   "testTitle": "shared navigation restores current reading and drafts, preserves branches and scopes commands",
-  "revision": "2169435211413ceb985de2557e52e76baacdb497",
+  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

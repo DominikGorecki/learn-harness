@@ -26,15 +26,15 @@ export async function holdValidatedWrite(desktop: ElectronApplication, sample: s
   }, { sample, projectId, outline: JSON.stringify(outline) })
 }
 
-/** Retain only a genuine exit event from one real owned diagnostic utility. */
-export async function holdDiagnosticExit(desktop: ElectronApplication) {
-  await desktop.evaluate(({ utilityProcess }) => {
+/** Retain only the selected owned utility's genuine exit event, never a fabricated exit. */
+async function holdWorkerExit(desktop: ElectronApplication, serviceName: 'Learning model access' | 'Learning outline') {
+  await desktop.evaluate(({ utilityProcess }, serviceName) => {
     const originalFork = utilityProcess.fork
     const barrier: Barrier = { held: false, pid: null, release: () => {}, restore: () => {} }
     ;(globalThis as unknown as MainBarriers).exitBarrier = barrier
     utilityProcess.fork = function (...args) {
       const worker = originalFork.apply(this, args)
-      if (args[2]?.serviceName !== 'Learning model access') return worker
+      if (args[2]?.serviceName !== serviceName) return worker
       utilityProcess.fork = originalFork
       const originalEmit = worker.emit
       let actualExit: Parameters<typeof worker.emit> | null = null
@@ -51,8 +51,10 @@ export async function holdDiagnosticExit(desktop: ElectronApplication) {
       return worker
     }
     barrier.restore = () => { utilityProcess.fork = originalFork; barrier.release() }
-  })
+  }, serviceName)
 }
+export const holdDiagnosticExit = (desktop: ElectronApplication) => holdWorkerExit(desktop, 'Learning model access')
+export const holdOutlineExit = (desktop: ElectronApplication) => holdWorkerExit(desktop, 'Learning outline')
 export async function barrierState(desktop: ElectronApplication, name: 'saveBarrier' | 'exitBarrier') {
   return desktop.evaluate((_, name) => {
     const value = (globalThis as unknown as MainBarriers)[name]

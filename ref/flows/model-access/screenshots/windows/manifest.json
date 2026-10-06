@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "4f053cb6dbe05846d21e4111f6f389f6285df5cdf578e520c6675f487735c528"
+      "sha256": "f6dc264abcda9f4311164441195a251c84d17fed077c569ae02ca632f64426f4"
     },
     {
       "id": "model-test-verified-light",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a3aca436500b457a2a3f95a9483333bc17233c1e72d7022d310eef4d5dd85ce8"
+      "sha256": "94b4f967dc6bada1047c52f88a3e01bc3c0303e4096aa5abdc7c27fb925a86d3"
     },
     {
       "id": "model-test-verified-dark",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "8428b8b2d083448df6b5c893e424f59d43bb18490f5452bb14981e96d6a15a0b"
+      "sha256": "47f790ccb644ab2b31b95d7f9a1df3cd46539b717371d1f89140ce923906b8c7"
     }
   ],
-  "capturedAt": "2026-10-06T13:40:02.077Z",
-  "testSha256": "0f71dc72d06a4185d31079cba36b77cb04dafd35f954423cacd18712a509e518",
+  "capturedAt": "2026-10-06T17:53:57.407Z",
+  "testSha256": "a7d35a932d7580628153dc59fc7deaffc7f8238ba78542bd31fe4a9bdc4090da",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "2169435211413ceb985de2557e52e76baacdb497",
+  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

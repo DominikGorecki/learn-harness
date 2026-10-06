@@ -7,7 +7,8 @@ import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { ProjectDocument } from '../../src/shared/workspace'
 import type { GenerationApi } from '../../src/shared/generation'
-import { barrierState, holdValidatedWrite, releaseBarrier } from '../fixtures/desktop-ai-barriers'
+import { barrierState, holdOutlineExit, holdValidatedWrite, releaseBarrier } from '../fixtures/desktop-ai-barriers'
+import { menuCommand, menuRevision, workspaceSnapshot } from '../fixtures/desktop-navigation'
 
 test('save retry, model recovery, usage limits, and explicit cancellation before switching preserve work', { tag: '@recovery', annotation: { type: 'flow', description: 'recovery' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture({ inferenceMode: 'hold' })
@@ -147,21 +148,69 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     })
     await expect(page.getByText('The outline process stopped unexpectedly. Your previous work is unchanged.', { exact: true })).toBeVisible()
     expect((await saved()).outline).toEqual(original)
+    // Make an existing Forward branch before starting the owned operation.
+    await choose(other)
+    await page.getByRole('button', { name: 'Open project', exact: false }).click()
+    await expect(page.locator('.workspace-title')).toHaveText('Second subject')
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.locator('.workspace-title')).toHaveText('Bayesian reasoning')
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
+    const ownedHandle = (await workspaceSnapshot(page)).activeProject!.id
+    await holdOutlineExit(desktop)
     await page.getByRole('button', { name: 'Create new outline', exact: true }).click()
     await page.getByRole('dialog').getByRole('button', { name: 'Create new outline', exact: true }).click()
     await expect.poll(() => fixture.inferenceRequests.length).toBe(5)
-    await choose(other)
-    await page.getByRole('button', { name: 'Open project', exact: false }).click()
+    await menuCommand(desktop, 'go-back')
     await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).toBeVisible()
-    await page.getByRole('button', { name: 'Stay here' }).click()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).toBeHidden()
     await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeVisible()
-    await page.getByRole('button', { name: 'Open project', exact: false }).click()
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
+    await page.getByRole('button', { name: 'Forward', exact: true }).click()
+    await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).toBeVisible()
+    const guardedRevision = await menuRevision(page)
+    await page.getByRole('button', { name: 'Stay here' }).click()
+    await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).toBeHidden()
+    await expect.poll(() => menuRevision(page)).toBeGreaterThan(guardedRevision)
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
+    const settledRevision = await menuRevision(page)
+    // Rendezvous with the renderer after main accepts the advisory state, then
+    // observe the actual callback through the named bridge consumer.
+    await page.evaluate(() => {
+      const host = globalThis as unknown as { learning: import('../../src/shared/application-menu').ApplicationMenuApi; recoveryCommands: unknown[]; stopRecoveryCommands(): void }
+      host.recoveryCommands = []
+      host.stopRecoveryCommands = host.learning.onApplicationCommand(command => host.recoveryCommands.push(command))
+    })
+    await menuCommand(desktop, 'go-forward')
+    await expect.poll(() => page.evaluate(() => (globalThis as unknown as { recoveryCommands: unknown[] }).recoveryCommands))
+      .toEqual([{ command: 'go-forward', revision: settledRevision }])
+    await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).toBeVisible()
+    // Synthetic delivery models an older queued DOM close arriving after this
+    // real menu command has opened its new, still-owned navigation decision.
+    await page.getByRole('dialog', { name: 'An outline is still in progress' }).dispatchEvent('close')
+    await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).toBeVisible()
     await page.getByRole('button', { name: 'Cancel and switch' }).click()
+    await expect.poll(() => barrierState(desktop!, 'exitBarrier')).toMatchObject({ held: true })
+    const ownedPid = (await barrierState(desktop, 'exitBarrier')).pid
+    expect(ownedPid).toBeGreaterThan(0)
+    expect(await desktop.evaluate((_, pid) => { try { process.kill(pid!, 0); return true } catch { return false } }, ownedPid)).toBe(false)
+    expect((await workspaceSnapshot(page)).activeProject!.id).toBe(ownedHandle)
+    expect((await aiActivity(page)).active).toMatchObject({ projectId: ownedHandle, phase: 'cancelling' })
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeDisabled()
+    expect(fixture.inferenceRequests).toHaveLength(5)
+    await releaseBarrier(desktop, 'exitBarrier')
     await expect(page.getByRole('textbox')).toHaveValue('')
     await expect(page.locator('.workspace-title')).toHaveText('Second subject')
     expect((await saved()).outline).toEqual(original)
     expect(fixture.inferenceRequests).toHaveLength(5)
-    await page.getByRole('navigation', { name: 'Projects', exact: true }).getByRole('button', { name: 'Bayesian reasoning', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeDisabled()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.locator('.workspace-title')).toHaveText('Bayesian reasoning')
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
+    await page.getByRole('button', { name: 'Forward', exact: true }).click()
+    await expect(page.locator('.workspace-title')).toHaveText('Second subject')
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.locator('.workspace-title')).toHaveText('Bayesian reasoning')
     await page.getByRole('button', { name: 'Create new outline', exact: true }).click()
     await page.getByRole('dialog').getByRole('button', { name: 'Create new outline', exact: true }).click()
     await expect.poll(() => fixture.inferenceRequests.length).toBe(6)
@@ -177,6 +226,10 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     expect(fixture.inferenceRequests).toHaveLength(6)
     expect((await saved()).outline?.model.id).toBe('fixture-model')
   } finally {
+    if (desktop) {
+      await (await desktop.firstWindow()).evaluate(() => (globalThis as unknown as { stopRecoveryCommands?: () => void }).stopRecoveryCommands?.())
+      await releaseBarrier(desktop, 'exitBarrier'); await releaseBarrier(desktop, 'saveBarrier')
+    }
     await desktop?.close()
     await fixture.close()
     await rm(root, { recursive: true, force: true })

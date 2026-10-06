@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2b71855e4897c8b1001aff0e9d786cc557689c141a2eec4e8f8f464e32e0c475"
+      "sha256": "0e1c88367e2e3d21bcebbe33182647dfc4f7825d5cd1d92072bc3c79a9175e6e"
     },
     {
       "id": "project-narrow",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cbb64eb3b74299bc7b49350a9187131c99a5dcf9b5058f556f3de0a833c6b09b"
+      "sha256": "9af91142267ff25e0d09c5c7a7215b857e6512e48a95cc2c0f65a9a9bead88d4"
     },
     {
       "id": "project-zoom-200",
@@ -59,16 +59,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "a6dc8f2633a640e63ea2f6fdb08cf1b7179f557bd7457c6467189de3019f8770"
+      "sha256": "40e179b0be97fca00dd4c0a9446f4460aa996ddd790fe3e51ac8e6fc607329bc"
     }
   ],
-  "capturedAt": "2026-10-06T13:40:28.893Z",
-  "testSha256": "d5b8da4ec551cd8fd634990ad36a644dffa826920497c33bff1b75c12add08ac",
+  "capturedAt": "2026-10-06T17:54:26.087Z",
+  "testSha256": "9c0f9926714fef1a436712a32a4cf37d3c5e4861dd20192976afedc1ea2cd938",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "2169435211413ceb985de2557e52e76baacdb497",
+  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

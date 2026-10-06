@@ -100,12 +100,24 @@ test('extra choices survive restart while independent diagnostic evidence resets
       const state = await page.evaluate(async () => (globalThis as unknown as { learning: AiApi }).learning.getAiActivity())
       return state.ok ? state.data.active?.preview : null
     }).toMatchObject({ kind: 'model-test-evidence', hasReply: true, completed: false, modelMatched: false })
-    await page.getByRole('button', { name: 'Projects', exact: true }).first().click()
+    const diagnosticOwner = await page.evaluate(async () => {
+      const value = await (globalThis as unknown as { learning: AiApi }).learning.getAiActivity()
+      return value.ok ? value.data.active!.operationId : null
+    })
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
     await expect(page.locator('#dashboard-heading')).toBeVisible()
     await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).not.toBeVisible()
     await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeEnabled()
     await flow.capture(desktop, page, 'model-test-dashboard-waiting')
-    await page.getByRole('main').getByRole('button', { name: /Learning project/ }).click()
+    await page.getByRole('button', { name: 'Forward', exact: true }).click()
+    await expect(page.locator('.workspace-title')).toHaveText('Learning project')
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeDisabled()
+    expect(await page.evaluate(async () => {
+      const value = await (globalThis as unknown as { learning: AiApi }).learning.getAiActivity()
+      return value.ok ? value.data.active?.operationId : null
+    })).toBe(diagnosticOwner)
+    expect(fixture.inferenceRequests).toHaveLength(3)
+    expect(await savedBytes()).toBe(beforeDiagnostic)
     await page.getByRole('button', { name: 'Account settings' }).click()
     await expect(page.getByRole('button', { name: 'Cancel model test' })).toBeVisible()
     await page.keyboard.press('Escape')

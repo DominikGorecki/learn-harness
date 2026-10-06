@@ -74,6 +74,10 @@ test('receiving for 200.5 real seconds keeps draft provisional before genuine ch
       const host = globalThis as unknown as { learning: AiApi; arrivals: { at: number; frame: AiActivitySnapshot }[]; stopArrivals?: () => void }
       host.arrivals = []; host.stopArrivals = host.learning.onAiActivityChanged(frame => host.arrivals.push({ at: Date.now(), frame }))
     })
+    await page.getByRole('button', { name: 'Projects', exact: true }).first().click()
+    await expect(page.locator('#dashboard-heading')).toBeVisible()
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
     const admission = Date.now()
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
     await expect(page.locator('#ai-operation-heading')).toBeFocused()
@@ -108,6 +112,7 @@ test('receiving for 200.5 real seconds keeps draft provisional before genuine ch
     await page.getByRole('button', { name: 'Done', exact: true }).click()
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await flow.capture(desktop, page, 'stream-structured-dark')
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
     // Real wall time since the first received provider chunk, without clock acceleration.
     await new Promise<void>(resolve => setTimeout(resolve, Math.max(0, stream!.firstByteAt + 190_100 - Date.now())))
     expect(Date.now() - stream!.firstByteAt).toBeGreaterThanOrEqual(190_000)
@@ -119,6 +124,7 @@ test('receiving for 200.5 real seconds keeps draft provisional before genuine ch
     expect(await readFile(join(app.project, 'preserved.bin'), 'utf8')).toBe(source)
     expect((await app.saved()).outline).toBeNull()
     expect(fixture.inferenceRequests).toHaveLength(1)
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
     await flow.capture(desktop, page, 'stream-past-190')
     await expect.poll(() => barrierState(desktop, 'saveBarrier'), { timeout: 35_000 }).toMatchObject({ held: true })
     expect(stream!.completedAt()! - stream!.firstByteAt).toBeGreaterThanOrEqual(200_500)
@@ -145,6 +151,9 @@ test('receiving for 200.5 real seconds keeps draft provisional before genuine ch
     await page.getByRole('button', { name: 'Forward', exact: true }).click()
     await expect(page.locator('#outline-heading')).toBeVisible()
     expect(fixture.inferenceRequests).toHaveLength(1)
+    expect(await app.bytes()).toBe(acceptedBytes)
+    expect(await readFile(join(app.project, 'preserved.bin'), 'utf8')).toBe(source)
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
     const frames = await aiFrames(page)
     for (let i = 0; i < frames.length; i++) {
       parseAiActivitySnapshot(frames[i])

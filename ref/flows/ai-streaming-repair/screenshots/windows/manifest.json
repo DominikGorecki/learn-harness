@@ -47,13 +47,13 @@
       "sha256": "e200ea56ff187e16aeac61bb3d39a5041e73cc2065cdd54a006bf28e30f58af8"
     }
   ],
-  "capturedAt": "2026-10-06T13:38:26.611Z",
-  "testSha256": "ef19a097254b5d5242a628b931a48d2f0888190f4328ad4ef24fbd3ebf1c6bf2",
+  "capturedAt": "2026-10-06T17:52:22.221Z",
+  "testSha256": "8c6d1aff499ae58db61676a45defcd20a7dc6a00e1af2dce41e12b95c7d9dd6c",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "structured repair replaces the candidate and accepts only the independently valid second turn",
-  "revision": "2169435211413ceb985de2557e52e76baacdb497",
+  "revision": "3327888ac631b8de43e61203bedc80ed41bbdd3d",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

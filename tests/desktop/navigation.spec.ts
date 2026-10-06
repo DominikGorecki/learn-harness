@@ -6,6 +6,7 @@ import { join, resolve } from 'node:path'
 import { createProjectStorage } from '../../src/main/storage/project-storage'
 import { learningOutline } from '../fixtures/learning-outline'
 import type { ProjectDocument } from '../../src/shared/workspace'
+import { chooserCalls, deliverCommand, holdChooser, menuRevision, rejectNextSelection, releaseChooser, restoreNavigationFault, workspaceSnapshot } from '../fixtures/desktop-navigation'
 
 test('shared navigation restores current reading and drafts, preserves branches and scopes commands', { tag: '@navigation', annotation: { type: 'flow', description: 'navigation' } }, async ({ playwright, flow }) => {
   test.setTimeout(90_000)
@@ -55,6 +56,62 @@ test('shared navigation restores current reading and drafts, preserves branches 
     await expect(forward).toBeEnabled()
     await choose(null); await page.getByRole('button', { name: 'Choose project folder' }).click()
     await expect(forward).toBeEnabled()
+    // Rejections reach the installed renderer owner through real IPC/events.
+    const firstHandle = (await workspaceSnapshot(page)).activeProject!.id
+    await deliverCommand(desktop, { command: 'select-recent-project', projectHandle: 'unknown-navigation-handle', revision: await menuRevision(page) })
+    await expect(page.getByRole('alert')).toContainText('Open this project folder before using it.')
+    expect((await workspaceSnapshot(page)).activeProject!.id).toBe(firstHandle)
+    await expect(forward).toBeEnabled()
+    await page.getByRole('button', { name: 'Dismiss message', exact: true }).click()
+    for (const code of ['BUSY', 'INTERNAL'] as const) {
+      await rejectNextSelection(desktop, code)
+      await deliverCommand(desktop, { command: 'go-forward', revision: await menuRevision(page) })
+      await expect(page.getByRole('alert')).toContainText(`Test-owned ${code} navigation rejection.`)
+      expect((await workspaceSnapshot(page)).activeProject!.id).toBe(firstHandle)
+      await expect(forward).toBeEnabled()
+      expect(await desktop.evaluate(() => (globalThis as unknown as { navigationFaultCalls: number }).navigationFaultCalls)).toBe(1)
+      await page.getByRole('button', { name: 'Dismiss message', exact: true }).click()
+    }
+    // A held chooser is one transaction; duplicates are ignored, never queued.
+    await holdChooser(desktop, first)
+    await page.getByRole('button', { name: 'Choose project folder' }).click()
+    await expect.poll(() => chooserCalls(desktop!)).toBe(1)
+    await expect(back).toBeDisabled(); await expect(forward).toBeDisabled()
+    const pendingRevision = await menuRevision(page)
+    await deliverCommand(desktop, { command: 'go-forward', revision: pendingRevision })
+    await deliverCommand(desktop, { command: 'open-project', revision: pendingRevision })
+    await page.locator('#outline-heading').focus(); await page.keyboard.press(backShortcut)
+    expect(await chooserCalls(desktop)).toBe(1)
+    await releaseChooser(desktop)
+    await expect(back).toBeEnabled(); await expect(forward).toBeEnabled()
+    expect((await workspaceSnapshot(page)).activeProject!.id).toBe(firstHandle)
+    // Non-history actions retain the existing branch and feature-owned drafts.
+    const staleRevision = await menuRevision(page)
+    await page.getByRole('button', { name: 'Hide navigation', exact: true }).click()
+    await page.getByRole('button', { name: 'Show navigation', exact: true }).click()
+    await expect.poll(() => menuRevision(page)).toBeGreaterThan(staleRevision)
+    await deliverCommand(desktop, { command: 'go-forward', revision: staleRevision })
+    expect((await workspaceSnapshot(page)).activeProject!.id).toBe(firstHandle)
+    await expect(forward).toBeEnabled()
+    await page.getByRole('button', { name: 'Settings', exact: true }).click(); await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Account settings', exact: true }).click(); await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Edit learning path', exact: true }).click()
+    await page.getByRole('textbox', { name: 'How would you like to change the outline?' }).fill('Retained path draft')
+    await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Edit topic: Topic 3', exact: true }).click()
+    await page.getByRole('textbox', { name: 'How would you like to change this topic?' }).fill('Retained topic draft')
+    await page.keyboard.press('Escape')
+    await summary.press('Enter'); await summary.press('Enter')
+    await expect(forward).toBeEnabled()
+    await forward.click(); await expect(page.locator('#outline-heading')).toHaveText('Second subject outline')
+    await back.click(); await expect(page.locator('#outline-heading')).toHaveText(outline.title)
+    await expect(forward).toBeEnabled()
+    await page.getByRole('button', { name: 'Edit learning path', exact: true }).click()
+    await expect(page.getByRole('textbox')).toHaveValue('Retained path draft'); await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Edit topic: Topic 3', exact: true }).click()
+    await expect(page.getByRole('textbox')).toHaveValue('Retained topic draft'); await page.keyboard.press('Escape')
+    expect(await readFile(join(first, '.edu/project.json'), 'utf8')).toBe(before)
+    await summary.focus()
     await flow.capture(desktop, page, 'reading-restored-light')
     // Native View callback traverses the same real history with live availability.
     await expect.poll(() => desktop!.evaluate(({ Menu }) => Menu.getApplicationMenu()!.getMenuItemById('go-forward')!.enabled)).toBe(true)
@@ -145,6 +202,26 @@ test('shared navigation restores current reading and drafts, preserves branches 
     await page.getByRole('button', { name: 'Try again', exact: true }).click()
     await expect(page.locator('#outline-heading')).toBeVisible(); await expect(forward).toBeEnabled()
     await expect(page.locator('#outline-heading')).toBeFocused()
+    // Relink and externally rename the same profile handle inside its retained branch.
+    const moved = join(root, 'Moved first subject')
+    await rename(first, moved)
+    await forward.click(); await back.click()
+    await expect(page.getByRole('heading', { name: 'Let’s find your project.' })).toBeVisible()
+    await choose(moved); await page.getByRole('button', { name: 'Locate folder' }).click()
+    await expect.poll(async () => (await workspaceSnapshot(page)).activeProject).toMatchObject({ id: firstHandle, projectId: document.projectId, folderPath: moved })
+    await expect(forward).toBeEnabled()
+    const relinked = await storage.load(moved), renamed = structuredClone(relinked.document!)
+    renamed.name = 'Renamed first subject'; renamed.revision++
+    await storage.save(moved, renamed, relinked.digest)
+    await forward.click(); await back.click()
+    await expect(page.locator('.workspace-title')).toHaveText('Renamed first subject')
+    expect((await workspaceSnapshot(page)).activeProject!.id).toBe(firstHandle)
+    await expect(forward).toBeEnabled()
+    await back.click(); await expect(page.locator('#dashboard-heading')).toBeVisible()
+    await forward.click(); await expect(page.locator('.workspace-title')).toHaveText('Renamed first subject')
+    await forward.click(); await expect(page.locator('.workspace-title')).toHaveText('Draft subject')
+    await expect(forward).toBeDisabled()
+    await back.click(); await expect(page.locator('.workspace-title')).toHaveText('Renamed first subject')
     // Hit-test all compact controls at the actual minimum window and Electron zoom.
     for (const theme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'Settings', exact: true }).click()
@@ -160,5 +237,8 @@ test('shared navigation restores current reading and drafts, preserves branches 
       else await flow.capture(desktop, page, 'compact-dark')
       await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.webContents.setZoomFactor(1); window.setContentSize(1280, 840) })
     }
-  } finally { await desktop?.close(); await rm(root, { recursive: true, force: true }) }
+  } finally {
+    if (desktop) { await restoreNavigationFault(desktop); await releaseChooser(desktop) }
+    await desktop?.close(); await rm(root, { recursive: true, force: true })
+  }
 })

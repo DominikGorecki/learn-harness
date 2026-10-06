@@ -376,7 +376,8 @@ export function App() {
       <p>{outlineRun?.status === 'unsaved' ? 'This will discard the unsaved result and use ChatGPT again.' : 'Your current outline stays available while the new one is created. A successful save replaces it. This uses your ChatGPT plan allowance.'}</p>
       <div className="button-row"><button className="button secondary" autoFocus onClick={() => setConfirmReplace(false)}>Keep current outline</button><button className="button primary" disabled={aiBusy} onClick={() => void createOutline(true)}>Create new outline</button></div>
     </dialog>
-    <dialog ref={switchDialog} className="confirmation-dialog" aria-labelledby="switch-heading" onCancel={() => { decideNavigation(false); setSavingNotice(false) }} onClose={() => { decideNavigation(false); setSavingNotice(false) }}>
+    {/* Decisions settle explicitly; a queued DOM close must not cancel a later guard. */}
+    <dialog ref={switchDialog} className="confirmation-dialog" aria-labelledby="switch-heading" onCancel={event => { event.preventDefault(); decideNavigation(false); setSavingNotice(false) }}>
       <h2 id="switch-heading">{savingNotice ? 'Please wait for the operation to settle' : 'An outline is still in progress'}</h2>
       <p>{savingNotice ? 'Finish saving or admission before switching. Use a new navigation command afterward.' : 'Stay here while it finishes, or cancel before switching. Your learning goal and previous saved outline will remain available.'}</p>
       <div className="button-row"><button className="button secondary" autoFocus onClick={() => { decideNavigation(false); setSavingNotice(false) }}>Stay here</button>{!savingNotice && <button className="button primary" disabled={!switching.canProceed} onClick={() => void cancelAndNavigate()}>Cancel and switch</button>}</div>
