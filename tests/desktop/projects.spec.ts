@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, realpath, readFile, readdir, rename, rm } from 'node:fs
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
+import { verifyApplicationMenuBridge } from './application-menu-bridge'
 
 test('real folders, project preferences, restart, relink, and responsive navigation', { tag: '@projects', annotation: { type: 'flow', description: 'projects' } }, async ({ playwright, flow }) => {
   const fixture = await startChatGPTFixture()
@@ -24,6 +25,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     desktop = await launch()
     let page = await desktop.firstWindow()
     await expect(page.getByRole('heading', { name: 'What would you like to understand?' })).toBeVisible()
+    await verifyApplicationMenuBridge(desktop, page)
     await flow.capture(desktop, page, 'dashboard-empty')
     await choose(first)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()

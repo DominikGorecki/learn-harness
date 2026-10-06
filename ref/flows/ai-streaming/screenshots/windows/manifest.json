@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "1e46ceb6f2684217f07257446b4494c9fcb659586a5f24031756dea9f752e477"
+      "sha256": "33332ed9148f3c590b94001b479f22cf508853aacb2e2ad8ceaf9c2ccd1dc60c"
     },
     {
       "id": "stream-structured-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "d65d94becf9d0324bffb7b93237b7d0d3210f532fd8bd35cf2c1efddc5fa7041"
+      "sha256": "2d76712d158f485f5a42da2399d481e755b881f1aa28a75208ac4f0b9f8bd5cb"
     },
     {
       "id": "stream-structured-dark",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "b34873cbfc90ada924e26d056c1644717d9fcd147821c6ff739129d7543cf7a1"
+      "sha256": "6f1f2bfa9db606fdd1b94ef655c54d5676d0a512c8cae279407078ae5f9fec7a"
     },
     {
       "id": "stream-past-190",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a142057dec074f280f3a39986bc25c5964abac34eb071d7a656f3ca3685c8d71"
+      "sha256": "21cdc989c70d16b35c7f3ff5dea2d34d64da888f7f64af2acd320cdfdb8bbae8"
     },
     {
       "id": "stream-saving",
@@ -74,7 +74,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "7eae7b32e64d7678d858682f899f35152ff49701eecec87e54c97c8d71f68612"
+      "sha256": "5276ff61bb645e889b7d0fac58e24b42a37b3008d940d796b853214ed59297e7"
     },
     {
       "id": "stream-saved",
@@ -89,7 +89,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "5a1cdc323b307476266b9505c41e7a8bb94342bb6968fdc7413ef907fd3658c9"
+      "sha256": "9d5f83d91f99d7470a4dd4c9468c989e85ff578b8b7a238b94b3363b72c7508c"
     },
     {
       "id": "stream-checking",
@@ -104,16 +104,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "4b21f1d6df937d2f21b59b6777751f96d9293253ea30484f4403175ae065dd51"
+      "sha256": "e7c5e89faafdf8dbef483d17df5b9412752092b1efe6d47c66c3538029cc745c"
     }
   ],
-  "capturedAt": "2026-10-05T22:00:13.458Z",
-  "testSha256": "e1137b2f722553064ef756be964ecfcc6a38e1b0e4ad680b8f6898a7d8e65cf5",
+  "capturedAt": "2026-10-06T12:36:07.421Z",
+  "testSha256": "5f962112dba2e9e46f6e91e507a2a0203d7ee16d3db72ff76cd9a256f4df7156",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "receiving for 200.5 real seconds keeps draft provisional before genuine checking and saving",
-  "revision": "e83944bd36b59663b0995167046385fb25293b70",
-  "sourceDirty": false,
+  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

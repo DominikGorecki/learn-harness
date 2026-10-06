@@ -1,5 +1,5 @@
 # Ticket: menus-and-navigation.T02 - Add authorized native menu and chrome adapters
-Status: Open
+Status: Done — native adapters accepted; renderer strip/controller and host qualification remain under T03-T04
 
 ## Source
 
@@ -39,10 +39,10 @@ Main owns Electron/Node; shared stays serializable and unprivileged; preload exp
 
 ## Acceptance criteria
 
-- [ ] File/Edit/View/Help/compact/macOS templates contain specified commands with correct role/availability behavior.
-- [ ] Unknown/extra-field/nonfinite/invalid sender inputs are rejected; command subscriptions validate fixed IDs and clean up.
-- [ ] Recent handles and names come from current workspace; navigation callbacks only emit guarded renderer commands.
-- [ ] Existing Electron flows still pass without shell activation; overlay options are ready for T03.
+- [x] File/Edit/View/Help/compact/macOS templates contain specified commands with correct role/availability behavior.
+- [x] Unknown/extra-field/nonfinite/invalid sender inputs are rejected; command subscriptions validate fixed IDs and clean up.
+- [x] Recent handles and names come from current workspace; navigation callbacks only emit guarded renderer commands.
+- [x] Existing Electron flows still pass without shell activation; overlay options are ready for T03.
 
 ## Manual verification
 
@@ -50,7 +50,19 @@ Inspect pinned Electron role/title-overlay APIs and actual bridge startup. Nativ
 
 ## Completion evidence
 
-Coordinator fills after review and validation.
+Worker: `/root/native_menu_bridge`, GPT-6.1 Sol, high reasoning. Prerequisite T01 is committed at `a123ed6`; coordinator owns acceptance and the local commit.
+
+Accepted by the coordinator on 2026-10-06 after source/test review and independent boundary-test confirmation. Strict named methods authorize/parse bounded requests; main derives Recent labels/handles and revalidates callbacks, while navigation only emits fixed renderer commands. Popup ownership settles on dismissal, new-document load and close; same-document/child-frame navigation preserves readiness. Integrated overlay options are available but unused by the current ordinary-title window.
+
+- Final worker `npm.cmd run check` (session 26211): exit 0, 27 files / 310 tests passed / 3 skipped; lint, flow references, both type scopes and production bundles passed.
+- Full `npm.cmd run test:desktop` (session 97800): exit 0, 15 passed / 1 packaged-only skip, 6.1 minutes. Actual receiving regression: 200,504 ms; existing AI, project, account and recovery journeys pass.
+- After macOS label/mnemonic and same-document readiness corrections, final focused project desktop journey (session 81023): exit 0, 1 passed. It exercises actual bridge validation, sender/frame rejection, command filtering/unsubscribe, zoomed native popup dismissal, keyboard skip-link readiness and reload reset.
+- Coordinator independent `npm.cmd exec -- vitest run tests/unit/application-menu.test.ts`: exit 0, 10 tests passed.
+- `git diff --check` passed. Initial sandbox Vite temporary-config EPERM required permitted elevation; initial lint/type failures were fixed before the final passes.
+
+Pinned Electron's `registerAccelerator:false` applies only on Windows/Linux. macOS app shortcuts therefore use fixed glyph labels without registering duplicate accelerators; native roles retain platform ownership. The final focused checks cover corrections made after the full Windows suite; fresh cumulative desktop validation remains mandatory after integration. The bridge helper's artificial Back/revision setup must be adapted to the real T03 menu publisher.
+
+Coordinator and independent reviewer inspected all 26 changed Windows PNGs, with no actionable layout/synthetic-content defect; 15 index/manifest pairs were refreshed. The project narrative states actual assertions and evidence limits. Fixtures cleaned their apps, servers, extra webContents and profiles; the existing user app was untouched. Native role execution, popup keyboard behavior and OS window/accessibility qualification remain separate integration evidence. Independent documentation-only commit `4b2a59e` was reconciled and preserved before the T02 commit.
 
 ## Notes
 

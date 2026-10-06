@@ -1,13 +1,13 @@
 {
   "flow": "inference-diagnostics",
   "captures": [],
-  "capturedAt": "2026-10-05T22:00:41.298Z",
+  "capturedAt": "2026-10-06T12:36:29.987Z",
   "testSha256": "6bb522cfe8d4ec10862a7de69004331ee99f9e6ea4a726470aca28d7e3716f56",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/logging.spec.ts",
   "testTitle": "model and utility diagnostics retain transport evidence and request correlation while excluding learner data",
-  "revision": "e83944bd36b59663b0995167046385fb25293b70",
-  "sourceDirty": false,
+  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

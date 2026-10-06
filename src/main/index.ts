@@ -23,6 +23,8 @@ import { modelTestActivity } from './generation/model-test-activity'
 import { safeLogData } from '../shared/diagnostics'
 import { initializeDiagnostics, observeWindow, registerRendererDiagnostics } from './logging/runtime'
 import { errorDiagnostic, logDiagnostic, silentLogger } from './logging/logger'
+import { ApplicationMenus } from './menus/application-menus'
+import { registerApplicationMenuHandlers } from './ipc/application-menu-handlers'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -34,6 +36,7 @@ if (!app.isPackaged && process.env.EDU_HARNESS_TEST_DATA_DIR) {
 }
 
 let mainWindow: BrowserWindow | null = null
+let menus: ApplicationMenus | null = null
 let account: AccountService | null = null
 let generation: GenerationService | null = null
 const ai = new AiCoordinator({ now: () => performance.now(), createId: randomUUID })
@@ -57,6 +60,7 @@ async function createWindow(): Promise<void> {
     }
   })
   observeWindow(mainWindow)
+  menus?.attach(mainWindow)
   mainWindow.once('ready-to-show', () => mainWindow?.show())
   mainWindow.on('closed', () => { mainWindow = null })
   mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
@@ -115,6 +119,9 @@ if (!app.requestSingleInstanceLock()) {
     })
     await workspace.initialize()
     registerWorkspaceHandlers(workspace, () => mainWindow, expectedOrigin)
+    menus = new ApplicationMenus(workspace, () => mainWindow)
+    registerApplicationMenuHandlers(menus, () => mainWindow, expectedOrigin)
+    workspace.subscribe(() => menus?.refresh())
     generation = new GenerationService({
       workspace, ai, createId: randomUUID, now: () => new Date().toISOString(),
       beforeStart: () => account!.assertCanStartOutline(), onAccountFailure: error => account!.recordFailure(error),

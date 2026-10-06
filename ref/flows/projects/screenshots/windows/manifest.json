@@ -5,31 +5,31 @@
       "id": "dashboard-empty",
       "caption": "Empty dashboard before choosing a project folder.",
       "width": 1583,
-      "height": 1004,
+      "height": 973,
       "theme": "light",
       "viewport": {
         "width": 1266,
-        "height": 803
+        "height": 778
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "829146d78d4e1b097fe118a5f9ac2ab77ee27015ce9776a91edef457500784b2"
+      "sha256": "465983816a272a80ea2de18ab867be4faaad28b1bc30333b68c1652fe1b89901"
     },
     {
       "id": "project-workspace",
       "caption": "Project-specific goal draft and saved model preference.",
       "width": 1583,
-      "height": 1004,
+      "height": 973,
       "theme": "light",
       "viewport": {
         "width": 1266,
-        "height": 803
+        "height": 778
       },
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "5cc81e6a5b260027152fea5c586497abe5ca080c01c5df0686822b92555fd41b"
+      "sha256": "42ce542def1961c2e320713519b200ec04b93e9a65aee53a1e1d9c0919d6af8f"
     },
     {
       "id": "project-narrow",
@@ -62,13 +62,13 @@
       "sha256": "d8438e49c0c4cc05358d74e5864bfeca6806e08adfe0453a80c8ac4c5fd389f9"
     }
   ],
-  "capturedAt": "2026-10-05T22:02:23.576Z",
-  "testSha256": "7d6fb1fc4cb4e532136d824549a3a6d63181a6820c57dbd7f9ad3c4ef1b0a657",
+  "capturedAt": "2026-10-06T12:43:25.054Z",
+  "testSha256": "c3dbd46ed50033942ba463b4f53bfd1073cc28f3ead125fc2bb15f1d4fa80b14",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "e83944bd36b59663b0995167046385fb25293b70",
-  "sourceDirty": false,
+  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

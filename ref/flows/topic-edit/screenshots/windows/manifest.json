@@ -74,16 +74,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "05b8909e5a0ec00308c4f0e849c36b9ae907f97bec7f6626101a1472e5c4d303"
+      "sha256": "6b5ce11f6697b0a4ba4720a51734918ba10155bc15f241e6d19f1973102ed15f"
     }
   ],
-  "capturedAt": "2026-10-05T22:02:53.347Z",
+  "capturedAt": "2026-10-06T12:38:44.202Z",
   "testSha256": "7365366f9bf91aba285b5cc19f827f5e5e3c491ff9ea0697f433d4975c656ebe",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-edit.spec.ts",
   "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
-  "revision": "e83944bd36b59663b0995167046385fb25293b70",
-  "sourceDirty": false,
+  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

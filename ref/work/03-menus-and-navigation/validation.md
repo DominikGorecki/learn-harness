@@ -25,6 +25,19 @@ T01 accepted after coordinator review of the pure modules, tests, ADR-0024 and a
 
 No desktop gate was run for unused pure modules and documentation; process/UI activation in later tickets requires it. The unrelated project-overview work advanced master through `8eaa710` and was preserved. The T01 implementation commit carries this evidence; its exact SHA is available from the branch history.
 
+## T02 accepted native adapters
+
+Worker: `/root/native_menu_bridge`, GPT-6.1 Sol, high. Prerequisite T01: `a123ed6`. Coordinator reviewed all source/tests and independently confirmed the 10 menu boundary tests. Read-only review found no remaining authorization/membership/popup defect after corrections.
+
+- Final `npm.cmd run check`, session 26211: exit 0; 27 files, 310 tests passed / 3 skipped; lint, flow references, both type scopes and production build pass.
+- Full `npm.cmd run test:desktop`, session 97800: exit 0; 15 passed / 1 packaged-only skip in 6.1 minutes. Actual receiving lasted 200,504 ms, with 56 bridge frames and one burst preview; fixture evidence does not establish live account access.
+- Final focused `npm.cmd run test:desktop -- --grep 'real folders, project preferences'`, session 81023: exit 0, 1 passed after macOS label/mnemonic and fragment-readiness corrections. Those corrections have fresh code/focused bridge evidence; fresh cumulative desktop validation follows T03/T04 integration.
+- Coordinator `npm.cmd exec -- vitest run tests/unit/application-menu.test.ts`: exit 0, 10 passed.
+- Initial lint/type issues were fixed; Vite temporary-config EPERM required permitted elevation. `git diff --check` passed.
+- All 26 changed Windows PNGs were reviewed by the coordinator/reviewer with no actionable layout/content issue; 15 flow index/manifest pairs refreshed. The coordinator updated the project-flow explanation and explicit renderer/native evidence limits.
+
+Native title-strip options remain unused until T03. Fixed command subscriptions strip events/filter malformed values and unsubscribe. New-document load clears menu readiness; skip-link fragment and child-frame navigation preserve it. All fixture apps, servers, extra webContents and profiles were cleaned; the user app was untouched. Branch master advanced independently through documentation-only `4b2a59e`; those additions were inspected and preserved. The T02 commit carries this evidence; record its SHA in later integration evidence rather than embedding its future SHA here.
+
 ## Remaining qualification
 
 Native Windows/macOS/Linux window controls, drag/resize/menu/keyboard and OS screen-reader checks are separate from renderer screenshot and fixture evidence. Record exact available-host outcomes during implementation; unexecuted mandatory scope remains unresolved.

@@ -29,16 +29,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "d053ef7ee4ecf1c65c439b3195d60dc3269209352011860f30984e7ed8f8beca"
+      "sha256": "3bbc1f3ec4511b1701b7009a34986a09d7a3743a4c4e9fb60b544ae794d0d909"
     }
   ],
-  "capturedAt": "2026-10-05T22:02:25.568Z",
+  "capturedAt": "2026-10-06T12:38:18.576Z",
   "testSha256": "223ff46cff8dcc3f0aa6a4018289986405baaca3344ba3ded21a93f9177a85bf",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/reading.spec.ts",
   "testTitle": "long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved",
-  "revision": "e83944bd36b59663b0995167046385fb25293b70",
-  "sourceDirty": false,
+  "revision": "4b2a59eb66ca5e4bef66f4cc31e9b4cc160816d7",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

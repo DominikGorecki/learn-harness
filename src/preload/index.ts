@@ -8,6 +8,8 @@ import type { GenerationApi, GenerationSnapshot } from '../shared/generation'
 import { aiChannels } from '../shared/ai/activity'
 import type { AiApi, AiActivitySnapshot } from '../shared/ai/activity'
 import { rendererDiagnosticChannel, rendererDiagnosticMessage, safeLogData } from '../shared/diagnostics'
+import { applicationMenuChannels, parseApplicationCommand } from '../shared/application-menu'
+import type { ApplicationMenuApi } from '../shared/application-menu'
 
 // Automatic failure telemetry carries no messages, URLs, promises or material.
 const diagnosticWindow = globalThis as unknown as {
@@ -26,7 +28,19 @@ diagnosticWindow.addEventListener('message', event => {
     ...safeLogData({ errorType: data.errorType, line: data.line, column: data.column }) })
 })
 
-const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi = {
+const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi & ApplicationMenuApi = {
+  showApplicationMenu: request => ipcRenderer.invoke(applicationMenuChannels.show, request),
+  setApplicationMenuState: request => ipcRenderer.invoke(applicationMenuChannels.state, request),
+  setWindowAppearance: request => ipcRenderer.invoke(applicationMenuChannels.appearance, request),
+  onApplicationCommand: listener => {
+    const receive = (_event: unknown, value: unknown) => {
+      let command
+      try { command = parseApplicationCommand(value) } catch { return }
+      listener(command)
+    }
+    ipcRenderer.on(applicationMenuChannels.command, receive)
+    return () => { ipcRenderer.removeListener(applicationMenuChannels.command, receive) }
+  },
   getAiActivity: () => ipcRenderer.invoke(aiChannels.get),
   cancelAiOperation: request => ipcRenderer.invoke(aiChannels.cancel, request),
   onAiActivityChanged: listener => {
