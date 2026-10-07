@@ -36,6 +36,7 @@
 .main-workspace .workspace-actions { display: inline-flex; align-items: stretch; flex-wrap: wrap; max-width: 100%; gap: 4px; padding: 4px; border: 1px solid var(--workspace-edge); border-radius: 12px; background: linear-gradient(135deg, var(--workspace-highlight), var(--workspace-surface)); }
 .main-workspace .workspace-action { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 40px; max-width: 100%; padding: 8px 14px; border: 0; border-radius: 8px; background: transparent; color: var(--text-primary); font-size: 14px; line-height: 1.5; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .main-workspace .workspace-action-primary { color: var(--workspace-action-text); font-weight: 500; }
+.main-workspace .workspace-actions > .workspace-action:has(+ .workspace-action) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
 .main-workspace .workspace-actions > .workspace-action + .workspace-action { border-left: 1px solid var(--workspace-edge); border-top-left-radius: 0; border-bottom-left-radius: 0; }
 .main-workspace .workspace-action:hover:not(:disabled) { background: var(--workspace-hover); }
 .main-workspace .workspace-action:active:not(:disabled) { background: var(--surface-selected); }

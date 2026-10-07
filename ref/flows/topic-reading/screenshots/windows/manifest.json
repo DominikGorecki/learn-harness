@@ -137,13 +137,13 @@
       "sha256": "ac4a1141ef3b4e734511e9295892d9b3aa637d46d181797ec962bec0037d696d"
     }
   ],
-  "capturedAt": "2026-10-07T16:35:57.631Z",
+  "capturedAt": "2026-10-07T16:53:09.769Z",
   "testSha256": "77f278ed49cade13687a6af324bb8750e5a6fbb8a6815189e776f1e9c313ca9e",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "5cfb859424e0a3cf9a96d5fda35b8f1246dd2830",
+  "revision": "53645870ec689645d0c338399a0c8c4b63d08401",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }
