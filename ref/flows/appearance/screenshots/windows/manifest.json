@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "d65876c4b76e39caf3946939c745de8299d59579fac73914f543e60b13151771"
+      "sha256": "fbe353fc2365553ffb6799397f60bb26871553939c549c133a8bab808fe552d0"
     },
     {
       "id": "workspace-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "48fc49206ece26c47675252314ebe3a484b4842229af821462d71a6e5a67b72e"
+      "sha256": "f0c136baed916fe79725329e1551899c2cce7f1dde5d1ab0cef3afada253ba07"
     },
     {
       "id": "settings-dark",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "d123baef3ef3ab488c00b4b392127830a26df65eae6ec39da3168a215a7a9be0"
+      "sha256": "588f2e91a407bca16309e62c36cf497e468169cbd3cafd5b2c0f2dbf6f8dd4cd"
     },
     {
       "id": "workspace-dark",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "eff44814a5c5b7072ac9aaa548db987131a6394fe3b15736fe5d9e8df4faff10"
+      "sha256": "2a139914564848ae0ea13054dfeb5817ee6580d6a5e3830ae8f2c8a37e7303e3"
     },
     {
       "id": "account-dark",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "f2ff529790db76b95d622d6ae2bafb7f5b9e39495f101906365851b28eecafc7"
+      "sha256": "a600d3c9446a827aa491cbb5d7575ff9d61b505d8cc34cd4951ea2bbb5db3848"
     }
   ],
-  "capturedAt": "2026-10-07T13:06:06.177Z",
-  "testSha256": "e42ed0f08ab5be3e3d6bcf2d23e6ca23e47d8bd5b11bafbf1dbb5ad9c7155e62",
+  "capturedAt": "2026-10-07T14:00:02.833Z",
+  "testSha256": "a5a8656a472a0f32582da43e2eb5185044a6234f9acc457f5a8ea324ceabd694",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/appearance.spec.ts",
   "testTitle": "appearance changes every surface, preserves drafts, and survives a desktop restart",
-  "revision": "d258a6d7ed5b869ec0cad2faa280e7c6915e84fc",
+  "revision": "7bee459ac5e6e5c42ca1a1ac3b76736a9a365aed",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

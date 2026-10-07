@@ -7,6 +7,9 @@ files:
   - package.json
 asar: true
 npmRebuild: false
+extraResources:
+  - from: assets/branding/icon.png
+    to: branding/icon.png
 electronFuses:
   runAsNode: false
   enableNodeOptionsEnvironmentVariable: false
@@ -15,14 +18,17 @@ electronFuses:
   onlyLoadAppFromAsar: true
   grantFileProtocolExtraPrivileges: false
 win:
+  icon: assets/branding/icon.ico
   target: nsis
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
 mac:
+  icon: assets/branding/icon.icns
   target: dmg
   category: public.app-category.education
 linux:
+  icon: assets/branding/icon-512.png
   target: AppImage
   category: Education
   syncDesktopName: true

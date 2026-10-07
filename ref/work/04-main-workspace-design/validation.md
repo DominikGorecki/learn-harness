@@ -48,3 +48,17 @@ Worker topic_workspace (gpt-6.1-sol/high); two read-only reviewers inspected nav
 - Opaque endpoint contrast lower bounds (primary/secondary/muted/action/focus): Light 13.47/5.09/4.66/5.88/5.20; Dark 11.80/6.42/5.28/6.20/4.96. Final composed-state contrast review remains T04.
 
 Review resolved two race/recovery defects and the minimum-size geometry failure before the final passes. Read-only renderer coverage is an explicitly typed main-sent fixture over real files, not Windows ACL evidence. The model-test dashboard PNG privacy mask crosses part of its dock header; use other captures/assertions for that header. Native ACL/screen-reader/IME/other-host/live-provider qualifications remain unrun. Owned wrappers/barriers/apps/profiles/projects were cleaned. R03–R10 and outline/topic R11–R14 are locally accepted; whole-bundle coverage/branding remains T03/T04.
+
+T02 commit: 7bee459ac5e6e5c42ca1a1ac3b76736a9a365aed.
+
+## T03 — accepted identity and native resources
+
+Worker branding (gpt-6.1-sol/high) supplied one editable three-path master, generated currentColor renderer geometry and deterministic native tile exports. Primary inspected source and actual previews/runtime images. Existing brand text, slot dimensions, functional icons, app identity/profile, ASAR/fuses and protected process boundaries remain unchanged.
+
+- Final worker npm run check passed: 29 suites, 327 passed/3 skipped, lint/flows/types/build. Appearance/navigation desktop passed 2/2. Windows x64 npm run package passed; npm run test:packaged passed 1/1 for outline/Sol/Luna ASAR workers.
+- npm run branding:check passed actual repeated render digests and alpha/padding/container audits. Final worker and independent primary npm run branding:package passed: fixed 256px runtime PNG, extracted actual ASAR main and executable RT_GROUP_ICON group 1 with all seven 16/24/32/48/64/128/256px PNG frame hashes match.
+- Independent read-only Pillow metadata audit confirmed all RGBA exports, alpha 0..255, PNG dimensions, seven ICO/ICNS representations and transparent padding of 1/1/2/3/4/9/19/39/79px at 16/24/32/48/64/128/256/512/1024px. Three high-opacity cores survive at all reviewed glyph sizes. Partially painted edge merging at small sizes is explicitly recorded in the asset README; no claim of complete alpha disconnection is made.
+- Actual built Learning Studio.exe was reviewed in Windows Explorer Details and Large icons; selected mark appeared correctly. The initial Explorer capture timeout/minimized state was resolved before review. No learner profile or packaged GUI was opened. Subsequent runtime/window/taskbar qualification was stopped when the user ended computer use and remains unrun. The owned isolated helper/profile was cleaned and the Explorer window restored.
+- Initial default export helper exited 2147483651 and default code check failed before tests with EPERM realpath. Reviewed normal-host execution passed with sandbox/context isolation/network denial intact. No application security weakening. Diff check passed.
+
+Reproducibility is qualified on the pinned Windows Electron/Chromium runtime. macOS/Linux packaging, Dock/launcher/platform masks, signing/installers, cross-host byte identity, native screen-reader/IME and live-provider qualifications remain unrun. The user requested Playwright for frontend checks going forward; remaining renderer acceptance follows isolated Playwright Electron fixtures. R17/R18 and the R01 brand-only exception are locally accepted with these named limits.

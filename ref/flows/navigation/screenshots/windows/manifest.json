@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "54c3ca9ad75130b40ecf7ded31e5e55b80450323f0efe01e28a7f4ac78a23be1"
+      "sha256": "ef61b17b3fce772e37be5fa5f08587b25b53ee45f1d035d984d23122fc360389"
     },
     {
       "id": "reading-current-dark",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c84dbd2fce15f59ca273db7220bd134cde1b5e61c5994ec70813735bed719148"
+      "sha256": "e62483ecbda1aaec6b5ac5edf44608ded2f2644a2ff3ab5fd3e3451f746088f1"
     },
     {
       "id": "compact-light",
@@ -59,16 +59,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "4446cefdafb5a696b94967322d8284d0401f78c72940e6f057501b2c2297fce9"
+      "sha256": "ea485c3f5ebc30c734982243793e5514058f752e5ab1dcd6a6abf31583139a4d"
     }
   ],
-  "capturedAt": "2026-10-07T13:43:53.595Z",
+  "capturedAt": "2026-10-07T14:00:07.620Z",
   "testSha256": "ebb462b1ddf8170f83cb25c082def08be148e21d63044fa0e30963ed10599ab2",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/navigation.spec.ts",
   "testTitle": "shared navigation restores current reading and drafts, preserves branches and scopes commands",
-  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "revision": "7bee459ac5e6e5c42ca1a1ac3b76736a9a365aed",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

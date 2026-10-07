@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "masterSha256": "c0e8ac38db3512161a7a95333bcea2ee2b8bab146df20413a49003d4562f810e",
+  "electron": "44.5.1",
+  "chromium": "152.0.7977.130",
+  "files": [
+    {
+      "name": "app-icon.svg",
+      "sha256": "820e4e6547a6e019ca5af88d7db1210f66f7b942f1fe328409ad68716155dfd4",
+      "bytes": 1019
+    },
+    {
+      "name": "preview.svg",
+      "sha256": "4674db902458cbcfdd35a6ba0bab355c4ba81f1fff285a8d65354b4cfdd699ac",
+      "bytes": 19633
+    },
+    {
+      "name": "icon-16.png",
+      "sha256": "ac13796784ca6e75ad0d690aff018c6938ae4885f4d373f24e58f64ee8573400",
+      "bytes": 756,
+      "width": 16,
+      "height": 16,
+      "alpha": {
+        "left": 1,
+        "top": 1,
+        "right": 14,
+        "bottom": 14,
+        "transparent": 64,
+        "opaque": 144
+      }
+    },
+    {
+      "name": "icon-24.png",
+      "sha256": "14c080950fee4b965120e44ac00791dc5970e0265724ebace33317c653d7af43",
+      "bytes": 1198,
+      "width": 24,
+      "height": 24,
+      "alpha": {
+        "left": 1,
+        "top": 1,
+        "right": 22,
+        "bottom": 22,
+        "transparent": 124,
+        "opaque": 380
+      }
+    },
+    {
+      "name": "icon-32.png",
+      "sha256": "ac09f1ee971003a6bfb7be46f075810a565c0ad447893f8a035f21b0a2d931c4",
+      "bytes": 1592,
+      "width": 32,
+      "height": 32,
+      "alpha": {
+        "left": 2,
+        "top": 2,
+        "right": 29,
+        "bottom": 29,
+        "transparent": 272,
+        "opaque": 652
+      }
+    },
+    {
+      "name": "icon-48.png",
+      "sha256": "d5446f27743c5330f6fd92643261a955c88a8104f616de015b2288362d4fbf0b",
+      "bytes": 2700,
+      "width": 48,
+      "height": 48,
+      "alpha": {
+        "left": 3,
+        "top": 3,
+        "right": 44,
+        "bottom": 44,
+        "transparent": 624,
+        "opaque": 1532
+      }
+    },
+    {
+      "name": "icon-64.png",
+      "sha256": "2bab949916610cb2f4353329024ded5a8eb6dd35b11c214e0bfb3040c353dc6b",
+      "bytes": 4507,
+      "width": 64,
+      "height": 64,
+      "alpha": {
+        "left": 4,
+        "top": 4,
+        "right": 59,
+        "bottom": 59,
+        "transparent": 1120,
+        "opaque": 2764
+      }
+    },
+    {
+      "name": "icon-128.png",
+      "sha256": "8b4cfe3c85db03010527ad3dc860035cf89e772f3623ff080eefdd1e4b5b1da2",
+      "bytes": 14107,
+      "width": 128,
+      "height": 128,
+      "alpha": {
+        "left": 9,
+        "top": 9,
+        "right": 118,
+        "bottom": 118,
+        "transparent": 4816,
+        "opaque": 11132
+      }
+    },
+    {
+      "name": "icon-256.png",
+      "sha256": "f1e3da148e272df4984738d29e23c880e541d398bd36f604b003bae0fbc8d730",
+      "bytes": 43556,
+      "width": 256,
+      "height": 256,
+      "alpha": {
+        "left": 19,
+        "top": 19,
+        "right": 236,
+        "bottom": 236,
+        "transparent": 19924,
+        "opaque": 44736
+      }
+    },
+    {
+      "name": "icon-512.png",
+      "sha256": "202f9cb9fd86e6c9e27e7aac76679bc76923b295f63d89766e895020246cfee5",
+      "bytes": 136608,
+      "width": 512,
+      "height": 512,
+      "alpha": {
+        "left": 39,
+        "top": 39,
+        "right": 472,
+        "bottom": 472,
+        "transparent": 81032,
+        "opaque": 179196
+      }
+    },
+    {
+      "name": "icon-1024.png",
+      "sha256": "09055858fdab2221c5e3ebde050de03c7d80b735511a7fc27431cef94154e599",
+      "bytes": 448677,
+      "width": 1024,
+      "height": 1024,
+      "alpha": {
+        "left": 79,
+        "top": 79,
+        "right": 944,
+        "bottom": 944,
+        "transparent": 326816,
+        "opaque": 720604
+      }
+    },
+    {
+      "name": "icon.png",
+      "sha256": "f1e3da148e272df4984738d29e23c880e541d398bd36f604b003bae0fbc8d730",
+      "bytes": 43556
+    },
+    {
+      "name": "icon.ico",
+      "sha256": "217c336a316bbdc1925c2b7fceb3e83c9339c81481975b9ae6589ace36d16a08",
+      "bytes": 68534
+    },
+    {
+      "name": "icon.icns",
+      "sha256": "c5a732af9988789b94e3e06b45919673abde6a12b7a3ebf93cb20b290c728614",
+      "bytes": 649867
+    },
+    {
+      "name": "glyph-16.png",
+      "sha256": "e32d4faf4302059e5d95578e4722b8244b9bda62f204d14c016bd59b32daf116",
+      "bytes": 467,
+      "width": 16,
+      "height": 16,
+      "alpha": {
+        "left": 1,
+        "top": 1,
+        "right": 14,
+        "bottom": 14,
+        "transparent": 124,
+        "opaque": 59
+      }
+    },
+    {
+      "name": "glyph-22.png",
+      "sha256": "45309d34789dcf76e64f18cc7c1595703ed87f025f7b14d671396b26911960a3",
+      "bytes": 632,
+      "width": 22,
+      "height": 22,
+      "alpha": {
+        "left": 1,
+        "top": 2,
+        "right": 20,
+        "bottom": 19,
+        "transparent": 257,
+        "opaque": 129
+      }
+    },
+    {
+      "name": "glyph-24.png",
+      "sha256": "49553dea90214287700078aed750fd4d30c7eb58cc42026fb50e046a469dc467",
+      "bytes": 721,
+      "width": 24,
+      "height": 24,
+      "alpha": {
+        "left": 1,
+        "top": 2,
+        "right": 22,
+        "bottom": 21,
+        "transparent": 311,
+        "opaque": 155
+      }
+    },
+    {
+      "name": "glyph-32.png",
+      "sha256": "438256dd3fcf7d068d54d9b5ae7b6ad8c2bb618ec5c845729b0774b77470adba",
+      "bytes": 947,
+      "width": 32,
+      "height": 32,
+      "alpha": {
+        "left": 2,
+        "top": 3,
+        "right": 29,
+        "bottom": 28,
+        "transparent": 569,
+        "opaque": 305
+      }
+    },
+    {
+      "name": "glyph-36.png",
+      "sha256": "1e96f58e4afa534888e008aeda484cc7f048ebdfc476adb9f13986b76de0ecae",
+      "bytes": 1059,
+      "width": 36,
+      "height": 36,
+      "alpha": {
+        "left": 2,
+        "top": 3,
+        "right": 33,
+        "bottom": 32,
+        "transparent": 730,
+        "opaque": 396
+      }
+    },
+    {
+      "name": "glyph-48.png",
+      "sha256": "ff68123d7a040e53072ba755ae8fa1d0b0737ad8d10edc7161ea8a4863e99778",
+      "bytes": 1391,
+      "width": 48,
+      "height": 48,
+      "alpha": {
+        "left": 3,
+        "top": 5,
+        "right": 44,
+        "bottom": 43,
+        "transparent": 1337,
+        "opaque": 752
+      }
+    }
+  ]
+}

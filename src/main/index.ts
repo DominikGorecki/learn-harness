@@ -26,6 +26,7 @@ import { errorDiagnostic, logDiagnostic, silentLogger } from './logging/logger'
 import { ApplicationMenus } from './menus/application-menus'
 import { registerApplicationMenuHandlers } from './ipc/application-menu-handlers'
 import { integratedChromeOptions } from './menus/chrome'
+import { windowIconPath } from './branding/icon'
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
@@ -54,6 +55,7 @@ async function createWindow(): Promise<void> {
   mainWindow = new BrowserWindow({
     width: 1280, height: 840, minWidth: 600, minHeight: 480,
     title: 'Learning Studio', backgroundColor: '#ffffff', show: false,
+    icon: windowIconPath(app.isPackaged, process.resourcesPath, import.meta.dirname),
     ...integratedChromeOptions(process.platform, 'light'),
     webPreferences: {
       preload: join(import.meta.dirname, '../preload/index.cjs'),
