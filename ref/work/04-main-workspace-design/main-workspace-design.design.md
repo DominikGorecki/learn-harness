@@ -1,6 +1,7 @@
 # Main-workspace design contract
 
 Date: 2026-10-06
+Updated: 2026-10-07 — selected logo added.
 Status: Selected implementation target accompanying the [spec](main-workspace-design.spec.md); not yet the maintained application standard or proof of migrated runtime.
 Selected direction: Sheet 04, option 5 — Quiet action groups.
 
@@ -8,7 +9,7 @@ Selected direction: Sheet 04, option 5 — Quiet action groups.
 
 ![Selected workspace reference](../../../docs/design/component-designs/02-project-overview/project-overview-final.png)
 
-The user locked the [selection](../../../docs/design/component-designs/02-project-overview/project-overview-selection.md), then clarified that this design applies to the **central main-window workspace and its present/future pages**. The rail, project sidebar/drawer, other side/detail panels and existing account/Settings panels retain their current design. The reference's left navigation is contextual. Existing editor/confirmation dialogs and the approved AI dock retain their structures and behavior.
+The user locked the [selection](../../../docs/design/component-designs/02-project-overview/project-overview-selection.md), then clarified that this design applies to the **central main-window workspace and its present/future pages**. The rail, project sidebar/drawer, other side/detail panels and existing account/Settings panels retain their current design. The later selected-logo request permits only replacing existing brand glyphs, not changing those panels' layouts/styles. The reference's left navigation is contextual. Existing editor/confirmation dialogs and the approved AI dock retain their structures and behavior.
 
 Adopt the following main-content vocabulary across pages: a strong subject/task heading, generous readable space, a barely perceptible lilac wash, neutral glass-like content groups and quiet labelled actions. Preserve each feature's actual task and data; a common look does not require every page to copy the overview's two-column layout.
 
@@ -17,6 +18,14 @@ Adopt the following main-content vocabulary across pages: a strong subject/task 
 Place new workspace styles on an explicit central-content root and separately scoped contextual header. Do not attach the recipe to the document root, whole shell or studio-workspace ancestor that also contains the AI dock. Keep existing theme variables as shared baselines; add workspace-only semantic roles for the new surfaces, headings and actions.
 
 Avoid global h1, button, .button.primary or surface palette changes that restyle excluded regions. Reusable workspace components consume scoped classes/tokens; sidebar/dialog/panel consumers continue their existing styles. If a feature later appears in both central content and a side panel, choose its region treatment explicitly rather than inheriting the main style by accident.
+
+## Selected identity — Sculpted aperture
+
+The user locked **logo sheet 02 option 4**, documented in the [logo handoff](../../../docs/design/component-designs/03-learning-studio-logo/learning-studio-logo-selection.md) with a [standalone reference](../../../docs/design/component-designs/03-learning-studio-logo/learning-studio-logo-final.png). Exactly three separate broad page shapes form an upright triangular contour/opening: two rising side pages and a shallow bottom page. Preserve the top/lower diagonal gaps and the taller triangular silhouette, rather than the sheet's rounder miniature wordmark.
+
+Use one clean vector master for glyph-only in-app branding, theme-aware/monochrome treatments and native app-icon exports. The app tile uses restrained lilac on charcoal with a subtle rounded-square surface; production glyph fill is flat. Retain exact **Learning Studio** text, existing brand-slot size/control semantics and accessible names. Replacing that mark is the only exception to panel preservation; it is not permission to replace action/status icons, add brand slots or retheme panels.
+
+R17–R18 in the spec require reproducible ICO/ICNS/PNG exports, actual small-size and package/native-host review, and canonical asset/clear-space/minimum-size/export documentation. The saved PNG is an approved visual reference, not a production vector or verified platform icon. No app identity/profile-path migration is implied.
 
 ## Reusable vocabulary
 

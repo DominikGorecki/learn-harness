@@ -2,7 +2,7 @@
 
 Date: 2026-10-06
 Updated: 2026-10-07
-Status: Sheet 02 refines the user's preferred sheet 01 option 6; no final selection or implementation.
+Status: Locked — sheet 02 option 4, Sculpted aperture; standalone reference and handoff saved, implementation planned.
 Method: Built-in image generation. Sheet 01 used no image references; sheet 02 used the actual sheet 01 image followed by two focused corrections of its generated output.
 
 ## Brief
@@ -51,7 +51,7 @@ The initial generation varied the shapes too little. A focused correction made t
 
 The saved 1536 × 1024 sheet was inspected: all six numbered directions, complete tiles, exact brand wordmarks and two alternate miniature treatments are present. Symbols are distinct and generally preserve their form across presentations. The light preview is pale lilac rather than the white workspace background; chosen geometry should later be checked on the actual Light canvas. Main glyphs show slight tonal shading; the white miniatures demonstrate the intended one-color treatment.
 
-There is no final selection, transparent standalone asset, editable vector, platform icon bundle or native small-size qualification yet. After a selection/refinement, use this actual sheet as the image reference. A later implementation can translate the chosen construction into a clean vector and verify actual small sizes, padding and platform icon requirements; this contact sheet is not that implementation.
+The user subsequently locked **sheet 02 option 4**. The [standalone reference](learning-studio-logo-final.png) and [selection handoff](learning-studio-logo-selection.md) preserve its large triangular mark. A later implementation must create the editable vector/native exports and verify actual small sizes and platform presentation; the generated miniatures are not qualification evidence.
 
 The saved sheet 02 is also 1536 × 1024 and was visually inspected. Labels/brand copy, complete panels and the original-plus-variations requirement are present; miniature drift is recorded above. Both sheets and their original generated cache files remain preserved. Neither sheet changes the app's current logo.
 
@@ -59,10 +59,14 @@ The saved sheet 02 is also 1536 × 1024 and was visually inspected. Labels/brand
 
 - [Exact sheet 01 prompt](learning-studio-logo-sheet-01-prompt.md)
 - [Sheet 02 generation and correction prompts](learning-studio-logo-sheet-02-prompt.md)
+- [Exact final prompt](learning-studio-logo-final-prompt.md)
+- [Locked selection handoff](learning-studio-logo-selection.md)
 - [Design system](../../../../ref/patterns-design-system.md)
 - [Locked main-workspace direction](../02-project-overview/project-overview-selection.md)
 - [Main-workspace design contract](../../../../ref/work/04-main-workspace-design/main-workspace-design.design.md)
 
 The exact image returned by this generation call was copied here; its original generated cache image remains preserved. No prior exploration was overwritten.
 
-Next decision: choose a sheet 02 direction or specify qualities to refine. Liking old #6 establishes the exploration family, not a locked final logo.
+## Locked selection
+
+The user explicitly selected **sheet 02 #4 — Sculpted aperture**, then requested adding it to the main-workspace spec. No further logo selection is pending. The large selected glyph, rather than its rounder miniature wordmark, is authoritative. The standalone saved copy was visually inspected; its three-piece triangular identity is preserved. Earlier sheets and original generation cache files remain intact.

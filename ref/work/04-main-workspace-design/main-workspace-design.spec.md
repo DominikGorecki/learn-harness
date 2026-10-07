@@ -2,7 +2,8 @@
 
 Status: Ready for implementation
 Date: 2026-10-06
-Source: User's locked sheet 04 option 5 and subsequent request for a main-window implementation spec, consistent existing pages and documented guidance for future features.
+Updated: 2026-10-07 — added locked Sculpted aperture logo and app-icon scope.
+Source: User's locked workspace sheet 04 option 5, request for consistent main-window pages and future-feature guidance, and subsequent locked logo sheet 02 option 4 with explicit request to add it to this spec.
 Goal: Learners see a coherent, beautiful central workspace with clear reading/editing actions; contributors extend the same design without restyling side panels.
 
 ## Summary
@@ -10,6 +11,8 @@ Goal: Learners see a coherent, beautiful central workspace with clear reading/ed
 Implement the selected **Quiet action groups** direction in the central main-window workspace. Apply its editorial hierarchy, restrained glass-like surfaces and subtle actions to every currently implemented central page, including a new saved-topic reading destination. Keep the rail, project sidebar, navigation drawer and other side/detail panels in their existing design. Preserve the separately approved AI bottom workbench.
 
 The [locked selection](../../../docs/design/component-designs/02-project-overview/project-overview-selection.md) and [standalone reference](../../../docs/design/component-designs/02-project-overview/project-overview-final.png) define the visual target. The [design contract](main-workspace-design.design.md) documents its reusable rules, boundaries, page adaptations and unshown states. This authoring change creates planning documents only; implementation must adopt the durable standard, migrate pages and provide actual evidence.
+
+Also implement the locked **Sculpted aperture** identity from [logo sheet 02 option 4](../../../docs/design/component-designs/03-learning-studio-logo/learning-studio-logo-sheet-02.png), following its [selection handoff](../../../docs/design/component-designs/03-learning-studio-logo/learning-studio-logo-selection.md) and [final reference](../../../docs/design/component-designs/03-learning-studio-logo/learning-studio-logo-final.png). Replace the existing brand glyph and supply native app icons. This is a narrow identity exception to panel preservation: existing brand slots change symbol only, while sidebar/panel composition and controls remain unchanged.
 
 ## Problem / Context
 
@@ -25,23 +28,25 @@ The [product overview](../../../docs/overview.md), [PRD 01](../../prds/01-projec
 - Make whole-outline editing, topic editing and topic reading visibly different, with working actions.
 - Give dashboard, setup/refinement, overview, topic reading and central recovery states one consistent visual vocabulary.
 - Publish a discoverable main-workspace design standard and reusable renderer primitives so future central features follow it.
+- Use one documented Sculpted aperture construction for in-app branding and native app icons, replacing the radial spark/default Electron artwork.
 - Preserve Light/Dark, keyboard operation, zoom, draft continuity, recovery, topic locality and shared AI behavior.
 
 ## Non-goals (Strict)
 
-- Restyling the outer rail, project sidebar/drawer, account or Settings panels, optional side/detail panels, native menus or title strip. The left side of the generated reference is context, not a redesign requirement.
+- Restyling the outer rail, project sidebar/drawer, account or Settings panels, optional side/detail panels, native menus or title strip. Replacing the glyph in existing brand slots is the sole identity exception; the left side of the workspace reference is not a panel redesign requirement.
 - Redesigning the approved AI workbench, its connected activity icons or lifecycle; a full-page dimming overlay, new progress modal or blocking saved reading during AI.
 - Structural redesign of editor/confirmation dialogs. Existing overlays retain their layout and contracts; new triggers must restore focus correctly.
 - Theme selection in the workspace, accent/theme customization, external fonts, native acrylic/Mica or transparent BrowserWindow effects.
 - New tutoring, authored lessons, module/session execution, research, progress metrics, mastery, manual reordering or additional AI producers.
 - Changing portable schemas, Pi tools/transport, filesystem access, account authorization or source transmission.
 - Tickets, runtime changes or flow refresh during spec authoring.
+- Product renaming, appId/bundle-identity changes, new branding slots, functional-icon replacement, signing/notarization, publishing or installer redesign as part of logo adoption.
 
 ## Scope
 
 ### In scope
 
-Central contextual header and content below it; shared workspace tokens/primitives; all implemented central states listed below; a saved-topic reading destination; navigation integration; documentation/decision adoption and actual visual/interaction acceptance.
+Central contextual header and content below it; shared workspace tokens/primitives; all implemented central states listed below; a saved-topic reading destination; navigation integration; locked logo/vector/native-icon adoption; documentation/decision adoption and actual visual/interaction acceptance.
 
 | Central surface | Required adaptation | Existing consumer |
 | --- | --- | --- |
@@ -62,7 +67,7 @@ Visual primitives and page migration can start independently. Topic destination/
 
 | ID | Testable requirement | Verification path |
 | --- | --- | --- |
-| R01 | Scope new styles to the central header/content; preserve current rail/sidebar/drawer, account/Settings/detail panels and AI dock presentation and behavior. Avoid new global h1/button/palette overrides. | Before/after Light/Dark panel captures with matched viewport/state; selector/token review; appearance, account and streaming desktop regressions. |
+| R01 | Scope new styles to the central header/content; preserve current rail/sidebar/drawer, account/Settings/detail panels and AI dock presentation and behavior, apart from R17's explicitly authorized existing-brand-glyph replacement. Avoid new global h1/button/palette overrides. | Before/after Light/Dark panel captures with matched viewport/state; selector/token review; appearance, account and streaming desktop regressions. |
 | R02 | Central pages use the documented editorial heading, faint illumination, neutral glass-like rows/forms and subtle controls through shared tokens/primitives. Dashboard, setup/refinement, overview, topic reading and central recovery states all migrate; no isolated old central page remains. | Page inventory acceptance and reviewed actual Light/Dark captures; source audit of shared component/token consumers. |
 | R03 | Saved overview presents eyebrow, authoritative title/overview, truthful Saved/Not saved yet, context columns, action group and ordered topic rows as in the locked main-content reference. All outcomes, scope, depth, assumptions, additions and source/coverage disclosures remain accessible. | Outline desktop data assertions and matched visual review; long-outline/offline reading journey. |
 | R04 | Hero group exposes Open first topic → and pencil/Edit outline as two independent visible commands. Open first topic resolves the saved startingLessonId, even when it is not the first displayed row. Edit outline opens the existing whole-outline editor without starting inference. | Fixture with recommended second topic; desktop request counts, editor opening/closing and focus assertions. |
@@ -77,13 +82,15 @@ Visual primitives and page migration can start independently. Topic destination/
 | R13 | Long titles/questions/objectives, 40-topic outlines and a 600px content window at 200% Electron zoom (300 CSS px effective width) reflow without horizontal overflow or overlapping text/actions. Groups wrap/stack without removing actions; core reading/actions remain reachable with the dock open. | Reading/projects/topic flow variants and DOM overflow/hit-area assertions with actual Electron zoom; visual inspection. |
 | R14 | Use semantic headings, named commands, visible focus, at least 32px action targets, native text selection and accessible announcements. Ordinary text targets 4.5:1, large text and essential focus/control indicators 3:1 on actual composited surfaces. Editing/validation/dismissal restores the appropriate new trigger; async saves do not steal focus. | Keyboard/IME/focus tests, measured contrast of both themes and visual fallback; manual screen-reader review with host limits recorded. |
 | R15 | Adopt and publish the main-workspace standard, scoped ADR amendment, contributor discovery routes and a reusable-page integration checklist described below. Every existing central surface has a documented consumer; every new central feature must identify shared primitives, states/adaptation, navigation effects and actual acceptance evidence. | Documentation/link audit and requirement-to-page/primitives inventory; review changed ADR/index/pattern/product guidance. |
-| R16 | Refresh changed real flows through the configured reporter and document topic reading as a real flow. Keep generated concepts separate from current runtime captures; record R01–R16 evidence and any live/platform/manual limits. | npm run test:flows, reviewed new captures/narratives, bundle validation.md and acceptance.md. |
+| R16 | Refresh changed real flows through the configured reporter and document topic reading as a real flow. Keep generated concepts separate from current runtime captures; record R01–R18 evidence and any live/platform/manual limits. | npm run test:flows, reviewed new captures/narratives, bundle validation.md and acceptance.md. |
+| R17 | Replace the radial-spark brand mark with the selected Sculpted aperture: exactly three separated broad page shapes forming an upright triangular contour/opening. Use the selected large glyph/final reference, not the sheet's rounder small wordmark. One editable vector construction supplies glyph-only in-app, Light/Dark and monochrome treatments with unchanged Learning Studio text, brand-slot dimensions, accessible names and control behavior. | Vector/consumer audit, actual 16/24/32/48px rendering review and Light/Dark brand-slot desktop captures; navigation/focus/label regressions. |
+| R18 | Derive reproducible Windows ICO, macOS ICNS and Linux PNG app icons from that same master with correct platform size sets/padding/transparency. Configure actual packaging/runtime icon consumers to use them instead of Electron's placeholder, retaining app identity and hardening. Document exports and native evidence limits. | Export metadata/alpha/size audit, host npm run package and artifact inspection, runtime resource-path checks and available-host app/taskbar/Dock/launcher review; unrun hosts remain explicit. |
 
 ## Requirements (Non-functional)
 
 - **Performance:** prefer layered neutral gradients/highlights for the glass appearance; usable opaque baseline precedes any bounded enhancement. No per-topic backdrop blur, full-window filter, external asset/font requests, layout animation on every activity event or continuously animated glow. Large outlines and the streaming dock retain responsive selection, scroll and keyboard use.
 - **Reliability:** authoritative saved data and domain-owned unsaved output remain separate. Shared navigation restoration resolves current content; no presentation cache restores old outline revisions. Visual migration does not discard drafts, selected model, topic identity or recoverable output.
-- **Security/privacy:** renderer-only presentation; preserve sandbox, context isolation, CSP, typed bridge and plain-text rendering of learner/model content. No new generic IPC, filesystem/shell access or raw provider output. Screenshots use isolated synthetic projects and mask private paths.
+- **Security/privacy:** workspace presentation remains renderer-owned; main/build own bounded packaged icon resources only. Preserve sandbox, context isolation, CSP, typed bridge and plain-text rendering of learner/model content. No new generic IPC, filesystem/shell access or raw provider output. Screenshots use isolated synthetic projects and mask private paths.
 - **Observability:** no new logging dependency or content telemetry required. Use existing safe diagnostics for failures and standard flow manifests for visual evidence. Main status colors and labels must retain their distinct meanings.
 
 ## Proposed Solution
@@ -94,12 +101,20 @@ Create small reusable components under src/renderer/src/components for a workspa
 
 Use the [design contract](main-workspace-design.design.md) for initial implementation dimensions, token roles, interaction states and migration decisions. Preserve the selected direction while adapting real data density; no fixed screenshot-sized layout or hardcoded Bayesian text. The glass look may use opaque gradient surfaces: translucency is an appearance, not a requirement for OS/BrowserWindow transparency.
 
+### Locked logo and icon construction
+
+[Mark.tsx](../../../src/renderer/src/components/Mark.tsx) currently draws a radial spark; its existing brand consumer in App uses a glyph beside Learning Studio. [electron-builder.yml](../../../electron-builder.yml) defines NSIS/DMG/AppImage without custom icon assets; [distribution patterns](../../patterns-distribution.md) identify the default Electron icon as a placeholder. These are the verified replacement points.
+
+Create a clean editable vector master from the selected large triangular glyph, with two tall rising side pages and one shallow broad bottom page, central upright negative space and three open gaps. Preserve orientation and geometry across uses; simplify raster shading into flat vector fill rather than copying it into additional shapes. The in-app mark is glyph-only, theme-aware and sized to the existing brand slot. The native app icon uses the reference's charcoal rounded tile/lilac glyph and platform-appropriate safe padding/masks; keep all gaps readable at small sizes. Small optical adjustments must retain the same silhouette and be documented.
+
+Store the master and export recipe in durable project assets, with one authoritative geometry source and verified consumer paths. Generate exports locally/reproducibly without invoking AI during builds. Configure electron-builder resources/target icons and any runtime window icon through fixed app-owned packaged/development paths, preserving existing ASAR/fuses. This planning change saves a transparent raster reference only; production SVG/ICO/ICNS/PNG generation is implementation work. Do not add a logo to every page or replace action/status icons.
+
 ### Process ownership
 
 - **Renderer:** shared primitives, page composition, topic view, pure destination identity/resolver/restoration adapter and integration with the existing navigation owner. Saved/unsaved documents come from typed snapshots; never parse project files in React.
 - **Core:** existing workspace/generation/admission/publication/topic-locality behavior remains authoritative and unchanged.
 - **Shared:** reuse SavedOutline/LearningOutline, workspace and activity contracts. No new durable schema or IPC DTO expected; topic location is renderer session state.
-- **Main/preload:** existing named project/account/generation capabilities and authorization remain unchanged. Existing selectProject resolves cross-project topic traversal before reading its authoritative outline. No privileged read-topic API is needed for already available saved data.
+- **Main/preload:** existing named project/account/generation capabilities and authorization remain unchanged. Existing selectProject resolves cross-project topic traversal before reading its authoritative outline. Main may resolve a fixed packaged window-icon resource; build configuration owns native icon inclusion. No new preload, icon-path-from-renderer or privileged read-topic API is needed.
 
 ### Overview data mapping
 
@@ -147,6 +162,7 @@ Implementation must promote the companion contract into **ref/patterns-main-work
 - Update UX for topic-reading actions/history/restoration and no-inference reading; renderer for scoped tokens/primitives and navigation ownership; documentation for the main-page checklist; flow patterns for actual new/changed journeys.
 - Update AGENTS.md's UI discovery route, README's future-extension/design links and docs/overview.md plus PRD 01 visual-direction links/status notes. Preserve their historical capabilities, acceptance limits and future teaching scope.
 - Keep the standard implementation-oriented: region boundary, Light/Dark semantic roles, typography/spacing/radii, surface recipe/fallback, action hierarchy, full states, responsive/zoom/focus/contrast, examples for each central surface, verified primitive paths and actual flow links. Do not leave the only guidance as a bitmap or this work bundle.
+- Document the selected logo within canonical design guidance: authoritative vector/export paths, exact Learning Studio wordmark, glyph-only versus app-tile use, palette/monochrome variants, clear space, minimum sizes and reproducible export commands. Include brand/icon adoption in the scoped durable decision and constrained distribution guidance, preserving separate native/signing/release qualification. Explain the existing-brand-slot exception so future page work cannot use it to restyle panels.
 
 **Future-page acceptance checklist:** state the beneficiary/task and main-region scope; reuse approved tokens/primitives; provide default/empty/loading/error/pending/recovery states as applicable; define navigation/history and ownership effects; cover both themes, long content, narrow/200% and keyboard/focus; preserve side panels/dock; refresh actual flow evidence and update the consumer inventory. Any deliberate deviation requires explicit design rationale and, if durable, the ADR workflow.
 
@@ -156,7 +172,8 @@ Implementation must promote the companion contract into **ref/patterns-main-work
 2. Implement primitives and migrate dashboard, setup/refinement and central loading/recovery states. Keep forms and existing state contracts intact.
 3. Implement selected outline overview, real data mapping, grouped triggers, full context disclosures and preserved editor/dock behavior.
 4. After bundle 03 controller integration, add saved-topic page and destination/resolver/mementos; connect all reading entry points, history and operation guards.
-5. Complete cross-surface/AI/panel regression and adaptation evidence; refresh flows/narratives; finalize implementation paths/status and requirement acceptance.
+5. Create the shared logo master, replace existing brand-glyph consumers, generate native icon exports and configure fixed runtime/package consumers; validate actual small sizes and available-host package presentation.
+6. Complete cross-surface/AI/panel/branding regression and adaptation evidence; refresh flows/narratives; finalize implementation paths/status and requirement acceptance.
 
 These are ordered seeds, not generated tickets or permission to implement.
 
@@ -169,7 +186,8 @@ These are ordered seeds, not generated tickets or permission to implement.
 - **Visual evidence:** actual Light/Dark empty/populated dashboard, setup/refinement, selected outline, topic reading, unavailable/unsaved/error; same-project reading with active dock; narrow and 200% long outline/topic; visible focus/disabled group and opaque fallback. Review selected central styling against the final reference and unchanged side panels/dock against matched baseline state, not different projects or viewports.
 - **Manual evidence:** contrast against actual composed backgrounds, keyboard/IME/selection, reduced motion and OS screen-reader checks. Review available native host(s); explicitly record Windows/macOS/Linux checks not run. Existing title-strip host qualification remains bundle 03-owned, but verify this layout does not obstruct its safe areas.
 - **Live gates:** no new live inference required for this presentation/navigation change. Fixture process/file evidence is sufficient for those regressions and does not resolve existing live-provider/accessibility/other-host qualifications.
-- **Evidence records:** implementation creates validation.md with exact commands/results/reviewed captures and acceptance.md mapping R01–R16, surface coverage, panel preservation and external limits. No evidence file or screenshot in this planning task claims runtime completion.
+- **Logo/icon gates:** inspect the actual vector and raster exports at 16/24/32/48px plus native larger sizes, both themes/monochrome, transparency and safe padding. Run npm run package on the available target host and inspect included icon metadata/artwork and fixed runtime path resolution; preserve existing packaged-worker checks where resource/build changes affect them. Review native app/taskbar/Dock/launcher presentation on actual available hosts, not just renderer screenshots. Unbuilt/unrun Windows/macOS/Linux icons and signing/installer acceptance remain named qualifications; export presence alone is not host proof.
+- **Evidence records:** implementation creates validation.md with exact commands/results/reviewed captures and acceptance.md mapping R01–R18, surface coverage, panel preservation, logo/export consumers and external limits. No evidence file or screenshot in this planning task claims runtime completion.
 
 ## Acceptance Criteria
 
@@ -179,10 +197,13 @@ These are ordered seeds, not generated tickets or permission to implement.
 - [ ] R12–R14: reviewed Light/Dark, fallback, keyboard/focus, long-content, narrow/200%, reduced-motion and contrast evidence; explicit manual/native limitations.
 - [ ] R15: canonical scoped design guide, ADR/index/pattern/discovery/product links and future-feature checklist are published with honest adoption/migration status and verified primitive consumers.
 - [ ] R16: required code/desktop/flow gates pass; actual captures/narratives and per-requirement evidence records are reviewed. Unrun external gates remain named.
+- [ ] R17–R18: selected triangular logo replaces current brand glyphs without panel redesign; one editable master and reproducible native exports are documented, small-size/theme output is reviewed and actual package/available-host evidence distinguishes unrun native targets.
 
 ## Rollout / Migration Plan
 
 No user-data migration or reset. Implement shared styles with an explicit main boundary, migrate existing central pages together before declaring completion, then integrate the topic route after the navigation dependency. Preserve excluded-region baseline states and upstream concurrent work. Run full integration gates after resolving shared App/style changes. Update current-capability wording only when runtime evidence exists; do not label a partially migrated UI complete.
+
+Brand adoption changes artwork only: keep Learning Studio, appId, application profile paths and native lifecycle unchanged. Record the branding exception when comparing baseline panels. Keep source/export assets in the repo; no dependency on generated-image cache paths at runtime or packaging.
 
 ## Risks and Alternatives
 
@@ -192,6 +213,7 @@ No user-data migration or reset. Implement shared styles with an explicit main b
 - A topic route could bypass history/cancellation. Depend on the common controller, resolve stable IDs against current content and separate saved-reading visits from project switches.
 - Keeping inline topic disclosure as the only reading view would reduce navigation work but would not deliver the selected Open topic experience. Retain disclosure for context/modules where useful; implement the bounded saved-plan page without tutoring.
 - Copying the full generated frame would change the side panels. Treat only its main content as the visual target, per the user's latest explicit boundary.
+- The selected sheet's small wordmark is rounder than its main mark; use the locked standalone/large triangular glyph. Native icon caches and platform masks can hide an incorrect export; inspect artifacts and actual host presentation separately.
 
 ## Patterns and Standards Alignment
 
@@ -201,7 +223,7 @@ The new design differs from current generic heading/primary-button conventions a
 
 ## Assumptions and Open Questions
 
-- “Main window” means the central workspace pages/context header, excluding navigation chrome, lateral panels, overlays and the separately approved bottom AI panel. This follows the user's explicit request to keep side panels as they are and the locked streaming design.
+- “Main window” means the central workspace pages/context header, excluding navigation chrome, lateral panels, overlays and the separately approved bottom AI panel. The later explicit logo request authorizes replacing existing brand glyphs/native app icons only, without broadening panel styling scope.
 - Open topic means a saved-plan reading page, not AI lesson delivery; this carries the locked handoff's capability boundary into an implementable outcome.
 - Light styling and exact CSS values are implementation adaptations of the selected Dark concept and documented roles, subject to visual/contrast acceptance; no additional design-selection round is a prerequisite.
 - No material product question blocks this bounded spec. Topic runtime integration is ordered after bundle 03's controller is available; native qualification is tracked separately, not assumed passed.
