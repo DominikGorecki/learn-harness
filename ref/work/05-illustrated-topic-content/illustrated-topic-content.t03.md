@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T03 — Add protected OpenRouter settings and durable request accounting
-Status: Open
+Status: Done
 
 ## Source
 
@@ -45,9 +45,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] Every OpenRouter dispatch requires a durable safe intent; preflight failure prevents dispatch and orphaned/terminal failures remain unresolved.
-- [ ] Known costs aggregate once at retained precision, missing costs remain unknown and history survives restart/key removal.
-- [ ] Three fixed choices and non-inference validation/refresh work with fixture endpoints while secrets never enter public DTOs/logs.
+- [x] Every adapter dispatch requires a durable safe intent; preflight failure prevents dispatch and orphaned/terminal failures remain unresolved. Paid transport activation remains T04/T05.
+- [x] Known costs aggregate once at retained precision, missing costs remain unknown and history survives restart/key removal.
+- [x] Three fixed choices and non-inference validation/refresh work with fixture endpoints while secrets never enter public DTOs/logs.
 
 ## Manual verification
 
@@ -55,7 +55,14 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: provider/accounting; planned model: gpt-6.1-sol; reasoning: high. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+Accepted main provider/accounting adapter. Worker: `/root/contracts`, `gpt-6.1-sol`, high reasoning. Dependency: T01 commit `9946770a127f192df170b217ef9f13695cb0d761`; implementation/review on `master` at `1cfbd02669ca54be5036876e0bd3d6df1b6cf3dc` after accepted T02. Coordinator inspected all eight modules, shared refinements and actual fixture/tests, with a read-only `gpt-6.1-sol` medium reviewer.
+
+Delivered protected independent ordinary-key persistence/validation, epoch-bound metadata cache, fixed catalog/endpoint capability projection, cached quotes, audited bounded non-inference HTTP, exact decimal accounting, restart/orphan/corruption handling, paged safe history and private image intent/checkpoint/terminal hooks. Review fixes include safe retained pricing, 60 KiB intent admission reserving terminal/history capacity within the unchanged 64 KiB frame, consumed-budget slot reservations and configuration exclusion across durable writes. Unsafe ledger labels/variants are projected without changing learner state or monetary evidence.
+
+- Final focused three OpenRouter unit files: 41 passed, including real loopback HTTP and near-limit retained billing/history fixtures.
+- Final `npm.cmd run check`: exit 0; lint, 36 unit files (408 passed / 3 skipped), flow audit, both type scopes and all production bundles. Initial lint/type-only fixture issues were corrected before this final stable pass.
+- No runtime IPC/worker/renderer activation in T03, so no new desktop gate applies to this adapter-only ticket. Actual Electron settings/inference qualification remains T04–T06 and final integration. Local fixtures are not live provider evidence.
+- No paid requests or private live credentials used. Test servers/temporary roots disposed; final worker return confirms cleanup. Primary owns local commit and whole-bundle acceptance.
 
 ## Notes
 

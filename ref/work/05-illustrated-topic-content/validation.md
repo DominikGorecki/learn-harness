@@ -29,11 +29,20 @@ Nine tickets cover R01–R35. Dependencies are acyclic and scheduled in increasi
 
 ### T02 portable storage and scoped media adapter
 
+- Accepted local commit: `1cfbd02669ca54be5036876e0bd3d6df1b6cf3dc` (`T02-Persist portable chapters and recoverable media`). Worktree clean after commit; T03 released against that HEAD.
 - Worker: storage/security, `gpt-6.1-sol`, high reasoning. Coordinator inspected actual source/tests and commissioned a read-only medium review; fixes now prevent changed/dropped source evidence and reuse/loss of retained revisions.
 - Final `npm.cmd run check`: exit 0; lint, 34 unit files (372 passed / 3 skipped), flow audit, both type scopes and production bundles. Focused final storage/media tests: 27 passed across two files.
 - `npm.cmd run test:desktop -- tests/desktop/topic-edit.spec.ts tests/desktop/topic-reading.spec.ts`: exit 0; 2 passed in 17.3 seconds. Ran on the stable tree before the final unactivated storage-only review fixes; final code check passed afterward. Configured reporter refreshed only these flows. Coordinator visually reviewed the changed PNGs plus Light/Dark reading references and the narrow 200% streaming capture.
 - Tested independent manifest commit marker, fault recovery and inference-free retry, preserving unknown bytes, restart/relocation, missing media/corrupt progress, source staleness, link/root/folder ownership, candidate retention, private partial writes and proven temporary-link crash recovery. Project metadata/source preservation asserted from actual bytes.
 - This adapter is not yet exposed through runtime IPC. Full off-main decoding, authorized protocol serving, reader/provider integration and whole-bundle acceptance remain pending. Sessions finished; fixture resources cleaned up; no paid calls.
+
+### T03 protected provider and durable accounting adapter
+
+- Worker: provider/accounting, `gpt-6.1-sol`, high reasoning. Coordinator inspected all eight adapter modules, shared refinements and actual tests; a read-only medium reviewer independently checked dispatch/accounting boundaries. Accepted dependency T01 is committed; implementation used T02 HEAD `1cfbd02669ca54be5036876e0bd3d6df1b6cf3dc`.
+- Final `npm.cmd run check`: exit 0; lint, 36 unit files (408 passed / 3 skipped), flow audit, both type scopes and production bundles. Final three-file OpenRouter focused run: 41 passed. Earlier fixture lint/type annotation issues were corrected before the final stable pass; `git diff --check` passed.
+- Real loopback HTTP verifies durable intent before metadata dispatch, fixed endpoints and absence of private payloads. Tests cover independent protected/local credentials, failure-before-replacement, cache epochs, exact decimal totals, orphan/corrupt history, known cost on returned-model mismatch/discard, bounded paging and 60–64 KiB intent admission, metadata failure/timeout/shutdown and simultaneous same-slot/consumed-budget admission.
+- Main-only cached quotes use the same routing/settings validation as authorization, without HTTP or inference admission. Configuration mutations exclude provider leases across durable writes. Unsafe ledger labels/price variants are projected without altering learner state.
+- Runtime bridge, utility producer and Settings UI remain unactivated; no adapter-only desktop test is needed. These layers and live qualification remain separate pending gates. No paid calls/private live credentials; all sessions finished, loopback servers and temporary test roots cleaned up.
 
 ## External qualification
 

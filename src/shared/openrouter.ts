@@ -11,7 +11,7 @@ export type OpenRouterImageModelId = typeof openRouterImageModels[number]['id']
 export const openRouterPolicy = {
   baseUrl: 'https://openrouter.ai/api/v1', defaultImageModel: 'openai/gpt-image-2' as OpenRouterImageModelId,
   metadataCacheMs: 24 * 60 * 60 * 1000, metadataTimeoutMs: 30_000, metadataBytes: 2 * 1024 * 1024,
-  ledgerFrameBytes: 64 * 1024, historyPageSize: 50, maximumHistoryPageSize: 100,
+  ledgerFrameBytes: 64 * 1024, ledgerIntentBytes: 60 * 1024, historyPageSize: 50, maximumHistoryPageSize: 100,
   imageInitialWaitMs: 300_000, imageIdleMs: 60_000, imageResponseBytes: 32 * 1024 * 1024,
   promptCharacters: 16_000, keyCharacters: 1024, maximumPriceLines: 16, maximumEndpoints: 64,
   decimalFractionDigits: 18, decimalIntegerDigits: 20
@@ -19,9 +19,14 @@ export const openRouterPolicy = {
 export type UsdDecimal = string
 export type ImageAspectRatio = '1:1' | '3:2' | '2:3' | '16:9' | '9:16'
 export interface ImageGenerationSettings { n: 1; aspectRatio: ImageAspectRatio; resolution?: '512' | '1K' | '2K' | '4K'; format?: 'png' | 'jpeg' | 'webp'; quality?: 'low' | 'medium' | 'high' | 'auto' }
-export interface PriceLine { billable: 'input' | 'output' | 'request'; unit: 'image' | 'megapixel' | 'token'; usd: UsdDecimal; quantity: number; variant: string | null }
+export interface PriceLine { billable: string; unit: 'image' | 'megapixel' | 'token'; usd: UsdDecimal; quantity: number | null; variant: string | null }
+export interface ImageEndpointCapabilities {
+  aspectRatios: ImageAspectRatio[]; resolutions: NonNullable<ImageGenerationSettings['resolution']>[];
+  qualities: NonNullable<ImageGenerationSettings['quality']>[]; formats: NonNullable<ImageGenerationSettings['format']>[]; supportsOneImage: boolean
+}
 export interface ImageEndpointPricing {
   id: string; settings: ImageGenerationSettings; lines: PriceLine[]
+  providerTag?: string | null; capabilities?: ImageEndpointCapabilities; pricingComplete?: boolean
 }
 export interface OpenRouterModelMetadata {
   modelId: OpenRouterImageModelId; availability: 'available' | 'unavailable' | 'unknown'; reason: string | null;
@@ -31,7 +36,7 @@ export type ImageCostEstimate = { kind: 'unknown'; reason: string } |
   { kind: 'fixed' | 'range'; minimumUsd: UsdDecimal; maximumUsd: UsdDecimal; approximate: boolean;
     imageCount: number; modelId: OpenRouterImageModelId; checkedAt: string; basis: string; stale: boolean }
 export type ReportedCallCost = { kind: 'unknown' } | { kind: 'known'; usd: UsdDecimal; source: 'response' | 'generation-metadata' | 'non-inference-contract'; recordedAt: string }
-export interface OpenRouterKeyUsage { checkedAt: string; usageUsd: UsdDecimal | null; limitUsd: UsdDecimal | null; remainingUsd: UsdDecimal | null }
+export interface OpenRouterKeyUsage { checkedAt: string; usageUsd: UsdDecimal | null; limitUsd: UsdDecimal | null; remainingUsd: UsdDecimal | null; dailyUsd?: UsdDecimal | null; weeklyUsd?: UsdDecimal | null; monthlyUsd?: UsdDecimal | null }
 export interface OpenRouterSpend { todayUsd: UsdDecimal; monthUsd: UsdDecimal; allTimeUsd: UsdDecimal; unresolvedCount: number }
 export interface OpenRouterSettings {
   revision: number; connection: 'absent' | 'connected' | 'invalid' | 'restricted' | 'limited' | 'offline' | 'storage-error';
@@ -47,6 +52,7 @@ export interface OpenRouterCallIntent {
   schemaVersion: 1; id: string; startedAt: string; connectionEpoch: string; endpoint: OpenRouterEndpoint;
   purpose: OpenRouterCallPurpose; operationId: string | null; runId: string | null;
   context: OpenRouterCallContext | null; modelId: OpenRouterImageModelId | null; estimate: ImageCostEstimate
+  pricing?: { settings: ImageGenerationSettings; endpoints: ImageEndpointPricing[] }
 }
 export interface OpenRouterCallTransition {
   schemaVersion: 1; callId: string; sequence: number; recordedAt: string; status: OpenRouterCallStatus;
@@ -111,11 +117,23 @@ export function parseReportedCallCost(value: unknown): ReportedCallCost {
 export function parseOpenRouterModelMetadata(value: unknown): OpenRouterModelMetadata {
   const data = strictRecord(value, ['modelId', 'availability', 'reason', 'checkedAt', 'endpoints'])
   const endpoints = list(data.endpoints, openRouterPolicy.maximumEndpoints, value => {
-    const endpoint = strictRecord(value, ['id', 'settings', 'lines'])
-    return { id: identifier(endpoint.id), settings: parseImageGenerationSettings(endpoint.settings), lines: list(endpoint.lines, openRouterPolicy.maximumPriceLines, value => {
+    const endpoint = strictRecord(value, ['id', 'settings', 'lines', 'providerTag', 'capabilities', 'pricingComplete'])
+    const result: ImageEndpointPricing = { id: identifier(endpoint.id), settings: parseImageGenerationSettings(endpoint.settings), lines: list(endpoint.lines, openRouterPolicy.maximumPriceLines, value => {
       const line = strictRecord(value, ['billable', 'unit', 'usd', 'quantity', 'variant'])
-      return { billable: choice(line.billable, ['input', 'output', 'request']), unit: choice(line.unit, ['image', 'megapixel', 'token']), usd: parseUsdDecimal(line.usd), quantity: natural(line.quantity, Number.MAX_SAFE_INTEGER, 1), variant: line.variant === null ? null : boundedText(line.variant, 'Price variant', 128) }
+      const billable = boundedText(line.billable, 'Billable class', 64)
+      if (!/^[a-z][a-z_]*$/.test(billable)) invalid()
+      return { billable, unit: choice(line.unit, ['image', 'megapixel', 'token']), usd: parseUsdDecimal(line.usd), quantity: line.quantity === null ? null : natural(line.quantity, Number.MAX_SAFE_INTEGER, 0), variant: line.variant === null ? null : boundedText(line.variant, 'Price variant', 128) }
     }) }
+    if (endpoint.providerTag !== undefined) {
+      if (endpoint.providerTag !== null && (typeof endpoint.providerTag !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(endpoint.providerTag))) invalid()
+      result.providerTag = endpoint.providerTag as string | null
+    }
+    if (endpoint.capabilities !== undefined) {
+      const capabilities = strictRecord(endpoint.capabilities, ['aspectRatios', 'resolutions', 'qualities', 'formats', 'supportsOneImage'])
+      result.capabilities = { aspectRatios: list(capabilities.aspectRatios, 5, value => choice(value, ['1:1', '3:2', '2:3', '16:9', '9:16'] as const)), resolutions: list(capabilities.resolutions, 4, value => choice(value, ['512', '1K', '2K', '4K'] as const)), qualities: list(capabilities.qualities, 4, value => choice(value, ['low', 'medium', 'high', 'auto'] as const)), formats: list(capabilities.formats, 3, value => choice(value, ['png', 'jpeg', 'webp'] as const)), supportsOneImage: flag(capabilities.supportsOneImage) }
+    }
+    if (endpoint.pricingComplete !== undefined) result.pricingComplete = flag(endpoint.pricingComplete)
+    return result
   })
   if (new Set(endpoints.map(item => item.id)).size !== endpoints.length) invalid()
   return { modelId: parseOpenRouterImageModel(data.modelId), availability: choice(data.availability, ['available', 'unavailable', 'unknown']),
@@ -124,17 +142,17 @@ export function parseOpenRouterModelMetadata(value: unknown): OpenRouterModelMet
 export function parseOpenRouterSettings(value: unknown): OpenRouterSettings {
   const data = strictRecord(value, ['revision', 'connection', 'protection', 'imageModelId', 'models', 'keyUsage', 'spend', 'metadataStale', 'errorCode'])
   const spend = strictRecord(data.spend, ['todayUsd', 'monthUsd', 'allTimeUsd', 'unresolvedCount'])
-  const usage = data.keyUsage === null ? null : strictRecord(data.keyUsage, ['checkedAt', 'usageUsd', 'limitUsd', 'remainingUsd'])
+  const usage = data.keyUsage === null ? null : strictRecord(data.keyUsage, ['checkedAt', 'usageUsd', 'limitUsd', 'remainingUsd', 'dailyUsd', 'weeklyUsd', 'monthlyUsd'])
   const models = list(data.models, 3, parseOpenRouterModelMetadata)
   if (new Set(models.map(item => item.modelId)).size !== models.length) invalid()
   return { revision: natural(data.revision), connection: choice(data.connection, ['absent', 'connected', 'invalid', 'restricted', 'limited', 'offline', 'storage-error']),
     protection: data.protection === null ? null : choice(data.protection, ['protected', 'local'] as const), imageModelId: parseOpenRouterImageModel(data.imageModelId), models,
-    keyUsage: usage && { checkedAt: timestamp(usage.checkedAt), usageUsd: usage.usageUsd === null ? null : parseUsdDecimal(usage.usageUsd), limitUsd: usage.limitUsd === null ? null : parseUsdDecimal(usage.limitUsd), remainingUsd: usage.remainingUsd === null ? null : parseUsdDecimal(usage.remainingUsd) },
+    keyUsage: usage && { checkedAt: timestamp(usage.checkedAt), usageUsd: usage.usageUsd === null ? null : parseUsdDecimal(usage.usageUsd), limitUsd: usage.limitUsd === null ? null : parseUsdDecimal(usage.limitUsd), remainingUsd: usage.remainingUsd === null ? null : parseUsdDecimal(usage.remainingUsd), ...Object.fromEntries(['dailyUsd', 'weeklyUsd', 'monthlyUsd'].filter(key => usage[key] !== undefined).map(key => [key, usage[key] === null ? null : parseUsdDecimal(usage[key])])) },
     spend: { todayUsd: parseUsdDecimal(spend.todayUsd), monthUsd: parseUsdDecimal(spend.monthUsd), allTimeUsd: parseUsdDecimal(spend.allTimeUsd), unresolvedCount: natural(spend.unresolvedCount) },
     metadataStale: flag(data.metadataStale), errorCode: data.errorCode === null ? null : choice(data.errorCode, errorCodes) }
 }
 export function parseOpenRouterCallIntent(value: unknown): OpenRouterCallIntent {
-  const data = strictRecord(value, ['schemaVersion', 'id', 'startedAt', 'connectionEpoch', 'endpoint', 'purpose', 'operationId', 'runId', 'context', 'modelId', 'estimate'])
+  const data = strictRecord(value, ['schemaVersion', 'id', 'startedAt', 'connectionEpoch', 'endpoint', 'purpose', 'operationId', 'runId', 'context', 'modelId', 'estimate', 'pricing'])
   if (data.schemaVersion !== 1) invalid()
   const context = data.context === null ? null : strictRecord(data.context, ['projectId', 'topicId', 'projectName', 'topicTitle'])
   const result: OpenRouterCallIntent = { schemaVersion: 1, id: identifier(data.id), startedAt: timestamp(data.startedAt), connectionEpoch: identifier(data.connectionEpoch),
@@ -145,6 +163,13 @@ export function parseOpenRouterCallIntent(value: unknown): OpenRouterCallIntent 
   const endpointForPurpose: Record<OpenRouterCallPurpose, OpenRouterEndpoint> = { 'chapter-image': 'images', 'image-replacement': 'images', 'model-discovery': 'image-models', 'endpoint-discovery': 'image-model-endpoints', 'key-validation': 'key', 'key-usage': 'key', 'cost-reconciliation': 'generation' }
   if (result.endpoint !== endpointForPurpose[result.purpose] || result.endpoint === 'images' && (!result.modelId || !result.operationId || !result.context) || result.purpose === 'chapter-image' && !result.runId || result.endpoint === 'image-model-endpoints' && !result.modelId) invalid()
   if (result.estimate.kind !== 'unknown' && result.estimate.modelId !== result.modelId) invalid()
+  if (data.pricing !== undefined) {
+    if (result.endpoint !== 'images' || !result.modelId) invalid()
+    const pricing = strictRecord(data.pricing, ['settings', 'endpoints'])
+    result.pricing = { settings: parseImageGenerationSettings(pricing.settings), endpoints: parseOpenRouterModelMetadata({ modelId: result.modelId, availability: 'available', reason: null, checkedAt: result.startedAt, endpoints: pricing.endpoints }).endpoints }
+  }
+  // Reserve space for the maximum safe terminal record and enclosing history page.
+  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > openRouterPolicy.ledgerIntentBytes) invalid()
   return result
 }
 export function parseOpenRouterCallTransition(value: unknown): OpenRouterCallTransition {
@@ -168,7 +193,9 @@ export function parseOpenRouterCall(value: unknown): OpenRouterCall {
 }
 export function parseOpenRouterCallPage(value: unknown): OpenRouterCallPage {
   const data = strictRecord(value, ['calls', 'nextCursor'])
-  return { calls: list(data.calls, openRouterPolicy.maximumHistoryPageSize, parseOpenRouterCall), nextCursor: data.nextCursor === null ? null : identifier(data.nextCursor) }
+  const result = { calls: list(data.calls, openRouterPolicy.maximumHistoryPageSize, parseOpenRouterCall), nextCursor: data.nextCursor === null ? null : identifier(data.nextCursor) }
+  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > openRouterPolicy.ledgerFrameBytes) invalid()
+  return result
 }
 export function parseSaveOpenRouterKey(value: unknown): { key: string } {
   const key = boundedText(strictRecord(value, ['key']).key, 'OpenRouter key', openRouterPolicy.keyCharacters)

@@ -52,4 +52,6 @@ T01's strict chapter/provider DTOs, identity/bounds tests, core ports and ADR-00
 
 T02's portable storage/media adapter is accepted locally. Fault-injection, restart/relocation, candidate retention, immutable revision and source evidence tests plus existing topic-edit/reading desktop regressions provide partial adapter evidence for R02/R06/R14–R17/R20/R32/R35. Full decoding, authorized runtime serving and chapter reader acceptance remain pending; see [T02 evidence](illustrated-topic-content.t02.md#completion-evidence).
 
+T03's protected provider/accounting adapter is accepted locally. Its 41 focused tests, real loopback metadata requests and full code check provide partial adapter evidence for R09/R10/R23–R31/R33/R34. Paid image dispatch, runtime IPC, estimates/history UI and live response/billing qualification remain pending; see [T03 evidence](illustrated-topic-content.t03.md#completion-evidence).
+
 Open. No paid live requests have been performed. Integrated implementation, full checks, packaging and requirement acceptance remain pending.
