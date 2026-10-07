@@ -16,6 +16,7 @@ This is a TypeScript Electron application with a React learning workspace and a 
 | Preload, IPC, schemas, protocols, permissions | [IPC and security](ref/patterns-ipc-security.md) |
 | Projects, outlines, account models, persistence | [Learning and data](ref/patterns-learning-data.md) |
 | Visual composition, typography, color/spacing tokens, component states | [Design system](ref/patterns-design-system.md) |
+| Central page composition, shared workspace primitives, brand/native artwork | [Main workspace](ref/patterns-main-workspace.md) |
 | Learner journeys, navigation, input, recovery, keyboard/focus | [UX](ref/patterns-ux.md) |
 | React components, renderer state, bridge results, safe rendering | [Renderer](ref/patterns-renderer.md) |
 | Documented journeys and current screenshots | [Flows](ref/patterns-flow.md) |
@@ -27,7 +28,7 @@ This is a TypeScript Electron application with a React learning workspace and a 
 
 Explicit user instructions and accepted task scope come first. Accepted ADRs govern durable decisions; focused patterns state current rules; maintained docs describe current contracts; code/tests show behavior. Research explains evidence and alternatives rather than silently overriding an accepted decision. Report contradictions and update the relevant guidance when resolving them.
 
-Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007/ADR-0013. Select only the relevant journey explanations and screenshots through [Flows](ref/patterns-flow.md); follow its Playwright refresh and AI maintenance workflow when creating or changing a flow. The project workspace follows the user-supplied ChatGPT screenshots and implemented Light/Dark appearance standard. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
+Before UI work, read the design system and UX patterns, then renderer rules and ADR-0007/ADR-0013. For central content/contextual header or existing brand artwork, also read [Main workspace](ref/patterns-main-workspace.md) and ADR-0025; every future central page must follow its shared recipe, consumer inventory and acceptance checklist. Preserve excluded panels, dialogs, title strip and AI dock. Select only the relevant journey explanations and screenshots through [Flows](ref/patterns-flow.md); follow its Playwright refresh and AI maintenance workflow when creating or changing a flow. The project workspace follows the user-supplied ChatGPT screenshots and implemented Light/Dark appearance standard. Respect the feature scope and status in [the product overview](docs/overview.md) and [PRD 01](ref/prds/01-project-setup-and-outline.md). Do not infer implementation authority or working capabilities from draft requirements or design examples.
 
 ## Essential boundaries
 
@@ -43,8 +44,10 @@ Before UI work, read the design system and UX patterns, then renderer rules and 
 
 ## Change workflow
 
-Inspect existing files first, preserve unrelated work, and implement the smallest useful slice. Use `npm run check` for code changes and `npm run test:desktop` for process/bridge/startup or user-flow changes. Desktop tests require a graphical session; use `xvfb-run -a npm run test:desktop` on headless Linux. Record exactly which checks ran and any environment limits. Do not weaken application security to make a test pass.
+Inspect existing files first, preserve unrelated work, and implement the smallest useful slice. Use `npm run check` for code changes and `npm run test:desktop` for process/bridge/startup or user-flow changes. Use isolated Electron Playwright tests and the configured flow reporter for frontend verification, as explicitly requested by the user; do not use computer use for frontend checks. Native OS qualification is separate and must be supported by actual evidence. Desktop tests require a graphical session; use `xvfb-run -a npm run test:desktop` on headless Linux. Record exactly which checks ran and any environment limits. Do not weaken application security to make a test pass.
 
 Automatically commit each completed, validated change to the branch active when the task began, including documentation, specs, tickets, and reviewed flow references. This is standing authorization for local commits; do not ask for routine commit confirmation or stop at a suggested commit message. Explicit user instructions to leave work uncommitted take precedence. Follow [the commit workflow](ref/patterns-development-testing.md#automatic-local-commits) and [ADR-0021](ref/ADRs/ADR-0021-automatic-local-commits.md): inspect branch/HEAD and existing changes, stage only task-owned files or hunks, preserve unrelated staged/unstaged/untracked work, and report the resulting commit. Do not switch branches, push, or rewrite history as part of automatic committing. If validation or committing is blocked, preserve the work and report the exact blocker.
+
+When the user asks only to group or generate commits, inspect the existing uncommitted changes, organize them into logical commits, and write suitable commit messages. Do not start tests or other validation unless the user asks; report any validation evidence already present without rerunning it.
 
 New durable decisions require a numbered ADR plus updates to the ADR index, pattern index, and constrained focused patterns. Keep future proposals separate from implemented rules. A connected Context Bank can supply reusable conventions through `cb-discover`; it does not determine this app's source architecture. Do not modify the bank just to document local app changes.

@@ -4,6 +4,10 @@
 - Date: 2026-10-04
 - Scope: renderer presentation, persistent UI session, appearance preference and documentation. Amends ADR-0007's visual palette and theme scope; application services and security boundaries are unchanged.
 
+## Subsequent scoped amendment — 2026-10-07
+
+[ADR-0025](ADR-0025-scoped-editorial-workspace-and-aperture-identity.md) adopts the [main-workspace standard](../patterns-main-workspace.md) for central contextual header/content and artwork in existing brand/native-icon slots. It amends generic central headings/actions/composition only. Local Light/Dark preference, semantic palettes, partition/security and excluded panel/dialog rules remain in force; ADR-0024 retains its title/native-control scope. Original appearance history below remains dated evidence.
+
 ## Context
 
 The user supplied light and dark screenshots of the current ChatGPT application, asked that they guide the UI and documentation, and explicitly requested light/dark switching in settings. The screenshots replace the earlier generic Codex reference as the primary visual reference for this change. They show a narrow icon rail, a tinted project sidebar, an inset workspace, spacious composition, rounded controls, and a restrained purple accent. The dark reference also demonstrates grouped appearance controls and visual mode previews. The original images were subsequently excluded from the current public source for privacy; the [appearance review](../research/chatgpt-app-appearance.md) retains the observations and isolated application captures.

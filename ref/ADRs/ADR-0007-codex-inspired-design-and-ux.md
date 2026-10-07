@@ -4,6 +4,10 @@
 - Date: 2026-10-04
 - Scope: adoption of documentation standards and design direction; renderer migration and new product capabilities are not implemented by this change.
 
+## Subsequent scoped amendment — 2026-10-07
+
+[ADR-0025](ADR-0025-scoped-editorial-workspace-and-aperture-identity.md) amends only generic central composition/heading/primary-action conventions and existing brand artwork. The [main-workspace standard](../patterns-main-workspace.md) governs current/future central pages. The original adoption history below is preserved; shell/panel boundaries, capability scope and ADR-0013 appearance/security rules remain otherwise unchanged.
+
 ## Context
 
 The user asked to rewrite UI/UX guidance using the latest Codex desktop application as inspiration. Existing renderer guidance mixed React implementation with the initial warm/terracotta/serif presentation. The product overview and draft first milestone already call for project navigation, a spacious workspace, and progressive disclosure. Current official desktop documentation and illustrations were reviewed in [the research brief](../research/codex-desktop-ui.md).

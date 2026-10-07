@@ -4,11 +4,11 @@ Governed by [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), which amen
 
 **Status:** adopted visual standard, implemented in the project workspace and account panel. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
 
-[ADR-0025](ADRs/ADR-0025-scoped-editorial-workspace-and-aperture-identity.md) adopts the [main-workspace standard](patterns-main-workspace.md) for central content/contextual header and the selected Sculpted aperture identity. Its larger editorial headings, opaque glass-like surfaces and quiet primary action groups override only the generic central-page defaults below. Dashboard/setup/refinement and central loading/recovery/messages use the new foundation; overview/topic and brand/native-icon migration remain pending in bundle 04. Rail/sidebar/drawer, panels, dialogs, title strip and ADR-0022 dock retain their current design; replacing existing brand artwork is the sole identity exception.
+[ADR-0025](ADRs/ADR-0025-scoped-editorial-workspace-and-aperture-identity.md) adopts the [main-workspace standard](patterns-main-workspace.md) for central content/contextual header and the selected Sculpted aperture identity. Its larger editorial headings, opaque glass-like surfaces and quiet primary action groups override only the generic central-page defaults below. Dashboard/setup/refinement, central loading/recovery/messages, saved/unsaved overview and saved-topic reading use the shared recipe; existing brand glyphs and native resource exports use the aperture master. [Bundle 04 acceptance](work/04-main-workspace-design/acceptance.md) and [validation](work/04-main-workspace-design/validation.md) record integration status and remaining native/manual/live limits. Rail/sidebar/drawer, panels, dialogs, title strip and ADR-0022 dock retain their current design; replacing existing brand artwork is the sole identity exception.
 
 ## Current application screenshots
 
-Before UI/design work, choose the relevant journey through the [flow index](patterns-flow.md), read its explanation and open only its relevant platform screenshots. Start with [appearance](flows/appearance/index.md) for Light/Dark composition, [outline](flows/outline/index.md) for saved learning documents, [topic editing](flows/topic-edit/index.md) for the scoped editor and [reading](flows/reading/index.md) for narrow/zoomed content.
+Before UI/design work, choose the relevant journey through the [flow index](patterns-flow.md), read its explanation and open only its relevant platform screenshots. Start with [topic reading](flows/topic-reading/index.md) for saved topic destinations and independent commands, [appearance](flows/appearance/index.md) for Light/Dark composition, [outline](flows/outline/index.md) for saved learning documents, [topic editing](flows/topic-edit/index.md) for the scoped editor and [reading](flows/reading/index.md) for narrow/zoomed content.
 
 Playwright refreshes passing flows in place under `ref/flows/`; each flow index records its test and observed checkpoints. See [flow maintenance](patterns-flow.md#creating-or-changing-a-flow) for capture/replacement and AI review. These are isolated Electron renderer captures, separate from the dated [appearance research](research/chatgpt-app-appearance.md) and proposal images under `docs/design/`. The manual computer-use gallery is superseded. Visual evidence supplements the adopted rules and does not establish live-provider access, backend correctness, mastery or accessibility certification.
 
@@ -43,7 +43,7 @@ Use semantic CSS variables so components consume purpose-based values. Keep stat
 | `state-warning` | `#8A4B0D` | `#EFC17D` | Attention needed |
 | `state-error` | `#AD3030` | `#FFAAAA` | Failure and recovery |
 
-Primary buttons use `text-primary` as their fill and `surface-canvas` as their label color. Purple accents support orientation and focus; ordinary surfaces remain neutral. Use text and shape alongside state colors. A saved result, a completed activity, and a selected item have different meanings even when all appear positive.
+Outside the scoped central workspace, primary buttons use `text-primary` as their fill and `surface-canvas` as their label color. Central primary commands follow [main-workspace quiet action groups](patterns-main-workspace.md#tokens-and-geometry). Purple accents support orientation and focus; ordinary surfaces remain neutral. Use text and shape alongside state colors. A saved result, a completed activity, and a selected item have different meanings even when all appear positive.
 
 Light and Dark are implemented through Settings → Appearance. Show visual previews with native radio semantics, apply changes immediately and remember the explicit choice on this device. With no saved choice, initialize from OS appearance; this is not a continuously following System mode. Themes cover every renderer surface, including account/recovery dialogs, selects and focus states. Custom palettes, theme import/export and font editing remain out of scope. Bounded Light/Dark native overlay presentation is implemented with the integrated strip under [ADR-0024](ADRs/ADR-0024-integrated-title-strip-with-native-controls.md); native window controls remain platform-owned, and unavailable overlay updates do not prevent renderer theming.
 
@@ -53,7 +53,7 @@ Use the native system sans-serif stack for chrome, headings, and learning prose.
 
 | Role | Default size / line height | Weight |
 | --- | --- | --- |
-| Workspace heading | 24–28 px / 1.25 | 600 |
+| Generic workspace heading (central editorial override: [main workspace](patterns-main-workspace.md#tokens-and-geometry)) | 24–28 px / 1.25 | 600 |
 | Section heading | 18–20 px / 1.35 | 600 |
 | UI labels and controls | 14 px / 1.45 | 400–500 |
 | Learning prose | 16 px / 1.65 | 400 |
