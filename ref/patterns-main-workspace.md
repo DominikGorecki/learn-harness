@@ -57,7 +57,7 @@ Headings use system sans, weight 600, line-height 1.2. Reading text is 16px/1.65
 
 The glass appearance is fully opaque gradients between neutral highlight/surface colors. No backdrop-filter, native acrylic/Mica, window transparency, continuously animated wash or repeated-row blur is used. Disabled commands retain labels; errors/saved status retain text and existing state meanings. Focus uses the existing 2px accent outline with 3px offset; composer focus surrounds the labelled form. Page entrance is immediate and reduced motion suppresses scoped transitions. Async messages announce without stealing focus. Target ordinary text contrast 4.5:1 and large text/essential controls/focus 3:1 against actual composed surfaces; decorative edges may remain quieter. Review opaque gradients and solid fallback, full long titles/content, minimum 600px content window at 200% Electron zoom, keyboard hit targets and saved reading with the independent dock open. Default, hover/pressed, focus, disabled/pending and error/recovery states retain visible labels and local feedback; AI never dims or makes the whole saved document inert.
 
-Adjacent grouped commands have square corners beside their divider on both sides; only the group's outer command corners remain rounded. A single-command group keeps all four command corners rounded.
+Adjacent grouped commands meet at their divider with no horizontal gap and have square corners beside it on both sides; only the group's outer command corners remain rounded. A single-command group keeps all four command corners rounded.
 
 ## Selected identity and native resources
 

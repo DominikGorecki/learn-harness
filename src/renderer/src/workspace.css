@@ -33,7 +33,7 @@
 .main-workspace .workspace-heading-line { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .main-workspace .workspace-heading-line h1 { min-width: 0; margin: 0; font-size: var(--workspace-heading-size); font-weight: 600; line-height: 1.2; letter-spacing: -1.2px; }
 .main-workspace .workspace-lead { max-width: 720px; margin-top: 16px; color: var(--text-secondary); font-size: 16px; line-height: 1.65; }
-.main-workspace .workspace-actions { display: inline-flex; align-items: stretch; flex-wrap: wrap; max-width: 100%; gap: 4px; padding: 4px; border: 1px solid var(--workspace-edge); border-radius: 12px; background: linear-gradient(135deg, var(--workspace-highlight), var(--workspace-surface)); }
+.main-workspace .workspace-actions { display: inline-flex; align-items: stretch; flex-wrap: wrap; max-width: 100%; gap: 4px 0; padding: 4px; border: 1px solid var(--workspace-edge); border-radius: 12px; background: linear-gradient(135deg, var(--workspace-highlight), var(--workspace-surface)); }
 .main-workspace .workspace-action { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 40px; max-width: 100%; padding: 8px 14px; border: 0; border-radius: 8px; background: transparent; color: var(--text-primary); font-size: 14px; line-height: 1.5; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .main-workspace .workspace-action-primary { color: var(--workspace-action-text); font-weight: 500; }
 .main-workspace .workspace-actions > .workspace-action:has(+ .workspace-action) { border-top-right-radius: 0; border-bottom-right-radius: 0; }

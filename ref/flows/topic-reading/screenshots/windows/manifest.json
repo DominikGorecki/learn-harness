@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c556b07ec0813a966c73ae753b86efc443c86e3faa4be496d02201438ce27b0c"
+      "sha256": "cf0f309b90f0bc5bdbe7883888400956661bf24e3b2d96e9e6a40eecc3969cc2"
     },
     {
       "id": "saved-topic-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "390e2a5f6c662566170a1134dd111aab66b78c74d06cb678203f36fa50ca459f"
+      "sha256": "2e02beda2c057e93469dd15e955c25ce9d4303db1d54a001c3a69d641b6e4fca"
     },
     {
       "id": "saved-topic-readonly",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "d6a2cfb5dff3cc6627aa9e16d299f7512613073a90fe8d839b8628f61080088f"
+      "sha256": "3137434c9f82ebdf1de2b8a87489ca414e25b324232b8a7cb9af0220421a7035"
     },
     {
       "id": "saved-topic-readonly-dark",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "f8771838bddbb81413e7fcab64d904a8d0bc8b9543a04cd45cb8d935dbe58283"
+      "sha256": "be91752b59b7a6584daf151885ed9f53641b07d18ffe33e690dab75761d65e5d"
     },
     {
       "id": "saved-topic-dark",
@@ -74,7 +74,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "24bc2b5741ec5d81a226d1d5735a555f603fb696c8bfe7fff37512dfb3d2e843"
+      "sha256": "e9c61610ce58887e62ad16ece055d431bc1a7374e06178725ff57fa25320bc54"
     },
     {
       "id": "saved-overview-dark",
@@ -89,7 +89,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a780a93bfb3c6eb98dab49094303011d5d1880b80d31480ea9e596d5fa78e54a"
+      "sha256": "45898569fae02d2f558c6ce62b17f91869cffae03d47905fc3cb5f92a57f651d"
     },
     {
       "id": "saved-topic-zoom",
@@ -104,7 +104,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "d4c56f9187d797b8a5106474321b343ef777419268ec12109dfd09c765745c53"
+      "sha256": "2bcfff012d51e4d70caae6bb44d8f0daf88d32c02eaa3ac8bc8e81383b22c058"
     },
     {
       "id": "missing-topic-overview",
@@ -119,7 +119,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "b8ff716be8a51b8fa586cb45058a3e284c385f3b65b7ddc594d35b831692a247"
+      "sha256": "22808b4fb7d4788e5bb77fe727a675738f798df6e510a09adc2cb5955ca17fb5"
     },
     {
       "id": "missing-topic-overview-light",
@@ -134,16 +134,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "ac4a1141ef3b4e734511e9295892d9b3aa637d46d181797ec962bec0037d696d"
+      "sha256": "994f01d3953538287ef15a03dfdccd89c8124d758c1e03d83875d2d6c9c12cc4"
     }
   ],
-  "capturedAt": "2026-10-07T16:53:09.769Z",
+  "capturedAt": "2026-10-07T17:00:46.214Z",
   "testSha256": "77f278ed49cade13687a6af324bb8750e5a6fbb8a6815189e776f1e9c313ca9e",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "53645870ec689645d0c338399a0c8c4b63d08401",
+  "revision": "c7549c88cb855b0260a679107b601b0bd7b2bb55",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }
