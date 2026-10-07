@@ -14,7 +14,7 @@ Linux's `desktopName` package metadata and `syncDesktopName: true` keep its desk
 
 Packaged binaries disable RunAsNode, Node options, Node CLI inspection, and file-protocol extra privileges. ASAR-only loading and integrity validation are configured; integrity enforcement support varies by platform. Development Electron is left inspectable for tests. Do not disable packaged fuses to drive experimental test tooling. `test:packaged` runs the artifact’s worker from ASAR through a development host, while actual hardened startup is checked separately. This distinction keeps testability from weakening the shipped binary.
 
-Use target OS runners for reliable native-module compatibility and platform packaging. macOS signing/notarization needs macOS. The CI matrix produces unsigned artifacts; a green run is not a signed public release. Before native modules are introduced, revisit `npmRebuild: false` and set up target Electron ABI rebuilds.
+Use target OS runners for reliable native-module compatibility and platform packaging. macOS signing/notarization needs macOS. The CI matrix produces unsigned artifacts; a green run is not a signed public release. The image utility uses pinned Sharp 0.35.5 through its Node-API runtime, with `sharp` and `@img` dependencies unpacked from ASAR. `npmRebuild: false` remains deliberate for this dependency; do not assume compatibility from that setting alone. Package freshly before `test:packaged` to verify actual decoding in the packaged utility on the current OS/architecture. Other native dependencies may require target Electron ABI rebuilds. Current-host ASAR evidence does not qualify macOS/Linux, another architecture, hardened startup or installers.
 
 ## Release work still required
 

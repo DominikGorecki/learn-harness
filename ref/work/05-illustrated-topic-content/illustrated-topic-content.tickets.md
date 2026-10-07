@@ -1,6 +1,6 @@
 # Illustrated topic content ticket map
 
-Status: In progress — T01 and T02 accepted/committed; T03 accepted, commit pending; T04 next
+Status: In progress — T01–T04 accepted; T05 next
 
 Source: [spec](illustrated-topic-content.spec.md)
 

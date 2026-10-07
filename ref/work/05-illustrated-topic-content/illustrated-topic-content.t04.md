@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T04 — Implement sanctioned Pi-compatible OpenRouter image worker
-Status: Open
+Status: Done
 
 ## Source
 
@@ -45,9 +45,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] Image transport cannot dispatch without main intent acknowledgement and cannot expose bytes/credentials through public activity.
-- [ ] Cancellation, late results, malformed/oversized media and provider errors settle safely and release only after actual worker exit.
-- [ ] Model/settings route exactly as configured; buffered waits and receiving behave truthfully beyond former elapsed deadlines.
+- [x] Image transport cannot dispatch without main intent acknowledgement and cannot expose bytes/credentials through public activity.
+- [x] Cancellation, late results, malformed/oversized media and provider errors settle safely and release only after actual worker exit.
+- [x] Model/settings route exactly as configured; buffered waits and receiving behave truthfully beyond former elapsed deadlines.
 
 ## Manual verification
 
@@ -55,7 +55,16 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: utility/transport; planned model: gpt-6.1-sol; reasoning: high. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+Accepted scoped utility/transport implementation. Worker: `gpt-6.1-sol`, high reasoning; a read-only medium reviewer checked private correlation, stopping and write/exit barriers. Primary inspected actual source/tests, dependency direction, generated evidence and maintained guidance. T01 and T03 are accepted commits; starting HEAD was T03 `c8eb934880f44bbfddd103f9c677a4e483533fb4`.
+
+- The fixed image profile invokes Pi's image interface with explicit main-approved authority, a fixed OpenRouter route, no ambient credentials/retry/fallback, buffered clean EOF and exact reported cost. Awaited terminal accounting precedes Sharp decode; private asset acceptance/checkpointing precedes completion. Native raster decoding is off main; public frame limits remain unchanged.
+- Intent/checkpoint write failures deny HTTP dispatch; terminal-write failure retains unresolved intent after one request. Cancellation preserves already reported billing while rejecting late pixels. Provider ownership remains BUSY until actual exit and pending writes complete in either order. Strict private frames reject correlation/profile/shape/size violations without JSON serialization of raster bytes.
+- Final `npm.cmd run check`: exit 0; 37 unit files, 436 passed / 3 skipped, lint, flow audit, both type scopes and production bundles. `git diff --check` passed.
+- `npm.cmd exec -- playwright test tests/desktop/image-worker.spec.ts` (using the built Electron tree; final code check rebuilt it afterward): exit 0, one passed in 7.5 minutes. Actual initial wait 216,164 ms, receiving 210,033 ms, 85 health frames, one image POST and 96 accepted bytes with exact digest/file equality. An earlier fixture run completed the image but failed its receiving threshold at 175,063 ms; changing fixture chunks from 25 to 30 seconds produced the passing run without production edits.
+- Fresh `npm.cmd run package` then `npm.cmd run test:packaged`: both exit 0; packaged test passed in 3.3 seconds. Actual Windows x64 ASAR utility loads Sharp and decodes/checkpoints exact bytes with cost ACK; outline and both fixed diagnostics still pass. Production fuses unchanged.
+- Nonvisual image-worker/packaged-worker flow manifests refreshed by the configured reporter; explanations reviewed. Owned workers, loopback servers and temporary roots cleaned up; test-only harness absent before packaging. No paid calls or private live credentials.
+
+The utility adapter is complete. Chapter/replacement runtime integration, shared global admission through named capabilities, reader/settings UI, live billing/editorial and other native/platform qualification remain separate pending gates in T05–T09.
 
 ## Notes
 

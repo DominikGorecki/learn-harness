@@ -4,7 +4,7 @@ import { developmentCsp } from './src/main/security/policy'
 import { resolve } from 'node:path'
 
 export default defineConfig({
-  main: { build: { rollupOptions: { input: { index: resolve('src/main/index.ts'), 'outline-worker': resolve('src/main/generation/worker-entry.ts') } } } },
+  main: { build: { rollupOptions: { external: ['sharp'], input: { index: resolve('src/main/index.ts'), 'outline-worker': resolve('src/main/generation/worker-entry.ts') } } } },
   preload: {
     build: {
       externalizeDeps: false,

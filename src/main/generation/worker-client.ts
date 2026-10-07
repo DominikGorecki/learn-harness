@@ -23,7 +23,7 @@ export function runPiWorker(profile: WorkerProfile, options: WorkerRunOptions): 
     },
     onPhase: phase => { log('debug', 'utility', 'worker.phase', { phase }); return options.onPhase?.(phase) },
     onDiagnostic: (event, data) => { log(event === 'process.unhandled' ? 'error' : 'debug', 'utility', event, data); return options.onDiagnostic?.(event, data) }
-  }, () => utilityProcess.fork(join(import.meta.dirname, 'outline-worker.js'), [], { env, stdio: 'ignore', serviceName: profile.profile === 'outline' ? 'Learning outline' : 'Learning model access' }))
+  }, () => utilityProcess.fork(join(import.meta.dirname, 'outline-worker.js'), [], { env, stdio: 'ignore', serviceName: profile.profile === 'outline' ? 'Learning outline' : profile.profile === 'fixed-image' ? 'Learning illustration' : 'Learning model access' }))
   void task.result.then(result => log('info', 'utility', 'worker.completed', { elapsedMs: Math.round(performance.now() - started), kind: 'kind' in result ? result.kind : undefined }),
     error => log('warn', 'utility', 'worker.failed', { elapsedMs: Math.round(performance.now() - started), code: error.code }))
   return task

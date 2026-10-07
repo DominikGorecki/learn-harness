@@ -7,6 +7,8 @@ import type { PiProtocolEvidence } from './pi-protocol-evidence'
 import type { TransportState, MonotonicClock } from './pi-stream-liveness'
 import { systemClock } from './pi-stream-liveness'
 import { observe } from './observe'
+import { parseImageAuthorization } from './image-worker-contract'
+import type { DecodedImage, ImageAuthorization, ImageTerminal } from './image-worker-contract'
 
 export interface WorkerHandle extends Pick<EventEmitter, 'on' | 'once' | 'removeListener'> {
   readonly pid?: number
@@ -20,9 +22,13 @@ export interface WorkerRunOptions {
   onModelEvidence?(evidence: PiProtocolEvidence): void
   onDiagnostic?(event: WorkerDiagnosticEvent, data: unknown): void
   onLifecycle?(event: 'spawned' | 'health' | 'exited' | 'stopping', data: Record<string, unknown>): void
+  /** Required private durable barriers, unlike observational activity callbacks. */
+  onImageIntent?(imageSlotId: string): Promise<ImageAuthorization>
+  onImageTerminal?(callId: string, terminal: ImageTerminal): Promise<void>
+  onImageAsset?(image: DecodedImage): Promise<void>
 }
 export interface PiWorkerTask {
-  result: Promise<OutlineEngineResult | PiProtocolEvidence>
+  result: Promise<OutlineEngineResult | PiProtocolEvidence | DecodedImage>
   stop(): Promise<void>
 }
 const errorMessages: Partial<Record<ApplicationError['code'], string>> = {
@@ -37,9 +43,9 @@ const errorMessages: Partial<Record<ApplicationError['code'], string>> = {
 export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions, fork: () => WorkerHandle): PiWorkerTask {
   const parsed = parseWorkerRequest({ type: 'start', ...profile })
   const clock = options.clock ?? systemClock
-  let resolveResult!: (value: OutlineEngineResult | PiProtocolEvidence) => void
+  let resolveResult!: (value: OutlineEngineResult | PiProtocolEvidence | DecodedImage) => void
   let rejectResult!: (error: ApplicationError) => void
-  const result = new Promise<OutlineEngineResult | PiProtocolEvidence>((resolve, reject) => { resolveResult = resolve; rejectResult = reject })
+  const result = new Promise<OutlineEngineResult | PiProtocolEvidence | DecodedImage>((resolve, reject) => { resolveResult = resolve; rejectResult = reject })
   // stop() consumes a failure without changing the result seen by the domain owner.
   const stopped = result.then(() => {}, () => {})
   if (options.signal.aborted) { rejectResult(new ApplicationError('CANCELLED', errorMessages.CANCELLED!)); return { result, stop: () => stopped } }
@@ -48,7 +54,10 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
   let spawned = false, exited = false, stopping = false, killed = false
   let sequence = -1, healthSequence = -1, transportTurn = -1
   let previousTransport: TransportState | null = null
-  let outcome: OutlineEngineResult | PiProtocolEvidence | undefined
+  let outcome: OutlineEngineResult | PiProtocolEvidence | DecodedImage | undefined
+  let imageRequestId: string | null = null, authority: ImageAuthorization | null = null
+  let terminalSeen = false, terminalSaved = false, terminalSucceeded = false, assetSeen = false, acceptedImage: DecodedImage | null = null
+  const pending = new Set<Promise<void>>()
   let failure: ApplicationError | null = null
   let spawnTimer: unknown | null = null, healthTimer: unknown | null = null, cleanupTimer: unknown | null = null
   const lifecycle = (event: Parameters<NonNullable<WorkerRunOptions['onLifecycle']>>[0], data: Record<string, unknown>) => observe(() => options.onLifecycle?.(event, data))
@@ -78,6 +87,24 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
     }, options.healthMs ?? 30_000)
   }
   const cancel = () => stop(new ApplicationError('CANCELLED', errorMessages.CANCELLED!), true)
+  const durable = (work: () => Promise<void>) => {
+    const task = work().catch(error => {
+      const safe = error instanceof ApplicationError ? error : new ApplicationError('STORAGE', 'Image accounting or checkpoint storage could not finish.')
+      if (!failure) failure = safe
+      stop(safe)
+    })
+    pending.add(task); void task.finally(() => pending.delete(task))
+  }
+  const terminal = (message: Extract<WorkerReply, { type: 'image-terminal' }>) => {
+    if (!authority || message.requestId !== imageRequestId || message.callId !== authority.callId || terminalSeen || !options.onImageTerminal) throw new ApplicationError('INTERNAL', 'Unexpected image billing.')
+    terminalSeen = true
+    durable(async () => {
+      await options.onImageTerminal!(message.callId, message.terminal)
+      terminalSaved = true
+      terminalSucceeded = message.terminal.status === 'succeeded' && message.terminal.errorCode === null && (message.terminal.returnedModelId === null || message.terminal.returnedModelId === authority!.modelId)
+      if (!exited) worker.postMessage({ type: 'image-terminal-ack', requestId: message.requestId, callId: message.callId, accepted: true })
+    })
+  }
   const spawnedEvent = () => {
     spawned = true
     if (spawnTimer !== null) clock.cancel(spawnTimer)
@@ -96,17 +123,40 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
         // Cleanup summaries remain useful while cancellation awaits exit. They cannot
         // publish progress, change the pending outcome or extend worker health.
         if (message.type === 'diagnostic') observe(() => options.onDiagnostic?.(message.event, message.data))
+        if (message.type === 'image-terminal') terminal(message)
         if (message.type === 'error' || message.type === 'result') kill()
         return
       }
       if (!spawned) throw new ApplicationError('INTERNAL', 'The AI process sent a premature message.')
       switch (message.type) {
+        case 'image-intent': {
+          if (imageRequestId || !options.onImageIntent || !options.onImageTerminal || !options.onImageAsset) throw new ApplicationError('FORBIDDEN', 'Image dispatch is unavailable.')
+          imageRequestId = message.requestId
+          durable(async () => {
+            const approved = parseImageAuthorization(await options.onImageIntent!(message.imageSlotId))
+            if (approved.imageSlotId !== message.imageSlotId) throw new ApplicationError('FORBIDDEN', 'The image slot changed.')
+            if (stopping || exited || options.signal.aborted) return
+            authority = approved
+            worker.postMessage({ type: 'image-authorized', requestId: message.requestId, authority: approved })
+          }); break
+        }
+        case 'image-terminal': terminal(message); break
+        case 'image-asset': {
+          if (!authority || !terminalSaved || !terminalSucceeded || assetSeen || message.requestId !== imageRequestId || message.image.callId !== authority.callId || message.image.imageSlotId !== authority.imageSlotId) throw new ApplicationError('INTERNAL', 'Unexpected illustration bytes.')
+          assetSeen = true
+          durable(async () => {
+            await options.onImageAsset!(message.image)
+            if (stopping || exited || options.signal.aborted) return
+            acceptedImage = message.image
+            worker.postMessage({ type: 'image-asset-ack', requestId: message.requestId, callId: authority!.callId, accepted: true })
+          }); break
+        }
         case 'health':
-          if (profile.profile === 'model-access' && !['preparing', 'waiting', 'receiving', 'finished'].includes(message.phase)) throw new ApplicationError('INTERNAL', 'The model diagnostic exceeded its task scope.')
+          if (profile.profile !== 'outline' && !['preparing', 'waiting', 'receiving', 'finished'].includes(message.phase)) throw new ApplicationError('INTERNAL', 'The AI process exceeded its task scope.')
           if (message.sequence <= healthSequence) throw new ApplicationError('INTERNAL', 'The AI process sent invalid health evidence.')
           healthSequence = message.sequence; resetHealth(); lifecycle('health', { phase: message.phase }); break
         case 'phase':
-          if (profile.profile === 'model-access') throw new ApplicationError('INTERNAL', 'The model diagnostic exceeded its task scope.')
+          if (profile.profile !== 'outline') throw new ApplicationError('INTERNAL', 'The AI process exceeded its task scope.')
           observe(() => options.onPhase?.(message.phase)); break
         case 'transport': {
           const state = message.state
@@ -125,8 +175,13 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
           observe(() => options.onProgress?.(message)); break
         case 'diagnostic': observe(() => options.onDiagnostic?.(message.event, message.data)); break
         case 'model-evidence': observe(() => options.onModelEvidence?.(message.evidence)); break
-        case 'result': outcome = message.result; stop(); break
-        case 'error': stop(new ApplicationError(message.code, errorMessages[message.code] ?? 'AI work could not finish. Your previous work is unchanged; try again.')); break
+        case 'result':
+          if (message.profile === 'fixed-image') {
+            if (!acceptedImage || message.result.callId !== acceptedImage.callId) throw new ApplicationError('INTERNAL', 'The illustration has not been checkpointed.')
+            outcome = acceptedImage
+          } else outcome = message.result
+          stop(); break
+        case 'error': stop(new ApplicationError(message.code, profile.profile === 'fixed-image' ? message.code === 'AUTH_REQUIRED' ? 'OpenRouter rejected the key. Replace it with a valid ordinary inference key.' : message.code === 'USAGE_LIMIT' ? 'OpenRouter allowance or rate limit was reached. Review credits or wait before retrying.' : message.code === 'ACCESS_RESTRICTED' ? 'OpenRouter restricted the request. Review key permissions and provider access.' : 'The illustration could not finish. Review the saved request before explicitly retrying.' : errorMessages[message.code] ?? 'AI work could not finish. Your previous work is unchanged; try again.')); break
       }
     } catch { stop(new ApplicationError('INTERNAL', 'The AI process sent an invalid message. Your previous work is unchanged; try again.')) }
   }
@@ -135,9 +190,13 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
     exited = true; clear(); options.signal.removeEventListener('abort', cancel)
     worker.removeListener('spawn', spawnedEvent); worker.removeListener('message', messageEvent); worker.removeListener('exit', exitEvent); worker.removeListener('error', errorEvent)
     lifecycle('exited', { exitCode })
-    if (failure) rejectResult(failure)
-    else if (outcome) resolveResult(outcome)
-    else rejectResult(new ApplicationError('INTERNAL', profile.profile === 'outline' ? 'The outline process stopped unexpectedly. Your previous work is unchanged.' : 'The AI process stopped unexpectedly. Your previous work is unchanged; try again.'))
+    // Real exit and all already-started durable writes are independent barriers.
+    void (async () => {
+      while (pending.size) await Promise.all([...pending])
+      if (failure) rejectResult(failure)
+      else if (outcome) resolveResult(outcome)
+      else rejectResult(new ApplicationError('INTERNAL', profile.profile === 'outline' ? 'The outline process stopped unexpectedly. Your previous work is unchanged.' : 'The AI process stopped unexpectedly. Your previous work is unchanged; try again.'))
+    })()
   }
   const errorEvent = () => stop(new ApplicationError('INTERNAL', 'The AI process could not start or continue. Try again.'))
   worker.once('spawn', spawnedEvent); worker.on('message', messageEvent); worker.once('exit', exitEvent); worker.on('error', errorEvent)

@@ -26,6 +26,7 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Long AI streaming](flows/ai-streaming/index.md) | Real ≥200-second receiving, bounded burst delivery, truthful checking and saving |
 | [Structured repair](flows/ai-streaming-repair/index.md) | Provisional candidate replacement across provider turns and independent acceptance |
 | [Packaged worker](flows/packaged-worker/index.md) | Nonvisual ASAR worker/dependency verification after packaging |
+| [Buffered image worker](flows/image-worker/index.md) | Nonvisual private image acknowledgements, real buffered waiting and utility raster decoding |
 
 ## Ownership and automatic refresh
 

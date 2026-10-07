@@ -54,4 +54,6 @@ T02's portable storage/media adapter is accepted locally. Fault-injection, resta
 
 T03's protected provider/accounting adapter is accepted locally. Its 41 focused tests, real loopback metadata requests and full code check provide partial adapter evidence for R09/R10/R23–R31/R33/R34. Paid image dispatch, runtime IPC, estimates/history UI and live response/billing qualification remain pending; see [T03 evidence](illustrated-topic-content.t03.md#completion-evidence).
 
-Open. No paid live requests have been performed. Integrated implementation, full checks, packaging and requirement acceptance remain pending.
+T04's fixed image utility is accepted locally. Real buffered-image waits/receiving, durable intent/accounting/asset acknowledgements, native off-main decode, private protocol bounds, cancellation and actual-exit/write barriers plus fresh Windows ASAR checks provide partial utility evidence for R09–R13/R27/R28/R30–R32/R34. Global runtime admission, chapter/replacement publication, serving/UI and live model/billing qualification remain pending; see [T04 evidence](illustrated-topic-content.t04.md#completion-evidence).
+
+Open. No paid live requests have been performed. Integrated implementation, full fresh cumulative checks and requirement acceptance remain pending.

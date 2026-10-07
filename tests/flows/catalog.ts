@@ -115,7 +115,8 @@ export const flows: Record<string, FlowDefinition> = {
     'repair-replacement': 'The second provider turn replaces the rejected candidate rather than appending it.',
     'repair-saved': 'Only the independently valid replacement becomes the saved outline.'
   } },
-  'packaged-worker': { title: 'Packaged Pi worker', testFile: 'packaged-worker.spec.ts', screenshots: {} }
+  'packaged-worker': { title: 'Packaged Pi worker', testFile: 'packaged-worker.spec.ts', screenshots: {} },
+  'image-worker': { title: 'Sanctioned image utility transport and accounting', testFile: 'image-worker.spec.ts', screenshots: {} }
 }
 
 export function flowDefinition(id: string): FlowDefinition {

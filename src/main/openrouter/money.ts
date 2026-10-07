@@ -19,11 +19,11 @@ export const addMoney = (values: readonly string[]): string => unitsMoney(values
 export const multiplyMoney = (value: string, count: number): string => unitsMoney(moneyUnits(value) * BigInt(count))
 const moneyKeys = /^(?:cost|cost_usd|total_cost|usage(?:_daily|_weekly|_monthly)?|limit|limit_remaining)$/
 /** Node 24 reviver context retains numeric provider literals at their reported precision. */
-export function parseProviderJson(text: string): unknown {
+export function parseProviderJson(text: string, unknownInvalidMoney = false): unknown {
   const reviver = (key: string, value: unknown, context?: { source?: string }) => {
     if (moneyKeys.test(key) && typeof value === 'number') {
       if (!context?.source) throw new ApplicationError('UNAVAILABLE', 'Exact provider amount parsing is unavailable.')
-      return decimalLiteral(context.source)
+      try { return decimalLiteral(context.source) } catch (error) { if (unknownInvalidMoney) return null; throw error }
     }
     return value
   }

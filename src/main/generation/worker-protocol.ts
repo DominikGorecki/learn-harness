@@ -11,6 +11,9 @@ import type { AiPreview, AiActivityEntry } from '../../shared/ai/activity'
 import type { PiProtocolEvidence } from './pi-protocol-evidence'
 import { protocolCodes, protocolStatuses, safeReturnedModel } from './pi-protocol-evidence'
 import type { TransportState } from './pi-stream-liveness'
+import { identifier } from '../../shared/validation'
+import { parseDecodedImage, parseImageAuthorization, parseImageTerminal } from './image-worker-contract'
+import type { DecodedImage, ImageAuthorization, ImageTerminal } from './image-worker-contract'
 
 export type EngineDiagnosticEvent = 'engine.materials' | 'engine.request' | 'engine.response' | 'engine.terminal' | 'engine.tool' | 'engine.turn' | 'engine.transport'
 export type WorkerDiagnosticEvent = EngineDiagnosticEvent | 'console.output' | 'process.unhandled'
@@ -19,8 +22,10 @@ export type WorkerPhase = typeof workerPhases[number]
 export const workerErrorCodes: ErrorCode[] = ['INVALID_INPUT', 'NOT_FOUND', 'FORBIDDEN', 'INTERNAL', 'AUTH_REQUIRED', 'PLAN_PERMISSION_REQUIRED',
   'ACCESS_RESTRICTED', 'USAGE_LIMIT', 'NETWORK', 'CANCELLED', 'BUSY', 'UNAVAILABLE', 'STORAGE', 'CONFLICT']
 export interface ModelAccessWorkerInput { target: 'gpt-6.1-sol' | 'gpt-6-luna'; accessToken: string; baseUrl: string }
-export type WorkerProfile = { profile: 'outline'; input: OutlineEngineInput } | { profile: 'model-access'; input: ModelAccessWorkerInput }
-export type WorkerRequest = ({ type: 'start' } & WorkerProfile) | { type: 'cancel' }
+export type WorkerProfile = { profile: 'outline'; input: OutlineEngineInput } | { profile: 'model-access'; input: ModelAccessWorkerInput } | { profile: 'fixed-image'; input: { imageSlotId: string } }
+export type WorkerRequest = ({ type: 'start' } & WorkerProfile) | { type: 'cancel' } |
+  { type: 'image-authorized'; requestId: string; authority: ImageAuthorization | null } |
+  { type: 'image-terminal-ack' | 'image-asset-ack'; requestId: string; callId: string; accepted: boolean }
 export type WorkerReply = { type: 'health'; sequence: number; phase: WorkerPhase } |
   { type: 'phase'; sequence: number; phase: EnginePhase } |
   { type: 'transport'; sequence: number; state: TransportState } |
@@ -28,6 +33,10 @@ export type WorkerReply = { type: 'health'; sequence: number; phase: WorkerPhase
   { type: 'progress'; sequence: number; turn: number; revision: number; preview: AiPreview; abbreviated?: boolean; activity?: AiActivityEntry[] } |
   { type: 'result'; sequence: number; profile: 'outline'; result: OutlineEngineResult } |
   { type: 'result'; sequence: number; profile: 'model-access'; result: PiProtocolEvidence } |
+  { type: 'image-intent'; sequence: number; requestId: string; imageSlotId: string } |
+  { type: 'image-terminal'; sequence: number; requestId: string; callId: string; terminal: ImageTerminal } |
+  { type: 'image-asset'; sequence: number; requestId: string; image: DecodedImage } |
+  { type: 'result'; sequence: number; profile: 'fixed-image'; result: { kind: 'image'; callId: string; imageSlotId: string } } |
   { type: 'error'; sequence: number; code: ErrorCode } |
   { type: 'diagnostic'; sequence: number; event: WorkerDiagnosticEvent; data: unknown }
 
@@ -49,9 +58,22 @@ function flag(value: unknown): boolean { if (typeof value !== 'boolean') invalid
 function age(value: unknown): number | null { return value === null ? null : natural(value) }
 export function parseWorkerRequest(value: unknown): WorkerRequest {
   if (workerFrameBytes(value) > maximumWorkerResultBytes) invalid()
-  const data = strictRecord(value, ['type', 'profile', 'input'])
+  const data = strictRecord(value, ['type', 'profile', 'input', 'requestId', 'authority', 'callId', 'accepted'])
   if (data.type === 'cancel') { strictRecord(value, ['type']); return { type: 'cancel' } }
+  if (data.type === 'image-authorized') {
+    strictRecord(value, ['type', 'requestId', 'authority'])
+    return { type: 'image-authorized', requestId: identifier(data.requestId), authority: data.authority === null ? null : parseImageAuthorization(data.authority) }
+  }
+  if (data.type === 'image-terminal-ack' || data.type === 'image-asset-ack') {
+    strictRecord(value, ['type', 'requestId', 'callId', 'accepted'])
+    return { type: data.type, requestId: identifier(data.requestId), callId: identifier(data.callId), accepted: flag(data.accepted) }
+  }
   if (data.type !== 'start') invalid()
+  strictRecord(value, ['type', 'profile', 'input'])
+  if (data.profile === 'fixed-image') {
+    const input = strictRecord(data.input, ['imageSlotId'])
+    return { type: 'start', profile: 'fixed-image', input: { imageSlotId: identifier(input.imageSlotId) } }
+  }
   if (data.profile === 'model-access') {
     const input = strictRecord(data.input, ['target', 'accessToken', 'baseUrl'])
     return { type: 'start', profile: 'model-access', input: { target: choice(input.target, ['gpt-6.1-sol', 'gpt-6-luna']),
@@ -90,10 +112,22 @@ function parseTransport(value: unknown): TransportState {
 }
 export function parseWorkerReply(value: unknown, profile: WorkerProfile): WorkerReply {
   const type = value && typeof value === 'object' ? (value as Record<string, unknown>).type : null
+  // Typed raster frames have their own binary bound. Never JSON-stringify these bytes.
+  if (type === 'image-asset') {
+    if (profile.profile !== 'fixed-image') invalid()
+    const data = strictRecord(value, ['type', 'sequence', 'requestId', 'image'])
+    return { type: 'image-asset', sequence: natural(data.sequence), requestId: identifier(data.requestId), image: parseDecodedImage(data.image) }
+  }
   if (workerFrameBytes(value) > (type === 'result' && profile.profile === 'outline' ? maximumWorkerResultBytes : aiLimits.frameBytes)) invalid()
-  const data = strictRecord(value, ['type', 'sequence', 'phase', 'state', 'evidence', 'turn', 'revision', 'preview', 'abbreviated', 'activity', 'profile', 'result', 'code', 'event', 'data'])
+  const data = strictRecord(value, ['type', 'sequence', 'phase', 'state', 'evidence', 'turn', 'revision', 'preview', 'abbreviated', 'activity', 'profile', 'result', 'code', 'event', 'data', 'requestId', 'imageSlotId', 'callId', 'terminal'])
   const sequence = natural(data.sequence)
   switch (data.type) {
+    case 'image-intent':
+      strictRecord(value, ['type', 'sequence', 'requestId', 'imageSlotId']); if (profile.profile !== 'fixed-image' || data.imageSlotId !== profile.input.imageSlotId) invalid()
+      return { type: 'image-intent', sequence, requestId: identifier(data.requestId), imageSlotId: identifier(data.imageSlotId) }
+    case 'image-terminal':
+      strictRecord(value, ['type', 'sequence', 'requestId', 'callId', 'terminal']); if (profile.profile !== 'fixed-image') invalid()
+      return { type: 'image-terminal', sequence, requestId: identifier(data.requestId), callId: identifier(data.callId), terminal: parseImageTerminal(data.terminal) }
     case 'health': strictRecord(value, ['type', 'sequence', 'phase']); return { type: 'health', sequence, phase: choice(data.phase, workerPhases) }
     case 'phase': strictRecord(value, ['type', 'sequence', 'phase']); return { type: 'phase', sequence, phase: choice(data.phase, ['examining', 'planning', 'validating']) }
     case 'transport': strictRecord(value, ['type', 'sequence', 'state']); return { type: 'transport', sequence, state: parseTransport(data.state) }
@@ -104,7 +138,7 @@ export function parseWorkerReply(value: unknown, profile: WorkerProfile): Worker
     case 'progress': {
       strictRecord(value, ['type', 'sequence', 'turn', 'revision', 'preview', 'abbreviated', 'activity'])
       const preview = parseAiPreview(data.preview)
-      if (profile.profile === 'outline' ? preview.kind === 'model-test-evidence' || (profile.input.topicId ? preview.kind !== 'none' && (preview.kind !== 'topic' || preview.topicId !== profile.input.topicId) : preview.kind === 'topic') : !['none', 'model-test-evidence'].includes(preview.kind)) invalid()
+      if (profile.profile === 'fixed-image' || (profile.profile === 'outline' ? profile.input.topicId ? preview.kind !== 'none' && (preview.kind !== 'topic' || preview.topicId !== profile.input.topicId) : !['none', 'text', 'outline'].includes(preview.kind) : !['none', 'model-test-evidence'].includes(preview.kind))) invalid()
       let activity: AiActivityEntry[] | undefined
       if (data.activity !== undefined) {
         if (profile.profile !== 'outline' || !Array.isArray(data.activity) || data.activity.length > aiLimits.activityEntries) invalid()
@@ -124,6 +158,11 @@ export function parseWorkerReply(value: unknown, profile: WorkerProfile): Worker
     case 'result': {
       strictRecord(value, ['type', 'sequence', 'profile', 'result'])
       if (data.profile !== profile.profile) invalid()
+      if (profile.profile === 'fixed-image') {
+        const result = strictRecord(data.result, ['kind', 'callId', 'imageSlotId'])
+        if (result.kind !== 'image' || result.imageSlotId !== profile.input.imageSlotId) invalid()
+        return { type: 'result', sequence, profile: 'fixed-image', result: { kind: 'image', callId: identifier(result.callId), imageSlotId: identifier(result.imageSlotId) } }
+      }
       if (profile.profile === 'model-access') return { type: 'result', sequence, profile: 'model-access', result: parseProtocolEvidence(data.result, true) }
       const result = strictRecord(data.result, ['kind', 'document', 'question', 'reason', 'coverage', 'projectEdits'])
       let parsed: OutlineEngineResult
