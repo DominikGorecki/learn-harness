@@ -100,6 +100,7 @@ test('topic dialog updates its outline branch and real topic files while preserv
     proposal.startingLessonId = 'evidence'; proposal.lessons[0]!.overview = 'Unrequested change to the other topic'
     fixture.options.outlineResult = proposal; fixture.options.inferenceMode = 'outline'
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).check(); await page.getByRole('button', { name: 'Done', exact: true }).click()
     await topicEdit.click(); await expect(input).toHaveValue(changes)
     await flow.capture(desktop, page, 'topic-edit-dark')

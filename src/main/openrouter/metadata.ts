@@ -76,7 +76,9 @@ export function selectImageRoute(metadata: OpenRouterModelMetadata, input: Image
   let estimate: ImageCostEstimate = { kind: 'unknown', reason: 'Compatible endpoint pricing has unsupported variants or unknown quantities.' }
   if (prices.length === endpoints.length) {
     const sorted = prices.sort((a, b) => moneyUnits(a) < moneyUnits(b) ? -1 : moneyUnits(a) > moneyUnits(b) ? 1 : 0), minimumUsd = sorted[0]!, maximumUsd = sorted.at(-1)!
-    estimate = { kind: minimumUsd === maximumUsd ? 'fixed' : 'range', minimumUsd, maximumUsd, approximate: true, imageCount: count, modelId: metadata.modelId, checkedAt: metadata.checkedAt, basis: `Compatible dedicated endpoint output_image/image pricing; no input references; settings ${JSON.stringify(settings)}.`, stale }
+    const description = [`${count} ${count === 1 ? 'image' : 'images'}`, `aspect ratio ${settings.aspectRatio}`,
+      ...(settings.resolution ? [`${settings.resolution} resolution`] : []), ...(settings.quality ? [`${settings.quality} quality`] : []), ...(settings.format ? [`${settings.format.toUpperCase()} format`] : [])].join(', ')
+    estimate = { kind: minimumUsd === maximumUsd ? 'fixed' : 'range', minimumUsd, maximumUsd, approximate: true, imageCount: count, modelId: metadata.modelId, checkedAt: metadata.checkedAt, basis: `Advertised per-image prices for selected compatible providers; ${description}; no reference images.`, stale }
   }
   return { settings, provider, endpoints, estimate }
 }

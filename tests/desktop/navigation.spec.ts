@@ -182,6 +182,7 @@ test('shared navigation restores current reading and drafts, preserves branches 
     await page.getByRole('textbox').dispatchEvent('compositionend')
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
     await page.keyboard.press(backShortcut); await expect(page.getByRole('dialog', { name: 'Settings', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).check(); await page.keyboard.press('Escape')
     await back.click(); await expect(page.locator('#outline-heading')).toHaveText(outline.title)
     // Changed authoritative content drops removed anchors, without reverting saved data.
@@ -225,6 +226,7 @@ test('shared navigation restores current reading and drafts, preserves branches 
     // Hit-test all compact controls at the actual minimum window and Electron zoom.
     for (const theme of ['light', 'dark'] as const) {
       await page.getByRole('button', { name: 'Settings', exact: true }).click()
+      await page.getByRole('button', { name: 'Appearance', exact: true }).click()
       await page.getByRole('radio', { name: theme === 'light' ? 'Light' : 'Dark', exact: true }).check(); await page.keyboard.press('Escape')
       await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.setContentSize(600, 480); window.webContents.setZoomFactor(2) })
       for (const label of ['Back', 'Forward', 'Show navigation', ...(!mac ? ['Menu'] : [])]) {

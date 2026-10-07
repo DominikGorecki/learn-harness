@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "8181a60a7c18d29e72e50035d3fa006496437fb471af80811f44bcd3c1338edd"
+      "sha256": "17fe3c74c946436dcdcf39d0ddc751c582f43714f49ba957507e496baa9cc81e"
     },
     {
       "id": "repair-replacement",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "9732ee68e0d0c17786729a0709d5f8841421a2108aae74dfe7d9944249d129d0"
+      "sha256": "397f4db7dbdb445f52d326e8c2d66582ca1e3932e72cd97f1987a58aa0a15678"
     },
     {
       "id": "repair-saved",
@@ -44,16 +44,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a6f61ec62f3c8bd5eb916a5dc1839ce510a07a00cb43da50fc5630166db4b6ae"
+      "sha256": "9bd5d4a4e7cce7c90ab70013c94f684ffa6f6b6a86aa9f7a187bc797d57a249a"
     }
   ],
-  "capturedAt": "2026-10-07T18:38:48.046Z",
-  "testSha256": "8c6d1aff499ae58db61676a45defcd20a7dc6a00e1af2dce41e12b95c7d9dd6c",
+  "capturedAt": "2026-10-07T22:16:25.795Z",
+  "testSha256": "8eb913d58fd7232145da581ad2cf937fa3fd6ce81bc17ef94f395cf3b36243a7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "structured repair replaces the candidate and accepts only the independently valid second turn",
-  "revision": "5c8ff9bb95a29373a5961f1194be3ba4c8436802",
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

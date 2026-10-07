@@ -14,7 +14,22 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c46d3589b1e4e07494b762b712536a12743c31bea21dc618fae1225549b936c4"
+      "sha256": "aad3f84dcd4023ed7c593a65477bbec82e685067eff3b2e7c892d790ad4dcdb6"
+    },
+    {
+      "id": "dashboard-empty-dark",
+      "caption": "The same empty dashboard in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "a0c655e84ad53706a322177cef9c8d51be8ef534b1a99d0d60ca52d58dadf11f"
     },
     {
       "id": "project-workspace",
@@ -29,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "116964d10642f00d48749810873aab4166a7fa68edc3f9f3acaa7171a204f0a7"
+      "sha256": "1b790fb6096cfae07a440d00fba5e2ddd676d8c29940b9d5b9e68b1a5de07ac8"
     },
     {
       "id": "project-narrow",
@@ -59,16 +74,76 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "24e85d21b07d89b05c20d514bf6a309c30b8e228eec1ef89f0bdbde5eee54054"
+      "sha256": "55db729d3ad4b94254ad55edec6c571fc8e1e3951f4e64472942c3e844601490"
+    },
+    {
+      "id": "dashboard-populated-light",
+      "caption": "Both saved recent project rows in Light after restart.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": true,
+      "sha256": "4ff61a699e01b0b03fcdee1795c36c395905e836ef21548194c71136b157ed23"
+    },
+    {
+      "id": "dashboard-populated-dark",
+      "caption": "The same populated dashboard in Dark, with project details preserved.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": true,
+      "sha256": "5ad31a97c9218ff4ba55acc0fe615a1b111f4e63181e69b3496a9d356fec2bfa"
+    },
+    {
+      "id": "missing-folder-light",
+      "caption": "Missing-folder recovery with its explicit Locate folder command in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": true,
+      "sha256": "5db1dd43811db43bd05b8539f886524b2dada32592b61571e0eeb24a136f492d"
+    },
+    {
+      "id": "missing-folder-dark",
+      "caption": "The same missing-folder recovery in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": true,
+      "sha256": "86cb34455bc12f1cfb538642b153b43f2d94fb6bce32403e2465f6ef005bf068"
     }
   ],
-  "capturedAt": "2026-10-07T13:06:10.523Z",
-  "testSha256": "01b3dad4bd727901ab76c4e4891de882e6c4302b61e082d600a1d1590825fef6",
+  "capturedAt": "2026-10-07T22:19:34.898Z",
+  "testSha256": "e120efc5e370f38be2ba152fbf1c79ed97aef169c31986cc1de6b56e9fa8d907",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "d258a6d7ed5b869ec0cad2faa280e7c6915e84fc",
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

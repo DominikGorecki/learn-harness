@@ -14,7 +14,22 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "9d130b33f3c7b4485f19d7b58c2890bfc22788436d69407a9c8e63ceff526847"
+      "sha256": "7b7e3c6599aa81b7b8809d2683bba2081d34e96d46082ce41cc02c45566d25ad"
+    },
+    {
+      "id": "material-setup-dark",
+      "caption": "The same material-led setup in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "da7f880e6347fe43aa286859b8b4d017c68cc1b90218168fb05d79a2f9886197"
     },
     {
       "id": "material-coverage",
@@ -29,7 +44,37 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "93cb93078a2449b5f2905bdff81197ea021620fa815fcf2b1c770890d7671a22"
+      "sha256": "9583a4b52c30eb1b61840c83f84dad3f502e50f2927e8535e9e28e07479577c8"
+    },
+    {
+      "id": "material-clarification-light",
+      "caption": "Editable clarification request and its retained answer in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "962e05dd2f6159bb490b128045e41f15c51356435c84af06a1f406ca26254a7b"
+    },
+    {
+      "id": "material-clarification-dark",
+      "caption": "The same clarification state in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "1d6ab8d14baac4aa8d5c59bb5de1f7bf6606d5aa87d6886a071e34095b98cf73"
     },
     {
       "id": "unsupported-material",
@@ -44,16 +89,31 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cee3e75b83cbb62fcea71525d4ba6424898ecc733f8392b826d636600f211ee7"
+      "sha256": "6a2beb85059a8dfdb0628b2971849e60b5b949873f179438bd2b6f704462b655"
+    },
+    {
+      "id": "unsupported-material-dark",
+      "caption": "The same unsupported-source recovery in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "b862e837e65c80ebc4b881835c1afde611a0a78dd55f7d9ce9ecac0846e67ee4"
     }
   ],
-  "capturedAt": "2026-10-06T18:06:15.294Z",
-  "testSha256": "09f6c743ce26da2c7970c966b809219abb2f637313e6cf80bfdc4ac6ac906f71",
+  "capturedAt": "2026-10-07T22:19:13.649Z",
+  "testSha256": "fecd94e03af0cee592818fe5392b92e3f442d6a041e6d63e8eab7bbaa51bb56a",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/materials.spec.ts",
   "testTitle": "folder-only learning, verified source coverage, ambiguity and unsupported recovery",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

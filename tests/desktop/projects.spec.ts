@@ -116,6 +116,9 @@ test('real folders, project preferences, restart, relink, and responsive navigat
 
     desktop = await launch()
     page = await desktop.firstWindow()
+    // The persistent renderer partition can retain the prior 200% origin zoom.
+    // Normal dashboard references use masked Playwright capture at zoom 1.
+    await desktop.evaluate(({ BrowserWindow }) => BrowserWindow.getAllWindows()[0]!.webContents.setZoomFactor(1))
     await expect(page.getByRole('heading', { name: 'Your projects', exact: true })).toBeVisible()
     await expect(page.locator('.dashboard-project')).toHaveCount(2)
     await flow.capture(desktop, page, 'dashboard-populated-light')

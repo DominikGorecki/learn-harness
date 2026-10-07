@@ -64,6 +64,7 @@ test('edit dialog rewrites the numbered path through Pi with the active model an
     await page.getByLabel('Project model').selectOption('fixture-model-fast')
     await expect(edit).toBeEnabled()
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).check()
     await page.getByRole('button', { name: 'Done', exact: true }).click()
     await edit.click(); await expect(input).toHaveValue(changes)

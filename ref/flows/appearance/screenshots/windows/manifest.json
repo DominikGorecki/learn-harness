@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "fbe353fc2365553ffb6799397f60bb26871553939c549c133a8bab808fe552d0"
+      "sha256": "97c89cb53a78214624327935f24c6af50ab7818dfe5d3ca15eb764ec6fd4643c"
     },
     {
       "id": "workspace-light",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "588f2e91a407bca16309e62c36cf497e468169cbd3cafd5b2c0f2dbf6f8dd4cd"
+      "sha256": "88a60ca51051092bc5a2e77a708e28e1ec77854a4c3720c5e7e6d5df5e266e78"
     },
     {
       "id": "workspace-dark",
@@ -75,15 +75,45 @@
       "method": "playwright",
       "maskedLocalPaths": false,
       "sha256": "a600d3c9446a827aa491cbb5d7575ff9d61b505d8cc34cd4951ea2bbb5db3848"
+    },
+    {
+      "id": "settings-zoom-dark",
+      "caption": "Dark Appearance controls in the sectioned Settings dialog at 600 pixels and 200% zoom with reduced motion.",
+      "width": 752,
+      "height": 802,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 321
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "823f79128d0180cceb49e8f48e57fc6b6979384f22cbfd46201a736fc5490074"
+    },
+    {
+      "id": "settings-zoom-light",
+      "caption": "The same reflowed Appearance controls in Light.",
+      "width": 752,
+      "height": 802,
+      "theme": "light",
+      "viewport": {
+        "width": 301,
+        "height": 321
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "47b5cc2a6e3839b7b51a2690653a5483ddfcad871cd826f5f62704339b06cb2a"
     }
   ],
-  "capturedAt": "2026-10-07T14:00:02.833Z",
-  "testSha256": "a5a8656a472a0f32582da43e2eb5185044a6234f9acc457f5a8ea324ceabd694",
+  "capturedAt": "2026-10-07T22:16:29.379Z",
+  "testSha256": "b13db3d0a7f8b1de949bc47584b743f59c9eea6fb66858d0c488f02eb6c9e251",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/appearance.spec.ts",
   "testTitle": "appearance changes every surface, preserves drafts, and survives a desktop restart",
-  "revision": "7bee459ac5e6e5c42ca1a1ac3b76736a9a365aed",
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

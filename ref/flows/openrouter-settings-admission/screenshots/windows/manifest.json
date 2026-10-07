@@ -1,0 +1,13 @@
+{
+  "flow": "openrouter-settings-admission",
+  "captures": [],
+  "capturedAt": "2026-10-07T22:19:27.894Z",
+  "testSha256": "e87ac457a2b8db3a3018551d0456f8e203149c8f39db28b5d1d7b79a857a9d61",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/openrouter-settings.spec.ts",
+  "testTitle": "provider mutations show BUSY while a real chapter image lease is active and Appearance remains usable",
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

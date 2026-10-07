@@ -51,9 +51,13 @@ Compact context controls contain only decisions that affect the action. The draf
 
 A documented target does not justify placeholder connected states, dummy saved indicators, inactive future toolbars, or a simulated tutor presented as working AI.
 
-## Appearance settings
+## Provider and Appearance settings
 
 Settings is available from the outer rail (bottom strip at narrow sizes) and Cmd/Ctrl+comma. Its Appearance group offers Light and Dark previews with native radio keyboard behavior. Apply the mode without closing the current project, resetting its draft, changing scroll position or touching an AI run. Escape, the close button and Done dismiss Settings and return focus to its trigger. Persist only the local presentation preference; if saving it fails, the current session still changes and the dialog explains the limit.
+
+Under [ADR-0026](ADRs/ADR-0026-illustrated-topic-content-and-openrouter-media.md), Settings is a wide native no-history dialog with OpenRouter and Appearance categories, independently scrolling content and stacked navigation at narrow widths/zoom. OpenRouter is the initial category; ordinary reopening remembers the category within the app session. Connection, Image generation, Usage and Call history groups use safe named bridge capabilities. The editable password draft survives category changes while open, clears on close or acknowledged save, and cannot be retrieved from the saved connection. Late replies or old native close events must not clear a new session's draft.
+
+Show the three fixed image choices, including a selected unavailable choice and its reason. Label cached one-image estimates with basis, check time and staleness; they are not guaranteed charges. App-reported UTC day/month/all-time spend and unresolved costs are separate from provider-reported key-wide usage/allowance. History offers bounded pages, filters and safe details; a failed page/filter clears stale rows and offers Retry history. Explicit metadata refresh makes no image request and keeps timestamped last-known values on failure. Settings, categories, filters and theme changes leave navigation history and inference activity unchanged. Provider mutations honor authoritative BUSY while an image operation owns the connection; Appearance remains available. See [Settings](flows/openrouter-settings/index.md) and [active-provider admission](flows/openrouter-settings-admission/index.md) for isolated Electron evidence and qualification limits.
 
 ## Progress and recovery
 

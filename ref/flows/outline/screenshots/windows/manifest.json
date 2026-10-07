@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "d093170fd9aaa053d17dfc8aa32c480f0bcb16943fda0e9b5c24e2a03f7ab2d1"
+      "sha256": "846499c971eec8aa65a015b11be14b0c642ffa560b6b6786362fcd1a500e0ec2"
     },
     {
       "id": "outline-streaming-dark",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "ecb298f122dd45a6b9602199b08d64a54257e0ccfac64b1026a2b75a7ee3ae56"
+      "sha256": "77444332e29c0d731d03236c80d7f3d54b0fcf6fff0e98af89de008cc4edf529"
     },
     {
       "id": "outline-streaming-zoom",
@@ -44,7 +44,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "80d08bcc6d8753440bf266b2aa3d97c0f4333b141f27df123af88c80572a51eb"
+      "sha256": "be71d7e1d5895c3fdf2fb04651661f1b29bdf9830c2f03c71a21d9c171b0c3fa"
     },
     {
       "id": "outline-overview",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "f54ccf792b5f36f705037d175f324bc18883f616c1083eaec20d316cc7652146"
+      "sha256": "b30a90f76ab585b7b5605dd533566fb0851686bbcc2b98d5a7edcf566e9b65bc"
     },
     {
       "id": "generated-outline",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "e8c61d7ce0c8124ce031b9d1d7cd7b2d1c5558a3e92d5703a0b13c6edfa42047"
+      "sha256": "78e3e7d8971e629eca1658aeaad114ef328908322d75a06d1cf9cce4b7d8046e"
     }
   ],
-  "capturedAt": "2026-10-07T13:44:06.187Z",
-  "testSha256": "5907a8bef5b0bb3e9147bd9c6e84962df8f2e7c6cc3f2cc647f59c38d999c052",
+  "capturedAt": "2026-10-07T22:17:31.040Z",
+  "testSha256": "6247aba30b12493af001bfce7539a4bfbb8b59a9b7a58bc7b95b25661287fb08",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline.spec.ts",
   "testTitle": "Pi utility process creates, validates, saves and reopens an outline; cancellation preserves prior work",
-  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

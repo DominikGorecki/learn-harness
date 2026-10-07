@@ -16,9 +16,20 @@ export const flows: Record<string, FlowDefinition> = {
     'settings-light': 'Light selected in the Appearance dialog.',
     'workspace-light': 'Light project composer with its existing learning draft.',
     'settings-dark': 'Dark selected through radio keyboard navigation.',
+    'settings-zoom-dark': 'Dark Appearance controls in the sectioned Settings dialog at 600 pixels and 200% zoom with reduced motion.',
+    'settings-zoom-light': 'The same reflowed Appearance controls in Light.',
     'workspace-dark': 'Dark project composer with the same draft.',
     'account-dark': 'Disconnected account panel in Dark mode.'
   } },
+  'openrouter-settings': { title: 'Sectioned provider settings and request history', testFile: 'openrouter-settings.spec.ts', screenshots: {
+    'settings-unavailable-light': 'The saved Seedream choice remains visible with its catalog absence reason in Light.',
+    'settings-usage-light': 'Exact app spend, unresolved cost count and separately labelled key-wide usage in Light.',
+    'settings-history-light': 'Filtered chapter-image history and unknown billing independent of save failure.',
+    'settings-stale-dark': 'Dark connection recovery retains last-known pricing after failed metadata refresh.',
+    'settings-narrow-dark': 'OpenRouter connection controls reflow at 600 pixels and 200% zoom in Dark with reduced motion.',
+    'settings-narrow-light': 'The same reflowed connection controls in Light.'
+  } },
+  'openrouter-settings-admission': { title: 'Provider settings during owned inference', testFile: 'openrouter-settings.spec.ts', screenshots: {} },
   navigation: { title: 'Shared application navigation', testFile: 'navigation.spec.ts', screenshots: {
     'reading-restored-light': 'Restored Light reading context after traversing real project history.',
     'reading-current-dark': 'Current Dark outline after removing a remembered stable topic.',

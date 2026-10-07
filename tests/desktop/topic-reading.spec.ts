@@ -86,7 +86,7 @@ test('saved topics read offline through one current-content history with indepen
     await desktop.evaluate(() => (globalThis as unknown as { heldTopicSelection?: { restore(): void } }).heldTopicSelection?.restore())
     await expect(back).toBeEnabled(); await back.click(); await expect(page.locator('#topic-heading')).toHaveText('Current renamed evidence topic')
     await expect(summary).toBeFocused(); await expect(disclosure).toHaveAttribute('open', '')
-    await page.getByRole('button', { name: 'Settings', exact: true }).click(); await page.getByRole('radio', { name: 'Dark', exact: true }).check(); await page.keyboard.press('Escape')
+    await page.getByRole('button', { name: 'Settings', exact: true }).click(); await page.getByRole('button', { name: 'Appearance', exact: true }).click(); await page.getByRole('radio', { name: 'Dark', exact: true }).check(); await page.keyboard.press('Escape')
     await main.evaluate(element => { element.scrollTop = 0 }); await flow.capture(desktop, page, 'saved-topic-dark')
     await back.click(); await expect(page.locator('#outline-heading')).toBeVisible(); await flow.capture(desktop, page, 'saved-overview-dark'); await forward.click(); await expect(page.locator('#topic-heading')).toHaveText('Current renamed evidence topic')
     await page.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true }).click()

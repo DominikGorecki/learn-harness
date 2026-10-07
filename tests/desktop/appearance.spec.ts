@@ -45,6 +45,7 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     }
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
     await expect(page.getByRole('dialog', { name: 'Settings', exact: true })).toBeVisible()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Light', exact: true }).check()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
     const brand = page.getByRole('button', { name: 'Learning Studio projects', exact: true })
@@ -102,6 +103,9 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     await page.getByRole('radio', { name: 'Dark', exact: true }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('radio', { name: 'Dark', exact: true })).toBeInViewport()
     expect(await page.getByRole('dialog').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
+    await page.emulateMedia({ reducedMotion: 'reduce' }); await flow.capture(desktop, page, 'settings-zoom-dark')
+    await page.getByRole('radio', { name: 'Light', exact: true }).check(); await flow.capture(desktop, page, 'settings-zoom-light')
+    await page.getByRole('radio', { name: 'Dark', exact: true }).check()
     await page.keyboard.press('Escape')
     await expect(page.getByRole('textbox')).toHaveValue(draft)
     await desktop.close(); desktop = undefined
@@ -110,7 +114,9 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     page = await desktop.firstWindow()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await expect(page.getByRole('radio', { name: 'Dark', exact: true })).toBeChecked()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Light', exact: true }).check()
     await page.getByRole('button', { name: 'Done', exact: true }).click()
     await page.reload()
@@ -118,6 +124,7 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     // A blocked preference store must not stop a learner from changing appearance.
     await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('Storage unavailable') } })
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).check()
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     await expect(page.getByRole('dialog').getByRole('status')).toContainText('This device could not save the preference.')

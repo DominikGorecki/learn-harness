@@ -108,6 +108,7 @@ test('receiving for 200.5 real seconds keeps draft provisional before genuine ch
     expect(arrival - burstAt).toBeLessThanOrEqual(250)
     await flow.capture(desktop, page, 'stream-structured-light')
     await page.getByRole('button', { name: 'Settings', exact: true }).click()
+    await page.getByRole('button', { name: 'Appearance', exact: true }).click()
     await page.getByRole('radio', { name: 'Dark', exact: true }).check()
     await page.getByRole('button', { name: 'Done', exact: true }).click()
     await page.emulateMedia({ reducedMotion: 'reduce' })

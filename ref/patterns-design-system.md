@@ -22,6 +22,8 @@ The shell contains navigation, a contextual header, the primary learning surface
 
 Use rows, document sections, and disclosure for project/lesson lists. A bordered container should identify an input, interactive artifact, dialog, or a real group. Keep routine metadata quiet. Give each workspace state one primary action; account/model settings remain compact unless the learner is resolving them.
 
+The [sectioned Settings dialog](flows/openrouter-settings/index.md) under [ADR-0026](ADRs/ADR-0026-illustrated-topic-content-and-openrouter-media.md) has a spacious category sidebar, selected category heading and neutral grouped rows. Its OpenRouter and Appearance content scrolls independently of the fixed header/footer. At narrow widths and 200% zoom the category navigation stacks above reflowed fields and actions. Preserve native modal focus and the existing Light/Dark radio previews; this scoped Settings change does not change account panels, central workspace, title strip or AI dock.
+
 ## Visual tokens
 
 Use semantic CSS variables so components consume purpose-based values. Keep state colors distinct from brand/accent color. Prefer opaque surfaces for predictable rendering across desktop platforms; any future translucency must preserve contrast and work with an opaque fallback.

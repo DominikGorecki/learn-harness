@@ -1,0 +1,104 @@
+{
+  "flow": "openrouter-settings",
+  "captures": [
+    {
+      "id": "settings-unavailable-light",
+      "caption": "The saved Seedream choice remains visible with its catalog absence reason in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "985f9fff3dd25f4bdf619d7c07884a3273eac3c7f0239f62cbabc63603b6702f"
+    },
+    {
+      "id": "settings-usage-light",
+      "caption": "Exact app spend, unresolved cost count and separately labelled key-wide usage in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "7266728938884f6749495d603f519ccca6146cfa7cf086d8ce2cff838d704ca3"
+    },
+    {
+      "id": "settings-history-light",
+      "caption": "Filtered chapter-image history and unknown billing independent of save failure.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "ff4ab17c625f2f4f544f8cd653d59edc21fca6f0e655150b7d0c4d93c70d3833"
+    },
+    {
+      "id": "settings-stale-dark",
+      "caption": "Dark connection recovery retains last-known pricing after failed metadata refresh.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "32a3e52f293625eebbb24b45f3a4b7b9c5f0fe7f13d07ee60417c5ff6786b15c"
+    },
+    {
+      "id": "settings-narrow-dark",
+      "caption": "OpenRouter connection controls reflow at 600 pixels and 200% zoom in Dark with reduced motion.",
+      "width": 752,
+      "height": 802,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 321
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "eb323e7fb6ef68de0e4203033e453e7e83585f3f6bb67e8d6607cccfd06c56a5"
+    },
+    {
+      "id": "settings-narrow-light",
+      "caption": "The same reflowed connection controls in Light.",
+      "width": 752,
+      "height": 802,
+      "theme": "light",
+      "viewport": {
+        "width": 301,
+        "height": 321
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "d10a514a9c17de5a3a74777b1456a85c1cb989ebcca8c72aaabc99ceb7aba9b1"
+    }
+  ],
+  "capturedAt": "2026-10-07T22:19:21.887Z",
+  "testSha256": "e87ac457a2b8db3a3018551d0456f8e203149c8f39db28b5d1d7b79a857a9d61",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/openrouter-settings.spec.ts",
+  "testTitle": "sectioned settings preserves secrets, exact costs and durable filtered request history without inference",
+  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

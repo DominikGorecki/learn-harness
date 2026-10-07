@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T06 — Build sectioned OpenRouter and Appearance settings
-Status: Open
+Status: Done — locally accepted; whole-bundle/live qualification pending
 
 ## Source
 
@@ -45,9 +45,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] OpenRouter controls use only typed named bridge methods and never display/store raw keys or raw provider messages.
-- [ ] History and labelled cost uncertainty remain usable across restart/filter/refresh failure.
-- [ ] Both themes, keyboard, 600-pixel/200% zoom and current appearance/no-history behavior have passing reviewed Playwright evidence.
+- [x] OpenRouter controls use only typed named bridge methods and never display/store raw keys or raw provider messages.
+- [x] History and labelled cost uncertainty remain usable across restart/filter/refresh failure.
+- [x] Both themes, keyboard, 600-pixel/200% zoom and current appearance/no-history behavior have passing reviewed Playwright evidence.
 
 ## Manual verification
 
@@ -55,7 +55,15 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: frontend/settings; planned model: gpt-6.1-sol; reasoning: medium. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+Worker: frontend/settings, `gpt-6.1-sol`, medium reasoning, against accepted prerequisites T03 `c8eb934880f44bbfddd103f9c677a4e483533fb4` and T05 `2b8afb5920be070f6a3197eaf1c099e5000b1f67` on `master`. Primary inspected actual source/test/flow changes and commissioned a read-only medium review; no remaining local blockers.
+
+The wide native no-history Settings dialog exposes OpenRouter and Appearance with responsive categories, neutral grouped controls, three fixed models and unavailable-choice reasons, protected one-way key setup, cached quote basis/check time/staleness, exact UTC app costs and unresolved counts, separately labelled key-wide usage, and filtered bounded history/details. Session/revision/model/request guards preserve new drafts against late replies/native close events. Close/current acknowledged save clears the editable password; history failures clear stale rows and offer retry. Quote failures settle as unavailable. Estimate basis copy uses plain count/aspect ratio/supported settings without changing main pricing/routing.
+
+Final `npm.cmd run check`: exit 0; 39 unit files, 456 passed / 3 skipped, lint/flow consistency/type scopes/build. The broad affected desktop gate produced exit 1 (10 passed / 4 failed), retaining successful actual longstream (200,507 ms receiving, 146 ms latest bridge, 57 frames), repair, Appearance/navigation and existing reading/outline/edit journeys. Failures were the quote-error first label, a shared helper assuming enabled action colors for correctly disabled material recovery, and persisted zoom selecting a native dashboard capture with unmasked paths. Production quote feedback, helper semantic-state assertions and fixture-only zoom normalization were corrected without weakening security or availability. `npm.cmd run test:desktop -- tests/desktop/openrouter-settings.spec.ts tests/desktop/materials.spec.ts tests/desktop/recovery.spec.ts tests/desktop/projects.spec.ts` then passed all five in 49.5 seconds; final narrative-only `npm.cmd run test:flows` passed.
+
+Actual Electron assertions cover non-inference key validation/metadata requests, invalid replacement preserving credential bytes, model absence, failed pages/filters/retry, date/model/purpose/outcome filters, exact known cost versus unknown/discard/save-failed, stale metadata, held save acknowledgement and deferred native close across sessions, keyboard trap/trigger restoration, restart/removal retaining costs with zero startup HTTP, DTO/diagnostic secret exclusion and no history/AI activity from Settings. A real chapter image fixture proves provider mutation BUSY while Appearance remains usable, followed by awaited cancellation and successful removal. Historical image costs are explicitly synthetic records; no paid live calls.
+
+Primary reviewed all six final Settings PNGs, normal/narrow Light/Dark Appearance, new material/recovery/project captures and relevant refreshed streaming/navigation/outline/edit/reading evidence. Configured reporter published the passing flows. No active sessions or owned fixture resources remain; private reference screenshot excluded. Reader/replacement integration, cumulative gates and live/editorial/native qualification remain separate pending work.
 
 ## Notes
 
