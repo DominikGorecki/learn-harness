@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a804c9870a10f5cde9466ad3b17cbc0c127cbb03caecbc4d89b23cd9ad33f6af"
+      "sha256": "c46d3589b1e4e07494b762b712536a12743c31bea21dc618fae1225549b936c4"
     },
     {
       "id": "project-workspace",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "0e1c88367e2e3d21bcebbe33182647dfc4f7825d5cd1d92072bc3c79a9175e6e"
+      "sha256": "116964d10642f00d48749810873aab4166a7fa68edc3f9f3acaa7171a204f0a7"
     },
     {
       "id": "project-narrow",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "9af91142267ff25e0d09c5c7a7215b857e6512e48a95cc2c0f65a9a9bead88d4"
+      "sha256": "4729d626776c41f96f7d2907e3ba275c201965527a96142ee6758183a120d76b"
     },
     {
       "id": "project-zoom-200",
@@ -59,16 +59,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "3aaaf1f0622a2fdc85e48453414ae474fe3603e8bc20656bd5c49f4d2de487a2"
+      "sha256": "24e85d21b07d89b05c20d514bf6a309c30b8e228eec1ef89f0bdbde5eee54054"
     }
   ],
-  "capturedAt": "2026-10-06T18:07:53.206Z",
-  "testSha256": "9c0f9926714fef1a436712a32a4cf37d3c5e4861dd20192976afedc1ea2cd938",
+  "capturedAt": "2026-10-07T13:06:10.523Z",
+  "testSha256": "01b3dad4bd727901ab76c4e4891de882e6c4302b61e082d600a1d1590825fef6",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "d258a6d7ed5b869ec0cad2faa280e7c6915e84fc",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

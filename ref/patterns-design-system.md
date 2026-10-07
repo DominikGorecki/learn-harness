@@ -4,6 +4,8 @@ Governed by [ADR-0013](ADRs/ADR-0013-chatgpt-inspired-appearance.md), which amen
 
 **Status:** adopted visual standard, implemented in the project workspace and account panel. Values here are Learning Studio defaults, chosen for this product; they are not measured Codex implementation tokens.
 
+[ADR-0025](ADRs/ADR-0025-scoped-editorial-workspace-and-aperture-identity.md) adopts the [main-workspace standard](patterns-main-workspace.md) for central content/contextual header and the selected Sculpted aperture identity. Its larger editorial headings, opaque glass-like surfaces and quiet primary action groups override only the generic central-page defaults below. Dashboard/setup/refinement and central loading/recovery/messages use the new foundation; overview/topic and brand/native-icon migration remain pending in bundle 04. Rail/sidebar/drawer, panels, dialogs, title strip and ADR-0022 dock retain their current design; replacing existing brand artwork is the sole identity exception.
+
 ## Current application screenshots
 
 Before UI/design work, choose the relevant journey through the [flow index](patterns-flow.md), read its explanation and open only its relevant platform screenshots. Start with [appearance](flows/appearance/index.md) for Light/Dark composition, [outline](flows/outline/index.md) for saved learning documents, [topic editing](flows/topic-edit/index.md) for the scoped editor and [reading](flows/reading/index.md) for narrow/zoomed content.

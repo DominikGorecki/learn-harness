@@ -25,6 +25,7 @@ import { useApplicationCommands } from './useApplicationCommands'
 import { destinationFromWorkspace, destinationKey } from './navigation/destination'
 import type { AiActivitySnapshot } from '../../../shared/ai/activity'
 import type { GenerationSnapshot } from '../../../shared/generation'
+import { WorkspacePage, WorkspaceHeader, WorkspaceActions, WorkspaceAction, WorkspaceMessage } from '../components/Workspace'
 
 
 function Navigation({ projects, selected, busy, account, onOpen, onSelect, onDashboard, onAccount }: {
@@ -311,7 +312,7 @@ export function App() {
       <button className="icon-button mobile-navigation-close" aria-label="Close navigation" onClick={closeNavigation}><Icon name="close" /></button>{navigation}
     </dialog>}
     <div className="studio-workspace">
-      <header className="workspace-topbar">
+      <header className="workspace-topbar main-workspace-header">
         <div className="topbar-location">
           {project ? <><button className="breadcrumb-button" onClick={dashboard}>Projects</button><Icon name="chevron" size={12} /><span className="workspace-title" title={project.name}>{project.name}</span></> : <span className="workspace-title">Projects</span>}
         </div>
@@ -321,22 +322,22 @@ export function App() {
           {!showSidebar && <button className="icon-button" aria-label="Account settings" onClick={openAccount}><Icon name="user" size={18} /></button>}
         </div>
       </header>
-      <main id="workspace" data-project-handle={project?.id} data-destination={workspace.snapshot ? destinationKey(destinationFromWorkspace(workspace.snapshot)) : undefined} className="workspace-scroll" ref={scroll} tabIndex={-1} aria-busy={workspace.busy}>
-        {ai.error && !panelVisible && <div className="workspace-message error-message" role="alert"><p>{ai.error}</p><button className="button secondary" onClick={() => void ai.refresh()}>Refresh AI activity</button></div>}
-        {generation.error && <div className="workspace-message error-message" role="alert"><p>{generation.error}</p><button className="icon-button" aria-label="Dismiss outline message" onClick={generation.clearError}><Icon name="close" size={16} /></button></div>}
-        {(workspace.error || workspace.snapshot?.issue) && <div className="workspace-message error-message" role="alert"><Icon name="info" size={18} />
-          <p>{workspace.error ?? workspace.snapshot?.issue}</p>{workspace.error && <button className="icon-button" aria-label="Dismiss message" onClick={workspace.clearError}><Icon name="close" size={16} /></button>}</div>}
-        {recoverableRun && (!panelVisible || visibleOperation?.runId !== recoverableRun.id) && <div className="workspace-message" role="status"><p>Your validated outline is still unsaved.</p><button className="button secondary" disabled={Boolean(ai.snapshot?.active)} onClick={() => { setDismissedActivity(latestOperation?.operationId ?? null); setDismissedRecovery(null); setRecoveryPresentationId(recoverableRun.id) }}>Review unsaved result</button></div>}
-        {!workspace.snapshot ? <div className="loading-surface" role="status">{workspace.error ? <button className="button secondary" onClick={() => void run(api => api.getWorkspace())}>Try again</button> : 'Opening your learning workspace…'}</div>
+      <main id="workspace" data-project-handle={project?.id} data-destination={workspace.snapshot ? destinationKey(destinationFromWorkspace(workspace.snapshot)) : undefined} className="workspace-scroll main-workspace" ref={scroll} tabIndex={-1} aria-busy={workspace.busy}>
+        {ai.error && !panelVisible && <WorkspaceMessage error><p>{ai.error}</p><WorkspaceAction onClick={() => void ai.refresh()}>Refresh AI activity</WorkspaceAction></WorkspaceMessage>}
+        {generation.error && <WorkspaceMessage error><p>{generation.error}</p><WorkspaceAction aria-label="Dismiss outline message" onClick={generation.clearError}><Icon name="close" size={16} />Dismiss</WorkspaceAction></WorkspaceMessage>}
+        {(workspace.error || workspace.snapshot?.issue) && <WorkspaceMessage error><Icon name="info" size={18} />
+          <p>{workspace.error ?? workspace.snapshot?.issue}</p>{workspace.error && <WorkspaceAction aria-label="Dismiss message" onClick={workspace.clearError}><Icon name="close" size={16} />Dismiss</WorkspaceAction>}</WorkspaceMessage>}
+        {recoverableRun && (!panelVisible || visibleOperation?.runId !== recoverableRun.id) && <WorkspaceMessage><p>Your validated outline is still unsaved.</p><WorkspaceAction disabled={Boolean(ai.snapshot?.active)} onClick={() => { setDismissedActivity(latestOperation?.operationId ?? null); setDismissedRecovery(null); setRecoveryPresentationId(recoverableRun.id) }}>Review unsaved result</WorkspaceAction></WorkspaceMessage>}
+        {!workspace.snapshot ? <WorkspacePage labelledBy="loading-heading" className="workspace-loading" reading><WorkspaceHeader id="loading-heading" eyebrow="Your learning workspace" title={workspace.error ? 'Your workspace needs attention' : 'Opening your learning workspace…'} />{workspace.error ? <WorkspaceActions><WorkspaceAction onClick={() => void run(api => api.getWorkspace())}>Try again</WorkspaceAction></WorkspaceActions> : <p role="status">Loading your projects.</p>}</WorkspacePage>
           : !project ? <Dashboard projects={projects} busy={workspace.busy} onOpen={openProject} onSelect={selectProject} />
-          : project.availability !== 'available' ? <><section className="unavailable-project workspace-enter"><span className="subject-emblem"><Icon name="folder" size={26} /></span>
-            <h1 id="project-heading" tabIndex={-1} data-focus-anchor="heading">{project.availability === 'missing' ? 'Let’s find your project.' : 'This project needs attention.'}</h1>
-            <p>{project.issue}</p><p className="unavailable-path">{project.folderPath}</p><div className="button-row">
-              <button className="button primary" disabled={workspace.busy} onClick={() => location.refresh(project.id, true)}><Icon name="folder" size={17} />Locate folder</button>
-              <button className="button secondary" disabled={workspace.busy} onClick={() => location.refresh(project.id)}>Try again</button>
-            </div></section>{generatedUnsaved && <OutlineView key={project.id} saved={generatedUnsaved} unsaved />}</>
+          : project.availability !== 'available' ? <><WorkspacePage labelledBy="project-heading" reading>
+            <WorkspaceHeader id="project-heading" eyebrow="Project recovery" title={project.availability === 'missing' ? 'Let’s find your project.' : 'This project needs attention.'}><p>{project.issue}</p></WorkspaceHeader>
+            <p className="unavailable-path workspace-path">{project.folderPath}</p><WorkspaceActions label="Project recovery">
+              <WorkspaceAction primary disabled={workspace.busy} onClick={() => location.refresh(project.id, true)}><Icon name="folder" size={17} />Locate folder</WorkspaceAction>
+              <WorkspaceAction disabled={workspace.busy} onClick={() => location.refresh(project.id)}>Try again</WorkspaceAction>
+            </WorkspaceActions></WorkspacePage>{generatedUnsaved && <OutlineView key={project.id} saved={generatedUnsaved} unsaved />}</>
           : <>
-            {project.issue && <div className="workspace-message" role="status"><Icon name="info" size={18} /><p>{project.issue}</p></div>}
+            {project.issue && <WorkspaceMessage><Icon name="info" size={18} /><p>{project.issue}</p></WorkspaceMessage>}
             {displayedOutline && !generationBusy && !generatedUnsaved && <div className="outline-toolbar"><button className="quiet-button" onClick={() => setRefining(previous => ({ ...previous, [project.id]: isRefining ? null : project.outline!.generatedAt }))}>
               <Icon name={isRefining ? 'close' : 'refresh'} size={14} />{isRefining ? 'Back to outline' : 'Refine learning direction'}</button></div>}
             {(!displayedOutline || isRefining) && <ProjectSetup project={project} account={account.snapshot} draft={draft} busy={workspace.busy || generationBusy} refining={Boolean(project.outline)}
@@ -346,7 +347,7 @@ export function App() {
               onCreate={() => void createOutline()}
               onSave={() => void run(api => api.saveProjectBrief({ projectId: project.id, brief: draft }))}
               onModel={modelId => void run(api => api.setProjectModel({ projectId: project.id, modelId }))} onConnect={openAccount} />}
-            {currentModelUnavailable && <p className="model-recovery">Your saved model is unavailable. Choose another project model to create an outline.</p>}
+            {currentModelUnavailable && <WorkspaceMessage warning><Icon name="info" size={18} /><p>Your saved model is unavailable. Choose another project model to create an outline.</p></WorkspaceMessage>}
             {displayedOutline && <OutlineView key={project.id} saved={displayedOutline} unsaved={Boolean(generatedUnsaved)}
               activeTopicId={ai.snapshot?.active?.projectId === project.id ? ai.snapshot.active.topicId : undefined}
               onEdit={() => { generation.clearError(); setEditAccepted(false); setEditTopicId(null); setEditProjectId(project.id) }}

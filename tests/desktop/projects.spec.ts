@@ -94,6 +94,13 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     // Hidden native title chrome may round the Windows content edge by one CSS pixel.
     await expect.poll(() => page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeLessThanOrEqual(301)
     expect(await page.evaluate(() => (globalThis as unknown as { innerWidth: number }).innerWidth)).toBeGreaterThanOrEqual(300)
+    const createAction = page.getByRole('button', { name: 'Create outline', exact: true })
+    await createAction.scrollIntoViewIfNeeded()
+    await expect(createAction).toBeInViewport()
+    expect(await createAction.evaluate(element => {
+      const box = element.getBoundingClientRect()
+      return box.height >= 32 && element.contains(element.ownerDocument.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2))
+    })).toBe(true)
     await page.getByRole('button', { name: 'Save learning goal' }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('button', { name: 'Save learning goal' })).toBeInViewport()
     expect(await page.getByRole('main').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
