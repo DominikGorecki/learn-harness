@@ -50,7 +50,7 @@ test('topic dialog updates its outline branch and real topic files while preserv
     await page.keyboard.press('Escape'); await expect(topicEdit).toBeFocused()
     expect(fixture.inferenceRequests).toHaveLength(0)
     await otherEdit.click(); await expect(input).toHaveValue(''); await input.fill('Other topic draft'); await page.keyboard.press('Escape')
-    await page.getByRole('button', { name: 'Edit learning path' }).click()
+    await page.getByRole('button', { name: 'Edit outline' }).click()
     await expect(page.getByRole('textbox', { name: 'How would you like to change the outline?' })).toHaveValue('')
     await page.keyboard.press('Escape')
     await topicEdit.click(); await expect(input).toHaveValue(changes)

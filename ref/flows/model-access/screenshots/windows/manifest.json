@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "5265d33873bbb657d4d7cfd83cdc8e02b10f2c0ba24db480cdd429f50ad9d66f"
+      "sha256": "4d599cac8069f5288d45e7005b3775fc2996b56a399de687a7d4687101f339ce"
     },
     {
       "id": "model-test-waiting-hint",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "01a90d3ed0928c95266fce208d747d37538f9c8902dab2b7cd394053825b80f0"
+      "sha256": "73769fef2f5536c34e33fb52eeac15b5384a501f4c321fe846de2f9f854d82e0"
     },
     {
       "id": "model-test-dashboard-waiting",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "e7e442dbd19fe99cb529a81ff7c68c37b6d5a4c93bd8caacca1d4bbe05c53304"
+      "sha256": "f8547064fd1c27b750b3541b37ddfb32a328ce1d96e860a59326ec2857fd8f4e"
     },
     {
       "id": "model-test-verified-light",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a3aca436500b457a2a3f95a9483333bc17233c1e72d7022d310eef4d5dd85ce8"
+      "sha256": "840dfd8d0c90511170f7a665923258319f86f99a27723cf82209f9410d8bb638"
     },
     {
       "id": "model-test-verified-dark",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "8428b8b2d083448df6b5c893e424f59d43bb18490f5452bb14981e96d6a15a0b"
+      "sha256": "c13a486dfa5420d68ca15eff929da9aeaaf205038f7bf73f82e0f3c398ed190b"
     }
   ],
-  "capturedAt": "2026-10-06T18:07:24.993Z",
-  "testSha256": "a7d35a932d7580628153dc59fc7deaffc7f8238ba78542bd31fe4a9bdc4090da",
+  "capturedAt": "2026-10-07T13:43:49.030Z",
+  "testSha256": "8c97daff68acef5e52b50fbee87a0e4f2c7266bc4bd9cd850e3bdb18521426fc",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

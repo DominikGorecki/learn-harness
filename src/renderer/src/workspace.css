@@ -100,3 +100,57 @@
 @media (prefers-reduced-motion: reduce) {
   .main-workspace *, .main-workspace-header * { scroll-behavior: auto; transition: none; }
 }
+
+/* Overview and saved topic documents share the central editorial recipe. */
+.main-workspace .outline-view { max-width: 1080px; }
+.main-workspace .workspace-context h2 { margin: 0 0 12px; font-size: 18px; line-height: 1.4; }
+.main-workspace .workspace-context :is(p, li) { font-size: 16px; line-height: 1.65; color: var(--text-secondary); }
+.main-workspace .workspace-context .learning-outcomes { margin: 0; padding: 0; border: 0; }
+.main-workspace .workspace-context .learning-outcomes ul { display: block; list-style: disc; padding-left: 20px; }
+.main-workspace .workspace-context .learning-outcomes li { display: list-item; margin-bottom: 8px; }
+.main-workspace .workspace-depth { margin-top: 12px; }
+.main-workspace .lesson-row { display: block; margin-bottom: 12px; padding: 20px; border: 1px solid var(--workspace-edge); }
+.main-workspace .workspace-topic-row { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+.main-workspace .workspace-topic-row .lesson-number { font-size: 32px; line-height: 1.2; min-width: 44px; padding-top: 3px; }
+.main-workspace .workspace-topic-copy { min-width: 0; flex: 1 1 240px; }
+.main-workspace .workspace-topic-copy h3 { margin: 0 0 6px; }
+.main-workspace .workspace-topic-title { display: inline-block; border: 0; padding: 0; min-height: 32px; max-width: 100%; background: transparent; color: var(--text-primary); font-size: 18px; font-weight: 600; line-height: 1.4; text-align: left; overflow-wrap: anywhere; }
+.main-workspace .workspace-topic-title:hover:not(:disabled) { color: var(--workspace-action-text); }
+.main-workspace .workspace-topic-title:disabled { opacity: 1; cursor: text; }
+.main-workspace .workspace-topic-copy p { color: var(--text-secondary); font-size: 16px; line-height: 1.65; }
+.main-workspace .workspace-topic-copy .starting-label { display: inline-block; margin-top: 8px; }
+.main-workspace .lesson-disclosure { margin-top: 12px; }
+.main-workspace .lesson-disclosure > summary { padding: 4px 0; min-height: 32px; color: var(--text-secondary); font-size: 14px; }
+.main-workspace .lesson-detail { padding: 16px 0 0; }
+.main-workspace .lesson-detail :is(p, li) { font-size: 16px; line-height: 1.65; }
+.main-workspace .outline-context > details > summary { min-height: 40px; font-size: 14px; }
+.main-workspace .outline-context :is(p, li) { font-size: 16px; line-height: 1.65; }
+.main-workspace .workspace-reading-note { margin-top: 16px; color: var(--text-secondary); font-size: 14px; line-height: 1.65; }
+.main-workspace .workspace-topic-breadcrumb { padding-left: 0; margin-bottom: 24px; justify-content: flex-start; }
+.main-workspace .topic-question { color: var(--text-primary); margin-bottom: 12px; }
+.main-workspace .workspace-module-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+.main-workspace .workspace-module { padding: 20px; }
+.main-workspace .workspace-module h3 { margin: 8px 0 12px; font-size: 18px; line-height: 1.4; }
+.main-workspace .workspace-module p { color: var(--text-secondary); font-size: 16px; line-height: 1.65; white-space: pre-wrap; }
+.main-workspace .workspace-module details { margin-top: 16px; }
+.main-workspace .workspace-module summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; min-height: 40px; font-size: 14px; }
+.main-workspace :is(.workspace-topic-title, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .main-workspace .lesson-row { padding: 16px; }
+  .main-workspace .workspace-topic-row { gap: 12px; }
+  .main-workspace .workspace-topic-copy { flex-basis: calc(100% - 60px); }
+  .main-workspace .workspace-topic-row > .workspace-actions { width: 100%; }
+  .main-workspace .workspace-topic-row .workspace-action { flex: 1 1 95px; }
+}
+
+@media (max-height: 420px) {
+  .workspace-topbar.main-workspace-header { min-height: 32px; padding: 0 12px; }
+  .main-workspace .workspace-action { min-height: 32px; padding: 4px 10px; }
+}
+
+@media (max-width: 640px) and (max-height: 420px) {
+  .workspace-topbar.main-workspace-header { flex-wrap: nowrap; }
+  .main-workspace-header .topbar-location { flex-basis: 0; gap: 6px; overflow: hidden; }
+  .main-workspace-header .topbar-actions { flex-wrap: nowrap; gap: 6px; }
+  .main-workspace-header .topbar-actions .model-control { max-width: 140px; }
+}

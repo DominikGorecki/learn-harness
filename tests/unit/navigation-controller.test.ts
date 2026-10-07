@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { NavigationController } from '../../src/renderer/src/app/navigation/controller'
+import { learningOutline } from '../fixtures/learning-outline'
+import { resolveDestination, sameProjectReading } from '../../src/renderer/src/app/navigation/destination'
 import { canGoForward } from '../../src/renderer/src/app/navigation/history'
 import { clampedScroll, supportedAnchor, ViewMementos } from '../../src/renderer/src/app/navigation/mementos'
 import { keyboardCommand } from '../../src/renderer/src/app/navigation/commands'
@@ -70,5 +72,55 @@ describe('bounded context and shortcut policies', () => {
     expect(keyboardCommand({ ...key, isComposing: true }, false, false)).toBeNull()
     expect(keyboardCommand({ ...key, ctrlKey: true }, false, false)).toBeNull()
     expect(keyboardCommand({ ...key, key: '[', altKey: false, metaKey: true }, true, false)).toBe('go-back')
+  })
+})
+
+function savedSnapshot(id = 'A') {
+  const value = snapshot(id)
+  value.activeProject!.outline = { document: learningOutline(), generatedAt: '', model: { id: 'model', name: 'Model' }, brief: '', inferredBrief: null, coverage: { files: [], limitations: [] } }
+  return value
+}
+const topic = (topicId: string, projectHandle = 'A') => ({ kind: 'topic' as const, projectHandle, topicId })
+describe('authoritative saved topic destinations', () => {
+  it('retains stable reading through current-content observations and keeps overview/topic mementos separate', () => {
+    const owner = controller(); visit(owner, 'A')
+    const state = savedSnapshot(), token = owner.begin({ kind: 'push', destination: topic('beliefs') })!.token
+    owner.execute(token); expect(owner.finish(token, state, state)).toBe(true)
+    state.activeProject!.outline!.document.lessons[0]!.title = 'Renamed saved topic'
+    owner.observe(state)
+    expect(owner.state.history.entries.at(-1)).toEqual(topic('beliefs'))
+    const store = new ViewMementos(); store.remember(topic('beliefs'), 50, ['module:beliefs-explain']); store.remember(destination('A'), 20, ['context:scope'])
+    expect(store.get(topic('beliefs'))?.scrollTop).toBe(50); expect(store.get(destination('A'))?.scrollTop).toBe(20)
+    state.activeProject!.writable = false
+    expect(sameProjectReading(topic('beliefs'), state)).toBe(true)
+    expect(resolveDestination(topic('beliefs'), state)?.destination).toEqual(topic('beliefs'))
+    expect(sameProjectReading(topic('beliefs', 'B'), state)).toBe(false)
+  })
+  it('canonicalizes only a missing owned topic, replaces the traversal slot and preserves Forward', () => {
+    const owner = controller(); visit(owner, 'A'); const state = savedSnapshot()
+    const token = owner.begin({ kind: 'push', destination: topic('beliefs') })!.token; owner.execute(token); owner.finish(token, state, state)
+    visit(owner, 'B')
+    const back = owner.begin({ kind: 'traverse', offset: -1 })!; owner.execute(back.token)
+    const missing = savedSnapshot(); missing.activeProject!.outline!.document.lessons.shift()
+    owner.observe(missing); expect(owner.state.pending?.token).toBe(back.token)
+    expect(owner.finish(back.token, state, missing)).toBe(true)
+    expect(owner.state.history.entries).toEqual([{ kind: 'dashboard' }, destination('A'), destination('A'), destination('B')])
+    expect(owner.state.history.cursor).toBe(2); expect(canGoForward(owner.state.history)).toBe(true)
+    expect(owner.notice).toContain('no longer'); owner.observe(missing); expect(owner.notice).toContain('no longer')
+    expect(resolveDestination(topic('beliefs', 'unknown'), missing)).toBeNull()
+    missing.activeProject!.availability = 'missing'
+    expect(resolveDestination(topic('evidence'), missing)?.destination).toEqual(destination('A'))
+  })
+  it('retains a pending same-project token when its current topic disappears and rejects stale identity replies', () => {
+    const owner = controller(); visit(owner, 'A'); const state = savedSnapshot()
+    let token = owner.begin({ kind: 'push', destination: topic('beliefs') })!.token; owner.execute(token); owner.finish(token, state, state)
+    token = owner.begin({ kind: 'push', destination: topic('evidence') })!.token
+    const missing = savedSnapshot(); missing.activeProject!.outline!.document.lessons.shift(); owner.observe(missing)
+    expect(owner.state.pending?.token).toBe(token)
+    owner.execute(token); expect(owner.finish(token, state, missing)).toBe(true)
+    expect(owner.state.history.entries.at(-1)).toEqual(topic('evidence'))
+    const next = owner.begin({ kind: 'push', destination: destination('B') })!; owner.execute(next.token); owner.observe(snapshot('C'))
+    expect(owner.finish(next.token, snapshot('B'), snapshot('C'))).toBe(false)
+    expect(owner.state.history.entries.at(-1)).toEqual(destination('C'))
   })
 })

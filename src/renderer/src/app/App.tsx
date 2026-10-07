@@ -7,6 +7,7 @@ import { useWorkspace } from '../features/projects/useWorkspace'
 import { Dashboard } from '../features/projects/Dashboard'
 import { ProjectSetup } from '../features/projects/ProjectSetup'
 import { ProjectModel } from '../features/projects/ProjectModel'
+import { TopicView } from '../features/projects/TopicView'
 import { OutlineView } from '../features/projects/OutlineView'
 import { OutlineEditDialog } from '../features/projects/OutlineEditDialog'
 import { useGeneration } from '../features/projects/useGeneration'
@@ -22,8 +23,9 @@ import { useAppearance } from '../features/settings/appearance'
 import { ShellChrome } from './ShellChrome'
 import { useNavigation } from './navigation/useNavigation'
 import { useApplicationCommands } from './useApplicationCommands'
-import { destinationFromWorkspace, destinationKey } from './navigation/destination'
+import { destinationFromWorkspace, destinationKey, sameProjectReading } from './navigation/destination'
 import type { AiActivitySnapshot } from '../../../shared/ai/activity'
+import type { AppDestination } from './navigation/destination'
 import type { GenerationSnapshot } from '../../../shared/generation'
 import { WorkspacePage, WorkspaceHeader, WorkspaceActions, WorkspaceAction, WorkspaceMessage } from '../components/Workspace'
 
@@ -136,15 +138,19 @@ export function App() {
     const state = projectNavigationState(latestAi.current?.active ?? null, active, admissionPending.current || cancellationPending.current)
     return storagePending.current ? { busy: true, saving: true, canProceed: false } : state
   }, [])
-  const available = useCallback(() => !navigationOwnership().busy, [navigationOwnership])
-  const guardNavigation = useCallback(async () => {
+  const available = useCallback((target: AppDestination | null) => sameProjectReading(target, workspace.latest()) || !navigationOwnership().busy, [navigationOwnership, workspace])
+  const guardNavigation = useCallback(async (target: AppDestination | null) => {
+    if (sameProjectReading(target, workspace.latest())) return true
     const ownership = navigationOwnership()
     if (!ownership.busy) return true
     if (ownership.saving || !ownership.canProceed) { setSavingNotice(true); return false }
     setPendingNavigation(true)
     return new Promise<boolean>(resolve => { navigationDecision.current = resolve })
-  }, [navigationOwnership])
+  }, [navigationOwnership, workspace])
   const location = useNavigation(workspace, scroll, guardNavigation, available, closeNavigation)
+  const topicId = location.destination?.kind === 'topic' && location.destination.projectHandle === project?.id ? location.destination.topicId : null
+  const renderedDestination = location.destination && (location.destination.kind === 'dashboard' ? !project : location.destination.projectHandle === project?.id) ? location.destination : workspace.snapshot ? destinationFromWorkspace(workspace.snapshot) : null
+  const readingTopic = project?.outline?.document.lessons.find(topic => topic.id === topicId)
   const openProject = location.open
   const selectProject = location.select
   const dashboard = location.dashboard
@@ -229,6 +235,12 @@ export function App() {
   const isRefining = Boolean(project?.outline && refining[project.id] === project.outline.generatedAt)
   const editDraftKey = JSON.stringify([project?.id, editTopicId])
   const editedTopic = project?.outline?.document.lessons.find(lesson => lesson.id === editTopicId)
+  useEffect(() => {
+    if (editProjectId === project?.id && editTopicId && !editedTopic) {
+      const request = requestAnimationFrame(() => { setEditProjectId(null); (document.getElementById('topic-heading') ?? document.getElementById('outline-heading'))?.focus({ preventScroll: true }) })
+      return () => cancelAnimationFrame(request)
+    }
+  }, [editProjectId, editTopicId, editedTopic, project?.id])
   const editRevision = editedTopic ? JSON.stringify(editedTopic) : project?.outline?.generatedAt ?? ''
   const editDraft = project?.outline && editDrafts[editDraftKey]?.outlineAt === editRevision ? editDrafts[editDraftKey]!.text : ''
   const rewriteOutline = async () => {
@@ -263,13 +275,16 @@ export function App() {
       setConfirmSave(true)
     } else void retrySave(target.projectId, target.id)
   }
-  const reviewInput = () => {
+  const reviewInput = async () => {
     const target = visibleOperation?.projectId ?? panelRun?.projectId
     if (target && target !== project?.id) { selectProject(target); return }
     if (project?.outline && visibleOperation?.kind !== 'create-outline') {
       setEditAccepted(false); setEditTopicId(visibleOperation?.topicId ?? panelRun?.topicId ?? null); setEditProjectId(project.id)
     } else {
-      if (project?.outline) setRefining(previous => ({ ...previous, [project.id]: project.outline!.generatedAt }))
+      if (project?.outline) {
+        setRefining(previous => ({ ...previous, [project.id]: project.outline!.generatedAt }))
+        if (readingTopic && !await location.select(project.id)) return
+      }
       requestAnimationFrame(() => document.getElementById('learning-details')?.focus())
     }
   }
@@ -322,7 +337,8 @@ export function App() {
           {!showSidebar && <button className="icon-button" aria-label="Account settings" onClick={openAccount}><Icon name="user" size={18} /></button>}
         </div>
       </header>
-      <main id="workspace" data-project-handle={project?.id} data-destination={workspace.snapshot ? destinationKey(destinationFromWorkspace(workspace.snapshot)) : undefined} className="workspace-scroll main-workspace" ref={scroll} tabIndex={-1} aria-busy={workspace.busy}>
+      <main id="workspace" data-project-handle={project?.id} data-destination={renderedDestination ? destinationKey(renderedDestination) : undefined} className="workspace-scroll main-workspace" ref={scroll} tabIndex={-1} aria-busy={workspace.busy}>
+        {location.notice && <WorkspaceMessage><p>{location.notice}</p></WorkspaceMessage>}
         {ai.error && !panelVisible && <WorkspaceMessage error><p>{ai.error}</p><WorkspaceAction onClick={() => void ai.refresh()}>Refresh AI activity</WorkspaceAction></WorkspaceMessage>}
         {generation.error && <WorkspaceMessage error><p>{generation.error}</p><WorkspaceAction aria-label="Dismiss outline message" onClick={generation.clearError}><Icon name="close" size={16} />Dismiss</WorkspaceAction></WorkspaceMessage>}
         {(workspace.error || workspace.snapshot?.issue) && <WorkspaceMessage error><Icon name="info" size={18} />
@@ -336,7 +352,9 @@ export function App() {
               <WorkspaceAction primary disabled={workspace.busy} onClick={() => location.refresh(project.id, true)}><Icon name="folder" size={17} />Locate folder</WorkspaceAction>
               <WorkspaceAction disabled={workspace.busy} onClick={() => location.refresh(project.id)}>Try again</WorkspaceAction>
             </WorkspaceActions></WorkspacePage>{generatedUnsaved && <OutlineView key={project.id} saved={generatedUnsaved} unsaved />}</>
-          : <>
+          : readingTopic && project.outline ? <>{project.issue && <WorkspaceMessage><Icon name="info" size={18} /><p>{project.issue}</p></WorkspaceMessage>}<TopicView key={`${project.id}:${readingTopic.id}`} topic={readingTopic} projectTitle={project.outline.document.title} onOverview={() => location.select(project.id)}
+            onEdit={() => { generation.clearError(); setEditAccepted(false); setEditTopicId(readingTopic.id); setEditProjectId(project.id) }}
+            editDisabled={!project.writable || workspace.busy || anyGenerationBusy || aiBusy || Boolean(generatedUnsaved) || submittingEdit} /></> : <>
             {project.issue && <WorkspaceMessage><Icon name="info" size={18} /><p>{project.issue}</p></WorkspaceMessage>}
             {displayedOutline && !generationBusy && !generatedUnsaved && <div className="outline-toolbar"><button className="quiet-button" onClick={() => setRefining(previous => ({ ...previous, [project.id]: isRefining ? null : project.outline!.generatedAt }))}>
               <Icon name={isRefining ? 'close' : 'refresh'} size={14} />{isRefining ? 'Back to outline' : 'Refine learning direction'}</button></div>}
@@ -349,6 +367,7 @@ export function App() {
               onModel={modelId => void run(api => api.setProjectModel({ projectId: project.id, modelId }))} onConnect={openAccount} />}
             {currentModelUnavailable && <WorkspaceMessage warning><Icon name="info" size={18} /><p>Your saved model is unavailable. Choose another project model to create an outline.</p></WorkspaceMessage>}
             {displayedOutline && <OutlineView key={project.id} saved={displayedOutline} unsaved={Boolean(generatedUnsaved)}
+              onOpenTopic={topicId => location.topic(project.id, topicId)}
               activeTopicId={ai.snapshot?.active?.projectId === project.id ? ai.snapshot.active.topicId : undefined}
               onEdit={() => { generation.clearError(); setEditAccepted(false); setEditTopicId(null); setEditProjectId(project.id) }}
               onEditTopic={topicId => { generation.clearError(); setEditAccepted(false); setEditTopicId(topicId); setEditProjectId(project.id) }}
@@ -358,14 +377,14 @@ export function App() {
       {panelVisible && <AiActivityPanel operation={visibleOperation} recovery={panelRun} active={Boolean(ai.snapshot?.active)} heading={panelHeading} focusRequest={focusRequest} onFocusHandled={handledFocus}
         awaiting={awaitingActivity ? acceptedContext : null}
         onCancel={() => { if (ai.snapshot?.active) void ai.cancel(ai.snapshot.active.operationId) }}
-        onDismiss={() => { setDismissedActivity(visibleOperation?.operationId ?? latestOperation?.operationId ?? null); setDismissedRecovery(panelRun?.id ?? recoverableRun?.id ?? null); setRecoveryPresentationId(null); if (document.activeElement?.closest('.ai-panel')) (document.getElementById('project-heading') ?? document.getElementById('outline-heading') ?? document.getElementById('dashboard-heading') ?? scroll.current)?.focus({ preventScroll: true }) }}
+        onDismiss={() => { setDismissedActivity(visibleOperation?.operationId ?? latestOperation?.operationId ?? null); setDismissedRecovery(panelRun?.id ?? recoverableRun?.id ?? null); setRecoveryPresentationId(null); if (document.activeElement?.closest('.ai-panel')) (document.getElementById('project-heading') ?? document.getElementById('topic-heading') ?? document.getElementById('outline-heading') ?? document.getElementById('dashboard-heading') ?? scroll.current)?.focus({ preventScroll: true }) }}
         onSave={() => saveRun(panelRun)} onConnect={openAccount} onInput={reviewInput} onRefresh={() => void ai.refresh()} error={ai.error}
         diagnosticMessage={visibleOperation?.kind.startsWith('test-') ? account.snapshot?.modelTestMessage ?? null : null} />}
     </div>
     <AccountPanel open={accountOpen} onClose={() => { setAccountOpen(false); if (narrow && !accountAccepted.current) navigationToggle.current?.focus() }} account={account} locked={aiBusy} onTest={modelId => void testModel(modelId)} />
     <SettingsPanel open={settingsOpen} onClose={() => { setSettingsOpen(false); settingsTrigger.current?.focus() }}
       appearance={appearance.appearance} onAppearance={appearance.chooseAppearance} persistent={appearance.persistent} />
-    {project?.outline && <OutlineEditDialog open={editProjectId === project.id} outline={project.outline} topicId={editTopicId} draft={editDraft}
+    {project?.outline && <OutlineEditDialog open={editProjectId === project.id && (!editTopicId || Boolean(editedTopic))} outline={project.outline} topicId={editTopicId} draft={editDraft}
       modelName={account.snapshot?.models.find(model => model.id === modelId)?.name ?? project.selectedModel?.name ?? ''}
       canSubmit={project.writable && !workspace.busy && !anyGenerationBusy && !aiBusy && !generatedUnsaved && !currentModelUnavailable}
       restoreFocus={!editAccepted}

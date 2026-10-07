@@ -1,12 +1,14 @@
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
-import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { startChatGPTFixture } from '../fixtures/chatgpt-provider'
 import type { AccountApi } from '../../src/shared/account'
 import type { AiApi } from '../../src/shared/ai/activity'
 import type { WorkspaceApi } from '../../src/shared/workspace'
+import { learningOutline } from '../fixtures/learning-outline'
+import { createProjectStorage } from '../../src/main/storage/project-storage'
 import type { GenerationApi } from '../../src/shared/generation'
 
 test('extra choices survive restart while independent diagnostic evidence resets', { tag: '@model-access', annotation: { type: 'flow', description: 'model-access' } }, async ({ playwright, flow }) => {
@@ -15,9 +17,10 @@ test('extra choices survive restart while independent diagnostic evidence resets
   // Keep the suite's normal 45-second limit unchanged.
   test.setTimeout(150_000)
   const fixture = await startChatGPTFixture({ modelTestMode: 'failed' })
-  const root = await mkdtemp(join(tmpdir(), 'edu-model-test-'))
+  const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-model-test-')))
   const project = join(root, 'Learning project')
   await mkdir(project)
+  await createProjectStorage().save(project, { version: 1, projectId: 'diagnostic-reading', revision: 1, name: 'Learning project', createdAt: '2026-10-07T12:00:00Z', updatedAt: '2026-10-07T12:00:00Z', selectedModel: { id: 'fixture-model', name: 'Learning model' }, brief: 'Bayesian reasoning', outline: { generatedAt: '2026-10-07T12:00:00Z', model: { id: 'fixture-model', name: 'Learning model' }, brief: 'Bayesian reasoning', inferredBrief: null, document: learningOutline(), coverage: { files: [], limitations: [] } } }, null)
   const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && key !== 'ELECTRON_RUN_AS_NODE' && key !== 'ELECTRON_RENDERER_URL')) as Record<string, string>
   const launch = () => playwright._electron.launch({ args: [resolve('out/main/index.js')], env: { ...env,
     EDU_HARNESS_TEST_DATA_DIR: join(root, 'profile'), EDU_HARNESS_TEST_PROVIDER_URL: fixture.baseUrl } })
@@ -60,7 +63,7 @@ test('extra choices survive restart while independent diagnostic evidence resets
     await page.getByRole('button', { name: 'Test GPT-6.1 Sol', exact: true }).click()
     await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeVisible()
     await expect(page.getByRole('region', { name: 'Model test evidence', exact: true })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Create outline', exact: true })).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Edit outline', exact: true })).toBeDisabled()
     await expect(page.locator('.ai-panel').getByLabel('Model test evidence')).not.toContainText('Bayesian')
     await expect.poll(() => fixture.inferenceRequests.length).toBe(2)
     const pending = await page.evaluate(async () => {
@@ -104,6 +107,10 @@ test('extra choices survive restart while independent diagnostic evidence resets
       const value = await (globalThis as unknown as { learning: AiApi }).learning.getAiActivity()
       return value.ok ? value.data.active!.operationId : null
     })
+    await page.getByRole('button', { name: 'Open first topic', exact: true }).click()
+    await expect(page.locator('#topic-heading')).toHaveText('Beliefs before evidence')
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.locator('#outline-heading')).toBeVisible()
     await page.getByRole('button', { name: 'Back', exact: true }).click()
     await expect(page.locator('#dashboard-heading')).toBeVisible()
     await expect(page.getByRole('dialog', { name: 'An outline is still in progress' })).not.toBeVisible()
@@ -111,6 +118,9 @@ test('extra choices survive restart while independent diagnostic evidence resets
     await flow.capture(desktop, page, 'model-test-dashboard-waiting')
     await page.getByRole('button', { name: 'Forward', exact: true }).click()
     await expect(page.locator('.workspace-title')).toHaveText('Learning project')
+    await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeEnabled()
+    await page.getByRole('button', { name: 'Forward', exact: true }).click()
+    await expect(page.locator('#topic-heading')).toHaveText('Beliefs before evidence')
     await expect(page.getByRole('button', { name: 'Forward', exact: true })).toBeDisabled()
     expect(await page.evaluate(async () => {
       const value = await (globalThis as unknown as { learning: AiApi }).learning.getAiActivity()

@@ -1,0 +1,119 @@
+{
+  "flow": "topic-reading",
+  "captures": [
+    {
+      "id": "saved-overview-light",
+      "caption": "Saved overview with full context and independent quiet commands in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "782d0a97e73a29e65175e3b180da97f75b0b8c1ac0b69d8102caf13f28182827"
+    },
+    {
+      "id": "saved-topic-light",
+      "caption": "Complete saved topic with its retained learning-task disclosure in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "3003e3fa132487f103481959c551a41e6c621acc478ffd5df7a529c737fbca35"
+    },
+    {
+      "id": "saved-topic-readonly",
+      "caption": "Typed main-sent read-only presentation fixture retains saved reading and its issue while edits are disabled.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "017b4fe9de4f492de16c21352a4dc8afc9e8ed963d4847124be8f93f42d157d0"
+    },
+    {
+      "id": "saved-topic-dark",
+      "caption": "Current renamed saved topic in Dark without inference.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "ae9ae11b8434a8c3b66f11c5bd4f3a68f877197572a7c52b299ff97073c00eca"
+    },
+    {
+      "id": "saved-overview-dark",
+      "caption": "Saved overview with independent quiet commands in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "6902f61324168031d930d093e99fdf7b51b122b483bb29448ff37e5b5e5d13cd"
+    },
+    {
+      "id": "saved-topic-zoom",
+      "caption": "Independent topic actions at 600 pixels and 200% Electron zoom.",
+      "width": 752,
+      "height": 802,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 321
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "d4c56f9187d797b8a5106474321b343ef777419268ec12109dfd09c765745c53"
+    },
+    {
+      "id": "missing-topic-overview",
+      "caption": "A removed saved topic resolves to its current owning outline with an explanation.",
+      "width": 1600,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "4bbdd70b28ac78b7c489f26972a27c39d9a5d58b42d68103c600a5e616411b14"
+    }
+  ],
+  "capturedAt": "2026-10-07T13:44:29.242Z",
+  "testSha256": "598aa19d118c196c96b1dba60ed99d5ab90e8c498afe02e9cbff5bc22cd01f48",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/topic-reading.spec.ts",
+  "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
+  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

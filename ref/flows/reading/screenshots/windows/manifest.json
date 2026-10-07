@@ -14,7 +14,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "526a6220636489355f7aa4910a4437c827beac777a2f3878e21246bb9659ae3d"
+      "sha256": "e3fa7437a76f8ee5b0bcb33927c171878a1334f60edc7d2677e8445253ba749b"
     },
     {
       "id": "unreadable-project",
@@ -29,16 +29,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "e2309eeabae713fae79f84c3a8983e51041565529389ff7f75e7aabf6a1d0175"
+      "sha256": "f113608362cabfc13f68528ffd86c2ccd6fe84bca35b90e1d07e696d47d5a794"
     }
   ],
-  "capturedAt": "2026-10-06T18:07:55.296Z",
-  "testSha256": "47a32978379a30e4e48ec0edbecc18fdf92d4b119ed3bbc7baee084387d3f972",
+  "capturedAt": "2026-10-07T13:44:08.334Z",
+  "testSha256": "d244ebf4d60e30ae06b01ef972c48e80c4cdb40c71e907a072f41c96f428dce7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/reading.spec.ts",
   "testTitle": "long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

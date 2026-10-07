@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cf4781c3df3376ec56004471cee3f6caa9a9cd2390cac4cf5a89af8c15271fe3"
+      "sha256": "3299276fac31e07704db5abef8cf66c29f80962284238bba6a4dc1101dfc2f35"
     },
     {
       "id": "outline-edit-dark",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c7dcffe6451dcdd15f3d1e3c604ac69b56c7e19c6cfb6ec3f995b0a5cd29169b"
+      "sha256": "09c6da42bdead6d048b5f46affa94b1242eae272e68a3b935f3b43906a2a2cf0"
     },
     {
       "id": "outline-edit-zoom",
@@ -44,7 +44,37 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "86bd177533dd1e14b71310bd0b3ff53f1fa42b4900ed212c28d515a2720b05ae"
+      "sha256": "64cb098990ff5927cb3d844d7571f83bab13d8d389219f46e1876c6999cb69e9"
+    },
+    {
+      "id": "saved-topic-receiving-zoom",
+      "caption": "Saved-topic reading action remains usable with the real receiving dock at minimum size and 200% zoom.",
+      "width": 752,
+      "height": 603,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 241
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "65641f5910ee75bdef7eed91b4585516865fe6dafd6cf26e894085479613d56d"
+    },
+    {
+      "id": "saved-topic-saving-zoom",
+      "caption": "Saved-topic reading action remains usable while validated publication is held at 600 by 480 and 200% zoom.",
+      "width": 752,
+      "height": 603,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 241
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "03dd89ba8495dd5cb9aeff4f9428479b14c44ad350c93d5133f0aef1c0f7d665"
     },
     {
       "id": "outline-edit-rejected",
@@ -59,16 +89,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "252d7740106435b7569df1b9ccdb028d95d5fbd033c8ec786d75a139024b8729"
+      "sha256": "e877896de1540802850938bfb7aa9d7e67d43fde2d5d4400f33fc7ed00938d3b"
     }
   ],
-  "capturedAt": "2026-10-06T18:07:40.087Z",
-  "testSha256": "8f608a4621abcfe43d82a6f0ebe203ff19ccc46c04dff56e2b1e37d57c4a174d",
+  "capturedAt": "2026-10-07T13:44:00.457Z",
+  "testSha256": "3ab6a6b8b4fa9fcde64046f1751408942936eb66dab0f31b5d063005fb13c7f6",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline-edit.spec.ts",
   "testTitle": "edit dialog rewrites the numbered path through Pi with the active model and persists it across restart",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -1,3 +1,4 @@
+import { learningOutline } from '../fixtures/learning-outline'
 import { aiActivity } from '../fixtures/ai-activity'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
@@ -130,6 +131,15 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await expect(page.locator('.ai-panel').getByText(/Your ChatGPT usage limit has been reached/)).toBeVisible()
     expect((await saved()).outline).toEqual(original)
     await expect(page.getByRole('textbox')).toHaveValue('A deeper look at evidence and base rates')
+    await page.getByRole('button', { name: 'Open first topic', exact: true }).click()
+    await expect(page.locator('#topic-heading')).toBeVisible()
+    await page.getByRole('button', { name: 'Review your request', exact: true }).click()
+    await expect(page.getByRole('textbox')).toHaveValue('A deeper look at evidence and base rates')
+    await expect(page.getByRole('textbox')).toBeFocused()
+    expect(fixture.inferenceRequests).toHaveLength(3)
+    // Return to the original retained overview before exercising cross-project guard targets.
+    await page.getByRole('button', { name: 'Back', exact: true }).click(); await expect(page.locator('#topic-heading')).toBeVisible()
+    await page.getByRole('button', { name: 'Back', exact: true }).click(); await expect(page.locator('#outline-heading')).toBeVisible()
     await page.locator('.ai-panel').getByText(/Your ChatGPT usage limit has been reached/).scrollIntoViewIfNeeded()
     await flow.capture(desktop, page, 'usage-recovery')
     await page.getByRole('button', { name: 'Review ChatGPT connection' }).click()
@@ -211,11 +221,29 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await expect(page.locator('.workspace-title')).toHaveText('Second subject')
     await page.getByRole('button', { name: 'Back', exact: true }).click()
     await expect(page.locator('.workspace-title')).toHaveText('Bayesian reasoning')
+    const candidate = learningOutline(); candidate.title = 'A distinctly revised unsaved learning path'; candidate.lessons[0]!.title = 'Proposed beliefs topic awaiting publication'; candidate.lessons[0]!.overview = 'This proposed topic has not entered saved project state.'
+    fixture.options.outlineResult = candidate; fixture.options.inferenceMode = 'preview-hold'
+    await page.getByRole('button', { name: 'Open first topic', exact: true }).click()
+    await expect(page.locator('#topic-heading')).toBeVisible()
+    await page.getByRole('button', { name: 'Back to outline', exact: true }).click()
     await page.getByRole('button', { name: 'Create new outline', exact: true }).click()
     await page.getByRole('dialog').getByRole('button', { name: 'Create new outline', exact: true }).click()
     await expect.poll(() => fixture.inferenceRequests.length).toBe(6)
     await writeFile(file, JSON.stringify({ ...await saved(), brief: 'Edited outside the app during generation' }))
     fixture.completePending()
+    await expect(page.getByText('Not saved yet', { exact: true })).toBeVisible()
+    await expect(page.locator('#outline-heading')).toHaveText(candidate.title)
+    await expect(page.getByRole('button', { name: candidate.lessons[0]!.title, exact: true })).toBeDisabled()
+    await expect(page.getByRole('button', { name: 'Open first topic', exact: true })).toBeDisabled()
+    for (const command of await page.getByRole('button', { name: 'Open topic', exact: true }).all()) await expect(command).toBeDisabled()
+    await expect(page.getByRole('main')).toContainText('Save this result before opening its proposed topics')
+    const unsavedBytes = await readFile(file, 'utf8')
+    await page.getByRole('button', { name: 'Back', exact: true }).click()
+    await expect(page.locator('#topic-heading')).toHaveText(original!.document.lessons[0]!.title)
+    await page.getByRole('button', { name: 'Forward', exact: true }).click()
+    await expect(page.getByText('Not saved yet', { exact: true })).toBeVisible()
+    expect(await readFile(file, 'utf8')).toBe(unsavedBytes)
+    expect(fixture.inferenceRequests).toHaveLength(6)
     await page.getByRole('button', { name: 'Review save conflict' }).click()
     await expect(page.getByRole('dialog', { name: 'Save over the changed outline?' })).toBeVisible()
     await page.getByRole('button', { name: 'Keep reviewing' }).click()

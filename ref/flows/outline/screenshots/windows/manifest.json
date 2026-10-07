@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "4ff80b834e2e3b674254abbc604ccb116e76eb055ae2dbc035c9f3e916892ea6"
+      "sha256": "d093170fd9aaa053d17dfc8aa32c480f0bcb16943fda0e9b5c24e2a03f7ab2d1"
     },
     {
       "id": "outline-streaming-dark",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "b4acc8bf29edacb107bfea0847e46bea29e413fcef9a9e1dc766e7b992269e2c"
+      "sha256": "ecb298f122dd45a6b9602199b08d64a54257e0ccfac64b1026a2b75a7ee3ae56"
     },
     {
       "id": "outline-streaming-zoom",
@@ -44,7 +44,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "90ed3d0c2456e8e83a704e21b958aea1b9c9a0bf236359703d8bf8bac4ce9e29"
+      "sha256": "80d08bcc6d8753440bf266b2aa3d97c0f4333b141f27df123af88c80572a51eb"
     },
     {
       "id": "outline-overview",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "8d0ba29ff04331150815ee5bae3204ccf0afe244169d855c4cd36fceb644165e"
+      "sha256": "f54ccf792b5f36f705037d175f324bc18883f616c1083eaec20d316cc7652146"
     },
     {
       "id": "generated-outline",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "7360a2ecdbf24a1b59f3eb57b65a090af1bd03dba621767d3532c79648c2f7cd"
+      "sha256": "e8c61d7ce0c8124ce031b9d1d7cd7b2d1c5558a3e92d5703a0b13c6edfa42047"
     }
   ],
-  "capturedAt": "2026-10-06T18:07:48.306Z",
+  "capturedAt": "2026-10-07T13:44:06.187Z",
   "testSha256": "5907a8bef5b0bb3e9147bd9c6e84962df8f2e7c6cc3f2cc647f59c38d999c052",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline.spec.ts",
   "testTitle": "Pi utility process creates, validates, saves and reopens an outline; cancellation preserves prior work",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

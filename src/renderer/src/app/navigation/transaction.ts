@@ -22,6 +22,7 @@ export interface NavigationState<D> {
 
 export type NavigationOutcome<D> =
   | { readonly kind: 'accepted'; readonly destination: D }
+  | { readonly kind: 'canonicalized'; readonly requested: D; readonly destination: D }
   | { readonly kind: 'canceled' | 'rejected' | 'stale' }
 
 export function createNavigationState<D>(): NavigationState<D> {
@@ -56,8 +57,13 @@ export function settleNavigation<D>(state: NavigationState<D>, token: number, ou
   const pending = state.pending
   if (!pending || pending.token !== token) return state
   const settled = { ...state, pending: null }
-  if (outcome.kind !== 'accepted') return settled
-  if (pending.destination !== null && !equal(pending.destination, outcome.destination)) return settled
+  if (outcome.kind !== 'accepted' && outcome.kind !== 'canonicalized') return settled
+  if (pending.destination !== null && !equal(pending.destination, outcome.kind === 'canonicalized' ? outcome.requested : outcome.destination)) return settled
+  if (outcome.kind === 'canonicalized' && pending.kind === 'traverse') {
+    const entries = [...state.history.entries]
+    entries[pending.cursor] = outcome.destination
+    return { ...settled, history: { entries, cursor: pending.cursor } }
+  }
   const history = applyHistoryEffect(state.history, pending.kind === 'traverse'
     ? { kind: 'traverse', cursor: pending.cursor }
     : { kind: pending.kind, destination: outcome.destination }, equal)

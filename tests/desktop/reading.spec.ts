@@ -16,7 +16,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
   await writeFile(join(corrupt, '.edu/project.json'), invalid)
   const outline = learningOutline()
   outline.title = 'Understanding the many ways that evidence, uncertainty, assumptions and prior beliefs shape decisions in complex systems'
-  outline.lessons = Array.from({ length: 20 }, (_, index) => ({ ...structuredClone(outline.lessons[index % 2]!), id: `lesson-${index}`, title: `Lesson ${index + 1}: ${outline.lessons[index % 2]!.title}`, overview: 'A meaningful overview with room for extended context. '.repeat(35) }))
+  outline.lessons = Array.from({ length: 40 }, (_, index) => ({ ...structuredClone(outline.lessons[index % 2]!), id: `lesson-${index}`, title: `Lesson ${index + 1}: ${outline.lessons[index % 2]!.title}`, overview: 'A meaningful overview with room for extended context. '.repeat(35) }))
   outline.startingLessonId = 'lesson-0'
   const model = { id: 'saved-model', name: 'A saved model with a deliberately long descriptive name for checking small windows and unavailable account states' }
   const document: ProjectDocument = { version: 1, projectId: 'reading-project', revision: 1, name: outline.title, createdAt: '2026-10-04T12:00:00Z', updatedAt: '2026-10-04T12:00:00Z',
@@ -36,7 +36,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await expect(page.getByRole('heading', { name: outline.title, exact: true })).toBeVisible()
     await expect(page.getByLabel('Project model')).toHaveValue('saved-model')
-    await expect(page.locator('.lesson-disclosure')).toHaveCount(20)
+    await expect(page.locator('.lesson-disclosure')).toHaveCount(40)
     await page.locator('.lesson-disclosure').first().locator('summary').focus()
     await page.keyboard.press('Enter')
     await expect(page.locator('.lesson-disclosure').first()).toHaveAttribute('open', '')
@@ -49,6 +49,10 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     expect(await page.getByRole('main').evaluate(element => element.clientHeight)).toBeGreaterThan(150)
     await page.getByRole('button', { name: 'Refine learning direction' }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('button', { name: 'Refine learning direction' })).toBeInViewport()
+    for (const label of ['Open first topic', 'Edit outline']) {
+      const action = page.getByRole('button', { name: label, exact: true }); await action.scrollIntoViewIfNeeded(); await expect(action).toBeInViewport(); expect(await action.evaluate(element => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(32)
+    }
+    expect(await page.getByRole('main').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
     await flow.capture(desktop, page, 'long-outline-zoom')
     await page.emulateMedia({ reducedMotion: 'reduce' })
     expect(await page.locator('.workspace-enter').evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).animationName)).toBe('none')

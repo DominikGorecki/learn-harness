@@ -4,7 +4,7 @@ import type { useWorkspace } from '../../features/projects/useWorkspace'
 import type { WorkspaceApi, WorkspaceSnapshot } from '../../../../shared/workspace'
 import type { ApiResult } from '../../../../shared/contracts'
 import { NavigationController } from './controller'
-import { destinationFromWorkspace, destinationKey } from './destination'
+import { destinationKey, sameProjectReading } from './destination'
 import { canGoBack, canGoForward, currentDestination } from './history'
 import { createNavigationState } from './transaction'
 import type { NavigationIntent } from './transaction'
@@ -13,7 +13,7 @@ import { ViewMementos, supportedAnchor } from './mementos'
 import { capturePresentation, restorePresentation } from './view-memento-dom'
 
 export function useNavigation(workspace: ReturnType<typeof useWorkspace>, main: RefObject<HTMLElement | null>,
-  guard: () => Promise<boolean>, available: () => boolean, close: () => void) {
+  guard: (target: AppDestination | null) => Promise<boolean>, available: (target: AppDestination | null) => boolean, close: () => void) {
   const [state, setState] = useState(createNavigationState<AppDestination>)
   const [controller] = useState(() => new NavigationController(setState))
   const [mementos] = useState(() => new ViewMementos())
@@ -27,12 +27,13 @@ export function useNavigation(workspace: ReturnType<typeof useWorkspace>, main: 
       const target = event.target as HTMLElement | null, element = main.current
       if (!target || !element?.contains(target)) return
       const anchor = target.closest<HTMLElement>('[data-focus-anchor]')?.dataset.focusAnchor ?? null
-      const destination: AppDestination = element.dataset.projectHandle ? { kind: 'project', projectHandle: element.dataset.projectHandle } : { kind: 'dashboard' }
+      const destination = currentDestination(controller.state.history)
+      if (!destination || element.dataset.destination !== destinationKey(destination)) return
       mementos.track(destination, supportedAnchor(anchor) ? anchor : null)
     }
     document.addEventListener('focusin', focus)
     return () => document.removeEventListener('focusin', focus)
-  }, [main, mementos])
+  }, [main, mementos, controller])
   useLayoutEffect(() => {
     const destination = currentDestination(state.history), element = main.current
     if (!element || !destination || restoredHistory.current === state.history && restoredRequest.current === restorationRequest || element.dataset.destination !== destinationKey(destination)) return
@@ -47,19 +48,22 @@ export function useNavigation(workspace: ReturnType<typeof useWorkspace>, main: 
     if (!transaction) return
     close()
     try {
-      if (!await guard() || !available() || !controller.execute(transaction.token)) { controller.reject(transaction.token); return }
-      const before = latest(), element = main.current
-      if (before && element) capturePresentation(mementos, destinationFromWorkspace(before), element)
       const target = transaction.destination
-      const reply = await run(api => action ? action(api) : !target ? api.openProject() : target.kind === 'dashboard' ? api.showDashboard() : api.selectProject({ projectId: target.projectHandle }))
+      if (!await guard(action ? null : target) || !available(action ? null : target) || !controller.execute(transaction.token)) { controller.reject(transaction.token); return }
+      const before = latest(), element = main.current
+      const current = currentDestination(controller.state.history)
+      if (before && element && current) capturePresentation(mementos, current, element)
+      const reply = !action && sameProjectReading(target, before) ? latest() : await run(api => action ? action(api) : !target ? api.openProject() : target.kind === 'dashboard' ? api.showDashboard() : api.selectProject({ projectId: target.projectHandle }))
       const accepted = controller.finish(transaction.token, reply, latest())
       if (accepted && action) setRestorationRequest(value => value + 1)
+      return accepted
     } catch { controller.reject(transaction.token) }
   }
-  return { state, ready: state.history.cursor >= 0, pending: Boolean(state.pending), back: canGoBack(state.history), forward: canGoForward(state.history),
+  return { state, destination: currentDestination(state.history), notice: controller.notice, ready: state.history.cursor >= 0, pending: Boolean(state.pending), back: canGoBack(state.history), forward: canGoForward(state.history),
     open: () => void navigate({ kind: 'push', destination: null }),
     dashboard: () => void navigate({ kind: 'push', destination: { kind: 'dashboard' } }),
-    select: (projectHandle: string) => void navigate({ kind: 'push', destination: { kind: 'project', projectHandle } }),
+    select: (projectHandle: string) => navigate({ kind: 'push', destination: { kind: 'project', projectHandle } }),
+    topic: (projectHandle: string, topicId: string) => void navigate({ kind: 'push', destination: { kind: 'topic', projectHandle, topicId } }),
     goBack: () => void navigate({ kind: 'traverse', offset: -1 }), goForward: () => void navigate({ kind: 'traverse', offset: 1 }),
     refresh: (projectHandle: string, locate = false) => void navigate({ kind: 'replace', destination: { kind: 'project', projectHandle } }, api => locate ? api.locateProject({ projectId: projectHandle }) : api.selectProject({ projectId: projectHandle })) }
 }

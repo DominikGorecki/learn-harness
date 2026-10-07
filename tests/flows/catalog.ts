@@ -39,6 +39,8 @@ export const flows: Record<string, FlowDefinition> = {
     'generated-outline': 'Expanded first topic with its module plan.'
   } },
   'outline-edit': { title: 'Whole-path outline rewriting', testFile: 'outline-edit.spec.ts', screenshots: {
+    'saved-topic-receiving-zoom': 'Saved-topic reading action remains usable with the real receiving dock at minimum size and 200% zoom.',
+    'saved-topic-saving-zoom': 'Saved-topic reading action remains usable while validated publication is held at 600 by 480 and 200% zoom.',
     'outline-edit-rejected': 'Raced admission rejection preserves the editor and its input while the diagnostic owns AI activity.',
     'outline-edit-light': 'Whole-path editor with a numbered change request in Light mode.',
     'outline-edit-dark': 'Preserved whole-path draft in Dark mode.',
@@ -60,6 +62,15 @@ export const flows: Record<string, FlowDefinition> = {
     'generation-pending': 'A real utility-process request held by the local provider fixture.',
     'generated-unsaved': 'A generated outline retained after an actual filesystem save failure.',
     'usage-recovery': 'Provider usage-limit feedback with the learner draft preserved.'
+  } },
+  'topic-reading': { title: 'Saved topic reading and history', testFile: 'topic-reading.spec.ts', screenshots: {
+    'saved-overview-light': 'Saved overview with full context and independent quiet commands in Light.',
+    'saved-overview-dark': 'Saved overview with independent quiet commands in Dark.',
+    'saved-topic-light': 'Complete saved topic with its retained learning-task disclosure in Light.',
+    'saved-topic-dark': 'Current renamed saved topic in Dark without inference.',
+    'saved-topic-readonly': 'Typed main-sent read-only presentation fixture retains saved reading and its issue while edits are disabled.',
+    'saved-topic-zoom': 'Independent topic actions at 600 pixels and 200% Electron zoom.',
+    'missing-topic-overview': 'A removed saved topic resolves to its current owning outline with an explanation.'
   } },
   reading: { title: 'Long outlines and unavailable state', testFile: 'reading.spec.ts', screenshots: {
     'long-outline-zoom': 'Long offline outline at narrow width and 200% Electron zoom.',

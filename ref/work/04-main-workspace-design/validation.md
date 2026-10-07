@@ -33,3 +33,18 @@ Worker workspace_foundation used gpt-6.1-sol/high. Primary inspected all source/
 - First sandbox Vitest attempt failed EPERM before tests ran; authorized execution passed. A test-only DOM type reference was fixed before final checks. No application security weakening.
 
 R01/R02/R11–R14 foundation covered; outline/topic, active dock, branding and final consumer/evidence coverage remain later tickets. Native/manual screen reader, IME and other hosts are unrun qualifications, not inferred from these captures. Fixture-owned processes/profile/provider cleaned up.
+
+T01 commit: 15802600833d551f31cf00466a7fd9b3a81b13f9.
+
+## T02 — accepted saved reading and navigation
+
+Worker topic_workspace (gpt-6.1-sol/high); two read-only reviewers inspected navigation/AI races and 26 selected/runtime images. Primary inspected source/new files and actual overview/topic/read-only/editor/minimum Receiving/Saving images.
+
+- Worker and independent primary npm run check: passed; 28 unit files, 324 tests passed/3 skipped, lint/flows/types/build.
+- Final frozen-source npm run test:desktop -- tests/desktop/topic-reading.spec.ts tests/desktop/navigation.spec.ts tests/desktop/reading.spec.ts tests/desktop/outline.spec.ts tests/desktop/outline-edit.spec.ts tests/desktop/topic-edit.spec.ts tests/desktop/recovery.spec.ts tests/desktop/model-test.spec.ts: 8/8 passed (1.8m). Final test:flows and diff check passed.
+- Non-first recommendation, full saved reading, exact original/final bytes, no inference, 40 topics, rename/deletion/Forward, per-destination scroll/disclosure/focus, edit trigger return, disappearing editor topic and held real-selection subscription/reply gap covered.
+- Real operation/file fixtures preserve owner/request count/bytes during Receiving, Cancelling and Saving; dashboard/other-project guards and storage-only retry remain. Distinct proposed result disables its reading commands; saved history remains readable. Create-outline request recovery now navigates to the retained input through the shared controller.
+- Minimum 600x480 at 200% Receiving and Saving retain a fully painted/hit-testable >=32px Back to outline. Central short-height commands reduce from 40px to 32px and contextual header stays 32px; dock/chrome/panels remain unchanged.
+- Opaque endpoint contrast lower bounds (primary/secondary/muted/action/focus): Light 13.47/5.09/4.66/5.88/5.20; Dark 11.80/6.42/5.28/6.20/4.96. Final composed-state contrast review remains T04.
+
+Review resolved two race/recovery defects and the minimum-size geometry failure before the final passes. Read-only renderer coverage is an explicitly typed main-sent fixture over real files, not Windows ACL evidence. The model-test dashboard PNG privacy mask crosses part of its dock header; use other captures/assertions for that header. Native ACL/screen-reader/IME/other-host/live-provider qualifications remain unrun. Owned wrappers/barriers/apps/profiles/projects were cleaned. R03–R10 and outline/topic R11–R14 are locally accepted; whole-bundle coverage/branding remains T03/T04.

@@ -8,9 +8,9 @@ Isolated profile, two saved offline outlines sharing stable lesson IDs and an em
 
 ## Journey and assertions
 
-Traverse actual project visits, restore disclosures, focus and main scroll, preserve Forward on same-location clicks and chooser cancellation, branch to a project with an oversized goal draft, and invoke the real native View command callback. Scope commands during editing, composition and a modal. Remove a remembered topic in current saved content and verify safe heading fallback. Reach and repair a known unavailable destination without adding a visit. Hit-test compact controls at 600 x 480 and 200% zoom in both themes.
+Traverse actual project visits, restore inline Preview topic plan/context disclosures, focus and main scroll, preserve Forward on same-location clicks and chooser cancellation, branch to a project with an oversized goal draft, and invoke the real native View command callback. Scope commands during editing, composition and a modal. Remove a remembered topic in current saved content and verify safe heading fallback. Reach and repair a known unavailable destination without adding a visit. Hit-test compact controls at 600 x 480 and 200% zoom in both themes.
 
-Reject an unknown profile handle through the real selection service, and inject one owning IPC BUSY or INTERNAL result before any selection mutation; current identity and Forward remain intact. Hold a chooser's real resolution and deliver duplicate commands while pending, then reject a valid stale revision through the real preload consumer. Settings, account, editor drafts, disclosures and sidebar changes retain the branch. Relink a moved folder under the same profile handle, externally rename its saved metadata, and traverse the retained branch using that current name without adding a visit.
+Reject an unknown profile handle through the real selection service, and inject one owning IPC BUSY or INTERNAL result before any selection mutation; current identity and Forward remain intact. Hold a chooser's real resolution and deliver duplicate commands while pending, then reject a valid stale revision through the real preload consumer. Settings, account, independent labelled Edit outline/Edit topic commands, editor drafts, disclosures and sidebar changes retain the branch. The separate [topic-reading flow](../topic-reading/index.md) covers real stable topic destinations and missing-topic canonicalization. Relink a moved folder under the same profile handle, externally rename its saved metadata, and traverse the retained branch using that current name without adding a visit.
 
 The recorded Windows journey enters the top-level menus with F10 and an Alt mnemonic, restores the original editor focus for the native popup, invokes its actual Select All role callback, then dismisses back to that editor. It verifies full selection, keyboard text replacement and Undo. This exercises the owning native popup and focused role callback; it does not select a native popup row with OS keyboard input.
 
@@ -30,7 +30,7 @@ The injected BUSY/INTERNAL replies establish rejected-transition behavior at the
 
 ### windows
 
-Last successful run: 2026-10-06T18:07:30.463Z. Source revision: bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0; source changes present: false.
+Last successful run: 2026-10-07T13:43:53.595Z. Source revision: 15802600833d551f31cf00466a7fd9b3a81b13f9; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

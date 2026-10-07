@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "8d7523099020f10ad7e3a5672c34796a59658b67ed2fdc8eb62e87ce57c6f88d"
+      "sha256": "d04478e95e93b61f38feb71579a4acbd220c8dc3d0e8c8b0ff1809624c247426"
     },
     {
       "id": "generated-unsaved",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "73b37ad3d0a6008fb2a5d4dbce9674451bae274c62aa6957aa043ad05ed9e81a"
+      "sha256": "d02d33d8b5ae0e3d8db2904e0c9111eecaf6d14a56eab362a581563957c51da0"
     },
     {
       "id": "usage-recovery",
@@ -44,16 +44,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2e3570b186736f2dfb8423979feea7b461ad337888b6d522e904b69beae3cb2b"
+      "sha256": "f67e2f232808cdfad5c2b81fc77658c7735c4f07b62449626bcfdf787e1bf7b8"
     }
   ],
-  "capturedAt": "2026-10-06T18:08:11.819Z",
-  "testSha256": "83d723731b481edd3146964c4cb5f42ebc68b0c4173bba7d5f6662f2ca8928e8",
+  "capturedAt": "2026-10-07T13:44:18.508Z",
+  "testSha256": "6c188f67af3ddad9052b400ce968c4003293ab11f67d32cdb4bce7026442523a",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/recovery.spec.ts",
   "testTitle": "save retry, model recovery, usage limits, and explicit cancellation before switching preserve work",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
-  "sourceDirty": false,
+  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

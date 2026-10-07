@@ -1,5 +1,5 @@
 import type { WorkspaceSnapshot } from '../../../../shared/workspace'
-import { destinationFromWorkspace, sameDestination } from './destination'
+import { destinationFromWorkspace, resolveDestination, sameDestination } from './destination'
 import type { AppDestination } from './destination'
 import { beginNavigation, createNavigationState, reconcileNavigation, settleNavigation } from './transaction'
 import type { NavigationIntent, NavigationState, NavigationTransaction } from './transaction'
@@ -9,17 +9,24 @@ import { currentDestination } from './history'
 export class NavigationController {
   state: NavigationState<AppDestination> = createNavigationState()
   private executing: number | null = null
+  notice: string | null = null
   constructor(private readonly changed: (state: NavigationState<AppDestination>) => void) {}
   private publish(next: NavigationState<AppDestination>) {
     if (next !== this.state) { this.state = next; this.changed(next) }
   }
   observe(snapshot: WorkspaceSnapshot) {
-    const destination = destinationFromWorkspace(snapshot), pending = this.state.pending
+    const base = destinationFromWorkspace(snapshot), pending = this.state.pending
     const current = currentDestination(this.state.history)
     if (pending && this.executing === pending.token) {
-      if (!pending.destination || sameDestination(pending.destination, destination) || current && sameDestination(current, destination)) return
+      if (!pending.destination || resolveDestination(pending.destination, snapshot) || current && resolveDestination(current, snapshot)) return
     }
-    this.publish(reconcileNavigation(this.state, destination, sameDestination))
+    const resolved = current ? resolveDestination(current, snapshot) : null
+    if (resolved?.notice) this.notice = resolved.notice
+    else if (!resolved) this.notice = null
+    const next = reconcileNavigation(this.state, resolved?.destination ?? base, sameDestination)
+    // Same-project content changes do not revoke an intent waiting at its guard.
+    const sameIdentity = current && sameDestination(current.kind === 'topic' ? { kind: 'project', projectHandle: current.projectHandle } : current, base)
+    this.publish(pending && sameIdentity ? { ...next, pending } : next)
   }
   begin(intent: NavigationIntent<AppDestination>): NavigationTransaction<AppDestination> | null {
     const previous = this.state
@@ -40,10 +47,16 @@ export class NavigationController {
   reject(token: number) { this.finish(token, null, null) }
   finish(token: number, reply: WorkspaceSnapshot | null, latest: WorkspaceSnapshot | null): boolean {
     const pending = this.state.pending
-    const destination = reply ? destinationFromWorkspace(reply) : null
-    const accepted = pending?.token === token && destination !== null && latest !== null &&
-      sameDestination(destination, destinationFromWorkspace(latest)) && (!pending.destination || sameDestination(pending.destination, destination))
-    this.publish(settleNavigation(this.state, token, accepted ? { kind: 'accepted', destination } : { kind: 'rejected' }, sameDestination))
+    const target = pending?.destination ?? (reply ? destinationFromWorkspace(reply) : null)
+    const resolved = target && latest ? resolveDestination(target, latest) : null
+    const accepted = pending?.token === token && reply !== null && latest !== null && resolved !== null &&
+      sameDestination(destinationFromWorkspace(reply), destinationFromWorkspace(latest))
+    if (accepted) this.notice = resolved.notice
+    this.publish(settleNavigation(this.state, token, accepted
+      ? pending.destination && !sameDestination(pending.destination, resolved.destination)
+        ? { kind: 'canonicalized', requested: pending.destination, destination: resolved.destination }
+        : { kind: 'accepted', destination: resolved.destination }
+      : { kind: 'rejected' }, sameDestination))
     if (this.executing === token) this.executing = null
     if (latest && !accepted) this.observe(latest)
     return Boolean(accepted)

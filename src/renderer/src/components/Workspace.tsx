@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
 import '../workspace.css'
 
 // Presentation only: features retain authoritative content, state and callbacks.
@@ -30,8 +30,8 @@ export function WorkspaceAction({ children, className = '', primary = false, ...
   return <button type="button" {...props} className={`workspace-action ${primary ? 'workspace-action-primary' : ''} ${className}`}>{children}</button>
 }
 
-export function WorkspaceRow({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`workspace-row ${className}`}>{children}</div>
+export function WorkspaceRow({ children, className = '', ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div {...props} className={`workspace-row ${className}`}>{children}</div>
 }
 
 export function WorkspaceSection({ children, title, id, count }: { children: ReactNode; title: string; id?: string; count?: ReactNode }) {

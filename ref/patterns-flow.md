@@ -18,6 +18,7 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Topic editing](flows/topic-edit/index.md) | Topic draft isolation, owned-file publication and preservation of other topics |
 | [Materials](flows/materials/index.md) | Folder-only setup, source coverage, clarification, unsupported files |
 | [Recovery](flows/recovery/index.md) | Pending/unsaved results, storage retry, usage limits, worker loss, conflicts |
+| [Topic reading](flows/topic-reading/index.md) | Authoritative saved topics, stable history, current-content fallback and reading restoration |
 | [Reading](flows/reading/index.md) | Offline long outlines, narrow/zoomed layout, missing/corrupt/read-only state |
 | [Model access](flows/model-access/index.md) | Extra model options, independent optional tests, session verification |
 | [Diagnostics](flows/diagnostics/index.md) | Nonvisual safe main/renderer/preload logging assertions |
