@@ -9,12 +9,17 @@ export async function startImageFixture() {
   const requests: { path: string; body: Record<string, unknown> | null; authorization: string | undefined; startedAt: number }[] = []
   let delayMs = 0, bodyChunkMs = 0
   let alternating = false, imageIndex = 0, failureStatus: number | null = null
+  let metadataFailure = false, metadataGate: Promise<void> | null = null, releaseMetadata: (() => void) | null = null
   const server = createServer(async (request, response) => {
     const chunks: Buffer[] = []; for await (const chunk of request) chunks.push(Buffer.from(chunk))
     const body = chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : null
     requests.push({ path: request.url!, body, authorization: request.headers.authorization, startedAt: Date.now() })
     response.setHeader('Content-Type', 'application/json')
     if (request.url !== '/api/v1/images') {
+      if (request.url === '/api/v1/images/models') {
+        if (metadataGate) await metadataGate
+        if (metadataFailure) { response.statusCode = 503; response.end('{}'); return }
+      }
       response.end(JSON.stringify(request.url === '/api/v1/key' ? routerKey : request.url === '/api/v1/images/models' ? routerCatalog : routerEndpoint(request.url!.slice('/api/v1/images/models/'.length, -'/endpoints'.length)))); return
     }
     if (failureStatus) { const status = failureStatus; failureStatus = null; response.statusCode = status; response.end(JSON.stringify({ error: 'Fixture image failure', usage: { cost: '0.045' } })); return }
@@ -37,6 +42,9 @@ export async function startImageFixture() {
   const address = server.address() as { port: number }
   return { baseUrl: `http://127.0.0.1:${address.port}/api/v1`, png, secondPng, requests,
     alternateImages() { alternating = true }, failNext(status: number) { failureStatus = status },
+    failMetadata(value: boolean) { metadataFailure = value },
+    holdMetadata() { metadataGate = new Promise<void>(resolve => { releaseMetadata = resolve }) },
+    releaseMetadata() { releaseMetadata?.(); metadataGate = null; releaseMetadata = null },
     delay(ms: number) { delayMs = ms }, chunkEvery(ms: number) { bodyChunkMs = ms },
-    async close() { server.closeAllConnections(); await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())) } }
+    async close() { releaseMetadata?.(); server.closeAllConnections(); await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())) } }
 }

@@ -129,6 +129,7 @@ export const flows: Record<string, FlowDefinition> = {
   'packaged-worker': { title: 'Packaged Pi worker', testFile: 'packaged-worker.spec.ts', screenshots: {} },
   'image-worker': { title: 'Sanctioned image utility transport and accounting', testFile: 'image-worker.spec.ts', screenshots: {} },
   'topic-content': { title: 'Checkpointed illustrated chapter lifecycle', testFile: 'topic-content.spec.ts', screenshots: {} },
+  'topic-content-preflight': { title: 'Explicit image metadata preflight', testFile: 'topic-content.spec.ts', screenshots: {} },
   'topic-content-recovery': { title: 'Explicit illustration completion and retry', testFile: 'topic-content.spec.ts', screenshots: {} },
   'topic-content-barriers': { title: 'Chapter durable-write and cleanup barriers', testFile: 'topic-content.spec.ts', screenshots: {} },
   'topic-media': { title: 'Authorized local chapter media', testFile: 'topic-content.spec.ts', screenshots: {} }

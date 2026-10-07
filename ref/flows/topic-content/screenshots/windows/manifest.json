@@ -1,13 +1,13 @@
 {
   "flow": "topic-content",
   "captures": [],
-  "capturedAt": "2026-10-07T21:49:11.077Z",
-  "testSha256": "74e8a90f2081feb898ebb37bc1337cf6fbb2e40e520ec5222170ae34d43b8a3c",
+  "capturedAt": "2026-10-07T22:30:53.801Z",
+  "testSha256": "b3c855d59f19a31397b0ca4b3d6145ef784176744f1ee8256ecb9b9ef29acd0d",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-content.spec.ts",
   "testTitle": "chapter tools checkpoint two decoded illustrations through global admission and reopen without inference",
-  "revision": "5a8af6b8ed27727c3e08cf7222fa544be42521d7",
+  "revision": "8d424f368fff3f687e4059dd9a920b0c6bc2526a",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

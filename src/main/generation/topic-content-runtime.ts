@@ -8,6 +8,7 @@ import type { AiCoordinator } from '../../core/ai/coordinator'
 import { runPiWorker } from './worker-client'
 import { imageWorkerAuthority, recordImageDisposition } from './image-worker-authority'
 import { collectMaterials } from './material-snapshot'
+import { prepareImageProvider } from './image-provider-preflight'
 
 export function topicContentRuntime(options: { repository: TopicContentRepositoryAdapter; account: AccountService; provider: OpenRouterService; ai: AiCoordinator; textBaseUrl: string }) {
   const engine: TopicContentEngine = {
@@ -32,10 +33,10 @@ export function topicContentRuntime(options: { repository: TopicContentRepositor
     }
   }
   async function images(): Promise<ChapterImageSession | null> {
-    const provider = options.provider, quote = provider.getImageConfiguration(1)
-    if (!quote.available || !quote.settings) return null
-    const lease = provider.acquireImageLease()
-    return { modelId: lease.modelId, settings: quote.settings,
+    const provider = options.provider, prepared = await prepareImageProvider(provider)
+    if (!prepared) return null
+    const { lease, settings } = prepared
+    return { modelId: lease.modelId, settings,
       async generate(context, checkpoint, imageId, aiLease, requested, accepted, progress) {
         const planned = checkpoint.plan.images.find(image => image.id === imageId)
         if (!planned) throw new ApplicationError('INVALID_INPUT', 'This image was not planned.')

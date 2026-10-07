@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T05 — Generate checkpointed illustrated chapters through the shared AI lifecycle
-Status: Done — local implementation accepted; bundle UI/live qualification remains pending
+Status: Done — locally accepted; whole-bundle/live qualification pending
 
 ## Source
 
@@ -64,6 +64,10 @@ Concrete review fixes preserve source/manifest baselines, retire published runs,
 Final stable-tree gates: `npm.cmd run check` passed (38 unit files, 453 passed / 3 skipped, lint/flow audit/type scopes/build); `npm.cmd run test:desktop -- tests/desktop/topic-content.spec.ts` passed four flows in 1.1 minutes; fresh `npm.cmd run package` then `npm.cmd run test:packaged` both passed, with one ASAR test in 4.0 seconds. Packaged outline, Sol/Luna diagnostics, chapter/guidance and image/Sharp profiles passed with actual PID absence. The four nonvisual chapter/media/recovery/barrier flow manifests and ASAR assertions were reviewed; they establish local process/storage evidence, not visual or live editorial qualification. Earlier fixture type/lint assertions and duplicate flow-reporter registration failures were corrected before these passing commands; no active sessions or owned fixture resources remain. No paid live/private credentials; Settings/reader/standalone replacement and mandatory live/editorial/native qualifications remain separate pending gates.
 
 ## Notes
+
+After accepted runtime commit and T06 integration, primary found that empty/unknown or failed provider metadata caused the runtime to return no image session before reaching the existing stale-refresh policy. The accepted main-owned repair acquires provider ownership first, refreshes stale metadata once and pins prior compatible settings; incompatible changes and discovery failures dispatch no image request. Startup/reading/quotes and deliberate text-only paths remain HTTP-free. Cancellation holds configuration/global admission until bounded discovery drains, then performs no inference.
+
+Follow-up worker: gpt-6.1-sol, high, against T06 HEAD `8d424f368fff3f687e4059dd9a920b0c6bc2526a`. Primary reviewed the actual helper, eight focused tests, fixture controls, Electron assertions and all five nonvisual manifests. Final stable `npm.cmd run check` passed: 40 unit files, 464 passed / 3 skipped, lint/flows/types/build. `npm.cmd run test:desktop -- tests/desktop/topic-content.spec.ts` passed five flows in 1.7 minutes, including eight isolated cache/key/cancel scenarios, exact metadata/image counts, accepted raster bytes, unchanged project bytes and existing lifecycle/media/recovery/barrier regressions. Initial sandboxed focused units hit Vite realpath EPERM before execution; approved retry passed. All sessions and owned resources cleaned up; no paid/live/private credentials. Packaging was not repeated because worker resources/native dependencies are unchanged; T09 still requires fresh cumulative packaging.
 
 - Requirements covered: R01, R02, R03, R04, R05, R06, R07, R08, R09, R11, R12, R13, R14, R16, R27, R28, R31, R34, R35.
 - Assumptions: the source spec's bounded defaults apply; no additional product blocker.

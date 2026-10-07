@@ -28,6 +28,93 @@ async function open(desktop: ElectronApplication, path: string): Promise<{ page:
 }
 async function settled(page: Page) { await expect.poll(async () => { const state = await page.evaluate(() => window.learning.getAiActivity()); return state.ok ? state.data.active : 'error' }, { timeout: 30_000 }).toBeNull() }
 
+test('explicit image preflight recovers cold and stale caches without background HTTP or paid retries', { tag: '@topic-content-preflight', annotation: { type: 'flow', description: 'topic-content-preflight' } }, async ({ playwright }) => {
+  test.setTimeout(180_000)
+  const fixture = await startChapterFixture(), images = await startImageFixture()
+  try {
+    for (const scenario of ['empty', 'aged', 'fresh', 'failed', 'failure', 'no-key', 'text-only', 'cancel'] as const) {
+      let root = '', desktop: ElectronApplication | undefined
+      images.failMetadata(false)
+      try {
+        const project = await topicContentProject(value => { root = value }), profile = join(root, 'desktop-profile')
+        project.document.selectedModel = { id: 'fixture-model', name: 'Learning model' }; project.document.outline!.model = project.document.selectedModel
+        await writeFile(join(project.path, '.edu/project.json'), JSON.stringify(project.document)); await writeFile(join(project.path, 'notes.md'), 'Visible assumptions and observed evidence.')
+        const before = await readFile(join(project.path, '.edu/project.json'))
+        const launch = () => playwright._electron.launch({ args: [resolve('out/main/index.js')], env: { ...environment(), EDU_HARNESS_TEST_DATA_DIR: profile, EDU_HARNESS_TEST_PROVIDER_URL: fixture.baseUrl, EDU_HARNESS_TEST_OPENROUTER_URL: images.baseUrl } })
+        desktop = await launch(); let { page, projectId } = await open(desktop, project.path)
+        await page.evaluate(() => window.learning.connectAccount())
+        await expect.poll(async () => { const result = await page.evaluate(() => window.learning.getAccount()); return result.ok ? result.data.modelsStatus : 'error' }).toBe('ready')
+        if (scenario !== 'no-key') expect(await page.evaluate(() => window.learning.saveOpenRouterKey({ key: 'sk-or-fixture-private-key' }))).toMatchObject({ ok: true })
+        await desktop.close()
+        const cachePath = join(profile, 'openrouter/openrouter-cache.json')
+        if (['empty', 'text-only', 'cancel', 'failure'].includes(scenario)) await rm(cachePath)
+        if (scenario === 'aged') {
+          const cache = JSON.parse(await readFile(cachePath, 'utf8'))
+          for (const model of cache.models) model.checkedAt = '2026-10-01T00:00:00Z'
+          await writeFile(cachePath, JSON.stringify(cache))
+        }
+        const start = images.requests.length, textStart = fixture.inferenceRequests.length
+        desktop = await launch(); ({ page, projectId } = await open(desktop, project.path))
+        const identity = { projectId, topicId: 'beliefs' }
+        await page.evaluate(async identity => { await window.learning.getOpenRouterSettings(); await window.learning.getTopicImageConfiguration({ imageCount: 2 }); await window.learning.getTopicContent(identity) }, identity)
+        expect(images.requests.length, `${scenario}: startup/read/quote`).toBe(start)
+        if (scenario === 'failed') {
+          images.failMetadata(true)
+          expect(await page.evaluate(() => window.learning.refreshOpenRouterMetadata())).toMatchObject({ ok: false })
+          expect(await page.evaluate(() => window.learning.getOpenRouterSettings())).toMatchObject({ ok: true, data: { metadataStale: true, connection: 'offline' } })
+          images.failMetadata(false)
+        }
+        if (scenario === 'failure') images.failMetadata(true)
+        if (scenario === 'cancel') images.holdMetadata()
+        const activationStart = images.requests.length
+        if (scenario === 'cancel') {
+          await page.evaluate(identity => {
+            const state = globalThis as unknown as { preflightStart: Promise<unknown> }
+            state.preflightStart = window.learning.generateTopicContent({ ...identity, mode: 'illustrated', replace: false, expectedRevisionId: null })
+          }, identity)
+          await expect.poll(() => images.requests.length).toBe(activationStart + 1)
+          expect(await page.evaluate(() => window.learning.removeOpenRouterKey())).toMatchObject({ ok: false, error: { code: 'BUSY' } })
+          expect(await page.evaluate(() => window.learning.setOpenRouterImageModel({ modelId: 'google/gemini-3.1-flash-image' }))).toMatchObject({ ok: false, error: { code: 'BUSY' } })
+          expect(await page.evaluate(() => window.learning.testSolModel())).toMatchObject({ ok: false, error: { code: 'BUSY' } })
+          await page.evaluate(async () => {
+            const activity = await window.learning.getAiActivity()
+            if (!activity.ok || !activity.data.active) throw new Error('Preflight ownership missing')
+            ;(globalThis as unknown as { preflightCancel: Promise<unknown> }).preflightCancel = window.learning.cancelAiOperation({ operationId: activity.data.active.operationId })
+          })
+          expect(await page.evaluate(() => window.learning.removeOpenRouterKey())).toMatchObject({ ok: false, error: { code: 'BUSY' } })
+          images.releaseMetadata()
+          await page.evaluate(() => (globalThis as unknown as { preflightStart: Promise<unknown> }).preflightStart)
+          expect(await page.evaluate(() => (globalThis as unknown as { preflightCancel: Promise<unknown> }).preflightCancel)).toMatchObject({ ok: true })
+          await settled(page)
+          expect(await page.evaluate(() => window.learning.getAiActivity())).toMatchObject({ ok: true, data: { settled: { outcome: 'cancelled' } } })
+          expect(fixture.inferenceRequests).toHaveLength(textStart)
+          expect(images.requests.slice(activationStart).filter(request => request.path === '/api/v1/images')).toHaveLength(0)
+          expect(await page.evaluate(() => window.learning.removeOpenRouterKey())).toMatchObject({ ok: true })
+        } else {
+          expect(await page.evaluate(({ identity, textOnly }) => window.learning.generateTopicContent({ ...identity, mode: textOnly ? 'text-only' : 'illustrated', replace: false, expectedRevisionId: null }), { identity, textOnly: scenario === 'text-only' })).toMatchObject({ ok: true })
+          await settled(page)
+          const content = await page.evaluate(identity => window.learning.getTopicContent(identity), identity)
+          if (!content.ok || !content.data) throw new Error(`${scenario}: Chapter missing`)
+          const illustrated = ['empty', 'aged', 'fresh', 'failed'].includes(scenario)
+          expect(content.data.status).toBe(illustrated ? 'illustrated' : scenario === 'text-only' ? 'text-only' : 'needs-images')
+          const calls = images.requests.slice(activationStart), posts = calls.filter(request => request.path === '/api/v1/images')
+          expect(posts).toHaveLength(illustrated ? 2 : 0)
+          expect(calls.filter(request => request.path !== '/api/v1/images')).toHaveLength(['empty', 'aged', 'failed'].includes(scenario) ? 5 : scenario === 'failure' ? 1 : 0)
+          if (illustrated) expect(await readFile(join(project.path, content.data.images[0]!.asset!.path))).toEqual(images.png)
+          if (scenario === 'failure') {
+            const count = fixture.inferenceRequests.length
+            expect(await page.evaluate(request => window.learning.completeTopicContentImages(request), { ...identity, chapterId: content.data.identity.chapterId, revisionId: content.data.identity.revisionId })).toMatchObject({ ok: false, error: { code: 'UNAVAILABLE' } })
+            await settled(page); expect(fixture.inferenceRequests).toHaveLength(count)
+            expect(images.requests.slice(activationStart).filter(request => request.path === '/api/v1/images')).toHaveLength(0)
+            expect(await page.evaluate(() => window.learning.removeOpenRouterKey())).toMatchObject({ ok: true })
+          }
+        }
+        expect(await readFile(join(project.path, '.edu/project.json'))).toEqual(before)
+      } finally { images.releaseMetadata(); if (desktop) await desktop.close(); if (root) await rm(root, { recursive: true, force: true }) }
+    }
+  } finally { await fixture.close(); await images.close() }
+})
+
 test('chapter tools checkpoint two decoded illustrations through global admission and reopen without inference', { tag: '@topic-content', annotation: { type: 'flow', description: 'topic-content' } }, async ({ playwright }) => {
   test.setTimeout(120_000)
   let root = '', desktop: ElectronApplication | undefined

@@ -1,6 +1,6 @@
 # Illustrated topic content ticket map
 
-Status: In progress — T01–T06 locally accepted; T05 cache-preflight follow-up before T07
+Status: In progress — T01–T06 locally accepted; T05 cache-preflight accepted before T07
 
 Source: [spec](illustrated-topic-content.spec.md)
 

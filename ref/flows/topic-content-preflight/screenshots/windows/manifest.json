@@ -1,12 +1,12 @@
 {
-  "flow": "topic-media",
+  "flow": "topic-content-preflight",
   "captures": [],
-  "capturedAt": "2026-10-07T22:30:55.153Z",
+  "capturedAt": "2026-10-07T22:30:46.289Z",
   "testSha256": "b3c855d59f19a31397b0ca4b3d6145ef784176744f1ee8256ecb9b9ef29acd0d",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-content.spec.ts",
-  "testTitle": "local media scheme permits only canonical owning-window image GETs and the trusted initiator",
+  "testTitle": "explicit image preflight recovers cold and stale caches without background HTTP or paid retries",
   "revision": "8d424f368fff3f687e4059dd9a920b0c6bc2526a",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
