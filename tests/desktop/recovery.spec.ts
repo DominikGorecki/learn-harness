@@ -1,3 +1,4 @@
+import { setDesktopAppearance } from '../fixtures/desktop-appearance'
 import { learningOutline } from '../fixtures/learning-outline'
 import { aiActivity } from '../fixtures/ai-activity'
 import { expect, test } from '../flows/fixture'
@@ -67,6 +68,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await page.getByRole('button', { name: 'Retry save' }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('button', { name: 'Retry save' })).toBeInViewport()
     await flow.capture(desktop, page, 'generated-unsaved')
+    await setDesktopAppearance(page, 'Dark'); await expect(page.getByText('Not saved yet', { exact: true })).toBeVisible(); await flow.capture(desktop, page, 'generated-unsaved-dark'); await setDesktopAppearance(page, 'Light')
     await page.getByRole('button', { name: 'Dismiss AI activity' }).click()
     await expect(page.locator('.ai-panel')).toHaveCount(0)
     await expect(page.locator('#outline-heading')).toBeFocused()
@@ -142,6 +144,7 @@ test('save retry, model recovery, usage limits, and explicit cancellation before
     await page.getByRole('button', { name: 'Back', exact: true }).click(); await expect(page.locator('#outline-heading')).toBeVisible()
     await page.locator('.ai-panel').getByText(/Your ChatGPT usage limit has been reached/).scrollIntoViewIfNeeded()
     await flow.capture(desktop, page, 'usage-recovery')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'usage-recovery-dark'); await setDesktopAppearance(page, 'Light')
     await page.getByRole('button', { name: 'Review ChatGPT connection' }).click()
     await page.getByRole('button', { name: 'Check availability' }).click()
     await expect(page.getByRole('heading', { name: 'Connected to ChatGPT' })).toBeVisible()

@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "782d0a97e73a29e65175e3b180da97f75b0b8c1ac0b69d8102caf13f28182827"
+      "sha256": "c556b07ec0813a966c73ae753b86efc443c86e3faa4be496d02201438ce27b0c"
     },
     {
       "id": "saved-topic-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "3003e3fa132487f103481959c551a41e6c621acc478ffd5df7a529c737fbca35"
+      "sha256": "390e2a5f6c662566170a1134dd111aab66b78c74d06cb678203f36fa50ca459f"
     },
     {
       "id": "saved-topic-readonly",
@@ -44,7 +44,22 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "017b4fe9de4f492de16c21352a4dc8afc9e8ed963d4847124be8f93f42d157d0"
+      "sha256": "d6a2cfb5dff3cc6627aa9e16d299f7512613073a90fe8d839b8628f61080088f"
+    },
+    {
+      "id": "saved-topic-readonly-dark",
+      "caption": "The same typed read-only saved-topic presentation in Dark.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "f8771838bddbb81413e7fcab64d904a8d0bc8b9543a04cd45cb8d935dbe58283"
     },
     {
       "id": "saved-topic-dark",
@@ -59,7 +74,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "ae9ae11b8434a8c3b66f11c5bd4f3a68f877197572a7c52b299ff97073c00eca"
+      "sha256": "24bc2b5741ec5d81a226d1d5735a555f603fb696c8bfe7fff37512dfb3d2e843"
     },
     {
       "id": "saved-overview-dark",
@@ -74,7 +89,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "6902f61324168031d930d093e99fdf7b51b122b483bb29448ff37e5b5e5d13cd"
+      "sha256": "a780a93bfb3c6eb98dab49094303011d5d1880b80d31480ea9e596d5fa78e54a"
     },
     {
       "id": "saved-topic-zoom",
@@ -104,16 +119,31 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "4bbdd70b28ac78b7c489f26972a27c39d9a5d58b42d68103c600a5e616411b14"
+      "sha256": "b8ff716be8a51b8fa586cb45058a3e284c385f3b65b7ddc594d35b831692a247"
+    },
+    {
+      "id": "missing-topic-overview-light",
+      "caption": "The same removed-topic fallback and reason in Light.",
+      "width": 1600,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1280,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "ac4a1141ef3b4e734511e9295892d9b3aa637d46d181797ec962bec0037d696d"
     }
   ],
-  "capturedAt": "2026-10-07T13:44:29.242Z",
-  "testSha256": "598aa19d118c196c96b1dba60ed99d5ab90e8c498afe02e9cbff5bc22cd01f48",
+  "capturedAt": "2026-10-07T16:35:57.631Z",
+  "testSha256": "77f278ed49cade13687a6af324bb8750e5a6fbb8a6815189e776f1e9c313ca9e",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "revision": "5cfb859424e0a3cf9a96d5fda35b8f1246dd2830",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

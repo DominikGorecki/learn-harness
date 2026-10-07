@@ -1,6 +1,6 @@
 # Saved topic reading and history
 
-[Test implementation](../../../tests/desktop/topic-reading.spec.ts) � [Flow patterns](../../patterns-flow.md)
+[Test implementation](../../../tests/desktop/topic-reading.spec.ts) · [Flow patterns](../../patterns-flow.md)
 
 ## Starting conditions
 
@@ -24,7 +24,7 @@ These are isolated renderer/bridge/storage fixtures. Pure resolver/admission tes
 
 ### windows
 
-Last successful run: 2026-10-07T13:44:29.242Z. Source revision: 15802600833d551f31cf00466a7fd9b3a81b13f9; source changes present: true.
+Last successful run: 2026-10-07T16:35:57.631Z. Source revision: 5cfb859424e0a3cf9a96d5fda35b8f1246dd2830; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 
@@ -33,9 +33,11 @@ Last successful run: 2026-10-07T13:44:29.242Z. Source revision: 15802600833d551f
 | [saved-overview-light](screenshots/windows/saved-overview-light.png) | Saved overview with full context and independent quiet commands in Light. | 1603 × 1053 |
 | [saved-topic-light](screenshots/windows/saved-topic-light.png) | Complete saved topic with its retained learning-task disclosure in Light. | 1603 × 1053 |
 | [saved-topic-readonly](screenshots/windows/saved-topic-readonly.png) | Typed main-sent read-only presentation fixture retains saved reading and its issue while edits are disabled. | 1603 × 1053 |
+| [saved-topic-readonly-dark](screenshots/windows/saved-topic-readonly-dark.png) | The same typed read-only saved-topic presentation in Dark. | 1603 × 1053 |
 | [saved-topic-dark](screenshots/windows/saved-topic-dark.png) | Current renamed saved topic in Dark without inference. | 1603 × 1053 |
 | [saved-overview-dark](screenshots/windows/saved-overview-dark.png) | Saved overview with independent quiet commands in Dark. | 1603 × 1053 |
 | [saved-topic-zoom](screenshots/windows/saved-topic-zoom.png) | Independent topic actions at 600 pixels and 200% Electron zoom. | 752 × 802 |
 | [missing-topic-overview](screenshots/windows/missing-topic-overview.png) | A removed saved topic resolves to its current owning outline with an explanation. | 1600 × 1053 |
+| [missing-topic-overview-light](screenshots/windows/missing-topic-overview-light.png) | The same removed-topic fallback and reason in Light. | 1600 × 1053 |
 
 <!-- flow-captures:end -->

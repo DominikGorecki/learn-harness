@@ -27,6 +27,11 @@ export const flows: Record<string, FlowDefinition> = {
   } },
   projects: { title: 'Project lifecycle and navigation', testFile: 'projects.spec.ts', screenshots: {
     'dashboard-empty': 'Empty dashboard before choosing a project folder.',
+    'dashboard-empty-dark': 'The same empty dashboard in Dark.',
+    'dashboard-populated-light': 'Both saved recent project rows in Light after restart.',
+    'dashboard-populated-dark': 'The same populated dashboard in Dark, with project details preserved.',
+    'missing-folder-light': 'Missing-folder recovery with its explicit Locate folder command in Light.',
+    'missing-folder-dark': 'The same missing-folder recovery in Dark.',
     'project-workspace': 'Project-specific goal draft and saved model preference.',
     'project-narrow': '600-pixel content width after dismissing the navigation drawer.',
     'project-zoom-200': 'Narrow project composer at 200% Electron zoom.'
@@ -55,13 +60,19 @@ export const flows: Record<string, FlowDefinition> = {
   } },
   materials: { title: 'Folder material and clarification', testFile: 'materials.spec.ts', screenshots: {
     'material-setup': 'Folder-only setup with an optional learning goal.',
+    'material-setup-dark': 'The same material-led setup in Dark.',
+    'material-clarification-light': 'Editable clarification request and its retained answer in Light.',
+    'material-clarification-dark': 'The same clarification state in Dark.',
     'material-coverage': 'Saved outline with supported and unsupported source coverage disclosed.',
-    'unsupported-material': 'Recovery for a folder containing only unsupported learning files.'
+    'unsupported-material': 'Recovery for a folder containing only unsupported learning files.',
+    'unsupported-material-dark': 'The same unsupported-source recovery in Dark.'
   } },
   recovery: { title: 'Generation and save recovery', testFile: 'recovery.spec.ts', screenshots: {
     'generation-pending': 'A real utility-process request held by the local provider fixture.',
     'generated-unsaved': 'A generated outline retained after an actual filesystem save failure.',
-    'usage-recovery': 'Provider usage-limit feedback with the learner draft preserved.'
+    'generated-unsaved-dark': 'The same retained unsaved outline and storage-only retry in Dark.',
+    'usage-recovery': 'Provider usage-limit feedback with the learner draft preserved.',
+    'usage-recovery-dark': 'The same usage-limit recovery in Dark.'
   } },
   'topic-reading': { title: 'Saved topic reading and history', testFile: 'topic-reading.spec.ts', screenshots: {
     'saved-overview-light': 'Saved overview with full context and independent quiet commands in Light.',
@@ -69,12 +80,17 @@ export const flows: Record<string, FlowDefinition> = {
     'saved-topic-light': 'Complete saved topic with its retained learning-task disclosure in Light.',
     'saved-topic-dark': 'Current renamed saved topic in Dark without inference.',
     'saved-topic-readonly': 'Typed main-sent read-only presentation fixture retains saved reading and its issue while edits are disabled.',
+    'saved-topic-readonly-dark': 'The same typed read-only saved-topic presentation in Dark.',
     'saved-topic-zoom': 'Independent topic actions at 600 pixels and 200% Electron zoom.',
-    'missing-topic-overview': 'A removed saved topic resolves to its current owning outline with an explanation.'
+    'missing-topic-overview': 'A removed saved topic resolves to its current owning outline with an explanation.',
+    'missing-topic-overview-light': 'The same removed-topic fallback and reason in Light.'
   } },
   reading: { title: 'Long outlines and unavailable state', testFile: 'reading.spec.ts', screenshots: {
     'long-outline-zoom': 'Long offline outline at narrow width and 200% Electron zoom.',
-    'unreadable-project': 'Corrupt project recovery without replacing its metadata.'
+    'unreadable-project': 'Corrupt project recovery without replacing its metadata.',
+    'unreadable-project-dark': 'The same corrupt-metadata recovery in Dark.',
+    'refinement-light': 'Saved-outline refinement with the retained learner draft in Light.',
+    'refinement-dark': 'The same refinement form and retained draft in Dark.'
   } },
   'model-access': { title: 'Independent model access checks', testFile: 'model-test.spec.ts', screenshots: {
     'model-test-dashboard-waiting': 'Global diagnostic panel remains discoverable after navigation to the project-free dashboard.',

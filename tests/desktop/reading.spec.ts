@@ -1,3 +1,4 @@
+import { setDesktopAppearance } from '../fixtures/desktop-appearance'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { chmod, mkdir, mkdtemp, realpath, readFile, rename, rm, writeFile } from 'node:fs/promises'
@@ -66,6 +67,12 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     expect(await page.evaluate(async () => (globalThis as unknown as { learning: AiApi }).learning.getAiActivity())).toMatchObject({ ok: true, data: { active: null, settled: null } })
     await expect(page.locator('.ai-panel')).toHaveCount(0)
     expect(await readFile(join(folder, '.edu/project.json'), 'utf8')).toBe(savedBefore)
+    await page.getByRole('button', { name: 'Refine learning direction', exact: true }).click()
+    const refinementDraft = await page.getByRole('textbox').inputValue()
+    await page.getByRole('main').evaluate(element => { element.scrollTop = 0 }); await flow.capture(desktop, page, 'refinement-light')
+    await setDesktopAppearance(page, 'Dark'); await expect(page.getByRole('textbox')).toHaveValue(refinementDraft); await flow.capture(desktop, page, 'refinement-dark'); await setDesktopAppearance(page, 'Light')
+    await page.getByRole('button', { name: 'Back to outline', exact: true }).click()
+    expect(await readFile(join(folder, '.edu/project.json'), 'utf8')).toBe(savedBefore)
 
     if (process.platform !== 'win32' && process.geteuid?.() !== 0) {
       await chmod(folder, 0o500); await chmod(join(folder, '.edu'), 0o500)
@@ -95,6 +102,7 @@ test('long saved outlines remain readable offline, at narrow sizes and 200% zoom
     await page.getByRole('button', { name: 'Try again', exact: true }).click()
     expect(await readFile(join(corrupt, '.edu/project.json'), 'utf8')).toBe(invalid)
     await flow.capture(desktop, page, 'unreadable-project')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'unreadable-project-dark'); expect(await readFile(join(corrupt, '.edu/project.json'), 'utf8')).toBe(invalid)
   } finally {
     await desktop?.close()
     await chmod(folder, 0o700); await chmod(join(folder, '.edu'), 0o700)

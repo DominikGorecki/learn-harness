@@ -1,3 +1,4 @@
+import { setDesktopAppearance } from '../fixtures/desktop-appearance'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, readFile, realpath, rm } from 'node:fs/promises'
@@ -54,6 +55,7 @@ test('saved topics read offline through one current-content history with indepen
     await expect(main).toContainText(readonlySnapshot.activeProject!.issue!)
     await expect(main.getByRole('button', { name: `Edit topic: ${lesson.title}`, exact: true })).toBeDisabled()
     await main.evaluate(element => { element.scrollTop = 0 }); await flow.capture(desktop, page, 'saved-topic-readonly')
+    await setDesktopAppearance(page, 'Dark'); await expect(main.getByRole('button', { name: `Edit topic: ${lesson.title}`, exact: true })).toBeDisabled(); await flow.capture(desktop, page, 'saved-topic-readonly-dark'); await setDesktopAppearance(page, 'Light')
     await back.click(); await expect(page.locator('#outline-heading')).toBeVisible(); await expect(main.getByRole('button', { name: 'Edit outline', exact: true })).toBeDisabled()
     await forward.click(); await expect(page.locator('#topic-heading')).toHaveText(lesson.title)
     expect(await readFile(join(folder, '.edu/project.json'), 'utf8')).toBe(original); expect((await aiActivity(page)).active).toBeNull()
@@ -100,6 +102,7 @@ test('saved topics read offline through one current-content history with indepen
     const removedBytes = await readFile(join(folder, '.edu/project.json'), 'utf8')
     await back.click(); await expect(page.locator('#outline-heading')).toHaveText(outline.title); await expect(main.getByRole('status')).toContainText('no longer in the saved outline'); await expect(forward).toBeEnabled()
     await flow.capture(desktop, page, 'missing-topic-overview')
+    await setDesktopAppearance(page, 'Light'); await flow.capture(desktop, page, 'missing-topic-overview-light'); await setDesktopAppearance(page, 'Dark')
     await forward.click(); await back.click(); await expect(page.locator('#outline-heading')).toHaveText(outline.title); await expect(forward).toBeEnabled()
     await page.getByRole('button', { name: 'Open topic', exact: true }).click(); await expect(page.locator('#topic-heading')).toHaveText(outline.lessons[0]!.title); await expect(forward).toBeDisabled()
     expect((await aiActivity(page)).active).toBeNull(); expect((await aiActivity(page)).settled).toBeNull(); await expect(page.locator('.ai-panel')).toHaveCount(0)

@@ -17,6 +17,36 @@
       "sha256": "e3fa7437a76f8ee5b0bcb33927c171878a1334f60edc7d2677e8445253ba749b"
     },
     {
+      "id": "refinement-light",
+      "caption": "Saved-outline refinement with the retained learner draft in Light.",
+      "width": 1600,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1280,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "ab4b2b730de937359fa526736d5f0f9ef84ac35d13957ec33f9d138033572a9d"
+    },
+    {
+      "id": "refinement-dark",
+      "caption": "The same refinement form and retained draft in Dark.",
+      "width": 1600,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "fff4659348e07ab4afe1a5963a9271b5197107b10ddace81d267f30e9ae24245"
+    },
+    {
       "id": "unreadable-project",
       "caption": "Corrupt project recovery without replacing its metadata.",
       "width": 1600,
@@ -29,16 +59,31 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "f113608362cabfc13f68528ffd86c2ccd6fe84bca35b90e1d07e696d47d5a794"
+      "sha256": "e5ad3ade75414c2b73d465f6def6c636214a1a2c29e9f9c3404f33747c26ac90"
+    },
+    {
+      "id": "unreadable-project-dark",
+      "caption": "The same corrupt-metadata recovery in Dark.",
+      "width": 1600,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": true,
+      "sha256": "25e30470f4c031652c44f8fd28d3ba81eed87b3ddb307ba5914cbdb3c19de20a"
     }
   ],
-  "capturedAt": "2026-10-07T13:44:08.334Z",
-  "testSha256": "d244ebf4d60e30ae06b01ef972c48e80c4cdb40c71e907a072f41c96f428dce7",
+  "capturedAt": "2026-10-07T16:35:45.372Z",
+  "testSha256": "8b5c5feff0a9cf37607cb449c82b0ab9098c41bdd8ac5ed0786ddd649c48d8ae",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/reading.spec.ts",
   "testTitle": "long saved outlines remain readable offline, at narrow sizes and 200% zoom; corrupt state is preserved",
-  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "revision": "5cfb859424e0a3cf9a96d5fda35b8f1246dd2830",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

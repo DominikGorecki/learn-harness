@@ -1,3 +1,4 @@
+import { setDesktopAppearance } from '../fixtures/desktop-appearance'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, rm, writeFile } from 'node:fs/promises'
@@ -36,6 +37,7 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     await expect(page.getByRole('textbox', { name: 'Your learning goal (optional)' })).toHaveValue('')
     expect(fixture.inferenceRequests).toHaveLength(0)
     await flow.capture(desktop, page, 'material-setup')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'material-setup-dark'); await setDesktopAppearance(page, 'Light')
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
     await expect(page.getByRole('main').getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
     const document = JSON.parse(await readFile(join(folder, '.edu/project.json'), 'utf8')) as ProjectDocument
@@ -57,6 +59,8 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     await expect(page.getByText('Would you like to focus on probability or city planning?', { exact: true })).toBeVisible()
     await expect(page.getByRole('textbox')).toBeEditable()
     await page.getByRole('textbox').fill('Focus on Bayesian reasoning; use examples from city planning.')
+    await flow.capture(desktop, page, 'material-clarification-light')
+    await setDesktopAppearance(page, 'Dark'); await expect(page.getByRole('textbox')).toHaveValue('Focus on Bayesian reasoning; use examples from city planning.'); await flow.capture(desktop, page, 'material-clarification-dark'); await setDesktopAppearance(page, 'Light')
     fixture.options.inferenceMode = 'materials'
     await page.getByRole('button', { name: 'Create outline', exact: true }).click()
     await expect(page.getByRole('main').getByRole('heading', { name: 'Bayesian reasoning', exact: true })).toBeVisible()
@@ -73,6 +77,7 @@ test('folder-only learning, verified source coverage, ambiguity and unsupported 
     await page.getByText('Material considered', { exact: true }).click()
     await expect(page.getByText('lecture.pdf', { exact: true })).toBeVisible()
     await flow.capture(desktop, page, 'unsupported-material')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'unsupported-material-dark'); await setDesktopAppearance(page, 'Light')
   } finally {
     await desktop?.close()
     await fixture.close()

@@ -1,3 +1,4 @@
+import { setDesktopAppearance } from '../fixtures/desktop-appearance'
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import { mkdir, mkdtemp, realpath, readFile, readdir, rename, rm } from 'node:fs/promises'
@@ -28,6 +29,7 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     await expect(page.getByRole('heading', { name: 'What would you like to understand?' })).toBeVisible()
     await verifyApplicationMenuBridge(desktop, page)
     await flow.capture(desktop, page, 'dashboard-empty')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'dashboard-empty-dark'); await setDesktopAppearance(page, 'Light')
     await choose(first)
     await page.getByRole('main').getByRole('button', { name: 'Open project' }).click()
     await expect(page.getByRole('textbox', { name: 'Your learning goal' })).toBeVisible()
@@ -116,6 +118,8 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     page = await desktop.firstWindow()
     await expect(page.getByRole('heading', { name: 'Your projects', exact: true })).toBeVisible()
     await expect(page.locator('.dashboard-project')).toHaveCount(2)
+    await flow.capture(desktop, page, 'dashboard-populated-light')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'dashboard-populated-dark'); await setDesktopAppearance(page, 'Light')
     await page.getByRole('main').getByRole('button', { name: /Bayesian reasoning/ }).click()
     await expect(page.getByRole('textbox')).toHaveValue(revisedGoal)
     await expect(page.getByLabel('Project model')).toHaveValue('fixture-model-fast')
@@ -125,6 +129,8 @@ test('real folders, project preferences, restart, relink, and responsive navigat
     await page.getByRole('button', { name: 'Projects', exact: true }).first().click()
     await page.getByRole('main').getByRole('button', { name: /Bayesian reasoning/ }).click()
     await expect(page.getByRole('heading', { name: 'Let’s find your project.' })).toBeVisible()
+    await flow.capture(desktop, page, 'missing-folder-light')
+    await setDesktopAppearance(page, 'Dark'); await flow.capture(desktop, page, 'missing-folder-dark'); await setDesktopAppearance(page, 'Light')
     await choose(moved)
     await page.getByRole('button', { name: 'Locate folder' }).click()
     await expect(page.getByRole('textbox')).toHaveValue(revisedGoal)
