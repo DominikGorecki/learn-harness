@@ -15,6 +15,27 @@ const setup = () => topicContentProject(root => roots.push(root))
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
 
 describe('portable chapter publication and recovery', () => {
+  it('explicitly discards only the proven uncommitted journal while preserving old and staged trees', async () => {
+    const { path, storage, authority } = await setup(), first = await contentManifest(storage, authority)
+    await storage.publish(authority, first)
+    const next = await contentManifest(storage, authority, 'revision-2')
+    const failing = createTopicContentStorage({ fault: point => { if (point === 'after-tree') throw new ApplicationError('STORAGE', 'Interruption') } })
+    await expect(failing.publish(authority, next)).rejects.toMatchObject({ code: 'STORAGE' })
+    const staged = await readFile(join(path, next.outputDirectory, 'chapter.md'))
+    await expect(storage.discardPublication(authority, 'wrong-run', next.revisionId)).rejects.toMatchObject({ code: 'CONFLICT' })
+    await storage.discardPublication(authority, next.provenance.runId, next.revisionId)
+    expect((await storage.read(authority)).manifest).toEqual(first)
+    expect(await readFile(join(path, next.outputDirectory, 'chapter.md'))).toEqual(staged)
+    await expect(storage.retryPublication(authority)).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    await expect(storage.discardPublication(authority, first.provenance.runId, first.revisionId)).rejects.toMatchObject({ code: 'CONFLICT' })
+  })
+  it('accepts an exact committed retry without a journal and rejects changed immutable bytes', async () => {
+    const { path, storage, authority } = await setup(), manifest = await contentManifest(storage, authority)
+    await storage.publish(authority, manifest); await storage.publish(authority, manifest)
+    await writeFile(join(path, manifest.outputDirectory, 'chapter.md'), 'External bytes')
+    await expect(storage.publish(authority, manifest)).rejects.toMatchObject({ code: 'CONFLICT' })
+    expect(await readFile(join(path, manifest.outputDirectory, 'chapter.md'), 'utf8')).toBe('External bytes')
+  })
   it('prepares/reads without account or project mutation and publishes independent readable bytes', async () => {
     const { path, handle, workspace, storage, authority } = await setup()
     const project = await readFile(join(path, '.edu/project.json'), 'utf8')
@@ -54,8 +75,9 @@ describe('portable chapter publication and recovery', () => {
     expect((await storage.read(authority)).recovery.kind).toBe('committed')
     expect(await readFile(join(path, topicJournalPath('beliefs')), 'utf8')).toBe(journal)
     const repository = createTopicContentRepository(workspace), context = await repository.resolve(handle, 'beliefs')
-    await repository.recover(context)
-    expect((await repository.load(context))?.revisionId).toBe('revision-1')
+    const next = await contentManifest(storage, authority, 'revision-2', true)
+    await repository.publish(context, next)
+    expect((await repository.load(context))?.revisionId).toBe('revision-2')
     await expect(readFile(join(path, topicJournalPath('beliefs')))).rejects.toMatchObject({ code: 'ENOENT' })
   })
   it.each(['manifest', 'tree', 'journal'] as const)('preserves unknown external %s bytes and refuses recovery replacement', async target => {
@@ -154,6 +176,19 @@ describe('portable chapter publication and recovery', () => {
 })
 
 describe('checkpoints, candidates and immutable storage retry', () => {
+  it('requires explicit charge acknowledgment even after an unresolved call is downgraded to failed', async () => {
+    const { storage, authority, handle } = await setup(), checkpoint = await contentCheckpoint(storage, authority)
+    await storage.saveCheckpoint(authority, checkpoint)
+    const failed = { ...checkpoint, checkpointRevision: 2, images: checkpoint.images.map(image => ({ ...image, status: 'failed' as const })) }
+    await storage.saveCheckpoint(authority, failed)
+    const retry = { projectId: handle, topicId: checkpoint.topicId, chapterId: checkpoint.chapterId, runId: checkpoint.runId,
+      checkpointRevision: 2, imageId: 'illustration', priorCallId: 'paid-intent', acknowledgeUncertainCharge: false }
+    const next = { ...failed, checkpointRevision: 3, images: [{ ...failed.images[0]!, status: 'planned' as const, callId: null,
+      previousAttempts: [{ callId: 'paid-intent', status: 'failed' as const, uncertaintyAcknowledged: true }] }] }
+    await expect(storage.saveCheckpoint(authority, next, retry)).rejects.toMatchObject({ code: 'CONFLICT' })
+    await storage.saveCheckpoint(authority, next, { ...retry, acknowledgeUncertainCharge: true })
+    expect((await storage.loadCheckpoint(authority, checkpoint.runId))?.images[0]?.previousAttempts).toEqual(next.images[0]!.previousAttempts)
+  })
   it('persists restart-safe unresolved paid intents and prevents their erasure through Continue', async () => {
     const { workspace, handle, storage, authority, path } = await setup(), checkpoint = await contentCheckpoint(storage, authority)
     await storage.saveCheckpoint(authority, checkpoint)
@@ -162,8 +197,15 @@ describe('checkpoints, candidates and immutable storage retry', () => {
     await expect(storage.saveCheckpoint(fresh, { ...checkpoint, checkpointRevision: 2, images: [{ imageId: 'illustration', status: 'planned', callId: null, asset: null }] })).rejects.toMatchObject({ code: 'CONFLICT' })
     expect(await readFile(join(path, topicCheckpointPath('run')), 'utf8')).toContain('paid-intent')
     await expect(storage.discardProgress(fresh, 'run', 2)).rejects.toMatchObject({ code: 'CONFLICT' })
+    // Simulate a crash after the immutable archive publication but before progress unlink.
+    await writeImmutableContent(path, '.edu/content-abandoned/run-1.json', JSON.stringify(checkpoint, null, 2) + '\n')
     await storage.discardProgress(fresh, 'run', 1)
     expect(await storage.loadCheckpoint(fresh, 'run')).toBeNull()
+    expect(await storage.excludedSources(fresh, [checkpoint.outputDirectory + '/chapter.md', 'manual/content/tutorial/section/intro.md'])).toEqual([checkpoint.outputDirectory + '/chapter.md'])
+    await storage.saveCheckpoint(fresh, checkpoint)
+    await storage.saveCheckpoint(fresh, { ...checkpoint, checkpointRevision: 2 })
+    await storage.discardProgress(fresh, 'run', 2)
+    expect(await readdir(join(path, '.edu/content-abandoned'))).toEqual(['run-1.json', 'run-2.json'])
   })
   it('keeps image candidates separate, rejects expired baselines, and retains original/candidate assets on discard', async () => {
     const { storage, authority, path, handle } = await setup(), original = await contentManifest(storage, authority, 'revision-1', true); await storage.publish(authority, original)

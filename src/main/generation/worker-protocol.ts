@@ -14,6 +14,11 @@ import type { TransportState } from './pi-stream-liveness'
 import { identifier } from '../../shared/validation'
 import { parseDecodedImage, parseImageAuthorization, parseImageTerminal } from './image-worker-contract'
 import type { DecodedImage, ImageAuthorization, ImageTerminal } from './image-worker-contract'
+import { parseChapterWorkerInput, parseChapterSubmission } from './chapter-worker-contract'
+import type { ChapterWorkerInput } from './chapter-worker-contract'
+import type { ChapterSubmission } from '../../core/topic-content/ports'
+import { parseTopicContentCheckpoint, topicContentPolicy } from '../../shared/topic-content'
+import type { TopicContentCheckpoint } from '../../shared/topic-content'
 
 export type EngineDiagnosticEvent = 'engine.materials' | 'engine.request' | 'engine.response' | 'engine.terminal' | 'engine.tool' | 'engine.turn' | 'engine.transport'
 export type WorkerDiagnosticEvent = EngineDiagnosticEvent | 'console.output' | 'process.unhandled'
@@ -22,10 +27,11 @@ export type WorkerPhase = typeof workerPhases[number]
 export const workerErrorCodes: ErrorCode[] = ['INVALID_INPUT', 'NOT_FOUND', 'FORBIDDEN', 'INTERNAL', 'AUTH_REQUIRED', 'PLAN_PERMISSION_REQUIRED',
   'ACCESS_RESTRICTED', 'USAGE_LIMIT', 'NETWORK', 'CANCELLED', 'BUSY', 'UNAVAILABLE', 'STORAGE', 'CONFLICT']
 export interface ModelAccessWorkerInput { target: 'gpt-6.1-sol' | 'gpt-6-luna'; accessToken: string; baseUrl: string }
-export type WorkerProfile = { profile: 'outline'; input: OutlineEngineInput } | { profile: 'model-access'; input: ModelAccessWorkerInput } | { profile: 'fixed-image'; input: { imageSlotId: string } }
+export type WorkerProfile = { profile: 'outline'; input: OutlineEngineInput } | { profile: 'model-access'; input: ModelAccessWorkerInput } | { profile: 'fixed-image'; input: { imageSlotId: string } } | { profile: 'chapter'; input: ChapterWorkerInput }
 export type WorkerRequest = ({ type: 'start' } & WorkerProfile) | { type: 'cancel' } |
   { type: 'image-authorized'; requestId: string; authority: ImageAuthorization | null } |
-  { type: 'image-terminal-ack' | 'image-asset-ack'; requestId: string; callId: string; accepted: boolean }
+  { type: 'image-terminal-ack' | 'image-asset-ack'; requestId: string; callId: string; accepted: boolean } |
+  { type: 'chapter-ack'; requestId: string; accepted: boolean; checkpoint: TopicContentCheckpoint | null }
 export type WorkerReply = { type: 'health'; sequence: number; phase: WorkerPhase } |
   { type: 'phase'; sequence: number; phase: EnginePhase } |
   { type: 'transport'; sequence: number; state: TransportState } |
@@ -37,6 +43,8 @@ export type WorkerReply = { type: 'health'; sequence: number; phase: WorkerPhase
   { type: 'image-terminal'; sequence: number; requestId: string; callId: string; terminal: ImageTerminal } |
   { type: 'image-asset'; sequence: number; requestId: string; image: DecodedImage } |
   { type: 'result'; sequence: number; profile: 'fixed-image'; result: { kind: 'image'; callId: string; imageSlotId: string } } |
+  { type: 'chapter-submission'; sequence: number; requestId: string; submission: ChapterSubmission } |
+  { type: 'result'; sequence: number; profile: 'chapter'; result: { kind: 'chapter'; paused: boolean } } |
   { type: 'error'; sequence: number; code: ErrorCode } |
   { type: 'diagnostic'; sequence: number; event: WorkerDiagnosticEvent; data: unknown }
 
@@ -58,8 +66,13 @@ function flag(value: unknown): boolean { if (typeof value !== 'boolean') invalid
 function age(value: unknown): number | null { return value === null ? null : natural(value) }
 export function parseWorkerRequest(value: unknown): WorkerRequest {
   if (workerFrameBytes(value) > maximumWorkerResultBytes) invalid()
-  const data = strictRecord(value, ['type', 'profile', 'input', 'requestId', 'authority', 'callId', 'accepted'])
+  const data = strictRecord(value, ['type', 'profile', 'input', 'requestId', 'authority', 'callId', 'accepted', 'checkpoint'])
   if (data.type === 'cancel') { strictRecord(value, ['type']); return { type: 'cancel' } }
+  if (data.type === 'chapter-ack') {
+    strictRecord(value, ['type', 'requestId', 'accepted', 'checkpoint'])
+    if (workerFrameBytes(value) > topicContentPolicy.checkpointBytes + 1024) invalid()
+    return { type: 'chapter-ack', requestId: identifier(data.requestId), accepted: flag(data.accepted), checkpoint: data.checkpoint === null ? null : parseTopicContentCheckpoint(data.checkpoint) }
+  }
   if (data.type === 'image-authorized') {
     strictRecord(value, ['type', 'requestId', 'authority'])
     return { type: 'image-authorized', requestId: identifier(data.requestId), authority: data.authority === null ? null : parseImageAuthorization(data.authority) }
@@ -70,6 +83,7 @@ export function parseWorkerRequest(value: unknown): WorkerRequest {
   }
   if (data.type !== 'start') invalid()
   strictRecord(value, ['type', 'profile', 'input'])
+  if (data.profile === 'chapter') return { type: 'start', profile: 'chapter', input: parseChapterWorkerInput(data.input) }
   if (data.profile === 'fixed-image') {
     const input = strictRecord(data.input, ['imageSlotId'])
     return { type: 'start', profile: 'fixed-image', input: { imageSlotId: identifier(input.imageSlotId) } }
@@ -112,6 +126,11 @@ function parseTransport(value: unknown): TransportState {
 }
 export function parseWorkerReply(value: unknown, profile: WorkerProfile): WorkerReply {
   const type = value && typeof value === 'object' ? (value as Record<string, unknown>).type : null
+  if (type === 'chapter-submission') {
+    if (profile.profile !== 'chapter' || workerFrameBytes(value) > topicContentPolicy.checkpointBytes + 1024) invalid()
+    const data = strictRecord(value, ['type', 'sequence', 'requestId', 'submission'])
+    return { type: 'chapter-submission', sequence: natural(data.sequence), requestId: identifier(data.requestId), submission: parseChapterSubmission(data.submission) }
+  }
   // Typed raster frames have their own binary bound. Never JSON-stringify these bytes.
   if (type === 'image-asset') {
     if (profile.profile !== 'fixed-image') invalid()
@@ -158,6 +177,11 @@ export function parseWorkerReply(value: unknown, profile: WorkerProfile): Worker
     case 'result': {
       strictRecord(value, ['type', 'sequence', 'profile', 'result'])
       if (data.profile !== profile.profile) invalid()
+      if (profile.profile === 'chapter') {
+        const result = strictRecord(data.result, ['kind', 'paused'])
+        if (result.kind !== 'chapter') invalid()
+        return { type: 'result', sequence, profile: 'chapter', result: { kind: 'chapter', paused: flag(result.paused) } }
+      }
       if (profile.profile === 'fixed-image') {
         const result = strictRecord(data.result, ['kind', 'callId', 'imageSlotId'])
         if (result.kind !== 'image' || result.imageSlotId !== profile.input.imageSlotId) invalid()

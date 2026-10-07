@@ -1,9 +1,9 @@
 export const appOrigin = 'learningapp://workspace'
 export const appEntry = `${appOrigin}/index.html`
 export const developmentOrigin = 'http://127.0.0.1:5173'
-export const productionCsp = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+export const productionCsp = "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' learningmedia://topic; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 // Vite/React refresh use inline scripts/styles and a local websocket only in development.
-export const developmentCsp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' ws://127.0.0.1:5173; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+export const developmentCsp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' ws://127.0.0.1:5173; img-src 'self' learningmedia://topic; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 
 export function isTrustedFrame(frame: { origin: string; url: string } | null, expectedOrigin: string): boolean {
   if (!frame || frame.origin !== expectedOrigin) return false

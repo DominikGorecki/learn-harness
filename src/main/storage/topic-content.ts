@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { ApplicationError } from '../../shared/contracts'
 import { identifier, strictRecord } from '../../shared/validation'
 import { contentRelativePath, parseChapterBaseline, parseChapterImageAsset, parseChapterManifest, parseChapterPlan, parseContentDigest, parseTopicContentCheckpoint, parseTopicImageCandidate, topicContentPolicy } from '../../shared/topic-content'
-import type { ChapterBaseline, ChapterImageAsset, ChapterManifest, ChapterPlan, TopicContentCheckpoint, TopicImageCandidate } from '../../shared/topic-content'
+import type { ChapterBaseline, ChapterImageAsset, ChapterManifest, ChapterPlan, TopicContentCheckpoint, TopicImageCandidate, RetryTopicContentImageRequest } from '../../shared/topic-content'
 import type { PreparedTopicContent, ProjectStorage, TopicFolderState } from '../../core/workspace/ports'
 import { atomicWrite } from './atomic-file'
 import { projectTarget } from './project-files'
@@ -103,7 +103,7 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
   }
   async function generatedSource(authority: TopicContentAuthority, path: string): Promise<boolean> {
     const parts = path.split('/')
-    if (parts.length < 5 || parts[1] !== 'content') return false
+    if (parts.length < 4 || parts[1] !== 'content') return false
     const root = authority.prepared.path, mirrorText = await readContentText(root, `${parts[0]}/.edu/topic.json`, topicContentPolicy.sectionBytes)
     if (!mirrorText) return false
     let topicId: string
@@ -113,11 +113,12 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
       try {
         const manifest = parseChapterManifest(JSON.parse(manifestText))
         if (manifest.projectId === authority.prepared.projectId && manifest.topicId === topicId && manifest.outputDirectory.split('/')[0] === parts[0] &&
-          (path.startsWith(manifest.outputDirectory + '/') || manifest.chapterId === parts[2] && manifest.previousRevisionIds.includes(parts[3]!) || manifest.images.some(image => image.asset?.path === path))) return true
+          (path === manifest.outputDirectory || path.startsWith(manifest.outputDirectory + '/') || manifest.chapterId === parts[2] && manifest.previousRevisionIds.includes(parts[3]!) || manifest.images.some(image => image.asset?.path === path))) return true
       } catch { /* Unknown chapter bytes do not authorize a generated namespace. */ }
     }
     for (const [folder, parser, maximum] of [
       ['.edu/content-runs', parseTopicContentCheckpoint, topicContentPolicy.checkpointBytes],
+      ['.edu/content-abandoned', parseTopicContentCheckpoint, topicContentPolicy.checkpointBytes],
       ['.edu/content-candidates', parseTopicImageCandidate, 256 * 1024]
     ] as const) {
       await projectTarget(root, folder + '/__scope__')
@@ -239,10 +240,22 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
     assertOwned(authority, manifest)
     parseChapterPlan(manifest.plan, { projectId: authority.prepared.projectId, topicId: authority.prepared.topicId, objectives: authority.prepared.topic.objectives })
     await ensureFolder(authority)
-    const previous = await rawManifest(authority), existing = await journal(authority), nextContent = serialize(manifest), nextDigest = contentDigest(nextContent)
+    const previous = await rawManifest(authority), nextContent = serialize(manifest), nextDigest = contentDigest(nextContent)
+    let existing = await journal(authority)
+    if (existing && previous.digest === existing.nextManifestDigest && existing.nextManifestDigest !== nextDigest) {
+      await recover(authority)
+      existing = await journal(authority)
+    }
     if (Buffer.byteLength(nextContent) > topicStoragePolicy.manifestBytes) throw new ApplicationError('STORAGE', 'This chapter manifest exceeds its storage limit.')
     if (existing && existing.nextManifestDigest !== nextDigest) throw contentConflict('Another chapter publication is pending. Save or resolve it before replacing this chapter.')
-    if (previous.digest === nextDigest && existing) { await recover(authority); return }
+    if (previous.digest === nextDigest) {
+      // Exact committed retries verify the immutable assets independently of journal cleanup.
+      await validateBaseline(authority, manifest.baseline, false)
+      await verifyInventory(authority, { schemaVersion: 1, projectId: manifest.projectId, topicId: manifest.topicId,
+        previousManifestDigest: manifest.baseline.expectedManifestDigest, nextManifestDigest: nextDigest, manifest, files: inventory(manifest) }, false)
+      if (existing) await recover(authority)
+      return
+    }
     await validateBaseline(authority, manifest.baseline)
     if (existing) for (const file of existing.files) await finishImmutableContentWrite(authority.prepared.path, file.path, file.digest, file.bytes)
     if (previous.manifest) {
@@ -281,6 +294,12 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
     await removeJournal(authority).catch(() => {})
   }
   return {
+    async excludedSources(authority: TopicContentAuthority, paths: readonly string[]): Promise<string[]> {
+      if (paths.length > 1000) throw new ApplicationError('UNAVAILABLE', 'Too many source paths.')
+      const excluded: string[] = []
+      for (const path of paths) if (await generatedSource(authority, contentRelativePath(path))) excluded.push(path)
+      return excluded
+    },
     async prepare(prepared: PreparedTopicContent): Promise<TopicContentAuthority> {
       const rootIdentity = await contentRootIdentity(prepared.path), folderName = prepared.topicFolder?.folder ?? identifier(prepared.topicId)
       contentRelativePath(folderName)
@@ -331,6 +350,17 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
       return state
     },
     recover, publish,
+    async discardPublication(authority: TopicContentAuthority, runId: string, revisionId: string): Promise<void> {
+      if (!(await current(authority)).writable) throw new ApplicationError('STORAGE', 'This project is read-only.')
+      const record = await journal(authority), actual = await rawManifest(authority)
+      if (actual.manifest && [actual.manifest.revisionId, ...actual.manifest.previousRevisionIds].includes(revisionId)) throw contentConflict('A published chapter cannot be discarded as unfinished progress.')
+      if (!record) return
+      if (record.manifest.provenance.runId !== runId || record.manifest.revisionId !== revisionId || actual.digest !== record.previousManifestDigest) throw contentConflict('This publication recovery record belongs to different or already committed content. Its bytes have been preserved.')
+      for (const file of record.files) await finishImmutableContentWrite(authority.prepared.path, file.path, file.digest, file.bytes)
+      await verifyInventory(authority, record, true)
+      await removeJournal(authority)
+      // Explicit discard abandons only the proven control record, never immutable or external trees.
+    },
     async retryPublication(authority: TopicContentAuthority): Promise<void> {
       const record = await journal(authority)
       if (!record) throw new ApplicationError('NOT_FOUND', 'No interrupted content publication is available to retry.')
@@ -375,7 +405,7 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
         return checkpoint
       } catch { throw contentConflict('Topic progress is unreadable or belongs to different content. It has been preserved; the published chapter remains readable.') }
     },
-    async saveCheckpoint(authority: TopicContentAuthority, value: TopicContentCheckpoint): Promise<void> {
+    async saveCheckpoint(authority: TopicContentAuthority, value: TopicContentCheckpoint, retry?: RetryTopicContentImageRequest): Promise<void> {
       const checkpoint = parseTopicContentCheckpoint(value)
       const content = serialize(checkpoint)
       if (Buffer.byteLength(content) > topicContentPolicy.checkpointBytes) throw contentStorageError('The progress record exceeds its storage limit.')
@@ -392,8 +422,20 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
           if (serialize(previous) === serialize(checkpoint)) return
           throw contentConflict('The saved progress revision changed. Its bytes have been preserved.')
         }
-        // Explicit uncertainty retries require a future lineage-bearing request; ordinary Continue cannot erase this call ID.
-        for (const image of previous.images) if ((image.status === 'complete' || image.status === 'unresolved' || image.status === 'requested') && !checkpoint.images.some(current => current.imageId === image.imageId && current.callId === image.callId)) throw contentConflict('A dispatched image intent cannot be forgotten by a checkpoint update.')
+        let retried = false
+        for (const image of previous.images) {
+          const next = checkpoint.images.find(current => current.imageId === image.imageId)
+          if (!next) throw contentConflict()
+          if (retry && image.imageId === retry.imageId) {
+            const uncertain = image.status === 'unresolved' || image.status === 'requested'
+            if (retry.projectId !== authority.prepared.projectHandle || retry.topicId !== previous.topicId || retry.chapterId !== previous.chapterId || retry.runId !== previous.runId || retry.checkpointRevision !== previous.checkpointRevision || retry.priorCallId !== image.callId || !['failed', 'requested', 'unresolved'].includes(image.status) || !retry.acknowledgeUncertainCharge || next.status !== 'planned' || next.callId !== null || next.asset !== null) throw contentConflict('This image retry no longer matches the saved attempt.')
+            const expected = [...(image.previousAttempts ?? []), { callId: image.callId, status: uncertain ? 'unresolved' : 'failed', uncertaintyAcknowledged: retry.acknowledgeUncertainCharge }]
+            if (JSON.stringify(next.previousAttempts) !== JSON.stringify(expected)) throw contentConflict('The previous image attempt must remain recorded.')
+            retried = true
+          } else if (image.callId !== null && image.callId !== next.callId || JSON.stringify(image.previousAttempts) !== JSON.stringify(next.previousAttempts)) throw contentConflict('A dispatched image intent cannot be forgotten by a checkpoint update.')
+        }
+        if (retry && !retried) throw contentConflict()
+        if (checkpoint.textTurns < previous.textTurns || checkpoint.imageRequests < previous.imageRequests) throw contentConflict('Lifetime request counters cannot be reset by continuation.')
         if (JSON.stringify(previous.plan) !== JSON.stringify(checkpoint.plan) || previous.images.some(image => image.status === 'complete' && !checkpoint.images.some(current => JSON.stringify(current) === JSON.stringify(image))) || previous.baseline.sources.some(source => !checkpoint.baseline.sources.some(current => current.path === source.path && current.digest === source.digest))) throw contentConflict('Validated plans, accepted images and inspected source evidence cannot be silently replaced by continuation.')
       } else if (checkpoint.checkpointRevision !== 1) throw contentConflict('The original progress record is missing. Its chapter files have been preserved.')
       for (const image of checkpoint.images) if (image.asset) await verifyAsset(authority, image.asset)
@@ -430,6 +472,12 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
       let checkpoint: TopicContentCheckpoint
       try { checkpoint = parseTopicContentCheckpoint(JSON.parse(content)); assertOwned(authority, checkpoint) } catch { throw contentConflict() }
       if (checkpoint.runId !== runId || checkpoint.checkpointRevision !== expectedRevision || await journal(authority)) throw contentConflict('Progress changed or has an interrupted publication. Resolve it before discarding.')
+      // Retain provenance for preserved generated trees without offering them as resumable progress.
+      const archivedPath = `.edu/content-abandoned/${identifier(runId)}-${checkpoint.checkpointRevision}.json`
+      await projectTarget(authority.prepared.path, archivedPath)
+      const archived: string[] = await readdir(join(authority.prepared.path, '.edu/content-abandoned'), { encoding: 'utf8' }).catch(error => { if (contentMissing(error)) return [] as string[]; throw error })
+      if (!archived.includes(archivedPath.split('/').at(-1)!) && archived.length >= topicStoragePolicy.progressEntries) throw new ApplicationError('STORAGE', 'Generated provenance archive is full. Existing records and unfinished progress have been preserved.')
+      await writeImmutableContent(authority.prepared.path, archivedPath, serialize(checkpoint))
       await unlink(await projectTarget(authority.prepared.path, path))
       // Immutable assets/history remain intact. Garbage collection is a later capability.
     },

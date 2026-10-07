@@ -1,0 +1,13 @@
+{
+  "flow": "topic-media",
+  "captures": [],
+  "capturedAt": "2026-10-07T21:49:12.357Z",
+  "testSha256": "74e8a90f2081feb898ebb37bc1337cf6fbb2e40e520ec5222170ae34d43b8a3c",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/topic-content.spec.ts",
+  "testTitle": "local media scheme permits only canonical owning-window image GETs and the trusted initiator",
+  "revision": "5a8af6b8ed27727c3e08cf7222fa544be42521d7",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

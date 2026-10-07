@@ -9,6 +9,9 @@ import { systemClock } from './pi-stream-liveness'
 import { observe } from './observe'
 import { parseImageAuthorization } from './image-worker-contract'
 import type { DecodedImage, ImageAuthorization, ImageTerminal } from './image-worker-contract'
+import type { ChapterSubmission } from '../../core/topic-content/ports'
+import type { TopicContentCheckpoint } from '../../shared/topic-content'
+import type { ChapterWorkerResult } from './chapter-worker-contract'
 
 export interface WorkerHandle extends Pick<EventEmitter, 'on' | 'once' | 'removeListener'> {
   readonly pid?: number
@@ -26,9 +29,10 @@ export interface WorkerRunOptions {
   onImageIntent?(imageSlotId: string): Promise<ImageAuthorization>
   onImageTerminal?(callId: string, terminal: ImageTerminal): Promise<void>
   onImageAsset?(image: DecodedImage): Promise<void>
+  onChapterSubmission?(submission: ChapterSubmission): Promise<TopicContentCheckpoint | null>
 }
 export interface PiWorkerTask {
-  result: Promise<OutlineEngineResult | PiProtocolEvidence | DecodedImage>
+  result: Promise<OutlineEngineResult | PiProtocolEvidence | DecodedImage | ChapterWorkerResult>
   stop(): Promise<void>
 }
 const errorMessages: Partial<Record<ApplicationError['code'], string>> = {
@@ -43,9 +47,9 @@ const errorMessages: Partial<Record<ApplicationError['code'], string>> = {
 export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions, fork: () => WorkerHandle): PiWorkerTask {
   const parsed = parseWorkerRequest({ type: 'start', ...profile })
   const clock = options.clock ?? systemClock
-  let resolveResult!: (value: OutlineEngineResult | PiProtocolEvidence | DecodedImage) => void
+  let resolveResult!: (value: OutlineEngineResult | PiProtocolEvidence | DecodedImage | ChapterWorkerResult) => void
   let rejectResult!: (error: ApplicationError) => void
-  const result = new Promise<OutlineEngineResult | PiProtocolEvidence | DecodedImage>((resolve, reject) => { resolveResult = resolve; rejectResult = reject })
+  const result = new Promise<OutlineEngineResult | PiProtocolEvidence | DecodedImage | ChapterWorkerResult>((resolve, reject) => { resolveResult = resolve; rejectResult = reject })
   // stop() consumes a failure without changing the result seen by the domain owner.
   const stopped = result.then(() => {}, () => {})
   if (options.signal.aborted) { rejectResult(new ApplicationError('CANCELLED', errorMessages.CANCELLED!)); return { result, stop: () => stopped } }
@@ -54,7 +58,9 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
   let spawned = false, exited = false, stopping = false, killed = false
   let sequence = -1, healthSequence = -1, transportTurn = -1
   let previousTransport: TransportState | null = null
-  let outcome: OutlineEngineResult | PiProtocolEvidence | DecodedImage | undefined
+  let outcome: OutlineEngineResult | PiProtocolEvidence | DecodedImage | ChapterWorkerResult | undefined
+  const chapterRequests = new Set<string>()
+  let chapterPending = false
   let imageRequestId: string | null = null, authority: ImageAuthorization | null = null
   let terminalSeen = false, terminalSaved = false, terminalSucceeded = false, assetSeen = false, acceptedImage: DecodedImage | null = null
   const pending = new Set<Promise<void>>()
@@ -129,6 +135,20 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
       }
       if (!spawned) throw new ApplicationError('INTERNAL', 'The AI process sent a premature message.')
       switch (message.type) {
+        case 'chapter-submission': {
+          if (chapterPending || chapterRequests.has(message.requestId) || !options.onChapterSubmission) throw new ApplicationError('FORBIDDEN', 'Chapter acceptance is unavailable.')
+          chapterRequests.add(message.requestId); chapterPending = true
+          durable(async () => {
+            try {
+              const checkpoint = await options.onChapterSubmission!(message.submission)
+              if (!stopping && !exited && !options.signal.aborted) worker.postMessage({ type: 'chapter-ack', requestId: message.requestId, accepted: true, checkpoint })
+            } catch (error) {
+              if (error instanceof ApplicationError && error.code === 'INVALID_INPUT') {
+                if (!stopping && !exited) worker.postMessage({ type: 'chapter-ack', requestId: message.requestId, accepted: false, checkpoint: null })
+              } else throw error
+            } finally { chapterPending = false }
+          }); break
+        }
         case 'image-intent': {
           if (imageRequestId || !options.onImageIntent || !options.onImageTerminal || !options.onImageAsset) throw new ApplicationError('FORBIDDEN', 'Image dispatch is unavailable.')
           imageRequestId = message.requestId
@@ -152,15 +172,15 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
           }); break
         }
         case 'health':
-          if (profile.profile !== 'outline' && !['preparing', 'waiting', 'receiving', 'finished'].includes(message.phase)) throw new ApplicationError('INTERNAL', 'The AI process exceeded its task scope.')
+          if (!['outline', 'chapter'].includes(profile.profile) && !['preparing', 'waiting', 'receiving', 'finished'].includes(message.phase)) throw new ApplicationError('INTERNAL', 'The AI process exceeded its task scope.')
           if (message.sequence <= healthSequence) throw new ApplicationError('INTERNAL', 'The AI process sent invalid health evidence.')
           healthSequence = message.sequence; resetHealth(); lifecycle('health', { phase: message.phase }); break
         case 'phase':
-          if (profile.profile !== 'outline') throw new ApplicationError('INTERNAL', 'The AI process exceeded its task scope.')
+          if (!['outline', 'chapter'].includes(profile.profile)) throw new ApplicationError('INTERNAL', 'The AI process exceeded its task scope.')
           observe(() => options.onPhase?.(message.phase)); break
         case 'transport': {
           const state = message.state
-          if (state.turn < 1 || state.turn > (profile.profile === 'outline' ? 16 : 1)) throw new ApplicationError('INTERNAL', 'The AI process exceeded its turn scope.')
+          if (state.turn < 1 || state.turn > (profile.profile === 'chapter' ? 48 : profile.profile === 'outline' ? 16 : 1)) throw new ApplicationError('INTERNAL', 'The AI process exceeded its turn scope.')
           if (state.turn < transportTurn || state.turn === transportTurn && previousTransport && (state.bytes < previousTransport.bytes || state.chunks < previousTransport.chunks || state.events < previousTransport.events)) {
             throw new ApplicationError('INTERNAL', 'The AI process sent invalid transport evidence.')
           }
@@ -176,6 +196,7 @@ export function startPiWorker(profile: WorkerProfile, options: WorkerRunOptions,
         case 'diagnostic': observe(() => options.onDiagnostic?.(message.event, message.data)); break
         case 'model-evidence': observe(() => options.onModelEvidence?.(message.evidence)); break
         case 'result':
+          if (chapterPending) throw new ApplicationError('INTERNAL', 'Chapter acceptance is still pending.')
           if (message.profile === 'fixed-image') {
             if (!acceptedImage || message.result.callId !== acceptedImage.callId) throw new ApplicationError('INTERNAL', 'The illustration has not been checkpointed.')
             outcome = acceptedImage

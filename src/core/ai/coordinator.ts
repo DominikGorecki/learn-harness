@@ -38,6 +38,7 @@ export class AiCoordinator {
   private terminal: AiOperation | null = null
   private revision = 0
   private stopped = false
+  private publication: { done: Promise<void>; release(): void } | null = null
   private listeners = new Set<(snapshot: AiActivitySnapshot) => void>()
   private deliveries = new Set<unknown>()
   private readonly schedule: (action: () => void, delayMs: number) => unknown
@@ -48,6 +49,7 @@ export class AiCoordinator {
   }
   claim(input: AiOperationInput): { lease: AiLease; reused: boolean } {
     if (this.stopped) throw new ApplicationError('UNAVAILABLE', 'AI activity has stopped.')
+    if (this.publication) throw new ApplicationError('BUSY', 'Validated content storage is still settling.')
     const metadata = parseAiOperationInput(input)
     if (this.owner) {
       if (!this.owner.controller.signal.aborted && metadata.kind.startsWith('test-') && metadata.kind === this.owner.operation.kind) return { lease: this.owner.lease, reused: true }
@@ -77,6 +79,15 @@ export class AiCoordinator {
     return { lease, reused: false }
   }
   isOwner(lease: AiLease): boolean { return this.owner?.lease === lease }
+  /** Storage-only recovery performs no inference or activity, but cannot race a producer's admission. */
+  reservePublication(): () => void {
+    if (this.stopped) throw new ApplicationError('UNAVAILABLE', 'AI activity has stopped.')
+    if (this.owner || this.publication) throw new ApplicationError('BUSY', 'Another AI action or publication is still running.')
+    let release!: () => void
+    const done = new Promise<void>(resolve => { release = resolve }), reservation = { done, release }
+    this.publication = reservation
+    return () => { if (this.publication === reservation) { this.publication = null; release() } }
+  }
   get(): AiActivitySnapshot {
     const owner = this.owner
     const active = owner ? { ...owner.operation, elapsedMs: Math.max(0, Math.floor(this.options.now() - owner.started)),
@@ -109,6 +120,7 @@ export class AiCoordinator {
   }
   async dispose(): Promise<void> {
     this.stopped = true
+    await this.publication?.done
     const owner = this.owner
     if (owner) {
       if (owner.operation.phase === 'saving') await owner.lease.settled

@@ -1,13 +1,13 @@
 {
   "flow": "packaged-worker",
   "captures": [],
-  "capturedAt": "2026-10-07T20:38:14.637Z",
-  "testSha256": "05bb5f1a35b3a091130282d82d18195060dcda2d871a0a0bf1877d396f0c1775",
+  "capturedAt": "2026-10-07T21:52:19.493Z",
+  "testSha256": "3c121e37303bbaa46e1329beafe64ce6d43f9c8e62ef9d599e50cd7327be65fc",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/packaged-worker.spec.ts",
-  "testTitle": "packaged ASAR worker runs scoped outline, both fixed diagnostics and the fixed image profile",
-  "revision": "c8eb934880f44bbfddd103f9c677a4e483533fb4",
+  "testTitle": "packaged ASAR worker runs outline, fixed diagnostics, image and guided chapter profiles",
+  "revision": "5a8af6b8ed27727c3e08cf7222fa544be42521d7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -40,6 +40,8 @@ export interface ChapterImageAsset {
 export interface ChapterImageProgress {
   imageId: string; status: 'planned' | 'requested' | 'complete' | 'failed' | 'unresolved';
   callId: string | null; asset: ChapterImageAsset | null
+  /** Prior explicitly retried paid attempts remain immutable audit correlations. */
+  previousAttempts?: { callId: string; status: 'failed' | 'unresolved'; uncertaintyAcknowledged: boolean }[]
 }
 export interface ChapterProvenance { runId: string; textModelId: string; imageModelId: OpenRouterImageModelId | null; createdAt: string }
 export interface ChapterManifest extends ChapterIdentity {
@@ -62,13 +64,15 @@ export interface TopicContentRequest extends TopicContentIdentity { sectionCurso
 export interface GenerateTopicContentRequest extends TopicContentIdentity { mode: TopicContentMode; replace: boolean; expectedRevisionId: string | null }
 export interface TopicContentRunRequest extends TopicContentIdentity { chapterId: string; runId: string; checkpointRevision: number }
 export interface RetryTopicContentSaveRequest extends TopicContentRunRequest { pendingResultId: string }
+export type CompleteTopicContentImagesRequest = ChapterIdentity
+export interface RetryTopicContentImageRequest extends TopicContentRunRequest { imageId: string; priorCallId: string; acknowledgeUncertainCharge: boolean }
 export interface GenerateTopicImageReplacementRequest extends ChapterIdentity { imageId: string; expectedImageVersionId: string; prompt: string }
 export interface TopicImageCandidateRequest extends ChapterIdentity { imageId: string; candidateId: string; expectedImageVersionId: string }
 export interface AcceptTopicImageReplacementRequest extends TopicImageCandidateRequest { caption: string; alt: string }
 export interface TopicContentSnapshot {
   revision: number; projectId: string; topicId: string;
   published: { chapterId: string; revisionId: string; status: ChapterManifest['status'] } | null;
-  progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[] } | null;
+  progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[]; pendingResultId?: string; imageSlots?: { imageId: string; status: ChapterImageProgress['status']; callId: string | null }[] } | null;
   candidate: TopicImageCandidate | null;
   stale: boolean; missingImageIds: string[]; errorCode: ErrorCode | null; message: string | null
 }
@@ -84,6 +88,8 @@ export interface TopicContentApi {
   continueTopicContent(request: TopicContentRunRequest): Promise<ApiResult<TopicContentSnapshot>>
   discardTopicContentProgress(request: TopicContentRunRequest): Promise<ApiResult<TopicContentSnapshot>>
   retryTopicContentSave(request: RetryTopicContentSaveRequest): Promise<ApiResult<TopicContentSnapshot>>
+  completeTopicContentImages(request: CompleteTopicContentImagesRequest): Promise<ApiResult<TopicContentSnapshot>>
+  retryTopicContentImage(request: RetryTopicContentImageRequest): Promise<ApiResult<TopicContentSnapshot>>
   generateTopicImageReplacement(request: GenerateTopicImageReplacementRequest): Promise<ApiResult<TopicContentSnapshot>>
   acceptTopicImageReplacement(request: AcceptTopicImageReplacementRequest): Promise<ApiResult<TopicContentSnapshot>>
   discardTopicImageReplacement(request: TopicImageCandidateRequest): Promise<ApiResult<TopicContentSnapshot>>
@@ -97,11 +103,11 @@ export function parseTopicContentPage(value: unknown): TopicContentPage {
   if (sections.length > topicContentPolicy.readerSectionsPerPage) invalid()
   // Paths are metadata only. Main authorizes opaque media identities; renderer never opens these paths.
   const images = list(data.images, topicContentPolicy.maximumImages, value => {
-    const image = strictRecord(value, ['imageId', 'status', 'callId', 'asset'])
+    const image = strictRecord(value, ['imageId', 'status', 'callId', 'asset', 'previousAttempts'])
     const imageId = identifier(image.imageId), status = choice(image.status, ['planned', 'requested', 'complete', 'failed', 'unresolved']), asset = image.asset === null ? null : parseChapterImageAsset(image.asset)
     const callId = image.callId === null ? null : identifier(image.callId)
     if (!plan.images.some(image => image.id === imageId) || (status === 'complete') !== (asset !== null) || status === 'planned' && callId !== null || status !== 'planned' && !callId || asset && (asset.imageId !== imageId || asset.callId !== callId || asset.path.split('/').length !== 6 || asset.path.split('/').slice(1, 3).join('/') !== `content/${identity.chapterId}` || asset.path.split('/')[4] !== 'images')) invalid()
-    return { imageId, status, callId, asset }
+    return { imageId, status, callId, asset, ...attempts(image.previousAttempts, callId) }
   })
   distinct(images.map(image => image.imageId))
   const result: TopicContentPage = { identity, plan, introduction: prose(data.introduction), synthesis: prose(data.synthesis), sourceNotes: textList(data.sourceNotes, 'Source notes', 40, 2000, 1), sections, images,
@@ -112,13 +118,15 @@ export function parseTopicContentPage(value: unknown): TopicContentPage {
 export function parseTopicContentSnapshot(value: unknown): TopicContentSnapshot {
   const data = strictRecord(value, ['revision', 'projectId', 'topicId', 'published', 'progress', 'candidate', 'stale', 'missingImageIds', 'errorCode', 'message'])
   const published = data.published === null ? null : strictRecord(data.published, ['chapterId', 'revisionId', 'status'])
-  const progress = data.progress === null ? null : strictRecord(data.progress, ['chapterId', 'runId', 'checkpointRevision', 'status', 'mode', 'completedSectionIds', 'pendingImageIds', 'unresolvedImageIds'])
+  const progress = data.progress === null ? null : strictRecord(data.progress, ['chapterId', 'runId', 'checkpointRevision', 'status', 'mode', 'completedSectionIds', 'pendingImageIds', 'unresolvedImageIds', 'pendingResultId', 'imageSlots'])
   if (typeof data.stale !== 'boolean') invalid()
   const ids = (value: unknown, max: number) => { const result = list(value, max, identifier); distinct(result); return result }
   const result: TopicContentSnapshot = { revision: natural(data.revision), ...topicRequest(data),
     published: published && { chapterId: identifier(published.chapterId), revisionId: identifier(published.revisionId), status: choice(published.status, ['illustrated', 'text-only', 'needs-images']) },
     progress: progress && { chapterId: identifier(progress.chapterId), runId: identifier(progress.runId), checkpointRevision: natural(progress.checkpointRevision, Number.MAX_SAFE_INTEGER, 1), status: choice(progress.status, ['paused', 'cancelled', 'interrupted', 'working', 'unsaved']), mode: choice(progress.mode, ['illustrated', 'text-only']),
-      completedSectionIds: ids(progress.completedSectionIds, topicContentPolicy.maximumSections), pendingImageIds: ids(progress.pendingImageIds, topicContentPolicy.maximumImages), unresolvedImageIds: ids(progress.unresolvedImageIds, topicContentPolicy.maximumImages) },
+      completedSectionIds: ids(progress.completedSectionIds, topicContentPolicy.maximumSections), pendingImageIds: ids(progress.pendingImageIds, topicContentPolicy.maximumImages), unresolvedImageIds: ids(progress.unresolvedImageIds, topicContentPolicy.maximumImages),
+      ...(progress.pendingResultId !== undefined ? { pendingResultId: identifier(progress.pendingResultId) } : {}),
+      ...(progress.imageSlots !== undefined ? { imageSlots: list(progress.imageSlots, topicContentPolicy.maximumImages, value => { const slot = strictRecord(value, ['imageId', 'status', 'callId']); return { imageId: identifier(slot.imageId), status: choice(slot.status, ['planned', 'requested', 'complete', 'failed', 'unresolved']), callId: slot.callId === null ? null : identifier(slot.callId) } }) } : {}) },
     candidate: data.candidate === null ? null : parseTopicImageCandidate(data.candidate), stale: data.stale, missingImageIds: ids(data.missingImageIds, topicContentPolicy.maximumImages),
     errorCode: data.errorCode === null ? null : choice(data.errorCode, ['INVALID_INPUT', 'NOT_FOUND', 'FORBIDDEN', 'INTERNAL', 'AUTH_REQUIRED', 'PLAN_PERMISSION_REQUIRED', 'ACCESS_RESTRICTED', 'USAGE_LIMIT', 'NETWORK', 'CANCELLED', 'BUSY', 'UNAVAILABLE', 'STORAGE', 'CONFLICT'] as const),
     message: data.message === null ? null : boundedText(data.message, 'Content status', 2000) }
@@ -219,7 +227,7 @@ export function parseChapterImageAsset(value: unknown): ChapterImageAsset {
 }
 function imageSet(value: unknown, plan: ChapterPlan, directory: string, retainedRevisionIds: string[] = []): ChapterImageProgress[] {
   const images = list(value, topicContentPolicy.maximumImages, value => {
-    const data = strictRecord(value, ['imageId', 'status', 'callId', 'asset'])
+    const data = strictRecord(value, ['imageId', 'status', 'callId', 'asset', 'previousAttempts'])
     const imageId = identifier(data.imageId), status = choice(data.status, ['planned', 'requested', 'complete', 'failed', 'unresolved'])
     const asset = data.asset === null ? null : parseChapterImageAsset(data.asset), callId = data.callId === null ? null : identifier(data.callId)
     if (!plan.images.some(image => image.id === imageId) || (status === 'complete') !== (asset !== null) || status === 'planned' && callId !== null || status !== 'planned' && !callId) invalid()
@@ -227,11 +235,23 @@ function imageSet(value: unknown, plan: ChapterPlan, directory: string, retained
       const parts = directory.split('/'), assetParts = asset.path.split('/')
       if (asset.imageId !== imageId || asset.callId !== callId || assetParts.length !== 6 || assetParts.slice(0, 3).join('/') !== parts.slice(0, 3).join('/') || ![parts[3], ...retainedRevisionIds].includes(assetParts[3]) || assetParts[4] !== 'images') invalid()
     }
-    return { imageId, status, callId, asset }
+    return { imageId, status, callId, asset, ...attempts(data.previousAttempts, callId) }
   })
   distinct(images.map(image => image.imageId))
   if (images.length !== plan.images.length || images.reduce((sum, image) => sum + (image.asset?.bytes ?? 0), 0) > topicContentPolicy.chapterMediaBytes) invalid()
   return images
+}
+function attempts(value: unknown, currentCallId: string | null): Pick<ChapterImageProgress, 'previousAttempts'> {
+  if (value === undefined) return {}
+  const previousAttempts = list(value, 100, value => {
+    const data = strictRecord(value, ['callId', 'status', 'uncertaintyAcknowledged'])
+    const status = choice(data.status, ['failed', 'unresolved'])
+    if (data.uncertaintyAcknowledged !== true) invalid()
+    return { callId: identifier(data.callId), status, uncertaintyAcknowledged: data.uncertaintyAcknowledged }
+  })
+  distinct(previousAttempts.map(attempt => attempt.callId))
+  if (previousAttempts.some(attempt => attempt.callId === currentCallId)) invalid()
+  return { previousAttempts }
 }
 function parseProvenance(value: unknown): ChapterProvenance {
   const data = strictRecord(value, ['runId', 'textModelId', 'imageModelId', 'createdAt'])
@@ -295,6 +315,21 @@ export function parseRetryTopicContentSave(value: unknown): RetryTopicContentSav
   const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'runId', 'checkpointRevision', 'pendingResultId'])
   return { ...parseTopicContentRunRequest({ projectId: data.projectId, topicId: data.topicId, chapterId: data.chapterId, runId: data.runId, checkpointRevision: data.checkpointRevision }), pendingResultId: identifier(data.pendingResultId) }
 }
+export function parseCompleteTopicContentImages(value: unknown): CompleteTopicContentImagesRequest {
+  const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'revisionId'])
+  return chapterIdentity(data)
+}
+export function parseRetryTopicContentImage(value: unknown): RetryTopicContentImageRequest {
+  const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'runId', 'checkpointRevision', 'imageId', 'priorCallId', 'acknowledgeUncertainCharge'])
+  if (typeof data.acknowledgeUncertainCharge !== 'boolean') invalid()
+  return { ...parseTopicContentRunRequest({ projectId: data.projectId, topicId: data.topicId, chapterId: data.chapterId, runId: data.runId, checkpointRevision: data.checkpointRevision }), imageId: identifier(data.imageId), priorCallId: identifier(data.priorCallId), acknowledgeUncertainCharge: data.acknowledgeUncertainCharge }
+}
+export const topicContentChannels = {
+  state: 'topic-content:state', get: 'topic-content:get', generate: 'topic-content:generate', continue: 'topic-content:continue',
+  discard: 'topic-content:discard', retrySave: 'topic-content:retry-save', completeImages: 'topic-content:complete-images', retryImage: 'topic-content:retry-image', changed: 'topic-content:changed'
+} as const
+/** Individual replacement capabilities are activated by their own implementation ticket. */
+export type TopicChapterApi = Omit<TopicContentApi, 'generateTopicImageReplacement' | 'acceptTopicImageReplacement' | 'discardTopicImageReplacement'>
 export function parseGenerateTopicImageReplacement(value: unknown): GenerateTopicImageReplacementRequest {
   const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'revisionId', 'imageId', 'expectedImageVersionId', 'prompt'])
   return { ...chapterIdentity(data), imageId: identifier(data.imageId), expectedImageVersionId: identifier(data.expectedImageVersionId), prompt: boundedText(data.prompt, 'Image prompt', openRouterPolicy.promptCharacters) }

@@ -27,6 +27,10 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Structured repair](flows/ai-streaming-repair/index.md) | Provisional candidate replacement across provider turns and independent acceptance |
 | [Packaged worker](flows/packaged-worker/index.md) | Nonvisual ASAR worker/dependency verification after packaging |
 | [Buffered image worker](flows/image-worker/index.md) | Nonvisual private image acknowledgements, real buffered waiting and utility raster decoding |
+| [Topic content](flows/topic-content/index.md) | Nonvisual chapter admission, checkpointing, publication and explicit recovery |
+| [Topic content recovery](flows/topic-content-recovery/index.md) | Nonvisual text-only image completion, failed paid attempts and explicit retry lineage |
+| [Topic content barriers](flows/topic-content-barriers/index.md) | Nonvisual durable intent/checkpoint/billing failures and global admission through actual cleanup |
+| [Topic media](flows/topic-media/index.md) | Nonvisual Chromium raster-scheme and named capability authorization |
 
 ## Ownership and automatic refresh
 

@@ -10,6 +10,7 @@ import { unavailableModels } from '../../src/main/openrouter/metadata'
 import type { OpenRouterCallIntent, OpenRouterCallTransition } from '../../src/shared/openrouter'
 import { openRouterPolicy, parseOpenRouterCallPage } from '../../src/shared/openrouter'
 import { routerAt, routerCipher } from '../fixtures/openrouter'
+import { recordImageDisposition } from '../../src/main/generation/image-worker-authority'
 const roots: string[] = []
 const directory = async () => { const root = await mkdtemp(join(tmpdir(), 'edu-ledger-')); roots.push(root); return root }
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
@@ -50,6 +51,21 @@ describe('independent private OpenRouter storage', () => {
   })
 })
 describe('exact money and durable request history', () => {
+  it('preserves published copied-image disposition while discarding a new unpublished call without changing exact billing', async () => {
+    const ledger = createOpenRouterLedger(await directory(), { now: () => routerAt }); await ledger.initialize()
+    for (const id of ['prior-published', 'new-unpublished']) {
+      await ledger.intent(intent(id)); await ledger.transition(id, terminal({ disposition: id === 'prior-published' ? 'published' : 'checkpointed' }))
+    }
+    const service = { getCall: ledger.get, async setDisposition(id: string, disposition: OpenRouterCallTransition['disposition']) {
+      const previous = ledger.get(id).latest!; await ledger.transition(id, { ...previous, disposition })
+    } }
+    const prior = ledger.get('prior-published'), freshCost = ledger.get('new-unpublished').latest!.cost
+    await recordImageDisposition(service, 'prior-published', 'discarded'); await recordImageDisposition(service, 'new-unpublished', 'discarded')
+    expect(ledger.get('prior-published')).toEqual(prior)
+    expect(ledger.get('new-unpublished').latest).toMatchObject({ disposition: 'discarded', sequence: 2, cost: freshCost })
+    expect(ledger.get('new-unpublished').latest!.cost).toEqual(freshCost)
+    expect(ledger.spend().allTimeUsd).toBe('0.200000000000000002')
+  })
   it('projects unsafe display labels without changing identities, ordinary titles or monetary evidence', async () => {
     const path = await directory(), ledger = createOpenRouterLedger(path, { now: () => routerAt }); await ledger.initialize()
     const original = intent('safe-labels'); original.context = { ...original.context!, projectName: 'Project at C:\\private\\project', topicTitle: 'Account sk-or-private-secret' }

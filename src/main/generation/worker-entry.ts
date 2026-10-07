@@ -9,6 +9,9 @@ import { randomUUID } from 'node:crypto'
 import { runImageProfile } from './pi-image-profile'
 import type { WorkerRequest } from './worker-protocol'
 import type { ImageAuthorization } from './image-worker-contract'
+import { generateChapterWithPi } from './pi-chapter-engine'
+import type { ChapterSubmission } from '../../core/topic-content/ports'
+import type { TopicContentCheckpoint } from '../../shared/topic-content'
 
 const controller = new AbortController()
 let started = false, sequence = 0, phase: WorkerPhase = 'preparing'
@@ -17,7 +20,24 @@ let imageRequestId: string | null = null, imageCallId: string | null = null
 let authorize: ((authority: ImageAuthorization | null) => void) | null = null
 let terminalAck: ((accepted: boolean) => void) | null = null
 let assetAck: ((accepted: boolean) => void) | null = null
+let activeProfile: string | null = null
+let chapterRequestId: string | null = null
+let chapterAck: ((request: Extract<WorkerRequest, { type: 'chapter-ack' }>) => void) | null = null
+async function acceptChapter(submission: ChapterSubmission): Promise<TopicContentCheckpoint | null> {
+  controller.signal.throwIfAborted()
+  chapterRequestId = randomUUID()
+  const acknowledgment = await new Promise<Extract<WorkerRequest, { type: 'chapter-ack' }>>(resolve => {
+    chapterAck = resolve; reply({ type: 'chapter-submission', requestId: chapterRequestId!, submission })
+  })
+  if (!acknowledgment.accepted) throw new ApplicationError('INVALID_INPUT', 'The chapter submission was rejected.')
+  return acknowledgment.checkpoint
+}
 function acknowledgment(request: Exclude<WorkerRequest, { type: 'start' | 'cancel' }>): void {
+  if (request.type === 'chapter-ack') {
+    if (!started || activeProfile !== 'chapter' || !chapterAck || request.requestId !== chapterRequestId) throw new ApplicationError('INTERNAL', 'Unexpected chapter acknowledgment.')
+    const resolve = chapterAck; chapterAck = null; resolve(request); return
+  }
+  if (activeProfile !== 'fixed-image') throw new ApplicationError('INTERNAL', 'Unexpected image acknowledgment.')
   if (!started || !imageRequestId || request.requestId !== imageRequestId) throw new ApplicationError('INTERNAL', 'Unexpected image acknowledgment.')
   if (request.type === 'image-authorized') {
     if (!authorize || imageCallId) throw new ApplicationError('INTERNAL', 'Duplicate image authorization.')
@@ -69,6 +89,7 @@ process.parentPort?.on('message', (event: { data: unknown }) => {
   }
   if (started) { controller.abort(); reply({ type: 'error', code: 'INTERNAL' }); return }
   started = true
+  activeProfile = request.profile
   heartbeat = setInterval(() => reply({ type: 'health', phase }), 5000)
   reply({ type: 'health', phase })
   const run = request.profile === 'outline'
@@ -77,6 +98,7 @@ process.parentPort?.on('message', (event: { data: unknown }) => {
       onProgress: frame => reply({ type: 'progress', ...frame }),
       onDiagnostic: (event, data) => reply({ type: 'diagnostic', event, data: safeLogData(data) }) })
       .then(result => reply({ type: 'result', profile: 'outline', result }))
+    : request.profile === 'chapter' ? generateChapterWithPi(request.input, { signal: controller.signal, accept: acceptChapter, onTransport: transport }).then(result => reply({ type: 'result', profile: 'chapter', result }))
     : request.profile === 'fixed-image' ? image(request.input) : runModelAccessProfile(request.input, { signal: controller.signal, onTransport: transport,
       onEvidenceProgress: evidence => reply({ type: 'model-evidence', evidence }),
       onEvidence: evidence => reply({ type: 'model-evidence', evidence }) })

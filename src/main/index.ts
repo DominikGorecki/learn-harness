@@ -27,9 +27,21 @@ import { ApplicationMenus } from './menus/application-menus'
 import { registerApplicationMenuHandlers } from './ipc/application-menu-handlers'
 import { integratedChromeOptions } from './menus/chrome'
 import { windowIconPath } from './branding/icon'
+import { TopicContentService } from '../core/topic-content/service'
+import { createTopicContentRepository } from './storage/topic-content-repository'
+import { topicContentRuntime } from './generation/topic-content-runtime'
+import { createOpenRouterService } from './openrouter/service'
+import type { OpenRouterService } from './openrouter/service'
+import { createOpenRouterSettingsStore } from './openrouter/settings-store'
+import { createOpenRouterLedger } from './openrouter/ledger'
+import { createOpenRouterGateway } from './openrouter/gateway'
+import { registerTopicContentHandlers } from './ipc/topic-content-handlers'
+import { registerOpenRouterHandlers } from './ipc/openrouter-handlers'
+import { registerTopicMediaProtocol } from './security/topic-media-protocol'
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } }
+  { scheme: 'learningapp', privileges: { standard: true, secure: true, supportFetchAPI: true } },
+  { scheme: 'learningmedia', privileges: { standard: true, secure: true } }
 ])
 app.setName('Learning Studio')
 // Automation uses an isolated writable profile, never an existing learner profile.
@@ -41,6 +53,8 @@ let mainWindow: BrowserWindow | null = null
 let menus: ApplicationMenus | null = null
 let account: AccountService | null = null
 let generation: GenerationService | null = null
+let topicContent: TopicContentService | null = null
+let openRouter: OpenRouterService | null = null
 const ai = new AiCoordinator({ now: () => performance.now(), createId: randomUUID })
 let diagnostics = silentLogger
 let stopping = false
@@ -141,6 +155,20 @@ if (!app.requestSingleInstanceLock()) {
       }
     })
     registerGenerationHandlers(generation, () => mainWindow, expectedOrigin)
+    const routerDirectory = join(app.getPath('userData'), 'openrouter')
+    const routerLedger = createOpenRouterLedger(join(routerDirectory, 'calls'))
+    const fixture = process.env.EDU_HARNESS_TEST_OPENROUTER_URL
+    openRouter = createOpenRouterService({ store: createOpenRouterSettingsStore(routerDirectory, {
+      available: () => safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'),
+      encrypt: value => safeStorage.encryptString(value), decrypt: value => safeStorage.decryptString(Buffer.from(value))
+    }), ledger: routerLedger, gateway: createOpenRouterGateway(routerLedger, fixture ? { fixture: { baseUrl: fixture, isPackaged: app.isPackaged, isolatedProfile: Boolean(process.env.EDU_HARNESS_TEST_DATA_DIR) } } : {}) })
+    await openRouter.initialize() // Reads protected profile/cache/history only; no provider HTTP on startup.
+    const topicRepository = createTopicContentRepository(workspace)
+    const runtime = topicContentRuntime({ repository: topicRepository, account, provider: openRouter, ai, textBaseUrl: providerEndpoints.resource })
+    topicContent = new TopicContentService({ ai, repository: topicRepository, ...runtime, createId: randomUUID, now: () => new Date().toISOString() })
+    registerTopicContentHandlers(topicContent, () => mainWindow, expectedOrigin)
+    registerOpenRouterHandlers(openRouter, () => mainWindow, expectedOrigin)
+    registerTopicMediaProtocol(rendererSession, () => mainWindow, expectedOrigin, identity => topicRepository.resolveMedia(identity))
     await createWindow()
     void account.initialize()
     app.on('activate', () => {
@@ -162,6 +190,8 @@ if (!app.requestSingleInstanceLock()) {
     // Publication/owned worker cleanup precedes the bounded diagnostics flush.
     void ai.dispose().then(async () => {
       await generation?.waitForIdle() // Storage-only retry has no AI lease but still owns publication.
+      await topicContent?.dispose()
+      await openRouter?.dispose()
       await account?.dispose()
       const deadline = setTimeout(() => { logsClosed = true; app.quit() }, 2000)
       try { await diagnostics.close() }

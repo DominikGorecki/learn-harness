@@ -10,12 +10,16 @@ import type { ImageAuthorization, DecodedImage, ImageTerminal } from '../../src/
 import { startImageFixture } from '../fixtures/image-provider'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
+import { startChapterFixture } from '../fixtures/chapter-provider'
+import { learningOutline } from '../fixtures/learning-outline'
+import type { TopicContentCheckpoint } from '../../src/shared/topic-content'
 
-test('packaged ASAR worker runs scoped outline, both fixed diagnostics and the fixed image profile', { tag: '@packaged-worker', annotation: { type: 'flow', description: 'packaged-worker' } }, async ({ playwright }) => {
+test('packaged ASAR worker runs outline, fixed diagnostics, image and guided chapter profiles', { tag: '@packaged-worker', annotation: { type: 'flow', description: 'packaged-worker' } }, async ({ playwright }) => {
   const asar = process.env.EDU_PACKAGED_WORKER_ASAR
   test.skip(!asar, 'Run npm run test:packaged after packaging to test the current artifact explicitly.')
   const fixture = await startChatGPTFixture({ inferenceMode: 'materials' })
   const images = await startImageFixture()
+  const chapterFixture = await startChapterFixture()
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-asar-worker-')))
   const project = join(root, 'project'); await mkdir(project)
   await writeFile(join(project, 'notes.md'), '# Bayesian reasoning\nPriors and evidence.')
@@ -34,6 +38,7 @@ test('packaged ASAR worker runs scoped outline, both fixed diagnostics and the f
       let pid: number | null = null
       let stopping = false, terminal: WorkerReply | undefined, failure: Error | undefined
       let pending = Promise.resolve(), requestId: string | null = null, imageDigest: string | null = null, billing: ImageTerminal | null = null
+      let checkpoint: TopicContentCheckpoint | null = null, turns = 0
       const persist = async (name: string, bytes: Uint8Array | string) => {
         const fs = process.getBuiltinModule('fs/promises') as typeof import('node:fs/promises'), file = await fs.open(input.auditDirectory + '/' + name, 'wx')
         try { await file.writeFile(bytes); await file.sync() } finally { await file.close() }
@@ -45,7 +50,21 @@ test('packaged ASAR worker runs scoped outline, both fixed diagnostics and the f
       const timeout = setTimeout(() => finish(undefined, new Error('Packaged worker timed out')), 30_000)
       worker.once('spawn', () => { pid = worker.pid ?? null; worker.postMessage({ type: 'start', ...input.profile }) })
       worker.on('message', (message: WorkerReply) => {
-        if (message.type === 'image-intent') {
+        if (message.type === 'chapter-submission') {
+          if (input.profile.profile !== 'chapter') { finish(undefined, new Error('Wrong packaged chapter profile')); return }
+          const source = input.profile.input, submission = message.submission
+          pending = pending.then(async () => {
+            await persist(`chapter-${message.sequence}.json`, JSON.stringify(submission))
+            if (submission.kind === 'turn') { turns++; if (checkpoint) { checkpoint.textTurns = turns; checkpoint.activationTextTurns = turns } }
+            else if (submission.kind === 'plan') checkpoint = { schemaVersion: 1, projectId: source.projectId, topicId: source.topicId, chapterId: source.chapterId, revisionId: 'packaged-revision', runId: 'packaged-run', checkpointRevision: 1, mode: 'text-only', status: 'working', outputDirectory: `beliefs/content/${source.chapterId}/packaged-revision`, plan: submission.plan,
+              sections: [], introduction: null, synthesis: null, sourceNotes: [], images: submission.plan.images.map(image => ({ imageId: image.id, status: 'planned', callId: null, asset: null })),
+              baseline: { topicDigest: 'a'.repeat(64), learningContextDigest: 'a'.repeat(64), sources: [], expectedManifestDigest: null }, provenance: { runId: 'packaged-run', textModelId: source.model.id, imageModelId: null, createdAt: new Date().toISOString() },
+              textTurns: turns, imageRequests: 0, activationTextTurns: turns, activationImageRequests: 0, updatedAt: new Date().toISOString() }
+            else if (submission.kind === 'section' && checkpoint) checkpoint.sections.push(submission.section)
+            else if (submission.kind === 'summary' && checkpoint) { checkpoint.introduction = submission.introduction; checkpoint.synthesis = submission.synthesis; checkpoint.sourceNotes = submission.sourceNotes }
+            worker.postMessage({ type: 'chapter-ack', requestId: message.requestId, accepted: true, checkpoint })
+          })
+        } else if (message.type === 'image-intent') {
           if (!input.authority || requestId || message.imageSlotId !== input.authority.imageSlotId) { finish(undefined, new Error('Invalid packaged image intent')); return }
           requestId = message.requestId
           pending = pending.then(async () => { await persist('intent.json', JSON.stringify({ callId: input.authority!.callId, slot: message.imageSlotId })); worker.postMessage({ type: 'image-authorized', requestId, authority: input.authority }) })
@@ -92,11 +111,19 @@ test('packaged ASAR worker runs scoped outline, both fixed diagnostics and the f
     expect(await readFile(join(root, 'accepted.png'))).toEqual(images.png)
     expect(image.imageDigest).toBe(createHash('sha256').update(images.png).digest('hex'))
     results.push(image)
+    const chapter = await run({ profile: 'chapter', input: { model: { id: 'fixture-model', name: 'Fixture model' }, accessToken: 'fixture-access', baseUrl: `${chapterFixture.baseUrl}/v1`, path: project, brief: 'Reason about beliefs.',
+      outline: learningOutline(), topicId: 'beliefs', projectId: 'portable-project', chapterId: 'packaged-chapter', checkpoint: null, settings: null, excludedSourcePaths: [] } })
+    expect(chapter.terminal).toMatchObject({ type: 'result', profile: 'chapter', result: { kind: 'chapter', paused: false } })
+    expect(chapterFixture.inferenceRequests).toHaveLength(5)
+    expect(JSON.stringify(chapterFixture.inferenceRequests[0])).toContain('Educational illustration guidance v1')
+    expect(JSON.stringify(chapterFixture.inferenceRequests[0])).toContain('generate_topic_image')
+    expect(JSON.stringify(chapterFixture.inferenceRequests[0])).not.toContain('write_project_file')
+    results.push(chapter)
     for (const completed of results) {
       expect(completed.exitCode).toBe(0)
       expect(completed.envKeys.every(key => ['PATH', 'SystemRoot', 'WINDIR', 'TEMP', 'TMP', 'TMPDIR', 'LANG', 'LC_ALL', 'SSL_CERT_FILE', 'SSL_CERT_DIR'].includes(key))).toBe(true)
       expect(completed.pid).toBeGreaterThan(0)
       expect(await desktop.evaluate((_, pid) => { try { process.kill(pid!, 0); return true } catch { return false } }, completed.pid)).toBe(false)
     }
-  } finally { await desktop?.close(); await fixture.close(); await images.close(); await rm(root, { recursive: true, force: true }) }
+  } finally { await desktop?.close(); await fixture.close(); await images.close(); await chapterFixture.close(); await rm(root, { recursive: true, force: true }) }
 })

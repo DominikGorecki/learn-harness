@@ -10,6 +10,10 @@ import type { AiApi, AiActivitySnapshot } from '../shared/ai/activity'
 import { rendererDiagnosticChannel, rendererDiagnosticMessage, safeLogData } from '../shared/diagnostics'
 import { applicationMenuChannels, parseApplicationCommand } from '../shared/application-menu'
 import type { ApplicationMenuApi } from '../shared/application-menu'
+import { topicContentChannels, parseTopicContentSnapshot } from '../shared/topic-content'
+import type { TopicChapterApi } from '../shared/topic-content'
+import { openRouterChannels, parseOpenRouterSettings } from '../shared/openrouter'
+import type { OpenRouterApi } from '../shared/openrouter'
 
 // Automatic failure telemetry carries no messages, URLs, promises or material.
 const diagnosticWindow = globalThis as unknown as {
@@ -28,7 +32,33 @@ diagnosticWindow.addEventListener('message', event => {
     ...safeLogData({ errorType: data.errorType, line: data.line, column: data.column }) })
 })
 
-const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi & ApplicationMenuApi = {
+const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi & ApplicationMenuApi & TopicChapterApi & OpenRouterApi = {
+  getTopicContentState: request => ipcRenderer.invoke(topicContentChannels.state, request),
+  getTopicContent: request => ipcRenderer.invoke(topicContentChannels.get, request),
+  generateTopicContent: request => ipcRenderer.invoke(topicContentChannels.generate, request),
+  continueTopicContent: request => ipcRenderer.invoke(topicContentChannels.continue, request),
+  discardTopicContentProgress: request => ipcRenderer.invoke(topicContentChannels.discard, request),
+  retryTopicContentSave: request => ipcRenderer.invoke(topicContentChannels.retrySave, request),
+  completeTopicContentImages: request => ipcRenderer.invoke(topicContentChannels.completeImages, request),
+  retryTopicContentImage: request => ipcRenderer.invoke(topicContentChannels.retryImage, request),
+  onTopicContentChanged: listener => {
+    const receive = (_event: unknown, value: unknown) => { try { listener(parseTopicContentSnapshot(value)) } catch { /* Reject malformed public frames. */ } }
+    ipcRenderer.on(topicContentChannels.changed, receive)
+    return () => { ipcRenderer.removeListener(topicContentChannels.changed, receive) }
+  },
+  getOpenRouterSettings: () => ipcRenderer.invoke(openRouterChannels.settings),
+  saveOpenRouterKey: request => ipcRenderer.invoke(openRouterChannels.saveKey, request),
+  removeOpenRouterKey: () => ipcRenderer.invoke(openRouterChannels.removeKey),
+  setOpenRouterImageModel: request => ipcRenderer.invoke(openRouterChannels.model, request),
+  refreshOpenRouterMetadata: () => ipcRenderer.invoke(openRouterChannels.refresh),
+  listOpenRouterCalls: request => ipcRenderer.invoke(openRouterChannels.list, request),
+  getOpenRouterCall: request => ipcRenderer.invoke(openRouterChannels.call, request),
+  getTopicImageConfiguration: request => ipcRenderer.invoke(openRouterChannels.quote, request),
+  onOpenRouterChanged: listener => {
+    const receive = (_event: unknown, value: unknown) => { try { listener(parseOpenRouterSettings(value)) } catch { /* Reject malformed public frames. */ } }
+    ipcRenderer.on(openRouterChannels.changed, receive)
+    return () => { ipcRenderer.removeListener(openRouterChannels.changed, receive) }
+  },
   showApplicationMenu: request => ipcRenderer.invoke(applicationMenuChannels.show, request),
   setApplicationMenuState: request => ipcRenderer.invoke(applicationMenuChannels.state, request),
   setWindowAppearance: request => ipcRenderer.invoke(applicationMenuChannels.appearance, request),

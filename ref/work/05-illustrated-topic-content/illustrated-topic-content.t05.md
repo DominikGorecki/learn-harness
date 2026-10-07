@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T05 — Generate checkpointed illustrated chapters through the shared AI lifecycle
-Status: Open
+Status: Done — local implementation accepted; bundle UI/live qualification remains pending
 
 ## Source
 
@@ -45,9 +45,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] A deterministic multi-call chapter has all objectives and useful planned images, preserves outline/other files and reopens offline.
-- [ ] Restart/cancel/budget pause/save failure/source conflicts preserve validated work and require explicit continuation; unresolved paid slots are never replayed silently.
-- [ ] BUSY, key guards, current project/topic identity and all named bridge rejected inputs work through actual Electron.
+- [x] A deterministic multi-call chapter has all objectives and useful planned images, preserves outline/other files and reopens offline.
+- [x] Restart/cancel/budget pause/save failure/source conflicts preserve validated work and require explicit continuation; unresolved paid slots are never replayed silently.
+- [x] BUSY, key guards, current project/topic identity and all named bridge rejected inputs work through actual Electron.
 
 ## Manual verification
 
@@ -55,7 +55,13 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: domain/Electron integration; planned model: gpt-6.1-sol; reasoning: high. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+Implemented core chapter orchestration, main-only repository/runtime/provider composition, named chapter/OpenRouter IPC and preload subscriptions, app-owned educational-image guidance and owning-window local raster serving. Chapter plans/sections/summaries are independently accepted and checkpointed; actual read evidence hashes raw source bytes. Finite activation counters, explicit Continue/uncertain image retry, text-only/needs-images, immutable replacement retention and exact storage-only Retry Save/Discard preserve accepted work and original project/source bytes.
+
+Worker: domain/Electron integration, gpt-6.1-sol, high reasoning; scoped read-only review: gpt-6.1-sol, medium. Primary inspected actual new/modified source, tests, manifests and guidance. Prerequisites T02 1cfbd02669ca54be5036876e0bd3d6df1b6cf3dc, T03 c8eb934880f44bbfddd103f9c677a4e483533fb4 and T04 5a8af6b8ed27727c3e08cf7222fa544be42521d7 are accepted commits on master.
+
+Concrete review fixes preserve source/manifest baselines, retire published runs, retain pending validated checkpoints/assets through failures/cancellation, reject unknown publication journals before inference, recover verified committed journals, archive discarded generated provenance, preserve copied published-call disposition and keep confirmed publication readable when ledger disposition fails. Storage-only admission holds global BUSY and shutdown without inference or new activity. Protocol serving validates both actual Chromium owning-frame request admission and runtime initiator/canonical current manifest identities under exact CSP.
+
+Final stable-tree gates: `npm.cmd run check` passed (38 unit files, 453 passed / 3 skipped, lint/flow audit/type scopes/build); `npm.cmd run test:desktop -- tests/desktop/topic-content.spec.ts` passed four flows in 1.1 minutes; fresh `npm.cmd run package` then `npm.cmd run test:packaged` both passed, with one ASAR test in 4.0 seconds. Packaged outline, Sol/Luna diagnostics, chapter/guidance and image/Sharp profiles passed with actual PID absence. The four nonvisual chapter/media/recovery/barrier flow manifests and ASAR assertions were reviewed; they establish local process/storage evidence, not visual or live editorial qualification. Earlier fixture type/lint assertions and duplicate flow-reporter registration failures were corrected before these passing commands; no active sessions or owned fixture resources remain. No paid live/private credentials; Settings/reader/standalone replacement and mandatory live/editorial/native qualifications remain separate pending gates.
 
 ## Notes
 

@@ -3,6 +3,13 @@ import type { createOpenRouterService, ImageProviderLease, PrepareImageCallReque
 import type { WorkerRunOptions } from './worker-lifecycle'
 import type { DecodedImage } from './image-worker-contract'
 
+/** Discarding a completion run never unpublishes an asset still accepted by its previous manifest. */
+export async function recordImageDisposition(service: Pick<ReturnType<typeof createOpenRouterService>, 'getCall' | 'setDisposition'>,
+  callId: string, disposition: 'published' | 'discarded'): Promise<void> {
+  if (disposition === 'discarded' && service.getCall(callId).latest?.disposition === 'published') return
+  await service.setDisposition(callId, disposition)
+}
+
 /** Main-only adapter: the worker proposes only the slot, never credentials or options.
  * The caller retains its AI/provider leases until task.result settles after exit and writes.
  */
