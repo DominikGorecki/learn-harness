@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { aiAdmissionUnavailable, AiStartGate, modelTestAdmission, newerActivity, presentationOutcome, projectNavigationState, recoveryPreview } from '../../src/renderer/src/features/ai/activity-state'
+import { aiAdmissionUnavailable, AiStartGate, modelTestAdmission, newerActivity, presentationOutcome, projectNavigationState, recoveryPreview, operationPhaseLabel } from '../../src/renderer/src/features/ai/activity-state'
+import type { TopicContentSnapshot } from '../../src/shared/topic-content'
 import type { AccountSnapshot } from '../../src/shared/account'
 import { parseOutline } from '../../src/shared/outline'
 import { AiCoordinator } from '../../src/core/ai/coordinator'
@@ -15,6 +16,17 @@ const frame = (revision = 1, sequence = 1): AiActivitySnapshot => ({ revision, a
 function run(): OutlineRun { return { id: 'run', projectId: 'project', brief: 'Learn', modelId: 'model', status: 'unsaved', message: 'Not saved', errorCode: 'STORAGE', question: null, coverage: null,
   result: { generatedAt: '2026-10-05T12:00:00Z', model: { id: 'model', name: 'Model' }, brief: 'Learn', inferredBrief: null, document: learningOutline(), coverage: { files: [], limitations: [] } } } }
 describe('AI presentation ownership', () => {
+  it('correlates chapter storage recovery with the exact publishing run, preserving discarded completion evidence', () => {
+    const op = { ...operation(), kind: 'generate-topic-content' as const, topicId: 'topic', chapterId: 'chapter', outcome: 'unsaved' as const }
+    const state: TopicContentSnapshot = { revision: 1, projectId: 'project', topicId: 'topic', published: { chapterId: 'chapter', revisionId: 'old', status: 'needs-images', runId: 'older-run' }, progress: null, candidate: null, stale: false, missingImageIds: [], errorCode: null, message: null }
+    expect(presentationOutcome(op, null, state)).toBe('unsaved')
+    state.published = { ...state.published!, revisionId: 'new', runId: op.runId }
+    expect(presentationOutcome(op, null, state)).toBe('incomplete')
+    state.published.status = 'illustrated'; expect(presentationOutcome(op, null, state)).toBe('saved')
+    expect(op.outcome).toBe('unsaved')
+    expect(operationPhaseLabel('generate-topic-content', 'planning')).toBe('Planning the chapter')
+    expect(operationPhaseLabel('create-outline', 'planning')).toBe('Drafting the outline')
+  })
   it('accepts a real next lease even when its operation sequence restarts below the terminal sequence', async () => {
     let id = 0
     const coordinator = new AiCoordinator({ now: () => 0, createId: () => `owner-${++id}` })

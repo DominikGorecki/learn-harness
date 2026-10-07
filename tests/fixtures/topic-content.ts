@@ -13,11 +13,11 @@ import { learningOutline } from './learning-outline'
 
 export const topicContentTimestamp = '2026-10-07T14:00:00.000Z'
 export const topicPng = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Y5S8AAAAASUVORK5CYII=', 'base64')
-export async function topicContentProject(registerRoot: (root: string) => void) {
+export async function topicContentProject(registerRoot: (root: string) => void, identity: { projectId: string; name: string } = { projectId: 'portable-project', name: 'Bayesian reasoning' }) {
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-content-'))); registerRoot(root)
   const path = join(root, 'project'); await mkdir(path)
   const projectStorage = createProjectStorage()
-  const document: ProjectDocument = { version: 1, projectId: 'portable-project', revision: 1, name: 'Bayesian reasoning', createdAt: topicContentTimestamp, updatedAt: topicContentTimestamp,
+  const document: ProjectDocument = { version: 1, projectId: identity.projectId, revision: 1, name: identity.name, createdAt: topicContentTimestamp, updatedAt: topicContentTimestamp,
     selectedModel: { id: 'offline-model', name: 'Offline model' }, brief: 'Learn Bayesian reasoning',
     outline: { generatedAt: topicContentTimestamp, model: { id: 'offline-model', name: 'Offline model' }, brief: 'Learn Bayesian reasoning', inferredBrief: null, document: learningOutline(), coverage: { files: [], limitations: [] } } }
   await projectStorage.save(path, document, null)

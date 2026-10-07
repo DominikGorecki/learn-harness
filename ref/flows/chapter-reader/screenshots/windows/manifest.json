@@ -1,0 +1,134 @@
+{
+  "flow": "chapter-reader",
+  "captures": [
+    {
+      "id": "chapter-light",
+      "caption": "Saved illustrated chapter with bounded local prose, TOC and exact objectives in Light.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "fc1ea69bab7d518e5babf49fee3030a4dd7d6d829fc688eec443186a340c3113"
+    },
+    {
+      "id": "chapter-dark",
+      "caption": "The same offline reader in Dark, with current-content history retained.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "e5b6ab0284e078c41ed9a4a58f938fa200e7b1fe343e9f664bdbe92bab4812c7"
+    },
+    {
+      "id": "chapter-illustration-dark",
+      "caption": "The same native illustration and caption actually visible in Dark.",
+      "width": 1602,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "d26597a9e34b013e20af79ca81f5cfa82813a447ecc9bbb69e9ae0bfc4690d0f"
+    },
+    {
+      "id": "chapter-illustration-light",
+      "caption": "Useful native local raster, explanatory caption and surrounding reading in Light.",
+      "width": 1602,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "ccb61b21c46501e7ca3d35f3592d70c762a7e5d78df40eb52fe422bc7ed56b54"
+    },
+    {
+      "id": "chapter-missing",
+      "caption": "Missing local illustration retains its caption, alternate explanation and saved prose.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "45c4eb0ecec0612059f7d4b03f2be466d5150e0e75ef306d0359b9cf89cb7ad3"
+    },
+    {
+      "id": "chapter-readonly",
+      "caption": "Typed main-sent read-only presentation retains chapter reading and disables mutations.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "780637f2b6bc00eee9c0633730f1c456286754f96a663bd38855cbf0a8feaebb"
+    },
+    {
+      "id": "chapter-narrow-dark",
+      "caption": "Dark chapter controls and reading reflow at 600 pixels and 200% zoom with reduced motion.",
+      "width": 752,
+      "height": 877,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 351
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "b767eea107ba512d422e0663c93dee913f66c5ec7d31065ad55a50c7517b3cb9"
+    },
+    {
+      "id": "chapter-narrow-light",
+      "caption": "The same bounded reader in Light at minimum size and zoom.",
+      "width": 752,
+      "height": 877,
+      "theme": "light",
+      "viewport": {
+        "width": 301,
+        "height": 351
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "f197c38a5317787746303c31a4777cefff6db7d23a7de437b1024dfc5720264b"
+    }
+  ],
+  "capturedAt": "2026-10-07T23:18:39.499Z",
+  "testSha256": "1811fce0fc480cf0e8bfabe459a6260f048e57034d5a8d9086aad36ba6697581",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/chapter-reader.spec.ts",
+  "testTitle": "illustrated chapters read offline through bounded pages, relocation and delayed current-content history",
+  "revision": "b0324d3bc9401083538c49b7cc5d53231f1677c2",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

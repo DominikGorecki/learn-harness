@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Mark } from '../components/Mark'
 import { Icon } from '../components/Icon'
 import { AccountPanel } from '../features/account/AccountPanel'
@@ -8,6 +8,9 @@ import { Dashboard } from '../features/projects/Dashboard'
 import { ProjectSetup } from '../features/projects/ProjectSetup'
 import { ProjectModel } from '../features/projects/ProjectModel'
 import { TopicView } from '../features/projects/TopicView'
+import { useTopicContent } from '../features/projects/useTopicContent'
+import { TopicContentControls } from '../features/projects/TopicContentControls'
+import type { ContentAction } from '../features/projects/TopicContentControls'
 import { OutlineView } from '../features/projects/OutlineView'
 import { OutlineEditDialog } from '../features/projects/OutlineEditDialog'
 import { useGeneration } from '../features/projects/useGeneration'
@@ -62,6 +65,8 @@ function Navigation({ projects, selected, busy, account, onOpen, onSelect, onDas
 export function App() {
   const appearance = useAppearance()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsCategoryRequest, setSettingsCategoryRequest] = useState(0)
+  const settingsReturn = useRef<HTMLElement | null>(null)
   const settingsTrigger = useRef<HTMLButtonElement>(null)
   const account = useAccount()
   const workspace = useWorkspace()
@@ -151,6 +156,10 @@ export function App() {
   const topicId = location.destination?.kind === 'topic' && location.destination.projectHandle === project?.id ? location.destination.topicId : null
   const renderedDestination = location.destination && (location.destination.kind === 'dashboard' ? !project : location.destination.projectHandle === project?.id) ? location.destination : workspace.snapshot ? destinationFromWorkspace(workspace.snapshot) : null
   const readingTopic = project?.outline?.document.lessons.find(topic => topic.id === topicId)
+  const content = useTopicContent(readingTopic && project?.availability === 'available' ? project.id : null, readingTopic?.id ?? null, project?.revision ?? null)
+  const presentationKey = renderedDestination ? destinationKey(renderedDestination) : null
+  const chapterReady = !readingTopic || content.ready
+  useLayoutEffect(() => { if (chapterReady && presentationKey) location.presentationReady(presentationKey) }, [chapterReady, presentationKey, location])
   const openProject = location.open
   const selectProject = location.select
   const dashboard = location.dashboard
@@ -161,7 +170,8 @@ export function App() {
     resolve?.(accepted)
   }, [])
   const openAccount = useCallback(() => { accountAccepted.current = false; closeNavigation(); setAccountOpen(true) }, [closeNavigation])
-  const openSettings = useCallback(() => { closeNavigation(); setSettingsOpen(true) }, [closeNavigation])
+  const openSettings = useCallback(() => { closeNavigation(); settingsReturn.current = settingsTrigger.current; setSettingsOpen(true) }, [closeNavigation])
+  const openImageSettings = () => { settingsReturn.current = document.activeElement as HTMLElement; closeNavigation(); setSettingsCategoryRequest(value => value + 1); setSettingsOpen(true) }
   const toggleNavigation = useCallback(() => {
     if (narrow) setNavigationOpen(value => !value)
     else setCollapsed(value => !value)
@@ -219,6 +229,15 @@ export function App() {
   const currentModelUnavailable = Boolean(project?.selectedModel && account.snapshot?.modelsStatus === 'ready' && !account.snapshot.models.some(model => model.id === modelId))
   const handledFocus = useCallback(() => setFocusRequest(0), [])
   const acceptedStart = (heading: string, request: string, model: string, after: number, kind: AiOperationKind, projectId?: string) => { setAcceptedContext({ heading, request, model, after, kind, projectId }); setRecoveryPresentationId(null); setDismissedActivity(null); setFocusRequest(value => value + 1) }
+  const contentAction = async (action: ContentAction, inference: boolean, needsText: boolean) => {
+    if (!project || !readingTopic || !project.writable || workspace.busy || aiBusy || admissionPending.current || storagePending.current) return
+    if (inference && needsText && (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || currentModelUnavailable)) { openAccount(); return }
+    if (inference) { admissionPending.current = true; setEducationPending(true) } else { storagePending.current = true; setEducationPending(true) }
+    try {
+      const result = inference ? await ai.start(() => content.mutate(action)) : await content.mutate(action)
+      if (result && inference) acceptedStart(`Writing ${readingTopic.title}`, 'Create validated content for this saved topic.', project.selectedModel?.name ?? modelId, ai.snapshot?.revision ?? -1, 'generate-topic-content', project.id)
+    } finally { admissionPending.current = false; storagePending.current = false; setEducationPending(false) }
+  }
   const createOutline = async (replace = false) => {
     if (!project || workspace.busy || anyGenerationBusy || aiBusy) return
     if (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || account.snapshot.modelTestStatus === 'testing') { openAccount(); return }
@@ -276,6 +295,10 @@ export function App() {
     } else void retrySave(target.projectId, target.id)
   }
   const reviewInput = async () => {
+    if (visibleOperation?.kind === 'generate-topic-content' || visibleOperation?.kind === 'regenerate-topic-image') {
+      if (visibleOperation.projectId && visibleOperation.topicId) location.topic(visibleOperation.projectId, visibleOperation.topicId)
+      return
+    }
     const target = visibleOperation?.projectId ?? panelRun?.projectId
     if (target && target !== project?.id) { selectProject(target); return }
     if (project?.outline && visibleOperation?.kind !== 'create-outline') {
@@ -337,7 +360,7 @@ export function App() {
           {!showSidebar && <button className="icon-button" aria-label="Account settings" onClick={openAccount}><Icon name="user" size={18} /></button>}
         </div>
       </header>
-      <main id="workspace" data-project-handle={project?.id} data-destination={renderedDestination ? destinationKey(renderedDestination) : undefined} className="workspace-scroll main-workspace" ref={scroll} tabIndex={-1} aria-busy={workspace.busy}>
+      <main id="workspace" data-project-handle={project?.id} data-destination={renderedDestination ? destinationKey(renderedDestination) : undefined} data-presentation-ready={chapterReady} className="workspace-scroll main-workspace" ref={scroll} tabIndex={-1} aria-busy={workspace.busy}>
         {location.notice && <WorkspaceMessage><p>{location.notice}</p></WorkspaceMessage>}
         {ai.error && !panelVisible && <WorkspaceMessage error><p>{ai.error}</p><WorkspaceAction onClick={() => void ai.refresh()}>Refresh AI activity</WorkspaceAction></WorkspaceMessage>}
         {generation.error && <WorkspaceMessage error><p>{generation.error}</p><WorkspaceAction aria-label="Dismiss outline message" onClick={generation.clearError}><Icon name="close" size={16} />Dismiss</WorkspaceAction></WorkspaceMessage>}
@@ -353,6 +376,8 @@ export function App() {
               <WorkspaceAction disabled={workspace.busy} onClick={() => location.refresh(project.id)}>Try again</WorkspaceAction>
             </WorkspaceActions></WorkspacePage>{generatedUnsaved && <OutlineView key={project.id} saved={generatedUnsaved} unsaved />}</>
           : readingTopic && project.outline ? <>{project.issue && <WorkspaceMessage><Icon name="info" size={18} /><p>{project.issue}</p></WorkspaceMessage>}<TopicView key={`${project.id}:${readingTopic.id}`} topic={readingTopic} projectTitle={project.outline.document.title} onOverview={() => location.select(project.id)}
+            projectHandle={project.id} chapter={content.chapter} contentState={content.state} loading={!content.ready} contentError={content.error} onReload={() => void content.refresh()} mediaReload={content.mediaReload}
+            controls={<TopicContentControls projectId={project.id} topicId={readingTopic.id} state={content.state} chapter={content.chapter} disabled={workspace.busy || aiBusy || anyGenerationBusy || educationPending || Boolean(generatedUnsaved)} writable={project.writable} textModel={project.selectedModel?.name ?? modelId} onAction={(action, inference, needsText) => void contentAction(action, inference, needsText)} onSetup={openImageSettings} onConnect={openAccount} />}
             onEdit={() => { generation.clearError(); setEditAccepted(false); setEditTopicId(readingTopic.id); setEditProjectId(project.id) }}
             editDisabled={!project.writable || workspace.busy || anyGenerationBusy || aiBusy || Boolean(generatedUnsaved) || submittingEdit} /></> : <>
             {project.issue && <WorkspaceMessage><Icon name="info" size={18} /><p>{project.issue}</p></WorkspaceMessage>}
@@ -375,6 +400,7 @@ export function App() {
           </>}
       </main>
       {panelVisible && <AiActivityPanel operation={visibleOperation} recovery={panelRun} active={Boolean(ai.snapshot?.active)} heading={panelHeading} focusRequest={focusRequest} onFocusHandled={handledFocus}
+        chapterState={content.state}
         awaiting={awaitingActivity ? acceptedContext : null}
         onCancel={() => { if (ai.snapshot?.active) void ai.cancel(ai.snapshot.active.operationId) }}
         onDismiss={() => { setDismissedActivity(visibleOperation?.operationId ?? latestOperation?.operationId ?? null); setDismissedRecovery(panelRun?.id ?? recoverableRun?.id ?? null); setRecoveryPresentationId(null); if (document.activeElement?.closest('.ai-panel')) (document.getElementById('project-heading') ?? document.getElementById('topic-heading') ?? document.getElementById('outline-heading') ?? document.getElementById('dashboard-heading') ?? scroll.current)?.focus({ preventScroll: true }) }}
@@ -382,7 +408,7 @@ export function App() {
         diagnosticMessage={visibleOperation?.kind.startsWith('test-') ? account.snapshot?.modelTestMessage ?? null : null} />}
     </div>
     <AccountPanel open={accountOpen} onClose={() => { setAccountOpen(false); if (narrow && !accountAccepted.current) navigationToggle.current?.focus() }} account={account} locked={aiBusy} onTest={modelId => void testModel(modelId)} />
-    <SettingsPanel open={settingsOpen} onClose={() => { setSettingsOpen(false); settingsTrigger.current?.focus() }}
+    <SettingsPanel open={settingsOpen} categoryRequest={settingsCategoryRequest} onClose={() => { setSettingsOpen(false); (settingsReturn.current?.isConnected ? settingsReturn.current : settingsTrigger.current)?.focus() }}
       appearance={appearance.appearance} onAppearance={appearance.chooseAppearance} persistent={appearance.persistent} />
     {project?.outline && <OutlineEditDialog open={editProjectId === project.id && (!editTopicId || Boolean(editedTopic))} outline={project.outline} topicId={editTopicId} draft={editDraft}
       modelName={account.snapshot?.models.find(model => model.id === modelId)?.name ?? project.selectedModel?.name ?? ''}

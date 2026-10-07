@@ -34,6 +34,14 @@ Use real buttons, labelled fields/radio groups, headings, and disclosure control
 
 Render goals/material/model text as text; do not introduce `dangerouslySetInnerHTML` for learner/model content. Any future rich-content renderer needs an explicit trust boundary under [IPC/security](patterns-ipc-security.md). Preserve native window controls and platform lifecycle behavior.
 
+## Illustrated topic reader
+
+ADR-0026's `useTopicContent` reads current state and at most six four-section pages behind the typed bridge. Selection generation, request epochs and published chapter/revision identity reject late queries/events; complete assembly checks repeated metadata, section order, cursor chain and document bounds. A new destination cannot expose the old chapter or mark presentation ready until its current pages resolve. Main's presentation-ready handshake delays memento restoration; same-destination provider/progress observations retain scroll. Exact published run identity independently establishes that storage-only Retry Save repaired a historical unsaved workbench result.
+
+`ReadableMarkdown` creates React text nodes for prose, headings, lists, tables, fenced code and emphasis. It never executes model HTML or opens model links/remote images. Bounded parser/node limits fall back to complete inert text rather than truncating learner content. `ChapterReader` uses authorized opaque raster URLs, actual dimensions, captions/alt and local failure recovery. `TopicContentControls` quotes cached main-owned prices using fresh-generation bounds or recorded image settings/counts; renderer performs no cost arithmetic or metadata HTTP. Every mutation retains main admission, current identity and writable authority. A selected image-slot retry makes only its acknowledged request; Continue handles other planned slots. OpenRouter setup entries explicitly select that Settings category and restore the actual trigger.
+
+The [reader](flows/chapter-reader/index.md) and [commands](flows/chapter-commands/index.md) flows distinguish actual local renderer/storage/HTTP assertions from live model/editorial and native accessibility qualifications. Individual image replacement remains separately scoped integration work.
+
 ## Local appearance state
 
 Under [ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md), bootstrap imports `lib/diagnostics.ts` before React initialization. Page error/rejection listeners post fixed safe metadata through same-origin DOM messages; preload/main authorize and project it before development persistence. No logger or filesystem API is exposed on `window.learning`. Never forward error messages, promises, URLs, payloads or learning content. This telemetry does not prevent default error behavior or alter UI state.

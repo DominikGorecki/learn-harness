@@ -8,6 +8,8 @@ The core coordinator, bounded shared DTOs/runtime parsers, named authorized acti
 
 ## Ownership and producer recipe
 
+The illustrated-topic extension also has renderer generation/recovery controls and chapter-aware workbench scope/phase labels. Saved-but-incomplete prose is labelled separately from unsaved text. Historical unsaved activity becomes Saved only when independent current publication matches its exact run; Discard cannot make an older same-chapter publication prove acceptance. An explicit image-slot retry makes one paid request for the acknowledged slot; other planned images remain for Continue. Cached estimates use recorded output settings/counts and create no HTTP or inference.
+
 1. Define a sanctioned task profile and domain acceptance adapter: operation kind, authorized model resolution, project/topic or account owner, permitted data/tools and safe preview policy. This does not authorize automatic/background AI or arbitrary tools.
 2. Claim the main-composed `AiCoordinator` synchronously before any authorization or preparation can yield. `claim` returns a private lease and `reused`; launch work only when `reused` is false. Competing requests fail BUSY, without a queue/provider call. Same fixed diagnostic target reuses its lease. Main must permit credential renewal for that owner while denying competing inference/account replacement.
 3. Register `lease.setCancellation` before yielding. Its callback must await actual task/worker cleanup and must never await `lease.settled`, avoiding a self-wait. Use the lease signal for immediate abort. Cleanup failure keeps ownership until explicit failed/cancelled owner settlement; aborted owners cannot publish late phase/preview/success updates.

@@ -1,0 +1,74 @@
+{
+  "flow": "chapter-commands",
+  "captures": [
+    {
+      "id": "chapter-preflight",
+      "caption": "Initial cached one-image and up-to-six estimates with deliberate text-only and setup recovery.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "1690c92514c00f9459386e298518c70125dd319422be63dae1a5db34dbd4edaa"
+    },
+    {
+      "id": "chapter-unsaved",
+      "caption": "Actual marker failure preserves validated content for storage-only Retry save.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "594b944e7c7730e64d16b6cec717fdd4376eff46f1eca57470223fa9b57c59a3"
+    },
+    {
+      "id": "chapter-progress",
+      "caption": "Uncertain image outcome offers explicit acknowledged retry while saved text remains readable.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "cf3855654366b296c0215b779e85de0e4567b98a9c5f3fb8108bce4a49cf803a"
+    },
+    {
+      "id": "chapter-generated",
+      "caption": "Actual local HTTP fixture completion publishes two educational synthetic rasters.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "ff3118d878a26c89602bfd7bc6a94de57c2d3169f97148a9badb3a4dd5455700"
+    }
+  ],
+  "capturedAt": "2026-10-07T23:04:10.131Z",
+  "testSha256": "377073ded5888740ba8a53e7ed65a95b26bea413e54e78999f6b311442394f6b",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/chapter-reader.spec.ts",
+  "testTitle": "chapter commands preserve saved prose, retry storage without inference and explicitly recover uncertain images",
+  "revision": "b0324d3bc9401083538c49b7cc5d53231f1677c2",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

@@ -6,6 +6,22 @@ export interface FlowDefinition {
 
 // Stable flow and checkpoint IDs are shared by tests, publication and discovery checks.
 export const flows: Record<string, FlowDefinition> = {
+  'chapter-reader': { title: 'Offline illustrated chapter reading and restoration', testFile: 'chapter-reader.spec.ts', screenshots: {
+    'chapter-light': 'Saved illustrated chapter with bounded local prose, TOC and exact objectives in Light.',
+    'chapter-illustration-light': 'Useful native local raster, explanatory caption and surrounding reading in Light.',
+    'chapter-illustration-dark': 'The same native illustration and caption actually visible in Dark.',
+    'chapter-dark': 'The same offline reader in Dark, with current-content history retained.',
+    'chapter-missing': 'Missing local illustration retains its caption, alternate explanation and saved prose.',
+    'chapter-readonly': 'Typed main-sent read-only presentation retains chapter reading and disables mutations.',
+    'chapter-narrow-dark': 'Dark chapter controls and reading reflow at 600 pixels and 200% zoom with reduced motion.',
+    'chapter-narrow-light': 'The same bounded reader in Light at minimum size and zoom.'
+  } },
+  'chapter-commands': { title: 'Chapter generation and explicit recovery commands', testFile: 'chapter-reader.spec.ts', screenshots: {
+    'chapter-preflight': 'Initial cached one-image and up-to-six estimates with deliberate text-only and setup recovery.',
+    'chapter-unsaved': 'Actual marker failure preserves validated content for storage-only Retry save.',
+    'chapter-progress': 'Uncertain image outcome offers explicit acknowledged retry while saved text remains readable.',
+    'chapter-generated': 'Actual local HTTP fixture completion publishes two educational synthetic rasters.'
+  } },
   'account-connection': { title: 'Account connection and restoration', testFile: 'account.spec.ts', screenshots: {
     'account-protocol-fixture': 'Connected account panel using the signed local provider fixture.'
   } },

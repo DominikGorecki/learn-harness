@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   contentRelativePath, parseChapterDocument, parseChapterImageAsset, parseChapterManifest, parseChapterPlan,
   parseGenerateTopicContent, parseGenerateTopicImageReplacement, parseGetTopicContent, parseTopicContentCheckpoint,
-  parseTopicContentRunRequest, parseTopicContentSnapshot, parseTopicImageCandidate, topicContentPolicy
+  parseTopicContentRunRequest, parseTopicContentSnapshot, parseTopicImageCandidate, topicContentPolicy, validateChapterPageability, readerMissingAssetReserveBytes, parseTopicContentPage
 } from '../../src/shared/topic-content'
 import type { ChapterImageAsset, ChapterManifest, ChapterPlan, TopicContentCheckpoint } from '../../src/shared/topic-content'
 
@@ -24,6 +24,38 @@ const checkpoint: TopicContentCheckpoint = { schemaVersion: 1, ...identity, runI
   textTurns: 48, imageRequests: 1, activationTextTurns: 48, activationImageRequests: 1, updatedAt: createdAt }
 
 describe('portable chapter contract boundaries', () => {
+  it('accepts six bounded pages but refuses a valid prose document whose complete envelope overflows', () => {
+    const paged = { ...manifest, plan: { ...plan, images: plan.images.map(image => ({ ...image, sectionId: 'section-0' })), sections: Array.from({ length: 24 }, (_, index) => ({ ...plan.sections[0]!, id: `section-${index}`, objectiveIndices: [0, 1] })) } }
+    paged.document = { ...manifest.document, sections: paged.plan.sections.map(item => ({ ...section, id: item.id })) }
+    expect(parseChapterManifest(paged).document.sections).toHaveLength(24)
+    expect(() => validateChapterPageability(paged, paged.plan, paged.document, paged.images, paged.status)).not.toThrow()
+    for (let index = 0; index < 24; index += 4) expect(parseTopicContentPage({ identity, plan: paged.plan, ...paged.document, sections: paged.document.sections.slice(index, index + 4), images: paged.images, status: paged.status, nextSectionCursor: paged.plan.sections[index + 4]?.id ?? null }).sections).toHaveLength(4)
+    const largePlan = { ...paged.plan, sections: paged.plan.sections.slice(0, 4), images: Array.from({ length: 6 }, (_, index) => ({ ...plan.images[0]!, id: `image-${index}`, sectionId: 'section-0', prompt: '界'.repeat(16_000), factualConstraints: Array.from({ length: 20 }, () => '界'.repeat(2000)) })) }
+    const document = { introduction: 'é"'.repeat(60_000), synthesis: 'é"'.repeat(60_000), sourceNotes: Array.from({ length: 40 }, () => '界'.repeat(2000)), sections: largePlan.sections.map(item => ({ ...section, id: item.id, markdown: 'é"'.repeat(60_000) })) }
+    expect(() => parseChapterDocument(document, largePlan)).not.toThrow()
+    const images = largePlan.images.map(item => ({ imageId: item.id, status: 'planned' as const, callId: null, asset: null }))
+    expect(() => validateChapterPageability(identity, largePlan, document, images, 'needs-images', true)).toThrow('bounded reading pages')
+    expect(() => parseTopicContentCheckpoint({ ...checkpoint, plan: largePlan, sections: document.sections, introduction: null, synthesis: null, sourceNotes: [], images, imageRequests: 0, activationImageRequests: 0 })).not.toThrow()
+    expect(() => parseTopicContentCheckpoint({ ...checkpoint, plan: largePlan, ...document, images, imageRequests: 0, activationImageRequests: 0 })).toThrow('bounded reading pages')
+  })
+  it('reserves more than a maximum-size accepted raster metadata envelope per missing image', () => {
+    const filename = 'i'.repeat(100) + '-' + 'v'.repeat(100) + '.png'
+    const suffix = '/content/chapter/revision/images/' + filename
+    const boundedAsset = parseChapterImageAsset({ ...asset, imageId: 'i'.repeat(100), versionId: 'v'.repeat(100), path: '界'.repeat(2048 - suffix.length) + suffix, callId: 'c'.repeat(100), previousVersionId: 'p'.repeat(100), returnedModelId: 'bytedance-seed/seedream-5-0-pro', width: 16_000_000, height: 1, bytes: 16 * 1024 * 1024 })
+    expect(Buffer.byteLength(JSON.stringify({ imageId: boundedAsset.imageId, status: 'complete', callId: boundedAsset.callId, asset: boundedAsset }))).toBeLessThan(readerMissingAssetReserveBytes)
+    const escaped = parseChapterImageAsset({ ...boundedAsset, path: '\uD800'.repeat(2048 - suffix.length) + suffix })
+    expect(Buffer.byteLength(JSON.stringify({ imageId: escaped.imageId, status: 'complete', callId: escaped.callId, asset: escaped, previousAttempts: [] }))).toBeLessThan(readerMissingAssetReserveBytes)
+  })
+  it('rejects a legal four-section cursor window crossing otherwise valid fixed batches', () => {
+    const sections = Array.from({ length: 8 }, (_, index) => ({ id: `section-${index}`, title: 'Explain', purpose: 'Apply', objectiveIndices: [0, 1] }))
+    const crossingPlan = { ...plan, sections, images: Array.from({ length: 4 }, (_, index) => ({ ...plan.images[0]!, id: `diagram-${index}`, sectionId: 'section-0', prompt: '界'.repeat(16_000), factualConstraints: Array.from({ length: 20 }, () => '界'.repeat(1500)) })) }
+    const document = { introduction: 'é"'.repeat(60_000), synthesis: 'é"'.repeat(60_000), sourceNotes: Array.from({ length: 40 }, () => '界'.repeat(2000)), sections: sections.map((item, index) => ({ ...section, id: item.id, markdown: index >= 1 && index <= 4 ? 'é"'.repeat(60_000) : 'Short prose.' })) }
+    const images = crossingPlan.images.map(item => ({ imageId: item.id, status: 'planned' as const, callId: null, asset: null }))
+    expect(() => parseChapterDocument(document, crossingPlan)).not.toThrow()
+    for (const start of [0, 4]) expect(() => parseTopicContentPage({ identity, plan: crossingPlan, ...document, sections: document.sections.slice(start, start + 4), images, status: 'needs-images', nextSectionCursor: sections[start + 4]?.id ?? null })).not.toThrow()
+    expect(() => parseTopicContentPage({ identity, plan: crossingPlan, ...document, sections: document.sections.slice(1, 5), images, status: 'needs-images', nextSectionCursor: 'section-5' })).toThrow()
+    expect(() => validateChapterPageability(identity, crossingPlan, document, images, 'needs-images')).toThrow('bounded reading pages')
+  })
   it('requires exact saved objective identity and complete coverage without truncation', () => {
     expect(parseChapterPlan(plan, { projectId: identity.projectId, topicId: identity.topicId, objectives: plan.objectives })).toEqual(plan)
     for (const patch of [{ objectives: ['Replacement objective'] }, { topicId: 'other' }, { sections: [plan.sections[0]] }, { sections: [{ ...plan.sections[0], objectiveIndices: [0, 2] }] }, { sections: Array(25).fill(plan.sections[0]) }, { images: [{ ...plan.images[0], sectionId: 'missing' }] }]) {

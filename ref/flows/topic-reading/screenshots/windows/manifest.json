@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2e02beda2c057e93469dd15e955c25ce9d4303db1d54a001c3a69d641b6e4fca"
+      "sha256": "92d4ff6c94a739607652b54da9cddc377c9c1dc72c7550903855d58f0baaf88a"
     },
     {
       "id": "saved-topic-readonly",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "3137434c9f82ebdf1de2b8a87489ca414e25b324232b8a7cb9af0220421a7035"
+      "sha256": "2e07713a48e022b9b25bf3085c8a80c77fd4717d1480c688ff069595a21cea2c"
     },
     {
       "id": "saved-topic-readonly-dark",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "be91752b59b7a6584daf151885ed9f53641b07d18ffe33e690dab75761d65e5d"
+      "sha256": "fc1f1d8c2863afe0db0f7eae175f520c34705c238598759c68352c9fb9a49b0d"
     },
     {
       "id": "saved-topic-dark",
@@ -74,7 +74,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "e9c61610ce58887e62ad16ece055d431bc1a7374e06178725ff57fa25320bc54"
+      "sha256": "c832bb3406a6340720f50ee9f571e667ea983952e7431ead818a5a5517701421"
     },
     {
       "id": "saved-overview-dark",
@@ -104,7 +104,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "2bcfff012d51e4d70caae6bb44d8f0daf88d32c02eaa3ac8bc8e81383b22c058"
+      "sha256": "27a69ff2dcb1aade5f57b6b3672dd30e79479a194c46cb7b83e8d99ac2b65543"
     },
     {
       "id": "missing-topic-overview",
@@ -137,13 +137,13 @@
       "sha256": "994f01d3953538287ef15a03dfdccd89c8124d758c1e03d83875d2d6c9c12cc4"
     }
   ],
-  "capturedAt": "2026-10-07T22:18:08.496Z",
-  "testSha256": "4928ab48bd145ad517c262e3eac372534fd1f91cea478035e9adeecde4b753bf",
+  "capturedAt": "2026-10-07T23:13:52.997Z",
+  "testSha256": "50b954c1eb73b007cc8d83d5be2d81efbd64ea6692848acc52dc4a690530db48",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
+  "revision": "b0324d3bc9401083538c49b7cc5d53231f1677c2",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

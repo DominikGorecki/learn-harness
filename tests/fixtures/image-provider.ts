@@ -3,9 +3,9 @@ import sharp from 'sharp'
 import { routerCatalog, routerEndpoint, routerKey } from './openrouter'
 
 /** Local deterministic pixels/pricing, never evidence of live model eligibility. */
-export async function startImageFixture() {
-  const png = await sharp({ create: { width: 4, height: 3, channels: 4, background: '#208050' } }).png().toBuffer()
-  const secondPng = await sharp({ create: { width: 5, height: 3, channels: 4, background: '#804020' } }).png().toBuffer()
+export async function startImageFixture(educationalPixels?: readonly [Buffer, Buffer]) {
+  const png = educationalPixels?.[0] ?? await sharp({ create: { width: 4, height: 3, channels: 4, background: '#208050' } }).png().toBuffer()
+  const secondPng = educationalPixels?.[1] ?? await sharp({ create: { width: 5, height: 3, channels: 4, background: '#804020' } }).png().toBuffer()
   const requests: { path: string; body: Record<string, unknown> | null; authorization: string | undefined; startedAt: number }[] = []
   let delayMs = 0, bodyChunkMs = 0
   let alternating = false, imageIndex = 0, failureStatus: number | null = null

@@ -2,6 +2,7 @@ import { boundAiPreview } from '../../../../shared/ai/activity'
 import type { AiActivitySnapshot, AiOperation, AiPreview, AiPreviewLesson } from '../../../../shared/ai/activity'
 import type { OutlineRun } from '../../../../shared/generation'
 import type { AccountSnapshot } from '../../../../shared/account'
+import type { TopicContentSnapshot } from '../../../../shared/topic-content'
 
 /** Queries and subscriptions share one monotonic public revision/owner sequence. */
 export function newerActivity(current: AiActivitySnapshot | null, next: AiActivitySnapshot): AiActivitySnapshot {
@@ -22,12 +23,16 @@ export function projectNavigationState(owner: AiOperation | null, run: OutlineRu
 }
 
 /** Storage retry has no AI lease; the domain run supersedes its historical unsaved outcome. */
-export function presentationOutcome(operation: AiOperation, run: OutlineRun | null) {
+export function presentationOutcome(operation: AiOperation, run: OutlineRun | null, chapter?: TopicContentSnapshot | null) {
+  if (operation.kind === 'generate-topic-content' && operation.outcome === 'unsaved' && chapter && chapter.projectId === operation.projectId && chapter.topicId === operation.topicId && !chapter.progress && chapter.published && chapter.published.chapterId === operation.chapterId && chapter.published.runId === operation.runId && Boolean(operation.runId)) return chapter.published.status === 'needs-images' ? 'incomplete' as const : 'saved' as const
   if (operation.outcome === 'unsaved' && run && run.id === operation.runId) {
     if (run.status === 'saving') return 'saving' as const
     if (run.status === 'saved') return 'saved' as const
   }
   return operation.outcome ?? operation.phase
+}
+export function operationPhaseLabel(kind: AiOperation['kind'] | undefined, phase: keyof typeof phaseLabels) {
+  return phase === 'planning' && kind === 'generate-topic-content' ? 'Planning the chapter' : phaseLabels[phase]
 }
 
 export function recoveryPreview(run: OutlineRun): { preview: AiPreview; abbreviated: boolean } {

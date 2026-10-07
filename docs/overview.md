@@ -40,6 +40,8 @@ Project state should travel with the folder. Account credentials belong to the p
 
 The exact organization of future lesson documents, notes, and other learner artifacts is still to be decided. Human-readable learning work and practical portability are desired product qualities.
 
+Illustrated topic chapters now have an independent portable manifest and immutable text/media revisions, with explicit generation, checkpoint recovery and offline reading. The chapter reader provides explanations and useful visual context alongside the saved plan; it does not run Socratic activities or assess mastery. OpenRouter image settings and call accounting remain device-owned separately from the ChatGPT text connection. [Bundle 05](../ref/work/05-illustrated-topic-content/illustrated-topic-content.spec.md) tracks individual image replacement and cumulative/live qualification; local protocol diagrams are not evidence of live educational quality.
+
 The [progressive discovery and interactive module proposal](progressive-learning-workspace.md) records a future design for evolving knowledge files, compact JSON indexes, and application-rendered Socratic activities. It does not change the current single-document storage contract.
 
 ## Learning hierarchy

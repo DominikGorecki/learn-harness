@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { AiActivityEntry, AiOperation, AiOperationKind, AiPreview, AiPreviewLesson } from '../../../../shared/ai/activity'
 import type { OutlineRun } from '../../../../shared/generation'
 import { GenerationStatus } from '../projects/GenerationStatus'
-import { phaseLabels, presentationOutcome, recoveryPreview } from './activity-state'
+import { operationPhaseLabel, presentationOutcome, recoveryPreview } from './activity-state'
+import type { TopicContentSnapshot } from '../../../../shared/topic-content'
 import './ai.css'
 
 function Lesson({ lesson }: { lesson: AiPreviewLesson }) {
@@ -30,10 +31,11 @@ function elapsedLabel(milliseconds: number) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')} elapsed`
 }
 
-export function AiActivityPanel({ operation, recovery, active, heading, focusRequest, onFocusHandled, onCancel, onDismiss, onSave, onConnect, onInput, onRefresh, error, diagnosticMessage, awaiting }: {
+export function AiActivityPanel({ operation, recovery, active, heading, focusRequest, onFocusHandled, onCancel, onDismiss, onSave, onConnect, onInput, onRefresh, error, diagnosticMessage, awaiting, chapterState }: {
   operation: AiOperation | null; recovery: OutlineRun | null; active: boolean; heading: string; focusRequest: number;
   onCancel(): void; onDismiss(): void; onSave(): void; onConnect(): void; onInput(): void; onRefresh(): void; onFocusHandled(): void; error: string | null; diagnosticMessage: string | null;
   awaiting: { heading: string; model: string; request: string; kind: AiOperationKind } | null
+  chapterState?: TopicContentSnapshot | null
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null)
   const actionRef = useRef<HTMLButtonElement>(null)
@@ -44,9 +46,9 @@ export function AiActivityPanel({ operation, recovery, active, heading, focusReq
   const atEnd = useRef(true)
   const [clock, setClock] = useState({ id: '', revision: '', delta: 0, waitElapsed: 0 })
   const waitOrigin = useRef({ id: '', turn: -1, elapsed: 0, network: false })
-  const outcome = operation ? presentationOutcome(operation, recovery) : awaiting ? 'preparing' : recovery?.status ?? 'unsaved'
+  const outcome = operation ? presentationOutcome(operation, recovery, chapterState) : awaiting ? 'preparing' : recovery?.status ?? 'unsaved'
   const diagnostic = Boolean((operation?.kind ?? awaiting?.kind)?.startsWith('test-'))
-  const phaseLabel = diagnostic && outcome === 'receiving' ? 'Receiving the model reply' : phaseLabels[outcome]
+  const phaseLabel = diagnostic && outcome === 'receiving' ? 'Receiving the model reply' : operationPhaseLabel(operation?.kind ?? awaiting?.kind, outcome)
   const identity = operation?.operationId ?? recovery?.id ?? ''
   const revision = `${operation?.turn}:${operation?.previewRevision}:${operation?.elapsedMs}:${operation?.lastByteAgeMs}:${operation?.phase}`
   useEffect(() => {
@@ -82,7 +84,7 @@ export function AiActivityPanel({ operation, recovery, active, heading, focusReq
   }, [identity, operation?.preview, recovery?.result])
   useEffect(() => { atEnd.current = true }, [identity])
   const entries: AiActivityEntry[] = operation ? [...operation.activity] : awaiting ? [{ id: 'accepted', label: 'Request accepted · Preparing', state: 'running' }] : [{ id: 'validated', label: 'Outline validated', state: 'completed' }]
-  if (active && !entries.some(entry => entry.state === 'running')) entries.push({ id: 'current-phase', label: phaseLabels[operation!.phase], state: 'running' })
+  if (active && !entries.some(entry => entry.state === 'running')) entries.push({ id: 'current-phase', label: operationPhaseLabel(operation!.kind, operation!.phase), state: 'running' })
   if (active && !diagnostic && !['saving', 'cancelling'].includes(outcome)) {
     if (!entries.some(entry => entry.id === 'domain-validation')) entries.push({ id: 'planned-check', label: 'Check the result', state: 'upcoming' })
     if (!entries.some(entry => entry.id === 'domain-save')) entries.push({ id: 'planned-save', label: 'Save accepted result', state: 'upcoming' })
@@ -91,7 +93,8 @@ export function AiActivityPanel({ operation, recovery, active, heading, focusReq
   const projected = recovered?.preview ?? operation?.preview ?? { kind: 'none' } as AiPreview
   const preview: AiPreview = diagnostic && projected.kind === 'none' ? { kind: 'model-test-evidence', hasReply: false, completed: false, modelMatched: false } : projected
   const requestSummary = operation?.requestSummary ?? awaiting?.request ?? recovery?.brief.slice(0, 512) ?? ''
-  const scope = diagnostic ? 'Account model access · No project content' : (operation?.kind ?? awaiting?.kind) === 'rewrite-topic' || !operation && recovery?.topicId ? 'Only this topic will change.' : 'This project’s outline and requested files can change.'
+  const kind = operation?.kind ?? awaiting?.kind
+  const scope = diagnostic ? 'Account model access · No project content' : kind === 'generate-topic-content' ? 'Only this topic’s chapter and illustrations can change.' : kind === 'regenerate-topic-image' ? 'Only the selected chapter illustration can change after acceptance.' : kind === 'rewrite-topic' || !operation && recovery?.topicId ? 'Only this topic will change.' : 'This project’s outline and requested files can change.'
   return <section className="ai-panel" aria-labelledby="ai-operation-heading" data-outcome={outcome} data-topic={(operation?.kind ?? awaiting?.kind) === 'rewrite-topic' || Boolean(!operation && recovery?.topicId) || undefined}>
     <header className="ai-panel-header"><div className="ai-panel-context"><h2 id="ai-operation-heading" ref={headingRef} tabIndex={-1}>{heading}</h2>
       {(operation || awaiting) && <span className="ai-model">{operation?.model.name ?? awaiting?.model}</span>}
@@ -117,7 +120,7 @@ export function AiActivityPanel({ operation, recovery, active, heading, focusReq
       {['failed', 'cancelled'].includes(outcome) && !diagnostic && <button className="quiet-button" onClick={onInput}>Review your request</button>}
       {diagnostic && outcome === 'failed' && <button className="quiet-button" onClick={onConnect}>Review ChatGPT connection</button>}
     </div><div className="ai-preview-column">
-      <p className="ai-body-label">{diagnostic ? 'Model test evidence' : recovery?.result && ['unsaved', 'saving'].includes(recovery.status) ? 'Validated result · Not saved' : outcome === 'saved' ? 'Accepted draft · Saved' : 'Draft preview · Not saved'}{['failed', 'cancelled'].includes(outcome) && ' · Incomplete'}</p>
+      <p className="ai-body-label">{diagnostic ? 'Model test evidence' : recovery?.result && ['unsaved', 'saving'].includes(recovery.status) ? 'Validated result · Not saved' : outcome === 'incomplete' ? 'Accepted prose · Saved · Images incomplete' : outcome === 'saved' ? 'Accepted draft · Saved' : 'Draft preview · Not saved'}{['failed', 'cancelled'].includes(outcome) && ' · Incomplete'}</p>
       <div className="ai-preview-region" ref={previewRef} tabIndex={0} role="region" aria-label={diagnostic ? 'Model test evidence' : 'Draft preview'} aria-live="off"
       onScroll={event => { const element = event.currentTarget; atEnd.current = element.scrollHeight - element.scrollTop - element.clientHeight < 24 }}>
       <div className="ai-preview-content"><Preview preview={preview} outcome={outcome} /></div>

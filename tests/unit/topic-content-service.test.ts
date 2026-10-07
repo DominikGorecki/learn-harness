@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { AiCoordinator } from '../../src/core/ai/coordinator'
@@ -8,7 +8,7 @@ import { createTopicContentRepository } from '../../src/main/storage/topic-conte
 import { ApplicationError } from '../../src/shared/contracts'
 import { collectMaterials } from '../../src/main/generation/material-snapshot'
 import { contentDigest, topicJournalPath } from '../../src/main/storage/topic-content-files'
-import { contentPlan, topicContentProject, topicPng } from '../fixtures/topic-content'
+import { contentPlan, contentCheckpoint, topicContentProject, topicPng } from '../fixtures/topic-content'
 
 const roots: string[] = []
 const services: TopicContentService[] = []
@@ -32,6 +32,25 @@ async function setup(configuration: { images?: () => Promise<ChapterImageSession
   return { ...project, repository, ai, engine, service, identity: { projectId: project.handle, topicId: 'beliefs' } }
 }
 describe('chapter admission, durable acceptance and recovery', () => {
+  it('retries only the acknowledged image slot and leaves other planned images for explicit Continue', async () => {
+    const calls: string[] = []
+    const prepared = await setup({ images: async () => ({ modelId: 'openai/gpt-image-2', settings: { n: 1, aspectRatio: '1:1' }, dispose() {}, async generate(_context, checkpoint, imageId, _lease, requested, accepted) {
+      calls.push(imageId); const callId = `call-${imageId}`
+      await requested(callId)
+      await accepted({ imageId, versionId: 'version', path: `${checkpoint.outputDirectory}/images/${imageId}-version.png`, mime: 'image/png', width: 1, height: 1, bytes: topicPng.length, digest: contentDigest(topicPng), createdAt: new Date().toISOString(), modelId: 'openai/gpt-image-2', returnedModelId: null, callId, previousVersionId: null }, topicPng)
+    } }) })
+    const checkpoint = await contentCheckpoint(prepared.storage, prepared.authority)
+    checkpoint.plan.images = ['selected', 'later-one', 'later-two'].map(id => ({ ...checkpoint.plan.images[0]!, id, purpose: id, skillVersion: 'educational-images-v1' }))
+    checkpoint.images = checkpoint.plan.images.map((image, index) => ({ imageId: image.id, status: index ? 'planned' : 'unresolved', callId: index ? null : 'old-call', asset: null }))
+    checkpoint.sections = checkpoint.plan.sections.map(section => ({ id: section.id, markdown: 'Accepted explanation.', examples: ['Concrete application.'], misconceptions: [] }))
+    checkpoint.synthesis = 'Connect the objectives.'; checkpoint.sourceNotes = ['Model knowledge.']; await prepared.storage.saveCheckpoint(prepared.authority, checkpoint)
+    await prepared.service.retryImage({ ...prepared.identity, chapterId: checkpoint.chapterId, runId: checkpoint.runId, checkpointRevision: checkpoint.checkpointRevision, imageId: 'selected', priorCallId: 'old-call', acknowledgeUncertainCharge: true }); await prepared.service.waitForIdle()
+    expect(calls).toEqual(['selected'])
+    const progress = (await prepared.service.getState(prepared.identity)).progress!
+    expect(progress.imageSlots?.filter(slot => slot.status === 'planned').map(slot => slot.imageId)).toEqual(['later-one', 'later-two'])
+    await prepared.service.continue({ ...prepared.identity, chapterId: progress.chapterId, runId: progress.runId, checkpointRevision: progress.checkpointRevision }); await prepared.service.waitForIdle()
+    expect(calls).toEqual(['selected', 'later-one', 'later-two']); expect((await prepared.service.getState(prepared.identity)).published?.status).toBe('illustrated')
+  })
   it('retains a failed initial completion checkpoint for storage-only retry before any image dispatch', async () => {
     let calls = 0
     const { service, repository, identity } = await setup({ images: async () => ({ modelId: 'openai/gpt-image-2', settings: { n: 1, aspectRatio: '1:1' }, dispose() {}, async generate() { calls++; throw new Error('No image dispatch expected') } }) })
@@ -61,14 +80,16 @@ describe('chapter admission, durable acceptance and recovery', () => {
   })
   it('keeps confirmed publication readable when an awaited ledger disposition fails and emits image previews', async () => {
     let dispositions = 0
+    const previews: string[] = []
     const { service, ai, identity } = await setup({ disposition: async () => { dispositions++; throw new ApplicationError('STORAGE', 'Profile write failed') },
       images: async () => ({ modelId: 'openai/gpt-image-2', settings: { n: 1, aspectRatio: '1:1' }, dispose() {},
         async generate(_context, checkpoint, imageId, _lease, requested, accepted, progress) {
           progress('waiting'); await requested('call-fixture'); progress('receiving'); progress('validating')
+          await vi.waitFor(() => expect(previews).toContain('validating'))
           await accepted({ imageId, versionId: 'version', path: `${checkpoint.outputDirectory}/images/${imageId}-version.png`, mime: 'image/png', width: 1, height: 1,
             bytes: topicPng.length, digest: contentDigest(topicPng), createdAt: new Date().toISOString(), modelId: 'openai/gpt-image-2', returnedModelId: null, callId: 'call-fixture', previousVersionId: null }, topicPng)
         } }) })
-    const previews: string[] = []; ai.subscribe(state => { if (state.active?.preview.kind === 'image') previews.push(state.active.preview.state) })
+    ai.subscribe(state => { if (state.active?.preview.kind === 'image') previews.push(state.active.preview.state) })
     await service.generate({ ...identity, mode: 'illustrated', replace: false, expectedRevisionId: null }); await service.waitForIdle()
     const state = await service.getState(identity)
     expect(state.published?.status).toBe('illustrated'); expect(state.progress).toBeNull(); expect(state.message).toContain('billing is preserved')

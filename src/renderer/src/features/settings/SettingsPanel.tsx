@@ -5,11 +5,13 @@ import { useOpenRouter } from './useOpenRouter'
 import { OpenRouterPanel } from './OpenRouterPanel'
 import './settings.css'
 
-export function SettingsPanel({ open, onClose, appearance, onAppearance, persistent }: {
-  open: boolean; onClose(): void; appearance: Appearance; onAppearance(value: Appearance): void; persistent: boolean
+export function SettingsPanel({ open, onClose, appearance, onAppearance, persistent, categoryRequest }: {
+  open: boolean; onClose(): void; appearance: Appearance; onAppearance(value: Appearance): void; persistent: boolean; categoryRequest?: number
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [category, setCategory] = useState<'openrouter' | 'appearance'>('openrouter')
+  const [categoryRequestSeen, setCategoryRequestSeen] = useState(categoryRequest)
+  if (categoryRequestSeen !== categoryRequest) { setCategoryRequestSeen(categoryRequest); setCategory('openrouter') }
   const [keyDraft, setKeyDraft] = useState('')
   const router = useOpenRouter(open)
   const close = () => { router.close(); setKeyDraft(''); onClose() }

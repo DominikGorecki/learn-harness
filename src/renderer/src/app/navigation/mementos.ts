@@ -3,10 +3,10 @@ import type { AppDestination } from './destination'
 import { maximumNavigationEntries } from './history'
 
 export interface ViewMemento { scrollTop: number; disclosures: string[]; focus: string | null }
-const maximumAnchors = 44 // At most 40 lessons plus fixed context/folder disclosures.
-const fixedAnchors = new Set(['heading', 'goal', 'path-edit', 'context:scope', 'context:additions', 'context:coverage', 'folder'])
+const maximumAnchors = 80 // Existing lessons plus bounded chapter sections/images and topic plan.
+const fixedAnchors = new Set(['heading', 'goal', 'path-edit', 'context:scope', 'context:additions', 'context:coverage', 'folder', 'chapter-generation'])
 export function supportedAnchor(value: string | null): value is string {
-  return value !== null && value.length <= 512 && (fixedAnchors.has(value) || value.startsWith('lesson:') || value.startsWith('summary:') || value.startsWith('edit:') || value.startsWith('open:') || value.startsWith('module:'))
+  return value !== null && value.length <= 512 && (fixedAnchors.has(value) || value === 'topic-plan' || value.startsWith('chapter-section:') || value.startsWith('chapter-toc:') || value.startsWith('chapter-image:') || value.startsWith('lesson:') || value.startsWith('summary:') || value.startsWith('edit:') || value.startsWith('open:') || value.startsWith('module:'))
 }
 export function clampedScroll(value: number, maximum: number): number {
   return Math.max(0, Math.min(Number.isFinite(maximum) ? Math.max(0, maximum) : 0, Number.isFinite(value) ? value : 0))

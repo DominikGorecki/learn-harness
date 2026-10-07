@@ -1,7 +1,7 @@
 import { ApplicationError } from '../../shared/contracts'
 import type { ErrorCode } from '../../shared/contracts'
 import type { AiOutcome } from '../../shared/ai/activity'
-import { parseChapterDocument, parseChapterManifest, parseChapterPlan, parseTopicContentCheckpoint, parseTopicContentPage, parseTopicContentSnapshot, topicContentPolicy } from '../../shared/topic-content'
+import { parseChapterDocument, parseChapterManifest, parseChapterPlan, parseTopicContentCheckpoint, parseTopicContentPage, parseTopicContentSnapshot, topicContentPolicy, validateChapterPageability } from '../../shared/topic-content'
 import type { ChapterManifest, TopicContentCheckpoint, TopicContentSnapshot, TopicContentIdentity, TopicContentRequest, GenerateTopicContentRequest, TopicContentRunRequest, CompleteTopicContentImagesRequest, RetryTopicContentImageRequest, RetryTopicContentSaveRequest } from '../../shared/topic-content'
 import type { AiCoordinator, AiLease } from '../ai/coordinator'
 import type { ChapterImageSession, ChapterSubmission, TopicContentContext, TopicContentEngine, TopicContentRepository } from './ports'
@@ -43,12 +43,12 @@ export class TopicContentService {
     const active = this.options.ai.get().active
     const ownsProgress = active?.projectId === identity.projectId && active.topicId === identity.topicId && active.runId === checkpoint?.runId
     return parseTopicContentSnapshot({ revision: ++this.revision, projectId: identity.projectId, topicId: identity.topicId,
-      published: state.manifest ? { chapterId: state.manifest.chapterId, revisionId: state.manifest.revisionId, status: state.manifest.status } : null,
+      published: state.manifest ? { chapterId: state.manifest.chapterId, revisionId: state.manifest.revisionId, status: state.manifest.status, runId: state.manifest.provenance.runId } : null,
       progress: checkpoint ? { chapterId: checkpoint.chapterId, runId: checkpoint.runId, checkpointRevision: checkpoint.checkpointRevision,
         status: pending || recovery ? 'unsaved' : checkpoint.status === 'working' && !ownsProgress ? 'interrupted' : checkpoint.status, mode: checkpoint.mode,
         completedSectionIds: checkpoint.sections.map(section => section.id), pendingImageIds: checkpoint.images.filter(image => image.status !== 'complete').map(image => image.imageId),
         unresolvedImageIds: checkpoint.images.filter(image => image.status === 'requested' || image.status === 'unresolved').map(image => image.imageId),
-        imageSlots: checkpoint.images.map(({ imageId, status, callId }) => ({ imageId, status, callId })), ...(pending || recovery ? { pendingResultId: pending?.checkpoint.revisionId ?? recovery!.revisionId } : {}) } : null,
+        imageSlots: checkpoint.images.map(({ imageId, status, callId }) => ({ imageId, status, callId, settings: checkpoint.plan.images.find(image => image.id === imageId)!.settings })), ...(pending || recovery ? { pendingResultId: pending?.checkpoint.revisionId ?? recovery!.revisionId } : {}) } : null,
       candidate: null, stale: state.stale, missingImageIds: state.missingImageIds,
       errorCode: error?.code ?? (state.issues.length || state.recovery.kind === 'conflict' ? 'STORAGE' : null),
       message: error?.message ?? state.issues[0] ?? (state.recovery.kind === 'conflict' ? state.recovery.message : null) })
@@ -143,6 +143,7 @@ export class TopicContentService {
         const completion = request as CompleteTopicContentImagesRequest
         if (!published || published.chapterId !== completion.chapterId || published.revisionId !== completion.revisionId || published.status === 'illustrated') throw new ApplicationError('CONFLICT', 'The current chapter no longer needs these illustrations.')
         if ((await repository.readState(context)).stale) throw new ApplicationError('CONFLICT', 'The published chapter sources or learning context changed. Generate fresh prose first.')
+        validateChapterPageability(published, published.plan, published.document, published.images, published.status, true)
         images = await this.options.images(context)
         if (!images) throw new ApplicationError('UNAVAILABLE', 'Validate a usable image key and compatible fixed image model before completing illustrations.')
         context.baseline = { ...published.baseline, expectedManifestDigest: context.baseline.expectedManifestDigest }
@@ -211,9 +212,9 @@ export class TopicContentService {
         if (checkpoint) await save({ ...checkpoint, status: 'paused' })
         return 'paused'
       }
-      if (mode === 'illustrated' && images) for (const slot of checkpoint.images.filter(image => image.status === 'planned')) await generateImage(slot.imageId)
+      if (mode === 'illustrated' && images) for (const slot of checkpoint.images.filter(image => image.status === 'planned' && (intent !== 'retry-image' || image.imageId === (request as RetryTopicContentImageRequest).imageId))) await generateImage(slot.imageId)
       lease.signal.throwIfAborted()
-      if (intent !== 'generate' && checkpoint.images.some(image => ['requested', 'unresolved', 'failed'].includes(image.status))) {
+      if (intent === 'retry-image' && checkpoint.images.some(image => image.status === 'planned') || intent !== 'generate' && checkpoint.images.some(image => ['requested', 'unresolved', 'failed'].includes(image.status))) {
         await save({ ...checkpoint, status: 'paused' }); return 'paused'
       }
       // Requested/unresolved/failed slots never become implicit paid retries, even in a cloned revision.

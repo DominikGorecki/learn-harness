@@ -1,6 +1,7 @@
 import { expect, test } from '../flows/fixture'
 import type { ElectronApplication } from '@playwright/test'
 import type { AiApi } from '../../src/shared/ai/activity'
+import sharp from 'sharp'
 import { mkdir, mkdtemp, readdir, realpath, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -15,6 +16,31 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
   try {
     desktop = await launch()
     let page = await desktop.firstWindow()
+    const paintedTheme = async (theme: 'light' | 'dark'): Promise<Buffer> => {
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
+      await expect(page.getByRole('radio', { name: theme === 'light' ? 'Light' : 'Dark', exact: true })).toBeChecked()
+      const dialog = page.getByRole('dialog', { name: 'Settings', exact: true })
+      await expect(dialog).toHaveCSS('background-color', theme === 'light' ? 'rgb(255, 255, 255)' : 'rgb(24, 24, 24)')
+      const window = await desktop!.browserWindow(page)
+      let verified: Buffer | null = null
+      await expect.poll(async () => {
+        const sample = await dialog.evaluate(async element => {
+          await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+          const box = element.getBoundingClientRect()
+          return { x: box.right - 24, y: box.top + 24, width: innerWidth, height: innerHeight }
+        })
+        const encoded = await window.evaluate(async window => (await window.webContents.capturePage()).toPNG().toString('base64'))
+        const bitmap = Buffer.from(encoded, 'base64'), { data, info } = await sharp(bitmap).raw().toBuffer({ resolveWithObject: true })
+        const x = Math.floor(sample.x * info.width / sample.width), y = Math.floor(sample.y * info.height / sample.height), expected = theme === 'light' ? 255 : 24
+        for (let row = y - 1; row <= y + 1; row++) for (let column = x - 1; column <= x + 1; column++) {
+          const offset = (row * info.width + column) * info.channels
+          if ([0, 1, 2].some(channel => Math.abs(data[offset + channel]! - expected) > 3)) return false
+        }
+        verified = bitmap; return true
+      }).toBe(true)
+      if (!verified) throw new Error('No native Settings frame for the selected theme')
+      return verified
+    }
     await desktop.evaluate(({ dialog }, selected) => { dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [selected] }) }, folder)
     await page.getByRole('main').getByRole('button', { name: 'Open project', exact: true }).click()
     const draft = 'How do ocean currents shape climate? Start with the foundations.'
@@ -103,8 +129,8 @@ test('appearance changes every surface, preserves drafts, and survives a desktop
     await page.getByRole('radio', { name: 'Dark', exact: true }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('radio', { name: 'Dark', exact: true })).toBeInViewport()
     expect(await page.getByRole('dialog').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
-    await page.emulateMedia({ reducedMotion: 'reduce' }); await flow.capture(desktop, page, 'settings-zoom-dark')
-    await page.getByRole('radio', { name: 'Light', exact: true }).check(); await flow.capture(desktop, page, 'settings-zoom-light')
+    await page.emulateMedia({ reducedMotion: 'reduce' }); const darkFrame = await paintedTheme('dark'); await flow.capture(desktop, page, 'settings-zoom-dark', { verifiedNativeBitmap: darkFrame })
+    await page.getByRole('radio', { name: 'Light', exact: true }).check(); const lightFrame = await paintedTheme('light'); expect(lightFrame.equals(darkFrame)).toBe(false); await flow.capture(desktop, page, 'settings-zoom-light', { verifiedNativeBitmap: lightFrame })
     await page.getByRole('radio', { name: 'Dark', exact: true }).check()
     await page.keyboard.press('Escape')
     await expect(page.getByRole('textbox')).toHaveValue(draft)

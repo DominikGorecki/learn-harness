@@ -1,0 +1,25 @@
+.main-workspace .chapter-reader { color: var(--text-primary); overflow-wrap: anywhere; }
+.main-workspace .chapter-toc { margin: 32px 0; padding: 24px; border-radius: 16px; background: var(--workspace-surface); }
+.main-workspace .chapter-toc h2 { margin: 0 0 12px; font-size: 18px; }
+.main-workspace .chapter-toc ol { margin: 0; padding-left: 24px; }
+.main-workspace .chapter-toc button { text-align: left; background: none; color: var(--workspace-action-text); border: 0; padding: 8px 4px; min-height: 40px; }
+.main-workspace .chapter-prose { line-height: 1.75; }
+.main-workspace .chapter-prose p { white-space: pre-wrap; }
+.main-workspace .chapter-prose h3, .main-workspace .chapter-section > h3 { margin: 24px 0 12px; font-size: 18px; }
+.main-workspace .chapter-prose h4 { font-size: 16px; }
+.main-workspace .chapter-prose pre { overflow: auto; padding: 16px; background: var(--workspace-surface); border-radius: 12px; white-space: pre-wrap; }
+.main-workspace .chapter-prose code { font-size: .9em; overflow-wrap: anywhere; }
+.main-workspace .chapter-prose blockquote { margin: 24px 0; padding: 8px 20px; border-left: 3px solid var(--border-control); }
+.main-workspace .chapter-table-scroll { overflow-x: auto; max-width: 100%; }
+.main-workspace .chapter-prose table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.main-workspace .chapter-prose th, .main-workspace .chapter-prose td { text-align: left; padding: 12px; border-bottom: 1px solid var(--workspace-edge); }
+.main-workspace .chapter-illustration { margin: 32px 0; }
+.main-workspace .chapter-image-frame { display: grid; place-items: center; background: var(--workspace-surface); border-radius: 12px; overflow: hidden; }
+.main-workspace .chapter-image-frame img { display: block; max-width: 100%; width: 100%; height: auto; }
+.main-workspace .chapter-image-frame p, .main-workspace .chapter-image-missing { padding: 24px; }
+.main-workspace .chapter-illustration figcaption { margin-top: 12px; font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+.main-workspace .chapter-preflight { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+.main-workspace .chapter-plan { margin-top: 40px; border-top: 1px solid var(--workspace-edge); padding-top: 24px; }
+.main-workspace .chapter-plan > summary { cursor: pointer; min-height: 40px; font-weight: 600; }
+.main-workspace .chapter-generation { margin: 16px 0; color: var(--text-secondary); font-size: 14px; }
+.main-workspace .chapter-generation > summary { cursor: pointer; min-height: 32px; }

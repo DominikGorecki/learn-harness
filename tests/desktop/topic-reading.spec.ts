@@ -95,7 +95,7 @@ test('saved topics read offline through one current-content history with indepen
     await page.emulateMedia({ reducedMotion: 'reduce' })
     for (const button of [main.getByRole('button', { name: 'Back to outline', exact: true }), main.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true })]) { await button.scrollIntoViewIfNeeded(); await expect(button).toBeInViewport(); expect(await button.evaluate(element => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(32) }
     expect(await main.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true)
-    expect(await main.locator('.workspace-actions').evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
+    expect(await main.getByRole('group', { name: 'Topic actions', exact: true }).evaluate(element => element.ownerDocument.defaultView!.getComputedStyle(element).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
     await flow.capture(desktop, page, 'saved-topic-zoom')
     await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.webContents.setZoomFactor(1); window.setContentSize(1280, 840) })
     await forward.click(); const latest = await storage.load(folder), removed = structuredClone(latest.document!); removed.revision++; removed.outline!.document.lessons.splice(1, 1); removed.outline!.document.startingLessonId = 'beliefs'; await storage.save(folder, removed, latest.digest)

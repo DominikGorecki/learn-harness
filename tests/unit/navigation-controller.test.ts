@@ -59,6 +59,7 @@ describe('bounded context and shortcut policies', () => {
     expect(clampedScroll(NaN, 100)).toBe(0); expect(clampedScroll(Infinity, 100)).toBe(0)
     expect(clampedScroll(200, 100)).toBe(100); expect(clampedScroll(-1, 100)).toBe(0)
     expect(supportedAnchor('context:scope')).toBe(true); expect(supportedAnchor('arbitrary')).toBe(false)
+    expect(supportedAnchor('chapter-generation')).toBe(true)
     const store = new ViewMementos(), project = destination('A')
     store.track(project, 'summary:quoted"id')
     store.track(project, null)

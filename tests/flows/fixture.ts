@@ -12,7 +12,7 @@ export class FlowRecorder {
     if (basename(info.file) !== flowDefinition(id).testFile) throw new Error('Flow belongs to a different test file')
   }
 
-  async capture(desktop: ElectronApplication, page: Page, id: string, options: { fullPage?: boolean } = {}): Promise<void> {
+  async capture(desktop: ElectronApplication, page: Page, id: string, options: { fullPage?: boolean; verifiedNativeBitmap?: Buffer } = {}): Promise<void> {
     const caption = flowDefinition(this.id).screenshots[id]
     if (!caption || this.captures.some(item => item.id === id)) throw new Error(`Unknown or duplicate capture: ${this.id}/${id}`)
     const window = await desktop.browserWindow(page)
@@ -27,14 +27,20 @@ export class FlowRecorder {
     const hasVisiblePath = await paths.evaluateAll(elements => elements.some(element => element.getBoundingClientRect().width > 0 && element.getBoundingClientRect().height > 0))
     const path = this.info.outputPath(`${id}.png`)
     let bytes: Buffer
-    if (zoom !== 1) {
+    const native = zoom !== 1 || options.verifiedNativeBitmap !== undefined
+    if (native) {
       if (hasVisiblePath) throw new Error('Collapse local paths before native Electron capture')
-      const encoded = await window.evaluate(async window => (await window.webContents.capturePage()).toPNG().toString('base64'))
-      bytes = Buffer.from(encoded, 'base64')
+      // Retain an actual native frame that already passed a paint assertion;
+      // re-capturing would introduce a second compositor race.
+      if (options.verifiedNativeBitmap) bytes = options.verifiedNativeBitmap
+      else {
+        const encoded = await window.evaluate(async window => (await window.webContents.capturePage()).toPNG().toString('base64'))
+        bytes = Buffer.from(encoded, 'base64')
+      }
       await writeFile(path, bytes)
     } else bytes = await page.screenshot({ path, animations: 'disabled', caret: 'hide', fullPage: options.fullPage, mask: [paths], maskColor: '#808080' })
     this.captures.push({ id, caption, ...pngSize(bytes), ...state, zoom,
-      method: zoom === 1 ? 'playwright' : 'electron', maskedLocalPaths: zoom === 1 && hasVisiblePath, sha256: digest(bytes) })
+      method: native ? 'electron' : 'playwright', maskedLocalPaths: !native && hasVisiblePath, sha256: digest(bytes) })
     await this.info.attach(id, { path, contentType: 'image/png' })
   }
 

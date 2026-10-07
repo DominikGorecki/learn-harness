@@ -36,7 +36,7 @@ export function useNavigation(workspace: ReturnType<typeof useWorkspace>, main: 
   }, [main, mementos, controller])
   useLayoutEffect(() => {
     const destination = currentDestination(state.history), element = main.current
-    if (!element || !destination || restoredHistory.current === state.history && restoredRequest.current === restorationRequest || element.dataset.destination !== destinationKey(destination)) return
+    if (!element || !destination || element.dataset.presentationReady === 'false' || restoredHistory.current === state.history && restoredRequest.current === restorationRequest || element.dataset.destination !== destinationKey(destination)) return
     mementos.prune(state.history.entries)
     restorePresentation(mementos, destination, element)
     restoredHistory.current = state.history
@@ -60,6 +60,10 @@ export function useNavigation(workspace: ReturnType<typeof useWorkspace>, main: 
     } catch { controller.reject(transaction.token) }
   }
   return { state, destination: currentDestination(state.history), notice: controller.notice, ready: state.history.cursor >= 0, pending: Boolean(state.pending), back: canGoBack(state.history), forward: canGoForward(state.history),
+    presentationReady: (key: string) => {
+      const destination = currentDestination(controller.state.history)
+      if (destination && destinationKey(destination) === key && main.current?.dataset.destination === key && restoredHistory.current !== controller.state.history) setRestorationRequest(value => value + 1)
+    },
     open: () => void navigate({ kind: 'push', destination: null }),
     dashboard: () => void navigate({ kind: 'push', destination: { kind: 'dashboard' } }),
     select: (projectHandle: string) => navigate({ kind: 'push', destination: { kind: 'project', projectHandle } }),

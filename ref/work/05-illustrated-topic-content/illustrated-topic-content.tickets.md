@@ -1,6 +1,6 @@
 # Illustrated topic content ticket map
 
-Status: In progress — T01–T06 locally accepted; T05 cache-preflight accepted before T07
+Status: In progress — T01–T07 locally accepted; T08/T09 pending; cumulative/live qualification remains open
 
 Source: [spec](illustrated-topic-content.spec.md)
 

@@ -17,6 +17,23 @@ afterEach(async () => { await Promise.all(services.splice(0).map(service => serv
 const setup = async (fetcher?: typeof fetch) => { const fixture = await routerFixture(root => roots.push(root), fetcher); services.push(fixture.service); return fixture }
 const deferred = () => { let resolve!: () => void; const promise = new Promise<void>(done => { resolve = done }); return { promise, resolve } }
 describe('audited fixed OpenRouter gateway', () => {
+  it('quotes recorded chapter settings independently from a changed selected model default without new HTTP', async () => {
+    let requests = 0
+    const { service } = await setup(async input => {
+      requests++
+      const url = String(input), id = openRouterImageModels.find(model => url.includes(model.id))?.id
+      const endpoint = routerEndpoint(id)
+      if (id === 'google/gemini-3.1-flash-image') endpoint.endpoints[0]!.supported_parameters.aspect_ratio.values = ['3:2']
+      return new Response(JSON.stringify(url.endsWith('/key') ? routerKey : url.endsWith('/images/models') ? routerCatalog : endpoint))
+    })
+    await service.saveKey({ key: 'ordinary-fixture-key' })
+    expect(service.getImageConfiguration(2, { n: 1, aspectRatio: '1:1' }).available).toBe(true)
+    await service.setImageModel({ modelId: 'google/gemini-3.1-flash-image' })
+    const before = requests
+    expect(service.getImageConfiguration(6)).toMatchObject({ settings: { n: 1, aspectRatio: '3:2' }, available: true })
+    expect(service.getImageConfiguration(2, { n: 1, aspectRatio: '1:1' })).toMatchObject({ settings: { n: 1, aspectRatio: '1:1' }, available: false, estimate: { kind: 'unknown' } })
+    expect(requests).toBe(before)
+  })
   it('persists every real loopback metadata HTTP request before dispatch, excludes management keys and retains history on removal', async () => {
     const fixture = await setup(), { root, store, ledger } = fixture
     const requests: string[] = []

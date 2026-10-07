@@ -13,6 +13,11 @@ export const topicContentPolicy = {
   maximumSources: 100, readerSectionsPerPage: 4, readerFrameBytes: 2 * 1024 * 1024,
   checkpointBytes: 3 * 1024 * 1024, maximumRetainedPointers: 100
 } as const
+// An accepted asset has bounded 100-character IDs, 2048-character path, decimal
+// dimensions/bytes, SHA-256 digest and fixed enums. 16 KiB also covers JSON's
+// six-byte escapes for every unpaired surrogate in a legal metadata path.
+// envelope even at every field bound; existing paid-attempt lineage is counted.
+export const readerMissingAssetReserveBytes = 16 * 1024
 export type TopicContentMode = 'illustrated' | 'text-only'
 /** Portable project ID in stored DTOs; registry handle in renderer capability requests. Main resolves the mapping. */
 export interface TopicContentIdentity { projectId: string; topicId: string }
@@ -71,8 +76,8 @@ export interface TopicImageCandidateRequest extends ChapterIdentity { imageId: s
 export interface AcceptTopicImageReplacementRequest extends TopicImageCandidateRequest { caption: string; alt: string }
 export interface TopicContentSnapshot {
   revision: number; projectId: string; topicId: string;
-  published: { chapterId: string; revisionId: string; status: ChapterManifest['status'] } | null;
-  progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[]; pendingResultId?: string; imageSlots?: { imageId: string; status: ChapterImageProgress['status']; callId: string | null }[] } | null;
+  published: { chapterId: string; revisionId: string; status: ChapterManifest['status']; runId?: string } | null;
+  progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[]; pendingResultId?: string; imageSlots?: { imageId: string; status: ChapterImageProgress['status']; callId: string | null; settings?: ImageGenerationSettings }[] } | null;
   candidate: TopicImageCandidate | null;
   stale: boolean; missingImageIds: string[]; errorCode: ErrorCode | null; message: string | null
 }
@@ -80,6 +85,22 @@ export interface TopicContentSnapshot {
 export interface TopicContentPage {
   identity: ChapterIdentity; plan: ChapterPlan; introduction: string; synthesis: string; sourceNotes: string[];
   sections: ChapterSection[]; images: ChapterImageProgress[]; status: ChapterManifest['status']; nextSectionCursor: string | null
+}
+/** Every legal cursor/limit window must fit, including windows crossing fixed batches. */
+export function validateChapterPageability(identity: ChapterIdentity, plan: ChapterPlan, document: ChapterDocument, images: ChapterImageProgress[], status: ChapterManifest['status'], reserveMissingAssets = false): void {
+  const envelope: TopicContentPage = { identity: { projectId: identity.projectId, topicId: identity.topicId, chapterId: identity.chapterId, revisionId: identity.revisionId }, plan, ...document, sections: [], images, status, nextSectionCursor: null }
+  const base = utf8Bytes(JSON.stringify(envelope)), sizes = document.sections.map(section => utf8Bytes(JSON.stringify(section)))
+  const reserve = reserveMissingAssets ? images.filter(image => !image.asset).length * readerMissingAssetReserveBytes : 0
+  // Serialize large repeated metadata once. Replacing [] adds section bytes and
+  // commas; replacing null adds exactly the serialized legal next cursor delta.
+  for (let start = 0; start < sizes.length; start++) {
+    let sectionBytes = 0
+    for (let count = 1; count <= topicContentPolicy.readerSectionsPerPage && start + count <= sizes.length; count++) {
+      sectionBytes += sizes[start + count - 1]!
+      const cursor = plan.sections[start + count]?.id ?? null
+      if (base + sectionBytes + count - 1 + utf8Bytes(JSON.stringify(cursor)) - 4 + reserve > topicContentPolicy.readerFrameBytes) throw new ApplicationError('INVALID_INPUT', 'The complete chapter is too large for bounded reading pages. Shorten the prose or illustration plan before generating images.')
+    }
+  }
 }
 export interface TopicContentApi {
   getTopicContentState(request: TopicContentIdentity): Promise<ApiResult<TopicContentSnapshot>>
@@ -117,16 +138,16 @@ export function parseTopicContentPage(value: unknown): TopicContentPage {
 }
 export function parseTopicContentSnapshot(value: unknown): TopicContentSnapshot {
   const data = strictRecord(value, ['revision', 'projectId', 'topicId', 'published', 'progress', 'candidate', 'stale', 'missingImageIds', 'errorCode', 'message'])
-  const published = data.published === null ? null : strictRecord(data.published, ['chapterId', 'revisionId', 'status'])
+  const published = data.published === null ? null : strictRecord(data.published, ['chapterId', 'revisionId', 'status', 'runId'])
   const progress = data.progress === null ? null : strictRecord(data.progress, ['chapterId', 'runId', 'checkpointRevision', 'status', 'mode', 'completedSectionIds', 'pendingImageIds', 'unresolvedImageIds', 'pendingResultId', 'imageSlots'])
   if (typeof data.stale !== 'boolean') invalid()
   const ids = (value: unknown, max: number) => { const result = list(value, max, identifier); distinct(result); return result }
   const result: TopicContentSnapshot = { revision: natural(data.revision), ...topicRequest(data),
-    published: published && { chapterId: identifier(published.chapterId), revisionId: identifier(published.revisionId), status: choice(published.status, ['illustrated', 'text-only', 'needs-images']) },
+    published: published && { chapterId: identifier(published.chapterId), revisionId: identifier(published.revisionId), status: choice(published.status, ['illustrated', 'text-only', 'needs-images']), ...(published.runId !== undefined ? { runId: identifier(published.runId) } : {}) },
     progress: progress && { chapterId: identifier(progress.chapterId), runId: identifier(progress.runId), checkpointRevision: natural(progress.checkpointRevision, Number.MAX_SAFE_INTEGER, 1), status: choice(progress.status, ['paused', 'cancelled', 'interrupted', 'working', 'unsaved']), mode: choice(progress.mode, ['illustrated', 'text-only']),
       completedSectionIds: ids(progress.completedSectionIds, topicContentPolicy.maximumSections), pendingImageIds: ids(progress.pendingImageIds, topicContentPolicy.maximumImages), unresolvedImageIds: ids(progress.unresolvedImageIds, topicContentPolicy.maximumImages),
       ...(progress.pendingResultId !== undefined ? { pendingResultId: identifier(progress.pendingResultId) } : {}),
-      ...(progress.imageSlots !== undefined ? { imageSlots: list(progress.imageSlots, topicContentPolicy.maximumImages, value => { const slot = strictRecord(value, ['imageId', 'status', 'callId']); return { imageId: identifier(slot.imageId), status: choice(slot.status, ['planned', 'requested', 'complete', 'failed', 'unresolved']), callId: slot.callId === null ? null : identifier(slot.callId) } }) } : {}) },
+      ...(progress.imageSlots !== undefined ? { imageSlots: list(progress.imageSlots, topicContentPolicy.maximumImages, value => { const slot = strictRecord(value, ['imageId', 'status', 'callId', 'settings']); return { imageId: identifier(slot.imageId), status: choice(slot.status, ['planned', 'requested', 'complete', 'failed', 'unresolved']), callId: slot.callId === null ? null : identifier(slot.callId), ...(slot.settings !== undefined ? { settings: parseImageGenerationSettings(slot.settings) } : {}) } }) } : {}) },
     candidate: data.candidate === null ? null : parseTopicImageCandidate(data.candidate), stale: data.stale, missingImageIds: ids(data.missingImageIds, topicContentPolicy.maximumImages),
     errorCode: data.errorCode === null ? null : choice(data.errorCode, ['INVALID_INPUT', 'NOT_FOUND', 'FORBIDDEN', 'INTERNAL', 'AUTH_REQUIRED', 'PLAN_PERMISSION_REQUIRED', 'ACCESS_RESTRICTED', 'USAGE_LIMIT', 'NETWORK', 'CANCELLED', 'BUSY', 'UNAVAILABLE', 'STORAGE', 'CONFLICT'] as const),
     message: data.message === null ? null : boundedText(data.message, 'Content status', 2000) }
@@ -268,7 +289,9 @@ export function parseChapterManifest(value: unknown): ChapterManifest {
   if (previousRevisionIds.includes(identity.revisionId)) invalid()
   const images = imageSet(data.images, plan, directory, previousRevisionIds), status = choice(data.status, ['illustrated', 'text-only', 'needs-images'])
   if (status === 'illustrated' && (!images.length || images.some(image => image.status !== 'complete')) || status === 'needs-images' && (!images.length || images.every(image => image.status === 'complete'))) invalid()
-  return { schemaVersion: 1, ...identity, outputDirectory: directory, status, plan, document: parseChapterDocument(data.document, plan), images, baseline: parseChapterBaseline(data.baseline), provenance: parseProvenance(data.provenance), previousRevisionIds }
+  const document = parseChapterDocument(data.document, plan)
+  validateChapterPageability(identity, plan, document, images, status)
+  return { schemaVersion: 1, ...identity, outputDirectory: directory, status, plan, document, images, baseline: parseChapterBaseline(data.baseline), provenance: parseProvenance(data.provenance), previousRevisionIds }
 }
 export function parseTopicContentCheckpoint(value: unknown): TopicContentCheckpoint {
   const data = strictRecord(value, ['schemaVersion', 'projectId', 'topicId', 'chapterId', 'revisionId', 'runId', 'checkpointRevision', 'mode', 'status', 'outputDirectory', 'plan', 'sections', 'introduction', 'synthesis', 'sourceNotes', 'images', 'baseline', 'provenance', 'textTurns', 'imageRequests', 'activationTextTurns', 'activationImageRequests', 'updatedAt'])
@@ -283,6 +306,10 @@ export function parseTopicContentCheckpoint(value: unknown): TopicContentCheckpo
     baseline: parseChapterBaseline(data.baseline), provenance, textTurns: natural(data.textTurns), imageRequests: natural(data.imageRequests),
     activationTextTurns: natural(data.activationTextTurns, topicContentPolicy.textTurnsPerActivation), activationImageRequests: natural(data.activationImageRequests, topicContentPolicy.maximumImages), updatedAt: timestamp(data.updatedAt) }
   if (result.mode === 'illustrated' && !plan.images.length || result.activationTextTurns > result.textTurns || result.activationImageRequests > result.imageRequests || result.imageRequests < images.filter(image => image.callId !== null).length || utf8Bytes(JSON.stringify(result)) > topicContentPolicy.checkpointBytes) invalid()
+  if (result.introduction && result.synthesis && result.sourceNotes.length && result.sections.length === plan.sections.length) {
+    const document = parseChapterDocument({ introduction: result.introduction, synthesis: result.synthesis, sourceNotes: result.sourceNotes, sections: result.sections }, plan)
+    validateChapterPageability(identity, plan, document, images, 'needs-images', result.mode === 'illustrated')
+  }
   return result
 }
 export function parseTopicImageCandidate(value: unknown): TopicImageCandidate {
