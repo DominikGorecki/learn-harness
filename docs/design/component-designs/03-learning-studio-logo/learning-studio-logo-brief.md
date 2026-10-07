@@ -1,8 +1,9 @@
 # Learning Studio logo — exploration
 
 Date: 2026-10-06
-Status: Sheet 01 for comparison; no selected logo or implementation.
-Method: Built-in image generation, new logo-brand contact sheet without image references.
+Updated: 2026-10-07
+Status: Sheet 02 refines the user's preferred sheet 01 option 6; no final selection or implementation.
+Method: Built-in image generation. Sheet 01 used no image references; sheet 02 used the actual sheet 01 image followed by two focused corrections of its generated output.
 
 ## Brief
 
@@ -27,19 +28,41 @@ Each panel uses comparable presentation: large app tile, symbol + Learning Studi
 
 Recommendation for feedback: **3** has the strongest compact silhouette; **1** communicates learning most immediately; **6** offers the most abstract direction. Recommendations are not selections.
 
+## Sheet 02 — aperture variations
+
+The user likes **sheet 01 option 6 — Insight aperture** and requested another contact sheet containing that original plus variations inspired by it. On this sheet, **option 1 corresponds to the previous option 6**. The three-page aperture identity, charcoal/lilac palette and comparable tile/wordmark presentation remain the constraints.
+
+![Six aperture-family variations](learning-studio-logo-sheet-02.png)
+
+| Option | Direction | Useful distinction |
+| --- | --- | --- |
+| 1 | Original aperture | Carries forward the old #6 curved three-blade mark as the comparison anchor |
+| 2 | Soft aperture | Rounded blade ends and a broad oval bottom piece soften the silhouette |
+| 3 | Open aperture | Larger negative-space opening and slimmer separated pieces |
+| 4 | Sculpted aperture | Taller, triangular outline with more pointed page forms |
+| 5 | Continuous aperture | One closed circular contour with a triangular opening, replacing radial separation |
+| 6 | Folded aperture | Angular page/ribbon pieces and a more directional triangular silhouette |
+
+The initial generation varied the shapes too little. A focused correction made the silhouettes more distinct; a second corrected several small wordmark/miniature symbols to follow their main marks. The final saved output retains the original concept as option 1 and six complete numbered panels. It is a visual reference, not a pixel-exact reproduction of the previous symbol.
+
+**Remaining preview drift:** option 4's wordmark symbol remains rounder than its triangular main mark; option 3's small variants do not fully reproduce the large mark's enlarged opening. Treat the large tile glyphs as authoritative for comparison, and all miniatures as illustrative rather than verified scaled assets. No additional round is generated before feedback. Suggested comparisons: **2** for a softer identity, **3** for a lighter version of the favorite, **6** for stronger folded-page geometry; these are not selections.
+
 ## Inspection and remaining work
 
 The saved 1536 × 1024 sheet was inspected: all six numbered directions, complete tiles, exact brand wordmarks and two alternate miniature treatments are present. Symbols are distinct and generally preserve their form across presentations. The light preview is pale lilac rather than the white workspace background; chosen geometry should later be checked on the actual Light canvas. Main glyphs show slight tonal shading; the white miniatures demonstrate the intended one-color treatment.
 
 There is no final selection, transparent standalone asset, editable vector, platform icon bundle or native small-size qualification yet. After a selection/refinement, use this actual sheet as the image reference. A later implementation can translate the chosen construction into a clean vector and verify actual small sizes, padding and platform icon requirements; this contact sheet is not that implementation.
 
+The saved sheet 02 is also 1536 × 1024 and was visually inspected. Labels/brand copy, complete panels and the original-plus-variations requirement are present; miniature drift is recorded above. Both sheets and their original generated cache files remain preserved. Neither sheet changes the app's current logo.
+
 ## References and generation record
 
 - [Exact sheet 01 prompt](learning-studio-logo-sheet-01-prompt.md)
+- [Sheet 02 generation and correction prompts](learning-studio-logo-sheet-02-prompt.md)
 - [Design system](../../../../ref/patterns-design-system.md)
 - [Locked main-workspace direction](../02-project-overview/project-overview-selection.md)
 - [Main-workspace design contract](../../../../ref/work/04-main-workspace-design/main-workspace-design.design.md)
 
 The exact image returned by this generation call was copied here; its original generated cache image remains preserved. No prior exploration was overwritten.
 
-Next decision: choose a numbered direction or qualities to refine. No additional sheet or final reference is generated before feedback.
+Next decision: choose a sheet 02 direction or specify qualities to refine. Liking old #6 establishes the exploration family, not a locked final logo.
