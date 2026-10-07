@@ -18,6 +18,8 @@ function Preview({ preview, outcome }: { preview: AiPreview; outcome: string }) 
     case 'none': return <p className="ai-empty-preview">No draft yet. The current activity is shown on the left.</p>
     case 'text': return <p>{preview.text}</p>
     case 'topic': return preview.lesson ? <Lesson lesson={preview.lesson} /> : <p className="ai-empty-preview">Preparing this topic…</p>
+    case 'chapter': return <>{preview.title && <h3>{preview.title}</h3>}{preview.sections?.map(section => <section key={section.id}>{section.title && <h4>{section.title}</h4>}{section.text && <p>{section.text}</p>}</section>)}</>
+    case 'image': return <p>{preview.modelName ? `${preview.modelName} · ` : ''}{preview.state === 'candidate' ? 'Replacement ready for review.' : preview.state === 'validating' ? 'Checking the illustration.' : preview.state === 'receiving' ? 'Receiving the illustration.' : 'Waiting for the illustration.'}</p>
     case 'outline': return <>{preview.title && <h3>{preview.title}</h3>}{preview.overview && <p>{preview.overview}</p>}{preview.lessons?.map((lesson, index) => <Lesson key={lesson.id ?? index} lesson={lesson} />)}</>
     case 'model-test-evidence': return <><p>{outcome === 'verified' ? 'The completed reply verified access for this model.' : ['failed', 'cancelled'].includes(outcome) ? 'This test ended. Access remains unverified.' : preview.hasReply ? 'Reply received. Access is being checked.' : 'Waiting for a short model reply.'}</p>
       {preview.completed && !['verified', 'failed', 'cancelled'].includes(outcome) && <p>Reply completion observed; independent verification is still required.</p>}<p className="ai-empty-preview">Reply text is kept private. No project content is sent by this test.</p></>

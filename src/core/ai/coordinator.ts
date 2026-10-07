@@ -175,7 +175,8 @@ export class AiCoordinator {
     if (owner.controller.signal.aborted && !['failed', 'cancelled'].includes(outcome)) throw new ApplicationError('INVALID_INPUT', 'An aborted AI action cannot publish success.')
     if (outcome === 'saved' && owner.operation.phase !== 'saving' || outcome === 'verified' && !owner.operation.kind.startsWith('test-') ||
       owner.operation.kind.startsWith('test-') && ['saved', 'unsaved', 'needs-details'].includes(outcome) ||
-      owner.operation.phase === 'saving' && ['cancelled', 'needs-details'].includes(outcome)) throw new ApplicationError('INVALID_INPUT', 'Invalid AI settlement.')
+      outcome === 'incomplete' && owner.operation.phase !== 'saving' ||
+      owner.operation.phase === 'saving' && ['cancelled', 'needs-details', 'paused', 'candidate'].includes(outcome)) throw new ApplicationError('INVALID_INPUT', 'Invalid AI settlement.')
     this.clearPending(owner)
     const current = this.get().active!
     const activity = current.activity.map(entry => entry.state === 'running' && (outcome === 'failed' || outcome === 'cancelled') ? { ...entry, state: 'failed' as const } : entry)

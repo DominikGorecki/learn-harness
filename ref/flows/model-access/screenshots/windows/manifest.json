@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "4d599cac8069f5288d45e7005b3775fc2996b56a399de687a7d4687101f339ce"
+      "sha256": "13cbef858654559dc93277cda7f0ad2e90e3c5d754034f9152c7b0d4d40a5b62"
     },
     {
       "id": "model-test-waiting-hint",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "73769fef2f5536c34e33fb52eeac15b5384a501f4c321fe846de2f9f854d82e0"
+      "sha256": "e2901caf36befd43820651606df51a22a00b1c98b2eaf5a4c6a519e808a49ca2"
     },
     {
       "id": "model-test-dashboard-waiting",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": true,
-      "sha256": "f8547064fd1c27b750b3541b37ddfb32a328ce1d96e860a59326ec2857fd8f4e"
+      "sha256": "c4cf5c147d5cbdd4d88bca750ded3c821b51ecc3626273ebd907e47370fb5b8b"
     },
     {
       "id": "model-test-verified-light",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "840dfd8d0c90511170f7a665923258319f86f99a27723cf82209f9410d8bb638"
+      "sha256": "489100da040767e74922892289fb60072b6f94f6cd75235885772ad456efc22a"
     },
     {
       "id": "model-test-verified-dark",
@@ -74,16 +74,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c13a486dfa5420d68ca15eff929da9aeaaf205038f7bf73f82e0f3c398ed190b"
+      "sha256": "2f0abfa48c5f1123922f8d2a09bf950a0ade9f25016b3b08af560d5e34dc5c4e"
     }
   ],
-  "capturedAt": "2026-10-07T13:43:49.030Z",
+  "capturedAt": "2026-10-07T18:39:58.206Z",
   "testSha256": "8c97daff68acef5e52b50fbee87a0e4f2c7266bc4bd9cd850e3bdb18521426fc",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/model-test.spec.ts",
   "testTitle": "extra choices survive restart while independent diagnostic evidence resets",
-  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "revision": "5c8ff9bb95a29373a5961f1194be3ba4c8436802",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -1,23 +1,26 @@
 import type { ApiResult, ErrorCode } from '../contracts'
 import { ApplicationError } from '../contracts'
 import { boundedText, identifier, strictRecord } from '../validation'
+import { parseOpenRouterImageModel } from '../openrouter'
 
 export const aiLimits = { previewBytes: 64 * 1024, frameBytes: 96 * 1024, activityEntries: 40, labelCharacters: 256, previewIntervalMs: 100 } as const
-export const aiOperationKinds = ['create-outline', 'rewrite-outline', 'rewrite-topic', 'test-sol', 'test-luna'] as const
+export const aiOperationKinds = ['create-outline', 'rewrite-outline', 'rewrite-topic', 'test-sol', 'test-luna', 'generate-topic-content', 'regenerate-topic-image'] as const
 export type AiOperationKind = typeof aiOperationKinds[number]
-export const aiPhases = ['preparing', 'waiting', 'receiving', 'examining', 'planning', 'validating', 'saving', 'cancelling'] as const
+export const aiPhases = ['preparing', 'waiting', 'receiving', 'examining', 'planning', 'writing', 'generating-images', 'validating', 'saving', 'cancelling'] as const
 export type AiPhase = typeof aiPhases[number]
-export const aiOutcomes = ['saved', 'verified', 'unsaved', 'needs-details', 'failed', 'cancelled'] as const
+export const aiOutcomes = ['saved', 'verified', 'unsaved', 'needs-details', 'failed', 'cancelled', 'paused', 'incomplete', 'candidate'] as const
 export type AiOutcome = typeof aiOutcomes[number]
 export interface AiPreviewModule { title?: string; purpose?: string; method?: string; task?: string }
 export interface AiPreviewLesson { id?: string; title?: string; question?: string; overview?: string; objectives?: string[]; modules?: AiPreviewModule[] }
 export type AiPreview = { kind: 'none' } | { kind: 'text'; text: string } |
   { kind: 'outline'; title?: string; overview?: string; lessons?: AiPreviewLesson[] } |
   { kind: 'topic'; topicId: string; lesson?: AiPreviewLesson } |
+  { kind: 'chapter'; topicId: string; chapterId: string; title?: string; sections?: { id: string; title?: string; text?: string }[] } |
+  { kind: 'image'; topicId: string; chapterId: string; imageId: string; state: 'waiting' | 'receiving' | 'validating' | 'candidate'; modelName?: string } |
   { kind: 'model-test-evidence'; hasReply: boolean; completed: boolean; modelMatched: boolean }
 export interface AiActivityEntry { id: string; label: string; state: 'upcoming' | 'running' | 'completed' | 'failed' }
 export interface AiOperationInput {
-  kind: AiOperationKind; runId?: string; projectId?: string; topicId?: string;
+  kind: AiOperationKind; runId?: string; projectId?: string; topicId?: string; chapterId?: string; imageId?: string;
   model: { id: string; name: string }; heading: string; requestSummary: string
 }
 export interface AiOperation extends AiOperationInput {
@@ -73,7 +76,7 @@ function lesson(value: unknown): AiPreviewLesson {
   return result
 }
 export function parseAiPreview(value: unknown): AiPreview {
-  const discriminator = strictRecord(value, ['kind', 'text', 'title', 'overview', 'lessons', 'topicId', 'lesson', 'hasReply', 'completed', 'modelMatched']).kind
+  const discriminator = strictRecord(value, ['kind', 'text', 'title', 'overview', 'lessons', 'topicId', 'lesson', 'hasReply', 'completed', 'modelMatched', 'chapterId', 'imageId', 'sections', 'state', 'modelName']).kind
   let result: AiPreview
   switch (discriminator) {
     case 'none': strictRecord(value, ['kind']); result = { kind: 'none' }; break
@@ -89,6 +92,25 @@ export function parseAiPreview(value: unknown): AiPreview {
       result = { kind: 'topic', topicId: identifier(data.topicId) }
       if (data.lesson !== undefined) result.lesson = lesson(data.lesson)
       if (result.lesson !== undefined && result.lesson.id !== result.topicId) invalid()
+      break
+    }
+    case 'chapter': {
+      const data = strictRecord(value, ['kind', 'topicId', 'chapterId', 'title', 'sections'])
+      result = { kind: 'chapter', topicId: identifier(data.topicId), chapterId: identifier(data.chapterId) }
+      if (data.title !== undefined) result.title = text(data.title)
+      if (data.sections !== undefined) {
+        result.sections = list(data.sections, 24, value => {
+          const section = strictRecord(value, ['id', 'title', 'text'])
+          return { id: identifier(section.id), ...optionalTextFields(section, ['title', 'text']) }
+        })
+        if (new Set(result.sections.map(section => section.id)).size !== result.sections.length) invalid()
+      }
+      break
+    }
+    case 'image': {
+      const data = strictRecord(value, ['kind', 'topicId', 'chapterId', 'imageId', 'state', 'modelName'])
+      result = { kind: 'image', topicId: identifier(data.topicId), chapterId: identifier(data.chapterId), imageId: identifier(data.imageId), state: choice(data.state, ['waiting', 'receiving', 'validating', 'candidate']) }
+      if (data.modelName !== undefined) result.modelName = text(data.modelName, 256)
       break
     }
     case 'model-test-evidence': {
@@ -117,7 +139,7 @@ export function boundAiPreview(preview: AiPreview, budget: number = aiLimits.pre
   let remaining = budget, abbreviated = false
   const copy = (value: unknown, key = ''): unknown => {
     if (typeof value === 'string') {
-      if (key === 'kind' || key === 'id' || key === 'topicId') return value
+      if (['kind', 'id', 'topicId', 'chapterId', 'imageId', 'state'].includes(key)) return value
       let result = ''
       for (const point of value) { const bytes = utf8Bytes(point); if (bytes > remaining) { abbreviated = true; break }; result += point; remaining -= bytes }
       return result
@@ -128,20 +150,24 @@ export function boundAiPreview(preview: AiPreview, budget: number = aiLimits.pre
   }
   // Reserve identifiers before prose so truncation never changes stable topic identity.
   const identifiers = (value: unknown): number => value && typeof value === 'object' ? Object.entries(value).reduce((sum, [key, item]) => sum +
-    ((key === 'id' || key === 'topicId') && typeof item === 'string' ? utf8Bytes(item) : identifiers(item)), 0) : 0
+    (['id', 'topicId', 'chapterId', 'imageId', 'state'].includes(key) && typeof item === 'string' ? utf8Bytes(item) : identifiers(item)), 0) : 0
   remaining = Math.max(0, budget - identifiers(preview))
   const bounded = copy(preview) as AiPreview
   return { preview: parseAiPreview(bounded), abbreviated }
 }
 export function parseAiOperationInput(value: unknown): AiOperationInput {
-  const data = strictRecord(value, ['kind', 'runId', 'projectId', 'topicId', 'model', 'heading', 'requestSummary'])
+  const data = strictRecord(value, ['kind', 'runId', 'projectId', 'topicId', 'chapterId', 'imageId', 'model', 'heading', 'requestSummary'])
   const model = strictRecord(data.model, ['id', 'name'])
   const result: AiOperationInput = { kind: choice(data.kind, aiOperationKinds), model: { id: boundedText(model.id, 'Model', 128), name: boundedText(model.name, 'Model', 256) },
     heading: boundedText(data.heading, 'Heading', 256), requestSummary: boundedText(data.requestSummary, 'Request summary', 512, true) }
-  for (const key of ['runId', 'projectId', 'topicId'] as const) if (data[key] !== undefined) result[key] = identifier(data[key])
+  for (const key of ['runId', 'projectId', 'topicId', 'chapterId', 'imageId'] as const) if (data[key] !== undefined) result[key] = identifier(data[key])
   const diagnostic = result.kind === 'test-sol' || result.kind === 'test-luna'
   if (diagnostic ? Boolean(result.runId || result.projectId || result.topicId) : !result.projectId) invalid()
-  if (result.kind === 'rewrite-topic' ? !result.topicId : result.topicId !== undefined) invalid()
+  const content = result.kind === 'generate-topic-content' || result.kind === 'regenerate-topic-image'
+  if (result.kind === 'rewrite-topic' || content ? !result.topicId : result.topicId !== undefined) invalid()
+  if (content ? !result.chapterId : result.chapterId !== undefined) invalid()
+  if (result.kind === 'regenerate-topic-image' ? !result.imageId : result.imageId !== undefined) invalid()
+  if (result.kind === 'regenerate-topic-image') parseOpenRouterImageModel(result.model.id)
   if (diagnostic && result.model.id !== (result.kind === 'test-sol' ? 'gpt-6.1-sol' : 'gpt-6-luna')) invalid()
   return result
 }
@@ -150,14 +176,20 @@ export function parseAiActivitySnapshot(value: unknown): AiActivitySnapshot {
   const data = strictRecord(value, ['revision', 'active', 'settled'])
   const operation = (value: unknown): AiOperation | null => {
     if (value === null) return null
-    const data = strictRecord(value, ['kind', 'runId', 'projectId', 'topicId', 'model', 'heading', 'requestSummary', 'operationId', 'sequence', 'phase', 'outcome', 'errorCode', 'elapsedMs', 'lastByteAgeMs', 'turn', 'previewRevision', 'preview', 'abbreviated', 'activity', 'omittedActivityCount', 'canCancel'])
-    const input = parseAiOperationInput(Object.fromEntries(['kind', 'runId', 'projectId', 'topicId', 'model', 'heading', 'requestSummary'].filter(key => data[key] !== undefined).map(key => [key, data[key]])))
+    const data = strictRecord(value, ['kind', 'runId', 'projectId', 'topicId', 'chapterId', 'imageId', 'model', 'heading', 'requestSummary', 'operationId', 'sequence', 'phase', 'outcome', 'errorCode', 'elapsedMs', 'lastByteAgeMs', 'turn', 'previewRevision', 'preview', 'abbreviated', 'activity', 'omittedActivityCount', 'canCancel'])
+    const input = parseAiOperationInput(Object.fromEntries(['kind', 'runId', 'projectId', 'topicId', 'chapterId', 'imageId', 'model', 'heading', 'requestSummary'].filter(key => data[key] !== undefined).map(key => [key, data[key]])))
     const result: AiOperation = { ...input, operationId: identifier(data.operationId), sequence: natural(data.sequence), phase: choice(data.phase, aiPhases),
       outcome: data.outcome === null ? null : choice(data.outcome, aiOutcomes), errorCode: data.errorCode === null ? null : choice(data.errorCode, errorCodes),
       elapsedMs: natural(data.elapsedMs), lastByteAgeMs: data.lastByteAgeMs === null ? null : natural(data.lastByteAgeMs), turn: natural(data.turn), previewRevision: natural(data.previewRevision),
       preview: parseAiPreview(data.preview), abbreviated: flag(data.abbreviated), omittedActivityCount: natural(data.omittedActivityCount), canCancel: flag(data.canCancel),
       activity: list(data.activity, aiLimits.activityEntries, value => { const entry = strictRecord(value, ['id', 'label', 'state']); return { id: identifier(entry.id), label: text(entry.label, 256), state: choice(entry.state, ['upcoming', 'running', 'completed', 'failed']) } }) }
     if (input.kind === 'rewrite-topic' && result.preview.kind !== 'none' && (result.preview.kind !== 'topic' || result.preview.topicId !== input.topicId)) invalid()
+    if (input.kind === 'generate-topic-content' && result.preview.kind !== 'none' && (!['chapter', 'image'].includes(result.preview.kind) || !('topicId' in result.preview) || result.preview.topicId !== input.topicId || !('chapterId' in result.preview) || result.preview.chapterId !== input.chapterId)) invalid()
+    if (input.kind === 'regenerate-topic-image' && result.preview.kind !== 'none' && (result.preview.kind !== 'image' || result.preview.topicId !== input.topicId || result.preview.chapterId !== input.chapterId || result.preview.imageId !== input.imageId)) invalid()
+    const content = input.kind === 'generate-topic-content' || input.kind === 'regenerate-topic-image'
+    if (!content && (['chapter', 'image'].includes(result.preview.kind) || ['writing', 'generating-images'].includes(result.phase) || result.outcome !== null && ['paused', 'incomplete', 'candidate'].includes(result.outcome))) invalid()
+    if (input.kind === 'generate-topic-content' && result.outcome === 'candidate' || input.kind === 'regenerate-topic-image' && result.outcome !== null && ['saved', 'needs-details', 'paused', 'incomplete'].includes(result.outcome)) invalid()
+    if (result.outcome === 'incomplete' && result.phase !== 'saving' || result.outcome === 'paused' && result.phase === 'saving') invalid()
     if ((input.kind === 'test-sol' || input.kind === 'test-luna') && !['none', 'model-test-evidence'].includes(result.preview.kind)) invalid()
     if (input.kind.startsWith('test-') && (result.phase === 'saving' || result.outcome !== null && ['saved', 'unsaved', 'needs-details'].includes(result.outcome))) invalid()
     if (!input.kind.startsWith('test-') && result.outcome === 'verified') invalid()

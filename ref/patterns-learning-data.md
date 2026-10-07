@@ -1,5 +1,11 @@
 # Learning and data patterns
 
+## Adopted chapter/provider contract foundation
+
+[ADR-0026](ADRs/ADR-0026-illustrated-topic-content-and-openrouter-media.md) adopts independent versioned `.edu/chapters` manifests and `.edu/content-runs` checkpoints plus immutable topic-owned `content/<chapter>/<revision>` output. Contracts/core ports are implemented; publication/provider/reader runtime remains pending. Preserve `.edu/project.json`, sources and unrelated topics. Main binds portable project/topic identity, exclusive folder ownership, topic/context/source digests and independent manifest commit marker. Exact saved objectives map to stable sections via zero-based indices; incomplete text is checkpoint progress, while complete prose may be `text-only` or `needs-images`. Image filenames bind stable image/version identity. Replacements retain unchanged assets through known prior revision pointers; pointer bounds never authorize deleting history. Candidate revisions bind the expected current manifest/image version and publish only after explicit acceptance. Save retry performs no inference; unresolved dispatched image slots cannot replay through ordinary Continue.
+
+OpenRouter keys, fixed image preference, cached capabilities and ledger are profile-owned and independent of ChatGPT. Key validation precedes replacement; protection/fallback reporting follows ADR-0014 without secret readback. Every app request requires a durable intent before dispatch and independently retained outcome/cost transitions. Known exact decimal USD and unknown costs remain distinct from publication status; latest cost counts once per call, and provider-wide key usage is separately labelled. Price lines preserve billable unit/variant/compatible settings. No prompt/raw payload/full URL enters the ledger. Metadata and key changes do not automatically run paid inference. See ADR-0026 for cache, liveness, byte/pixel and recovery bounds.
+
 Governed by [ADR-0008](ADRs/ADR-0008-chatgpt-plan-connection-and-pi-foundation.md) and [ADR-0009](ADRs/ADR-0009-portable-project-workspace.md). ADR-0003 records the retired demo baseline.
 
 ## Project ownership

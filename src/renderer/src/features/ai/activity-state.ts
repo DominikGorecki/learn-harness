@@ -76,5 +76,7 @@ export const phaseLabels = {
   examining: 'Examining project material', planning: 'Drafting the outline', validating: 'Checking the result',
   saving: 'Saving to your project', cancelling: 'Cancelling and cleaning up', saved: 'Saved to your project',
   verified: 'Model access verified', unsaved: 'Validated result · Not saved', 'needs-details': 'More direction needed',
-  failed: 'Request failed', cancelled: 'Request cancelled'
+  failed: 'Request failed', cancelled: 'Request cancelled', writing: 'Writing chapter sections',
+  'generating-images': 'Generating illustrations', paused: 'Progress saved · Continue when ready',
+  incomplete: 'Chapter saved · Images incomplete', candidate: 'Replacement ready · Awaiting your choice'
 } as const

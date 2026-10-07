@@ -26,6 +26,8 @@ Under [ADR-0017](ADRs/ADR-0017-outline-rewrites-with-saved-context.md), core obt
 
 ## Growth boundary
 
+[ADR-0026](ADRs/ADR-0026-illustrated-topic-content-and-openrouter-media.md) adds the chapter/provider contract foundation in `src/shared/topic-content.ts`, `src/shared/openrouter.ts` and narrow `src/core/topic-content/ports.ts`. Core owns future chapter coverage/recovery; main resolves registry handles to portable identities and owns storage/provider/ledger/lifecycle. Sanctioned workers author text and decode raster images off main; private binary transfer cannot expand public AI limits. Runtime adapters and bridge activation remain pending; these ports do not grant new capabilities.
+
 Development diagnostics follow [ADR-0018](ADRs/ADR-0018-development-file-diagnostics.md): `src/main/logging` owns one asynchronous, bounded JSONL writer in the application profile. Shared owns safe field projection and internal event types. Preload automatically forwards failure metadata on an authorized internal channel; no public logger or filesystem API is exposed. Utility events travel through the existing private port. Core remains unaware of logging implementations; main instruments composition and subscriptions. Packaged applications do not persist these development diagnostics.
 
 Keep one package until independent build/runtime ownership justifies packages. Add files by responsibility rather than generic `utils` or `services` dumping grounds. Future compute-heavy document parsing, indexing, or local inference goes into workers or utility processes with bounded jobs, cancellation, and lifecycle ownership. That process isolation is not sufficient to safely execute arbitrary learner code.
