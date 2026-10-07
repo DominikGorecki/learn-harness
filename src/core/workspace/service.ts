@@ -2,7 +2,7 @@ import { ApplicationError } from '../../shared/contracts'
 import type { ModelChoice } from '../../shared/account'
 import { parseSavedOutline } from '../../shared/workspace'
 import type { ProjectDocument, ProjectSnapshot, ProjectSummary, SavedOutline, WorkspaceSnapshot } from '../../shared/workspace'
-import type { LoadedProject, ProjectRegistry, ProjectStorage, RegisteredProject, TopicFolderState, ProjectChanges } from './ports'
+import type { LoadedProject, ProjectRegistry, ProjectStorage, RegisteredProject, TopicFolderState, ProjectChanges, PreparedTopicContent, TopicContentMutationLease } from './ports'
 import { localizeTopicOutline } from '../../shared/outline'
 import { observeNotification } from '../notifications'
 
@@ -15,6 +15,7 @@ export class WorkspaceService {
   private queue: Promise<unknown> = Promise.resolve()
   private listeners = new Set<(snapshot: WorkspaceSnapshot) => void>()
   private generationLocks = new Set<string>()
+  private contentLocks = new Map<string, object>()
 
   constructor(private readonly options: {
     registry: ProjectRegistry; storage: ProjectStorage; models(): ModelChoice[]; createId(): string; now(): string
@@ -155,7 +156,62 @@ export class WorkspaceService {
     return this.serial(() => { this.mutable(id); return this.updateDocument(id, document => ({ ...document, brief })) })
   }
   private mutable(id: string): void {
-    if (this.generationLocks.has(id)) throw new ApplicationError('BUSY', 'Finish or cancel this outline before changing its project settings.')
+    if (this.generationLocks.has(id) || this.contentLocks.has(id)) throw new ApplicationError('BUSY', 'Finish or cancel this project’s generation before changing its settings.')
+  }
+  private async topicContent(id: string, topicId: string): Promise<PreparedTopicContent> {
+    const entry = this.entry(id), loaded = await this.options.storage.load(entry.path)
+    this.assertIdentity(entry, loaded)
+    const document = loaded.document, outline = document?.outline
+    if (!document || !outline || !loaded.digest) throw new ApplicationError('UNAVAILABLE', 'Save an outline before generating topic content.')
+    const topicIndex = outline.document.lessons.findIndex(topic => topic.id === topicId)
+    if (topicIndex < 0) throw new ApplicationError('NOT_FOUND', 'This topic is no longer in the saved outline.')
+    const topic = outline.document.lessons[topicIndex]!
+    const topicFolder = await this.options.storage.prepareTopicFolder(entry.path, document.projectId, topic, topicIndex + 1, outline.document.lessons.filter(topic => topic.id !== topicId))
+    return structuredClone({ projectHandle: id, projectId: document.projectId, topicId, path: entry.path, projectDigest: loaded.digest,
+      writable: loaded.writable, brief: document.brief, name: document.name, selectedModel: document.selectedModel, outline, topic, topicNumber: topicIndex + 1, topicFolder })
+  }
+  /** Reading performs no project save and requires no account or currently available model. */
+  readTopicContent(id: string, topicId: string): Promise<PreparedTopicContent> { return this.serial(() => this.topicContent(id, topicId)) }
+  prepareTopicContent(id: string, topicId: string, textModelId?: string): Promise<PreparedTopicContent> {
+    return this.serial(async () => {
+      this.mutable(id)
+      const prepared = await this.topicContent(id, topicId)
+      if (!prepared.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Saving content requires a writable folder.')
+      if (textModelId && !this.options.models().some(model => model.id === textModelId)) throw new ApplicationError('UNAVAILABLE', 'Connect ChatGPT and choose an available text model before generating content.')
+      return prepared
+    })
+  }
+  /** A private token owns long-running content work; every write still enters the workspace queue. */
+  lockTopicContent(id: string): TopicContentMutationLease {
+    this.entry(id); this.mutable(id)
+    const token = {}, pending = new Set<Promise<unknown>>()
+    let released = false
+    this.contentLocks.set(id, token)
+    return {
+      mutate: <T>(topicId: string, action: (prepared: PreparedTopicContent) => Promise<T>) => {
+        const next = this.serial(async () => {
+          if (released || this.contentLocks.get(id) !== token) throw new ApplicationError('CONFLICT', 'This content operation no longer owns the project.')
+          const prepared = await this.topicContent(id, topicId)
+          if (!prepared.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Saving content requires a writable folder.')
+          return action(prepared)
+        })
+        pending.add(next)
+        void next.finally(() => {
+          pending.delete(next)
+          if (released && pending.size === 0 && this.contentLocks.get(id) === token) this.contentLocks.delete(id)
+        }).catch(() => {})
+        return next
+      },
+      release: () => { released = true; if (!pending.size && this.contentLocks.get(id) === token) this.contentLocks.delete(id) }
+    }
+  }
+  mutateTopicContent<T>(id: string, topicId: string, action: (prepared: PreparedTopicContent) => Promise<T>): Promise<T> {
+    return this.serial(async () => {
+      this.mutable(id)
+      const prepared = await this.topicContent(id, topicId)
+      if (!prepared.writable) throw new ApplicationError('STORAGE', 'This project is read-only. Saving content requires a writable folder.')
+      return action(prepared)
+    })
   }
   prepareOutline(id: string, modelId: string, brief: string, replace: boolean, rewrite = false, topicId?: string): Promise<{ path: string; digest: string | null; model: ModelChoice; brief: string; currentOutline: SavedOutline | null; topicFolder?: TopicFolderState | null }> {
     return this.serial(async () => {

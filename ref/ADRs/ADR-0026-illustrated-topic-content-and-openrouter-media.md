@@ -1,6 +1,6 @@
 # ADR-0026: Illustrated topic content and OpenRouter media
 
-- Status: Accepted; contract/port foundation implemented, storage/provider/worker/reader integration pending in [bundle 05](../work/05-illustrated-topic-content/illustrated-topic-content.spec.md).
+- Status: Accepted; contract/port foundation and main storage adapter implemented, provider/worker/reader integration pending in [bundle 05](../work/05-illustrated-topic-content/illustrated-topic-content.spec.md).
 - Date: 2026-10-07
 - Scope: explicit selected-topic chapters and image replacement, binary media publication, independent ordinary OpenRouter credentials and durable call accounting. Extends only ADR-0019's text-only authoring/outline commit marker and ADR-0022's sanctioned profiles, transport and public projections.
 
@@ -28,6 +28,6 @@ Main persists an immutable intent before every app OpenRouter HTTP dispatch, inc
 
 ## Consequences
 
-Chapters, checkpoints, candidate review, ephemeral AI presentation and the profile call ledger have independent ownership. The adopted schemas and parsers do not enable runtime network, IPC or storage capabilities yet. Later tickets must prove actual publication/recovery, decoder and endpoint capability behavior, protected storage, safe serving and reader/settings interactions. Fixture/code acceptance is separate from explicitly authorized live paid qualification, pedagogical review, packaged-worker and native/accessibility evidence. Socratic execution, mastery, speech and web research remain outside this decision.
+Chapters, checkpoints, candidate review, ephemeral AI presentation and the profile call ledger have independent ownership. The main storage adapter implements independent publication, checkpoints, candidate records and scoped media resolution behind the workspace mutation queue; it is not exposed through runtime IPC yet. Later tickets must prove integrated publication/recovery, decoder and endpoint capability behavior, protected storage, safe serving and reader/settings interactions. Fixture/code acceptance is separate from explicitly authorized live paid qualification, pedagogical review, packaged-worker and native/accessibility evidence. Socratic execution, mastery, speech and web research remain outside this decision.
 
 Current rules: [architecture](../patterns-architecture.md), [AI operations](../patterns-ai.md), [IPC/security](../patterns-ipc-security.md), [learning/data](../patterns-learning-data.md).

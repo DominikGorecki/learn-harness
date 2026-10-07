@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T02 — Persist portable chapters and checkpoints with scoped media access
-Status: Open
+Status: Done — main storage adapter accepted; runtime integration belongs to T05
 
 ## Source
 
@@ -45,9 +45,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] Fault injection before/after the manifest marker preserves current content and supports storage-only retry; unknown external bytes are preserved as conflicts.
-- [ ] Offline/reopened/relocated content resolves portable IDs and assets; corrupt progress does not prevent published reading.
-- [ ] Paths, links, ambiguous folders and unsupported media cannot escape topic authority; retained image revisions remain intact.
+- [x] Fault injection before/after the manifest marker preserves current content and supports storage-only retry; unknown external bytes are preserved as conflicts.
+- [x] Offline/reopened/relocated content resolves portable IDs and assets; corrupt progress does not prevent published reading.
+- [x] Paths, links, ambiguous folders and unsupported media cannot escape topic authority; retained image revisions remain intact.
 
 ## Manual verification
 
@@ -55,7 +55,16 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: storage/security; planned model: gpt-6.1-sol; reasoning: high. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+Worker: `/root/contracts`, storage/security, `gpt-6.1-sol`, high reasoning; dependency T01 accepted at `9946770a127f192df170b217ef9f13695cb0d761`. Coordinator inspected all source/test changes and used a read-only `gpt-6.1-sol` medium reviewer for publication/ownership boundaries. Review fixes prevent changed/dropped source evidence and reuse/loss of retained revision identities; meaningful regressions pass.
+
+Delivered main-private authority resolution, independent manifest/journal publication, immutable chapter/section/media revisions, restart-safe checkpoints, separate image candidates and portable scoped media resolution. Workspace reads do not save metadata or require account access; all explicit mutations/recovery cleanup serialize through its existing queue. Marker fault injection, external conflicts, relocation, missing assets, corrupt progress, source/root/link/ambiguous ownership, partial writes and proven temporary-link crash recovery are tested. Full decoding and IPC/UI exposure remain T04/T05 work.
+
+- Final `npm.cmd run check`: exit 0; lint, 34 unit files (372 passed / 3 skipped), flow audit, both type scopes and production bundles.
+- Final focused storage/media verification: 2 files, 27 passed.
+- `npm.cmd run test:desktop -- tests/desktop/topic-edit.spec.ts tests/desktop/topic-reading.spec.ts`: exit 0; 2 passed in 17.3 seconds. These existing flow regressions ran before the final two unactivated storage-only review fixes; final full code checks ran afterward. Coordinator reviewed the regenerated topic-edit/reading artifacts, including Light/Dark and narrow zoom captures.
+- All worker sessions finished and fixtures cleaned up. No paid request or new runtime inference capability was exercised. Native/live/full-decoder and integrated reader gates remain pending at bundle level.
+
+Suggested local subject: `T02-Persist portable chapters and recoverable media`; coordinator owns the commit and records its actual SHA in validation after success.
 
 ## Notes
 

@@ -94,7 +94,7 @@ export function createProjectStorage(options: { write?: typeof atomicWrite } = {
         if ((!entry.isDirectory() && !entry.isSymbolicLink()) || entry.name === '.edu' || entry.name === '.git') continue
         const named = matches(entry.name)
         if (entry.isSymbolicLink()) {
-          if (named) throw new ApplicationError('FORBIDDEN', 'The topic folder must be a regular folder inside this project.')
+          if (named || sourceRoots.has(entry.name)) throw new ApplicationError('FORBIDDEN', 'The topic folder must be a regular folder inside this project.')
           continue
         }
         let content: string | null, owned = false

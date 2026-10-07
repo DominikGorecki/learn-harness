@@ -24,7 +24,7 @@ These are isolated renderer/bridge/storage fixtures. Pure resolver/admission tes
 
 ### windows
 
-Last successful run: 2026-10-07T17:00:46.214Z. Source revision: c7549c88cb855b0260a679107b601b0bd7b2bb55; source changes present: true.
+Last successful run: 2026-10-07T19:10:47.310Z. Source revision: 9946770a127f192df170b217ef9f13695cb0d761; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

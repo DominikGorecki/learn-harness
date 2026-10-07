@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cf0f309b90f0bc5bdbe7883888400956661bf24e3b2d96e9e6a40eecc3969cc2"
+      "sha256": "92221985ba8735e467155424104efb727d3fcf00d3f100644c4dfed2bc107a23"
     },
     {
       "id": "saved-topic-light",
@@ -137,13 +137,13 @@
       "sha256": "994f01d3953538287ef15a03dfdccd89c8124d758c1e03d83875d2d6c9c12cc4"
     }
   ],
-  "capturedAt": "2026-10-07T17:00:46.214Z",
+  "capturedAt": "2026-10-07T19:10:47.310Z",
   "testSha256": "77f278ed49cade13687a6af324bb8750e5a6fbb8a6815189e776f1e9c313ca9e",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "c7549c88cb855b0260a679107b601b0bd7b2bb55",
+  "revision": "9946770a127f192df170b217ef9f13695cb0d761",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

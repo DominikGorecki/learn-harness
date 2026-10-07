@@ -1,6 +1,6 @@
 # Illustrated topic content ticket map
 
-Status: Open — implementation scheduled
+Status: In progress — T01 and T02 accepted; T03 ready after T02 commit
 
 Source: [spec](illustrated-topic-content.spec.md)
 

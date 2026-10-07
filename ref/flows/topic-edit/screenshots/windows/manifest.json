@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "b8547b33f98b505d2c14e581133f4e07f0d1411b4d3d51c9bd5d75ca39ac11c1"
+      "sha256": "e542e3c5d937cfaaf64dc034d5e21de29f3751df2191ee3b62f8502ec7510da4"
     },
     {
       "id": "topic-streaming-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "55dfbedce09f6481a2b786b70a72a0db14549cda6291f93ac4017e94b2ef6694"
+      "sha256": "6651812e0a75833feb7a0974b442e2bf40316197be49a5149f58172ee9694da4"
     },
     {
       "id": "topic-edit-dark",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "4fd0e920eefb276a2aa8050fed41ce0a8742db7086fea76c6aeefddee2bd976e"
+      "sha256": "2a847c0ff0448de124b6cdffcde4e7fb6ef9a35299aa3fb38ef80e9aac880e15"
     },
     {
       "id": "topic-edit-zoom",
@@ -74,16 +74,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "60fb63d986958c44e5bed004f6dbe6b843081dd006e86a1ae994d4ced9ccb80e"
+      "sha256": "154240d885abb05f92801f7814030cbce5108dbdbbeb23f03d99cb8e682e03eb"
     }
   ],
-  "capturedAt": "2026-10-07T13:44:25.836Z",
+  "capturedAt": "2026-10-07T19:10:41.355Z",
   "testSha256": "5949bd9ab2f0a1c96f4fabba58fca3980cfe93f69c3038ee581121c525d6e6e8",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-edit.spec.ts",
   "testTitle": "topic dialog updates its outline branch and real topic files while preserving other topics across cancellation and restart",
-  "revision": "15802600833d551f31cf00466a7fd9b3a81b13f9",
+  "revision": "9946770a127f192df170b217ef9f13695cb0d761",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -50,4 +50,6 @@ The coordinator will inspect implementation and actual evidence for each require
 
 T01's strict chapter/provider DTOs, identity/bounds tests, core ports and ADR-0026 are accepted as the foundation. Existing AI desktop regressions passed; this is partial contract evidence for its owning requirement rows, not integrated feature acceptance. See [T01 evidence](illustrated-topic-content.t01.md#completion-evidence).
 
-Open. No paid live requests have been performed. Implementation, full checks, packaging and requirement acceptance remain pending.
+T02's portable storage/media adapter is accepted locally. Fault-injection, restart/relocation, candidate retention, immutable revision and source evidence tests plus existing topic-edit/reading desktop regressions provide partial adapter evidence for R02/R06/R14–R17/R20/R32/R35. Full decoding, authorized runtime serving and chapter reader acceptance remain pending; see [T02 evidence](illustrated-topic-content.t02.md#completion-evidence).
+
+Open. No paid live requests have been performed. Integrated implementation, full checks, packaging and requirement acceptance remain pending.
