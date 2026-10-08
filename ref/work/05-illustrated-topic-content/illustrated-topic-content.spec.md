@@ -1,6 +1,6 @@
 # Spec: Illustrated topic content and OpenRouter image generation
 
-Status: Ready for implementation
+Status: Implementation in progress — ticket commits present; integrated recovery repairs, final gates and required live qualification remain open
 
 Date: 2026-10-07
 
@@ -330,3 +330,25 @@ At implementation, write **ADR-0026: Illustrated topic content and OpenRouter me
 No unresolved product blocker prevents tickets. The bounded defaults above make the request implementable: project-source/model-knowledge research; speech deferred; sectioned modal; initial GPT Image 2 choice; explicit text-only fallback; automatic validated chapter save and explicit image acceptance. They remain revisable if the learner changes scope.
 
 Live availability, endpoint cost metadata and image quality are acceptance gates, not established facts about this user's account. Resolve unsupported provider combinations with explicit unavailability, not an undisclosed change in transport/model. The spec is ready for `spec-tickets`; no tickets, implementation, accepted ADR change or live paid request is included in authoring it.
+
+## Implementation verification
+
+Branch: original `master`; starting revision: `5c8ff9bb95a29373a5961f1194be3ba4c8436802`. All ticket workers used advertised `gpt-6.1-sol`; reasoning and roles are recorded below. One worker mutated the shared checkout at a time; independent medium reviewers checked coupled boundaries. The primary owns acceptance records, staging, commits and cumulative verification. No branch switch, push or history rewrite.
+
+| Ticket | Worker role / reasoning | Accepted implementation commit |
+| --- | --- | --- |
+| T01 | domain/contracts / high | `9946770a127f192df170b217ef9f13695cb0d761` |
+| T02 | storage/security / high | `1cfbd02669ca54be5036876e0bd3d6df1b6cf3dc` |
+| T03 | provider/accounting / high | `c8eb934880f44bbfddd103f9c677a4e483533fb4` |
+| T04 | utility/transport / high | `5a8af6b8ed27727c3e08cf7222fa544be42521d7` |
+| T05 | domain/Electron integration / high | `2b8afb5920be070f6a3197eaf1c099e5000b1f67`; preflight follow-up `b0324d3bc9401083538c49b7cc5d53231f1677c2` |
+| T06 | frontend/settings / medium | `8d424f368fff3f687e4059dd9a920b0c6bc2526a` |
+| T07 | frontend/reader / medium | `ad32e087bfd3e4352d5d57d980ec95660921e75f` |
+| T08 | full-stack/image replacement / high | `5a6e93481738b6bd61482c62903e1759a74ff573` |
+| T09 | integration/review / high | `5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7` |
+
+Requirement-level implementation and actual local evidence for R01–R35 are mapped in [acceptance](acceptance.md), with exact commands, failures, capture review and limits in [validation](validation.md). Delivered surfaces include bounded multi-call chapters, portable immutable media/checkpoints, protected OpenRouter settings and exact accounting, offline reading, explicit continuation/save recovery and candidate image replacement. ADR-0026 and maintained guidance describe the implemented process and trust boundaries.
+
+The first fresh primary code gate passed (492 unit tests/three Windows skips, lint/flows/types/build). The first full desktop command failed (31 passed/two Escape-focus failures/one packaged-test skip). Image modal close ordering and topic presentation/memento restoration are under focused repair; those failures are retained as evidence. Final cumulative checks, fresh consecutive package/ASAR validation and verified follow-up commits have not yet passed.
+
+No paid live calls or private live credential access have occurred. The required three-model ordinary-key routing/returned-cost checks, real ChatGPT multi-call chapter and pedagogical image review need separate explicit execution authorization. Native macOS/Linux, screen-reader and hardened startup/installer qualification are separately unrun. This section records implementation progress and does not close the bundle.

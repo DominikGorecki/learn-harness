@@ -44,7 +44,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "4ece67b2b46882bf19afdf691d395c3636059cbebdcd007058cd7ef4c113a52c"
+      "sha256": "12bbd1827dbdff071fd9cf03391c4018c231ec226a83085e13f2bd29a3bc359b"
     },
     {
       "id": "compact-dark",
@@ -59,16 +59,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "fe1f43677d0b6181bbbc38447ac500110c0e7948332531c608ea4933f525d050"
+      "sha256": "ea485c3f5ebc30c734982243793e5514058f752e5ab1dcd6a6abf31583139a4d"
     }
   ],
-  "capturedAt": "2026-10-08T00:45:56.274Z",
+  "capturedAt": "2026-10-08T01:38:08.068Z",
   "testSha256": "905319f7bb069311a35c62e81973fe8e017b7b098861e1bc5e0402ae637417e5",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/navigation.spec.ts",
   "testTitle": "shared navigation restores current reading and drafts, preserves branches and scopes commands",
-  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
+  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

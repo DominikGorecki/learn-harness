@@ -24,6 +24,8 @@ Record accepted transitions rather than clicks or arbitrary backend subscription
 
 Capture main scroll, stable disclosure IDs and focus before departure; restore only after the current authoritative destination is rendered. Bound mementos to retained history destinations, discard unsupported/removed anchors and clamp scroll. Draft and recovery ownership stays with the feature/domain, so memento eviction does not discard it. Refresh/relink uses replacement without a visit; dialogs, sidebar/disclosures, preferences, saves and streaming observations leave history unchanged. A known unavailable project resolves to its recovery destination; an unknown handle fails without an accepted transition. Await permitted project cancellation, reject Saving departure without queued resumption, and retain storage-only retry independently of inference.
 
+Capture a complete memento only after matching authoritative presentation has acknowledged restoration. Departure during a pending read preserves the retained memento and merges only deliberate current-destination focus, disclosure and scroll interactions. Flush queued disclosure/scroll changes before acknowledgement or departure; scroll geometry changes must not adopt a temporary content clamp as learner intent. Clear interaction intents before applying restoration, and preserve focus owned by an open native modal. Close image-review native modality before the parent restores its trigger focus.
+
 Feature review must name the affected entry points, history effect, resolution/error policy, context restoration, active-operation guard and focused test/flow coverage. Update these rules when the contract changes; a no-history choice is explicit evidence, not an omission.
 
 ## Design implementation

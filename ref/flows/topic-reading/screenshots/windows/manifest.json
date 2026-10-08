@@ -104,7 +104,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "14f2cc6c6e574b73fa73225abd44dec2f606ebd56e8bfbc14d5dbfd4bb1920fd"
+      "sha256": "aa256f438e2da46a57ccb4cb571e7a55fe23f25d3809f1a00445bd802ad222b6"
     },
     {
       "id": "missing-topic-overview",
@@ -137,13 +137,13 @@
       "sha256": "994f01d3953538287ef15a03dfdccd89c8124d758c1e03d83875d2d6c9c12cc4"
     }
   ],
-  "capturedAt": "2026-10-08T00:50:31.435Z",
-  "testSha256": "50b954c1eb73b007cc8d83d5be2d81efbd64ea6692848acc52dc4a690530db48",
+  "capturedAt": "2026-10-08T01:39:04.290Z",
+  "testSha256": "f2e9bb8fdb96075e5826ff415af8fd5fd9088ed585c41e645194d8c74a455ec5",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
+  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

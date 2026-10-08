@@ -9,8 +9,28 @@ import { learningOutline } from '../fixtures/learning-outline'
 import type { ProjectDocument } from '../../src/shared/workspace'
 import { workspaceSnapshot } from '../fixtures/desktop-navigation'
 import { aiActivity } from '../fixtures/ai-activity'
+import { desktopFocusDiagnostics } from '../fixtures/desktop-focus'
 
-test('saved topics read offline through one current-content history with independent commands and restoration', { tag: '@topic-reading', annotation: { type: 'flow', description: 'topic-reading' } }, async ({ playwright, flow }) => {
+async function holdTopicRead(desktop: ElectronApplication, topicId: string) {
+  await desktop.evaluate(({ ipcMain }, topicId) => {
+    type Handler = (event: unknown, payload: { topicId?: string }) => Promise<unknown>
+    const handlers = (ipcMain as unknown as { _invokeHandlers: Map<string, Handler> })._invokeHandlers
+    const original = handlers.get('topic-content:state')!
+    let release!: () => void; const gate = new Promise<void>(resolve => { release = resolve })
+    const host = globalThis as unknown as { heldTopicRead?: { held: boolean; restore(): void } }
+    host.heldTopicRead = { held: false, restore: () => { handlers.set('topic-content:state', original); release() } }
+    handlers.set('topic-content:state', async (event, payload) => {
+      if (payload.topicId !== topicId) return original(event, payload)
+      handlers.set('topic-content:state', original)
+      const reply = await original(event, payload); host.heldTopicRead!.held = true; await gate; return reply
+    })
+  }, topicId)
+}
+async function releaseTopicRead(desktop: ElectronApplication) {
+  await desktop.evaluate(() => (globalThis as unknown as { heldTopicRead?: { restore(): void } }).heldTopicRead?.restore())
+}
+
+test('saved topics read offline through one current-content history with independent commands and restoration', { tag: '@topic-reading', annotation: { type: 'flow', description: 'topic-reading' } }, async ({ playwright, flow }, info) => {
   test.setTimeout(90_000)
   const root = await realpath(await mkdtemp(join(tmpdir(), 'edu-topic-reading-')))
   const folder = join(root, 'Saved learning'), other = join(root, 'Other learning'); await mkdir(folder); await mkdir(other)
@@ -57,11 +77,17 @@ test('saved topics read offline through one current-content history with indepen
     await main.evaluate(element => { element.scrollTop = 0 }); await flow.capture(desktop, page, 'saved-topic-readonly')
     await setDesktopAppearance(page, 'Dark'); await expect(main.getByRole('button', { name: `Edit topic: ${lesson.title}`, exact: true })).toBeDisabled(); await flow.capture(desktop, page, 'saved-topic-readonly-dark'); await setDesktopAppearance(page, 'Light')
     await back.click(); await expect(page.locator('#outline-heading')).toBeVisible(); await expect(main.getByRole('button', { name: 'Edit outline', exact: true })).toBeDisabled()
+    await holdTopicRead(desktop, lesson.id)
     await forward.click(); await expect(page.locator('#topic-heading')).toHaveText(lesson.title)
+    await expect.poll(() => desktop!.evaluate(() => (globalThis as unknown as { heldTopicRead?: { held: boolean } }).heldTopicRead?.held)).toBe(true)
+    await expect(main).toHaveAttribute('data-presentation-ready', 'false')
     expect(await readFile(join(folder, '.edu/project.json'), 'utf8')).toBe(original); expect((await aiActivity(page)).active).toBeNull()
     await desktop.evaluate(({ BrowserWindow }, snapshot) => BrowserWindow.getAllWindows()[0]!.webContents.send('workspace:changed', snapshot), writableSnapshot)
     // An external current revision is observed only on explicit cross-project selection.
     await choose(other); await page.getByRole('button', { name: 'Choose project folder' }).click()
+    await releaseTopicRead(desktop)
+    await expect(page.locator('#outline-heading')).toHaveText(outline.title)
+    await expect(page.locator('#topic-heading')).toHaveCount(0)
     const loaded = await storage.load(folder), renamed = structuredClone(loaded.document!); renamed.revision++; renamed.outline!.document.lessons[1]!.title = 'Current renamed evidence topic'; await storage.save(folder, renamed, loaded.digest)
     await back.click(); await expect(page.locator('#topic-heading')).toHaveText('Current renamed evidence topic')
     const firstHandle = (await workspaceSnapshot(page)).activeProject!.id
@@ -86,11 +112,59 @@ test('saved topics read offline through one current-content history with indepen
     await desktop.evaluate(() => (globalThis as unknown as { heldTopicSelection?: { restore(): void } }).heldTopicSelection?.restore())
     await expect(back).toBeEnabled(); await back.click(); await expect(page.locator('#topic-heading')).toHaveText('Current renamed evidence topic')
     await expect(summary).toBeFocused(); await expect(disclosure).toHaveAttribute('open', '')
+    // Deliberate loading interactions survive late authoritative presentation, including a modal.
+    await back.click(); await expect(page.locator('#outline-heading')).toBeVisible()
+    await holdTopicRead(desktop, lesson.id); await forward.click()
+    await expect.poll(() => desktop!.evaluate(() => (globalThis as unknown as { heldTopicRead?: { held: boolean } }).heldTopicRead?.held)).toBe(true)
+    await expect(main).toHaveAttribute('data-presentation-ready', 'false')
+    await summary.click(); await expect(disclosure).toHaveAttribute('open', '')
+    await summary.press('Enter'); await expect(disclosure).not.toHaveAttribute('open', '')
+    const earlyEdit = page.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true })
+    const earlyFocus = await desktopFocusDiagnostics(desktop, page, earlyEdit, info, 'loading-editor-focus')
+    try {
+      await earlyFocus.sample('before-loading-edit'); await earlyEdit.click()
+      const input = page.getByRole('textbox', { name: 'How would you like to change this topic?' })
+      await expect(input).toBeFocused(); await earlyFocus.sample('loading-editor')
+      await releaseTopicRead(desktop); await expect(main).toHaveAttribute('data-presentation-ready', 'true')
+      await expect(input).toBeFocused(); await expect(disclosure).not.toHaveAttribute('open', '')
+      await earlyFocus.sample('ready-editor'); await page.keyboard.press('Escape')
+      await expect(earlyEdit).toBeFocused()
+    } finally { await earlyFocus.attach() }
+    await back.click(); await expect(page.locator('#outline-heading')).toBeVisible(); await forward.click()
+    await expect(main).toHaveAttribute('data-presentation-ready', 'true'); await expect(disclosure).not.toHaveAttribute('open', '')
+    await summary.click(); await expect(disclosure).toHaveAttribute('open', '')
+    await back.click(); await expect(page.locator('#outline-heading')).toBeVisible()
+    await holdTopicRead(desktop, lesson.id); await forward.click()
+    await expect.poll(() => desktop!.evaluate(() => (globalThis as unknown as { heldTopicRead?: { held: boolean } }).heldTopicRead?.held)).toBe(true)
+    await expect(main).toHaveAttribute('data-presentation-ready', 'false')
+    await main.hover(); await page.mouse.wheel(0, 180)
+    await expect.poll(() => main.evaluate(element => element.scrollTop)).toBeGreaterThan(0)
+    const loadingScroll = await main.evaluate(element => element.scrollTop)
+    await releaseTopicRead(desktop); await expect(main).toHaveAttribute('data-presentation-ready', 'true')
+    await expect.poll(() => main.evaluate(element => element.scrollTop)).toBe(loadingScroll)
+    await expect(disclosure).toHaveAttribute('open', '')
+    await back.click(); await expect(page.locator('#outline-heading')).toBeVisible()
+    await holdTopicRead(desktop, lesson.id); await forward.click()
+    await expect.poll(() => desktop!.evaluate(() => (globalThis as unknown as { heldTopicRead?: { held: boolean } }).heldTopicRead?.held)).toBe(true)
+    await expect(main).toHaveAttribute('data-presentation-ready', 'false')
+    const scrollbar = await main.evaluate(node => { const element = node as HTMLElement, bounds = element.getBoundingClientRect(); return { x: bounds.right - (element.offsetWidth - element.clientWidth) / 2, y: bounds.top + element.clientHeight * element.clientHeight / element.scrollHeight / 2, height: element.clientHeight } })
+    await page.mouse.move(scrollbar.x, scrollbar.y); await page.mouse.down()
+    await page.mouse.move(scrollbar.x, Math.min(scrollbar.y + 80, scrollbar.y + scrollbar.height / 4), { steps: 8 }); await page.mouse.up()
+    await expect.poll(() => main.evaluate(element => element.scrollTop)).toBeGreaterThan(0)
+    const draggedScroll = await main.evaluate(element => element.scrollTop)
+    await releaseTopicRead(desktop); await expect(main).toHaveAttribute('data-presentation-ready', 'true')
+    await expect.poll(() => main.evaluate(element => element.scrollTop)).toBe(draggedScroll)
     await page.getByRole('button', { name: 'Settings', exact: true }).click(); await page.getByRole('button', { name: 'Appearance', exact: true }).click(); await page.getByRole('radio', { name: 'Dark', exact: true }).check(); await page.keyboard.press('Escape')
     await main.evaluate(element => { element.scrollTop = 0 }); await flow.capture(desktop, page, 'saved-topic-dark')
     await back.click(); await expect(page.locator('#outline-heading')).toBeVisible(); await flow.capture(desktop, page, 'saved-overview-dark'); await forward.click(); await expect(page.locator('#topic-heading')).toHaveText('Current renamed evidence topic')
-    await page.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true }).click()
-    await expect(page.getByRole('dialog', { name: 'Edit topic', exact: true })).toBeVisible(); await page.keyboard.press('Escape'); await expect(page.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true })).toBeFocused(); await expect(forward).toBeEnabled()
+    const editTrigger = page.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true })
+    const focus = await desktopFocusDiagnostics(desktop, page, editTrigger, info)
+    try {
+      await focus.sample('before-edit-click'); await editTrigger.click()
+      await expect(page.getByRole('dialog', { name: 'Edit topic', exact: true })).toBeVisible(); await focus.sample('after-edit-click')
+      await page.keyboard.press('Escape'); await focus.sample('after-escape')
+      await expect(editTrigger).toBeFocused(); await expect(forward).toBeEnabled()
+    } finally { await focus.attach() }
     await desktop.evaluate(({ BrowserWindow }) => { const window = BrowserWindow.getAllWindows()[0]!; window.setContentSize(600, 640); window.webContents.setZoomFactor(2) })
     await page.emulateMedia({ reducedMotion: 'reduce' })
     for (const button of [main.getByRole('button', { name: 'Back to outline', exact: true }), main.getByRole('button', { name: 'Edit topic: Current renamed evidence topic', exact: true })]) { await button.scrollIntoViewIfNeeded(); await expect(button).toBeInViewport(); expect(await button.evaluate(element => element.getBoundingClientRect().height)).toBeGreaterThanOrEqual(32) }
@@ -113,5 +187,5 @@ test('saved topics read offline through one current-content history with indepen
     const replacement = structuredClone(removed); replacement.revision++; replacement.outline!.document.lessons[0]!.id = 'replacement'; replacement.outline!.document.startingLessonId = 'replacement'; await storage.save(folder, replacement, saved.digest)
     await page.evaluate(async () => { const api = (globalThis as unknown as { learning: import('../../src/shared/workspace').WorkspaceApi }).learning; const value = await api.getWorkspace(); if (value.ok && value.data.activeProject) await api.selectProject({ projectId: value.data.activeProject.id }) })
     await expect(page.getByRole('dialog', { name: 'Edit topic', exact: true })).not.toBeVisible(); await expect(page.locator('#outline-heading')).toBeFocused(); await expect(page.getByRole('button', { name: 'Rewrite outline', exact: true })).not.toBeVisible()
-  } finally { if (desktop) await desktop.evaluate(() => (globalThis as unknown as { heldTopicSelection?: { restore(): void } }).heldTopicSelection?.restore()); await desktop?.close(); await rm(root, { recursive: true, force: true }) }
+  } finally { if (desktop) { await releaseTopicRead(desktop); await desktop.evaluate(() => (globalThis as unknown as { heldTopicSelection?: { restore(): void } }).heldTopicSelection?.restore()) } await desktop?.close(); await rm(root, { recursive: true, force: true }) }
 })

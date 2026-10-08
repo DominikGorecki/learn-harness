@@ -12,6 +12,8 @@ Open the overview, inspect its scope/outcomes and independently open/dismiss the
 
 ## Run and refresh
 
+A held real authorized topic read covers departure before presentation is ready without overwriting retained scroll/disclosure/focus. Further held reads exercise deliberate disclosure changes, an editor opened before readiness, wheel scrolling and a native scrollbar drag. Releasing the read retains those changes and the editor's focus; Escape restores the exact connected Edit trigger. Bounded DOM/native-focus diagnostics observe these assertions without activating the window or changing their target.
+
 ```powershell
 npm run test:desktop -- tests/desktop/topic-reading.spec.ts
 ```
@@ -24,7 +26,7 @@ These are isolated renderer/bridge/storage fixtures. Pure resolver/admission tes
 
 ### windows
 
-Last successful run: 2026-10-08T00:50:31.435Z. Source revision: 5a6e93481738b6bd61482c62903e1759a74ff573; source changes present: true.
+Last successful run: 2026-10-08T01:39:04.290Z. Source revision: 5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

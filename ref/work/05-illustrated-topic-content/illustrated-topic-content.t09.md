@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T09 — Verify integrated chapter and provider delivery
-Status: Local integration repairs accepted — fresh primary cumulative gates and required live/editorial qualification pending
+Status: Integration verification in progress — focus repairs verified locally; fresh cumulative/package and required live/editorial qualification pending
 
 ## Source
 
@@ -67,6 +67,12 @@ The primary accepted the scoped local repairs after inspecting source/tests, act
 Primary owns the fresh full code/desktop/package/ASAR gates, final records, local commits and bundle closure. Those whole-spec checks and required live/editorial qualification remain unresolved at this implementation acceptance point.
 
 ## Notes
+
+### Pending-presentation recovery follow-up
+
+Primary full command 41335 failed image modal and topic editor focus; subsequent retained trace 89277 also proved a pending-read departure overwrote the topic disclosure memento. The repair captures full presentation only after matching authoritative restoration, merges deliberate loading interactions without replacing untouched fields, flushes queued disclosure/scroll intent before acknowledgement/departure, rejects temporary scroll clamps and preserves active modal focus. Held real authorized reads exercise early departure, disclosure changes, editor readiness, wheel and native scrollbar dragging. Original assertions remain intact; no privileged contract changes.
+
+Worker `gpt-6.1-sol` high; independent renderer reviewer medium. Final source freeze `2026-10-08T01:34:57.818035Z`. `npm.cmd run check` (77810) exited 0: 42 unit files, 492 passed/3 skipped, lint/flows/types/build passed. `npm.cmd run test:desktop -- tests/desktop/image-regeneration.spec.ts tests/desktop/topic-reading.spec.ts tests/desktop/navigation.spec.ts tests/desktop/chapter-reader.spec.ts tests/desktop/topic-content-integration.spec.ts` (72959) exited 0: ten passed in 2.6 minutes. Primary inspected actual final focus JSON: textarea focus remains through readiness and Escape returns to the exact connected enabled button, with document/native focus true. Reading test SHA256 `f2e9bb8fdb96075e5826ff415af8fd5fd9088ed585c41e645194d8c74a455ec5`; all affected manifests match their current test hashes. Processes/fixture roots settled; Electron count zero. These scoped checks require the fresh cumulative and package gates below before integrated local acceptance.
 
 - Requirements covered: R01–R35.
 - Assumptions: the source spec's bounded defaults apply; no additional product blocker.

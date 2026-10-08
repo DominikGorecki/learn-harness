@@ -1,6 +1,6 @@
 # Illustrated topic content ticket map
 
-Status: In progress — T01–T08 locally accepted/committed; T09 local repairs accepted for commit; fresh primary cumulative gates and live qualification remain open
+Status: In progress — T01–T09 implementation present; focus repairs verified locally; fresh cumulative/package and live qualification remain open
 
 Source: [spec](illustrated-topic-content.spec.md)
 

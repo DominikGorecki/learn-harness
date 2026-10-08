@@ -16,7 +16,7 @@ Isolated Windows Electron and deterministic loopback fixtures qualify these proc
 
 ### windows
 
-Last successful run: 2026-10-08T00:50:26.559Z. Source revision: 5a6e93481738b6bd61482c62903e1759a74ff573; source changes present: true.
+Last successful run: 2026-10-08T01:38:57.743Z. Source revision: 5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

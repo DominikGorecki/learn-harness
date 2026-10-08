@@ -25,6 +25,19 @@ export class ViewMementos {
     this.values.set(key, { scrollTop: clampedScroll(scrollTop, Number.MAX_SAFE_INTEGER), disclosures: disclosures.filter(supportedAnchor).slice(0, maximumAnchors), focus: this.focuses.get(key) ?? null })
     if (this.values.size > maximumNavigationEntries) this.values.delete(this.values.keys().next().value!)
   }
+  /** Merge deliberate interactions with a view whose authoritative presentation is pending. */
+  merge(destination: AppDestination, change: { focus?: string | null; scrollTop?: number; disclosure?: { anchor: string; open: boolean } }) {
+    const key = destinationKey(destination), previous = this.values.get(key) ?? { scrollTop: 0, disclosures: [], focus: null }
+    let disclosures = previous.disclosures
+    if (change.disclosure && supportedAnchor(change.disclosure.anchor)) {
+      disclosures = disclosures.filter(anchor => anchor !== change.disclosure!.anchor)
+      if (change.disclosure.open) disclosures = [...disclosures, change.disclosure.anchor].slice(-maximumAnchors)
+    }
+    this.values.set(key, { disclosures,
+      scrollTop: change.scrollTop === undefined ? previous.scrollTop : clampedScroll(change.scrollTop, Number.MAX_SAFE_INTEGER),
+      focus: change.focus === undefined ? previous.focus : supportedAnchor(change.focus) ? change.focus : null })
+    if (this.values.size > maximumNavigationEntries) this.values.delete(this.values.keys().next().value!)
+  }
   prune(destinations: readonly AppDestination[]) {
     const retained = new Set(destinations.map(destinationKey))
     for (const key of this.values.keys()) if (!retained.has(key)) this.values.delete(key)

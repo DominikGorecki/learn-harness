@@ -1,13 +1,13 @@
 {
   "flow": "topic-content-budget",
   "captures": [],
-  "capturedAt": "2026-10-08T00:50:19.700Z",
+  "capturedAt": "2026-10-08T01:38:51.158Z",
   "testSha256": "7e47ca90caa7f1425b5da74036a7f29b58daa47e913cfd7063a6d8dfd44d238d",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-content-integration.spec.ts",
   "testTitle": "real chapter turn budgets distinguish failed admission from durable pause and preserve recorded continuation model and source baselines",
-  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
+  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }
