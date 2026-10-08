@@ -2,8 +2,8 @@ import { lstat, mkdir, readdir, unlink } from 'node:fs/promises'
 import { join } from 'node:path'
 import { ApplicationError } from '../../shared/contracts'
 import { identifier, strictRecord } from '../../shared/validation'
-import { contentRelativePath, parseChapterBaseline, parseChapterImageAsset, parseChapterManifest, parseChapterPlan, parseContentDigest, parseTopicContentCheckpoint, parseTopicImageCandidate, topicContentPolicy } from '../../shared/topic-content'
-import type { ChapterBaseline, ChapterImageAsset, ChapterManifest, ChapterPlan, TopicContentCheckpoint, TopicImageCandidate, RetryTopicContentImageRequest } from '../../shared/topic-content'
+import { contentRelativePath, parseChapterBaseline, parseChapterImageAsset, parseChapterManifest, parseChapterPlan, parseContentDigest, parseTopicContentCheckpoint, parseTopicImageCandidate, parseTopicImageReplacementAttempt, topicContentPolicy } from '../../shared/topic-content'
+import type { ChapterBaseline, ChapterImageAsset, ChapterManifest, ChapterPlan, TopicContentCheckpoint, TopicImageCandidate, TopicImageReplacementAttempt, RetryTopicContentImageRequest } from '../../shared/topic-content'
 import type { PreparedTopicContent, ProjectStorage, TopicFolderState } from '../../core/workspace/ports'
 import { atomicWrite } from './atomic-file'
 import { projectTarget } from './project-files'
@@ -12,7 +12,7 @@ import { validateRasterAsset } from '../security/topic-media'
 import {
   assertContentRoot, contentConflict, contentDigest, contentMissing, contentRootIdentity, contentStorageError,
   readContentBytes, readContentText, finishImmutableContentWrite, topicCandidatePath, topicCheckpointPath, topicJournalPath,
-  topicManifestPath, writeImmutableContent
+  topicManifestPath, topicImageAttemptPath, writeImmutableContent
 } from './topic-content-files'
 import type { ContentFileIdentity } from './topic-content-files'
 import type { TopicMediaIdentity } from '../../shared/topic-content-media'
@@ -119,7 +119,9 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
     for (const [folder, parser, maximum] of [
       ['.edu/content-runs', parseTopicContentCheckpoint, topicContentPolicy.checkpointBytes],
       ['.edu/content-abandoned', parseTopicContentCheckpoint, topicContentPolicy.checkpointBytes],
-      ['.edu/content-candidates', parseTopicImageCandidate, 256 * 1024]
+      ['.edu/content-candidates', parseTopicImageCandidate, 256 * 1024],
+      ['.edu/content-image-attempts', parseTopicImageReplacementAttempt, 256 * 1024],
+      ['.edu/content-image-abandoned', parseTopicImageReplacementAttempt, 256 * 1024]
     ] as const) {
       await projectTarget(root, folder + '/__scope__')
       const entries = await readdir(join(root, ...folder.split('/')), { withFileTypes: true }).catch(error => { if (contentMissing(error)) return []; throw error })
@@ -465,6 +467,54 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
       await ensureFolder(authority)
       await writeImmutableContent(authority.prepared.path, topicCandidatePath(candidate.candidateId), content)
     },
+    async loadReplacementAttempt(authority: TopicContentAuthority, candidateId: string): Promise<TopicImageReplacementAttempt | null> {
+      await current(authority)
+      const content = await readContentText(authority.prepared.path, topicImageAttemptPath(candidateId), 256 * 1024)
+      if (content === null) return null
+      try {
+        const attempt = parseTopicImageReplacementAttempt(JSON.parse(content)); assertOwned(authority, attempt)
+        if (attempt.candidateId !== candidateId) throw contentConflict()
+        return attempt
+      } catch { throw contentConflict('The image attempt record changed or is unreadable. Its bytes have been preserved.') }
+    },
+    async saveReplacementAttempt(authority: TopicContentAuthority, value: TopicImageReplacementAttempt): Promise<void> {
+      const attempt = parseTopicImageReplacementAttempt(value); assertOwned(authority, attempt)
+      const manifest = await rawManifest(authority), original = manifest.manifest?.images.find(image => image.imageId === attempt.imageId)?.asset
+      if (manifest.digest !== attempt.expectedManifestDigest || manifest.manifest?.chapterId !== attempt.chapterId || manifest.manifest.revisionId !== attempt.expectedRevisionId || original?.versionId !== attempt.expectedImageVersionId || manifest.manifest.previousRevisionIds.includes(attempt.revisionId)) throw contentConflict()
+      await validateBaseline(authority, { ...manifest.manifest.baseline, expectedManifestDigest: attempt.expectedManifestDigest })
+      const path = topicImageAttemptPath(attempt.candidateId), previousText = await readContentText(authority.prepared.path, path, 256 * 1024)
+      if (previousText) {
+        const previous = parseTopicImageReplacementAttempt(JSON.parse(previousText))
+        if (JSON.stringify(previous) === JSON.stringify(attempt)) return
+        const stable = (entry: TopicImageReplacementAttempt) => Object.fromEntries(Object.entries(entry).filter(([field]) => !['sequence', 'status', 'callId', 'acceptedAsset'].includes(field)))
+        if (JSON.stringify(stable(previous)) !== JSON.stringify(stable(attempt)) || attempt.sequence !== previous.sequence + 1 || previous.callId !== null && previous.callId !== attempt.callId || previous.acceptedAsset && JSON.stringify(previous.acceptedAsset) !== JSON.stringify(attempt.acceptedAsset) || previous.status === 'complete' || previous.status !== 'planned' && attempt.status === 'planned') throw contentConflict('An image attempt cannot silently change identity or replay a paid call.')
+      } else if (attempt.sequence !== 1 || attempt.status !== 'planned') throw contentConflict()
+      await ensureFolder(authority)
+      await write(await projectTarget(authority.prepared.path, path, true), serialize(attempt))
+    },
+    async archiveReplacement(authority: TopicContentAuthority, candidateId: string): Promise<void> {
+      if (!(await current(authority)).writable) throw new ApplicationError('STORAGE', 'A writable project is required to discard the image review.')
+      const text = await readContentText(authority.prepared.path, topicImageAttemptPath(candidateId), 256 * 1024)
+      if (!text) throw contentConflict('The image attempt ownership record is missing.')
+      const attempt = parseTopicImageReplacementAttempt(JSON.parse(text)); assertOwned(authority, attempt)
+      if (attempt.candidateId !== candidateId) throw contentConflict()
+      const path = `.edu/content-image-abandoned/${identifier(candidateId)}-${attempt.sequence}.json`
+      await projectTarget(authority.prepared.path, path)
+      const entries: string[] = await readdir(join(authority.prepared.path, '.edu/content-image-abandoned')).catch(error => { if (contentMissing(error)) return []; throw error })
+      if (!entries.includes(path.split('/').at(-1)!) && entries.length >= topicStoragePolicy.progressEntries) throw new ApplicationError('STORAGE', 'The image ownership archive is full. Review state has been preserved.')
+      await writeImmutableContent(authority.prepared.path, path, serialize(attempt))
+    },
+    async discardReplacement(authority: TopicContentAuthority, candidateId: string): Promise<void> {
+      // Archiving first proves ownership of preserved assets and any partially authored Use tree.
+      await this.archiveReplacement(authority, candidateId)
+      if (await journal(authority)) throw contentConflict('Resolve the owned publication before removing image review controls.')
+      const attempt = await this.loadReplacementAttempt(authority, candidateId)
+      const candidate = await this.loadCandidate(authority, candidateId)
+      if (!attempt || candidate && (candidate.chapterId !== attempt.chapterId || candidate.revisionId !== attempt.revisionId || candidate.imageId !== attempt.imageId || candidate.expectedRevisionId !== attempt.expectedRevisionId || candidate.expectedImageVersionId !== attempt.expectedImageVersionId || candidate.expectedManifestDigest !== attempt.expectedManifestDigest || candidate.asset.callId !== attempt.callId || candidate.createdAt !== attempt.createdAt || candidate.prompt !== attempt.prompt || candidate.caption !== attempt.caption || candidate.alt !== attempt.alt || candidate.asset.modelId !== attempt.modelId || candidate.asset.previousVersionId !== attempt.expectedImageVersionId || !attempt.acceptedAsset || JSON.stringify(candidate.asset) !== JSON.stringify(attempt.acceptedAsset) || JSON.stringify(candidate.settings) !== JSON.stringify(attempt.settings))) throw contentConflict('The image review marker changed. Its bytes have been preserved.')
+      for (const path of [topicCandidatePath(candidateId), topicImageAttemptPath(candidateId)]) {
+        if (await readContentText(authority.prepared.path, path, 256 * 1024) !== null) await unlink(await projectTarget(authority.prepared.path, path))
+      }
+    },
     async discardProgress(authority: TopicContentAuthority, runId: string, expectedRevision: number): Promise<void> {
       if (!(await current(authority)).writable) throw new ApplicationError('STORAGE', 'This project is read-only. Discarding progress requires a writable folder.')
       const path = topicCheckpointPath(runId), content = await readContentText(authority.prepared.path, path, topicContentPolicy.checkpointBytes)
@@ -490,14 +540,44 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
       if (candidate.candidateId !== candidateId || candidate.expectedRevisionId !== expectedRevisionId || await journal(authority)) throw contentConflict()
       await unlink(await projectTarget(authority.prepared.path, path))
     },
-    async progressIds(authority: TopicContentAuthority, kind: 'runs' | 'candidates'): Promise<string[]> {
+    async progressIds(authority: TopicContentAuthority, kind: 'runs' | 'candidates' | 'image-attempts'): Promise<string[]> {
       await current(authority)
-      const folder = kind === 'runs' ? '.edu/content-runs' : '.edu/content-candidates'
+      const folder = kind === 'runs' ? '.edu/content-runs' : kind === 'candidates' ? '.edu/content-candidates' : '.edu/content-image-attempts'
       await projectTarget(authority.prepared.path, folder + '/__scope__')
       let entries
       try { entries = await readdir(join(authority.prepared.path, ...folder.split('/')), { withFileTypes: true }) } catch (error) { if (contentMissing(error)) return []; throw error }
       if (entries.length > topicStoragePolicy.progressEntries) throw new ApplicationError('UNAVAILABLE', 'There are too many content recovery records to inspect in one request. Existing records are preserved.')
-      return entries.filter(entry => entry.isFile() && !entry.isSymbolicLink() && /^[a-zA-Z0-9][a-zA-Z0-9_-]*\.json$/.test(entry.name)).map(entry => entry.name.slice(0, -5)).sort()
+      if (kind === 'runs') return entries.filter(entry => entry.isFile() && !entry.isSymbolicLink() && /^[a-zA-Z0-9][a-zA-Z0-9_-]*\.json$/.test(entry.name)).map(entry => entry.name.slice(0, -5)).sort()
+      const ids: string[] = []
+      for (const entry of entries) {
+        if (!entry.isFile() || entry.isSymbolicLink() || !/^[a-zA-Z0-9][a-zA-Z0-9_-]*\.json$/.test(entry.name)) throw contentConflict('Unknown recovery entries have been preserved.')
+        const id = entry.name.slice(0, -5)
+        const text = await readContentText(authority.prepared.path, `${folder}/${entry.name}`, 256 * 1024)
+        let record: TopicImageCandidate | TopicImageReplacementAttempt
+        try {
+          const value: unknown = JSON.parse(text ?? '')
+          record = kind === 'candidates' ? parseTopicImageCandidate(value) : parseTopicImageReplacementAttempt(value)
+        } catch { throw contentConflict('An unreadable recovery record has been preserved.') }
+        if (record.projectId !== authority.prepared.projectId || record.candidateId !== id) throw contentConflict()
+        if (record.topicId === authority.prepared.topicId) { assertOwned(authority, record); ids.push(id); continue }
+        // A fully validated record from another saved topic is not this topic's review.
+        const latest = await current(authority), index = latest.outline.document.lessons.findIndex(topic => topic.id === record.topicId)
+        if (index < 0) {
+          // Removal preserves historical controls. Validate their bound folder mirror,
+          // then ignore them here without granting any asset or mutation authority.
+          const output = 'outputDirectory' in record ? record.outputDirectory : record.asset.path.split('/').slice(0, 4).join('/')
+          const parts = output.split('/'), mirrorText = await readContentText(latest.path, `${parts[0]}/.edu/topic.json`, topicContentPolicy.sectionBytes)
+          let mirror: Record<string, unknown>
+          try { mirror = strictRecord(JSON.parse(mirrorText ?? ''), ['version', 'projectId', 'topicId', 'generatedAt', 'topic']) } catch { throw contentConflict() }
+          if (output !== `${parts[0]}/content/${record.chapterId}/${record.revisionId}` || mirror.version !== 1 || mirror.projectId !== record.projectId || mirror.topicId !== record.topicId) throw contentConflict()
+          continue
+        }
+        const topic = latest.outline.document.lessons[index]!
+        const owned = await projectStorage.prepareTopicFolder(latest.path, latest.projectId, topic, index + 1, latest.outline.document.lessons.filter(item => item.id !== topic.id))
+        const prefix = `${owned?.folder}/content/${record.chapterId}/${record.revisionId}`
+        if (!owned || ('outputDirectory' in record ? record.outputDirectory !== prefix : !record.asset.path.startsWith(prefix + '/images/'))) throw contentConflict()
+      }
+      return ids.sort()
     },
     async resolveMedia(authority: TopicContentAuthority, identity: TopicMediaIdentity): Promise<{ bytes: Uint8Array; mime: ChapterImageAsset['mime'] }> {
       if (identity.projectHandle !== authority.prepared.projectHandle || identity.topicId !== authority.prepared.topicId) throw new ApplicationError('FORBIDDEN', 'This illustration belongs to another project or topic.')

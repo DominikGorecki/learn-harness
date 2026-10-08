@@ -1,0 +1,22 @@
+.main-workspace .chapter-image-frame { position: relative; }
+.main-workspace .chapter-image-regenerate { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; display: grid; place-items: center; padding: 0; border: 1px solid var(--border-control); border-radius: 8px; color: var(--text-secondary); background: var(--surface-raised); opacity: .7; cursor: pointer; }
+.main-workspace .chapter-image-regenerate:hover, .main-workspace .chapter-image-regenerate:focus-visible { opacity: 1; color: var(--text-primary); background: var(--surface-hover); }
+.main-workspace .chapter-image-regenerate:disabled { cursor: default; opacity: .4; }
+.image-replacement-dialog { width: min(880px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 0; border: 1px solid var(--border-subtle); border-radius: 18px; color: var(--text-primary); background: var(--surface-canvas); box-shadow: var(--shadow-dialog); overflow: hidden; }
+.image-replacement-dialog[open] { display: flex; flex-direction: column; }
+.image-replacement-dialog::backdrop { background: var(--overlay); }
+.image-replacement-dialog header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border-subtle); }
+.image-replacement-dialog h2 { margin: 4px 0 0; font-size: 22px; }
+.image-replacement-eyebrow { margin: 0; color: var(--text-secondary); font-size: 12px; }
+.image-replacement-body { padding: 20px 24px; min-height: 0; overflow: auto; }
+.image-replacement-note { font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 18px; }
+.image-comparison { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-bottom: 20px; }
+.image-comparison.has-candidate { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.image-comparison figure { margin: 0; min-width: 0; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px; background: var(--surface-raised); }
+.image-comparison figcaption { margin-bottom: 10px; font-size: 14px; font-weight: 600; }
+.image-comparison img { display: block; width: 100%; max-height: 220px; object-fit: contain; }
+.image-comparison p { color: var(--text-secondary); line-height: 1.6; }
+.image-prompt-label, .image-accessible-text label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+.image-replacement-dialog textarea { display: block; width: 100%; margin-top: 8px; padding: 12px; border: 1px solid var(--border-control); border-radius: 10px; background: var(--surface-raised); color: var(--text-primary); font: inherit; font-weight: 400; line-height: 1.5; resize: vertical; }
+.image-replacement-dialog footer { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--border-subtle); }
+@media (max-width: 640px) { .image-comparison.has-candidate { grid-template-columns: minmax(0, 1fr); } .image-replacement-dialog header, .image-replacement-body, .image-replacement-dialog footer { padding-left: 16px; padding-right: 16px; } }

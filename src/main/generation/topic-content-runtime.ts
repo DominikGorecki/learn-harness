@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { ApplicationError } from '../../shared/contracts'
-import type { TopicContentEngine, ChapterImageSession } from '../../core/topic-content/ports'
+import type { TopicContentEngine, ChapterImageSession, ReplacementImageSession } from '../../core/topic-content/ports'
 import type { TopicContentRepositoryAdapter } from '../storage/topic-content-repository'
 import type { AccountService } from '../auth/account-service'
 import type { OpenRouterService } from '../openrouter/service'
@@ -65,5 +65,33 @@ export function topicContentRuntime(options: { repository: TopicContentRepositor
             } }), onTransport: state => { if (state.lastByteAgeMs !== null) aiLease.receivedByteAge(state.lastByteAgeMs); progress(state.stage === 'ended' ? 'validating' : state.stage) } }).result
       }, dispose: () => lease.release() }
   }
-  return { engine, images, disposition: (callId: string, state: 'published' | 'discarded') => recordImageDisposition(options.provider, callId, state) }
+  async function replacementImages(): Promise<ReplacementImageSession | null> {
+    const preparedProvider = await prepareImageProvider(options.provider)
+    if (!preparedProvider) return null
+    const { lease, settings } = preparedProvider
+    return { modelId: lease.modelId, settings, dispose: () => lease.release(),
+      async generate(context, attempt, aiLease, requested, accepted, progress) {
+        const prepared = options.repository.workerContext(context)
+        const request = { purpose: 'image-replacement' as const, operationId: aiLease.operationId, runId: attempt.candidateId,
+          context: { ...context.identity, projectName: prepared.name, topicTitle: context.topic.title }, imageSlotId: attempt.imageId, settings: attempt.settings,
+          activationImageRequests: 0, plannedImages: 1, signal: aiLease.signal, checkpointRequested: requested,
+          validateOwnership: async () => {
+            aiLease.signal.throwIfAborted()
+            if (!options.ai.isOwner(aiLease)) throw new ApplicationError('CONFLICT', 'Image replacement ownership changed.')
+            const current = await options.repository.loadReplacementAttempt(context, attempt.candidateId)
+            if (!current || current.chapterId !== attempt.chapterId || current.revisionId !== attempt.revisionId || current.imageId !== attempt.imageId || !['planned', 'requested'].includes(current.status)) throw new ApplicationError('CONFLICT', 'The image attempt changed.')
+            await options.repository.recordSources(context, [])
+          } }
+        await runPiWorker({ profile: 'fixed-image', input: { imageSlotId: attempt.imageId } }, { signal: aiLease.signal,
+          ...imageWorkerAuthority({ service: options.provider, lease, request, prompt: attempt.prompt, acceptAsset: async image => {
+            progress('validating')
+            const versionId = randomUUID(), extension = image.mime === 'image/png' ? 'png' : image.mime === 'image/jpeg' ? 'jpg' : 'webp'
+            await accepted({ imageId: attempt.imageId, versionId, path: `${attempt.outputDirectory}/images/${attempt.imageId}-${versionId}.${extension}`,
+              mime: image.mime, width: image.width, height: image.height, bytes: image.bytes.byteLength, digest: image.digest, createdAt: new Date().toISOString(),
+              modelId: lease.modelId, returnedModelId: options.provider.getCall(image.callId).latest?.returnedModelId ?? null, callId: image.callId, previousVersionId: attempt.expectedImageVersionId }, image.bytes)
+          } }), onTransport: state => { if (state.lastByteAgeMs !== null) aiLease.receivedByteAge(state.lastByteAgeMs); progress(state.stage === 'ended' ? 'validating' : state.stage) } }).result
+      } }
+  }
+  return { engine, images, replacementImages: { model: () => options.provider.getSettings().imageModelId, prepare: replacementImages },
+    disposition: (callId: string, state: 'published' | 'discarded') => recordImageDisposition(options.provider, callId, state) }
 }

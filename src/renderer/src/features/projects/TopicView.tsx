@@ -5,9 +5,9 @@ import { ChapterReader } from './ChapterReader'
 import { Icon } from '../../components/Icon'
 import { WorkspacePage, WorkspaceHeader, WorkspaceActions, WorkspaceAction, WorkspaceSection, WorkspaceRow } from '../../components/Workspace'
 
-export function TopicView({ topic, projectTitle, onOverview, onEdit, editDisabled, chapter, contentState, projectHandle, controls, loading, contentError, onReload, mediaReload }: {
+export function TopicView({ topic, projectTitle, onOverview, onEdit, editDisabled, chapter, contentState, projectHandle, controls, loading, contentError, onReload, mediaReload, onRegenerate, regenerateDisabled, onReviewImage, imageReviewDisabled }: {
   topic: OutlineLesson; projectTitle: string; onOverview(): void; onEdit(): void; editDisabled: boolean;
-  chapter: TopicContentPage | null; contentState: TopicContentSnapshot | null; projectHandle: string; controls: ReactNode; loading: boolean; contentError: string | null; onReload(): void; mediaReload: number
+  chapter: TopicContentPage | null; contentState: TopicContentSnapshot | null; projectHandle: string; controls: ReactNode; loading: boolean; contentError: string | null; onReload(): void; mediaReload: number; onRegenerate?(imageId: string, trigger: HTMLElement): void; regenerateDisabled?: boolean; onReviewImage?(): void; imageReviewDisabled?: boolean
 }) {
   const plan = <>
     <WorkspaceSection title="Learning objectives" id="topic-objectives"><ul className="plain-list">{topic.objectives.map((objective, index) => <li key={index}>{objective}</li>)}</ul></WorkspaceSection>
@@ -24,8 +24,9 @@ export function TopicView({ topic, projectTitle, onOverview, onEdit, editDisable
     {contentError && <div role="alert"><p>{contentError}</p></div>}
     {contentState?.stale && <p role="status">This chapter is based on older topic or source context. It remains readable; regenerate to use the current context.</p>}
     {contentState?.errorCode && <p role="status">Saved content needs attention. {contentState.message}</p>}
+    {contentState?.replacement && <p className="chapter-generation" role="status">{contentState.candidate ? 'An illustration candidate is ready to review.' : contentState.replacement.status === 'unsaved' ? 'An accepted image result needs saving.' : 'An image attempt is retained. It will not be replayed automatically.'} <WorkspaceAction disabled={imageReviewDisabled} onClick={onReviewImage}>Review retained image</WorkspaceAction></p>}
     {controls}
     {(chapter || contentError) && <WorkspaceAction onClick={onReload}>Reload saved content</WorkspaceAction>}
-    {chapter ? <><ChapterReader chapter={chapter} projectHandle={projectHandle} missingImageIds={contentState?.missingImageIds ?? []} mediaReload={mediaReload} /><details className="chapter-plan" data-disclosure="topic-plan"><summary data-focus-anchor="topic-plan">Topic plan</summary><p>{topic.question}</p><p>{topic.overview}</p>{plan}</details></> : plan}
+    {chapter ? <><ChapterReader chapter={chapter} projectHandle={projectHandle} missingImageIds={contentState?.missingImageIds ?? []} mediaReload={mediaReload} onRegenerate={onRegenerate} regenerateDisabled={regenerateDisabled} /><details className="chapter-plan" data-disclosure="topic-plan"><summary data-focus-anchor="topic-plan">Topic plan</summary><p>{topic.question}</p><p>{topic.overview}</p>{plan}</details></> : plan}
   </WorkspacePage>
 }

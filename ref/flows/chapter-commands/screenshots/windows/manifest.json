@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "594b944e7c7730e64d16b6cec717fdd4376eff46f1eca57470223fa9b57c59a3"
+      "sha256": "b95a4176c4a0869a5f8fa43c7a9a69adbc921362fe00cbca73536804a0e73072"
     },
     {
       "id": "chapter-progress",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "cf3855654366b296c0215b779e85de0e4567b98a9c5f3fb8108bce4a49cf803a"
+      "sha256": "10291798548cae80738a9f10ec9e014ae7ed7165a9cc14753926d81fecab00cb"
     },
     {
       "id": "chapter-generated",
@@ -59,16 +59,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "ff3118d878a26c89602bfd7bc6a94de57c2d3169f97148a9badb3a4dd5455700"
+      "sha256": "8889bb8c1dd57df963de3046443560754e10991dcc951332819d67e532a82772"
     }
   ],
-  "capturedAt": "2026-10-07T23:04:10.131Z",
-  "testSha256": "377073ded5888740ba8a53e7ed65a95b26bea413e54e78999f6b311442394f6b",
+  "capturedAt": "2026-10-08T00:18:18.980Z",
+  "testSha256": "f51c7159cd0dd0759067b10a08c2fe9c636d1aa3054dea2afa6d983147555d4b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/chapter-reader.spec.ts",
   "testTitle": "chapter commands preserve saved prose, retry storage without inference and explicitly recover uncertain images",
-  "revision": "b0324d3bc9401083538c49b7cc5d53231f1677c2",
+  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

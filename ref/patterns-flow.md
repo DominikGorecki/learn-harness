@@ -23,6 +23,9 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Topic reading](flows/topic-reading/index.md) | Authoritative saved topics, stable history, current-content fallback and reading restoration |
 | [Chapter reader](flows/chapter-reader/index.md) | Illustrated offline reading, TOC, local media recovery and destination-ready history restoration |
 | [Chapter commands](flows/chapter-commands/index.md) | Generation estimates, text-only/replacement/continuation and storage-only recovery |
+| [Image regeneration](flows/image-regeneration/index.md) | Individual prompt/candidate review, retained originals and explicit image acceptance |
+| [Image regeneration recovery](flows/image-regeneration-recovery/index.md) | Storage-only image recovery, interrupted attempts, missing originals and preflight cancellation |
+| [Image regeneration barriers](flows/image-regeneration-barriers/index.md) | Nonvisual replacement admission through durable billing and actual utility exit |
 | [Reading](flows/reading/index.md) | Offline long outlines, narrow/zoomed layout, missing/corrupt/read-only state |
 | [Model access](flows/model-access/index.md) | Extra model options, independent optional tests, session verification |
 | [Diagnostics](flows/diagnostics/index.md) | Nonvisual safe main/renderer/preload logging assertions |

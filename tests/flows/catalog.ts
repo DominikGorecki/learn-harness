@@ -6,6 +6,18 @@ export interface FlowDefinition {
 
 // Stable flow and checkpoint IDs are shared by tests, publication and discovery checks.
 export const flows: Record<string, FlowDefinition> = {
+  'image-regeneration': { title: 'Individual image candidate review', testFile: 'image-regeneration.spec.ts', screenshots: {
+    'prompt-light': 'Pinned image prompt, original educational raster and one-image quote in Light.',
+    'prompt-dark': 'The same editable prompt and current original in Dark.',
+    'comparison-light': 'Original and actual decoded candidate, retained model identity and native caption/alt editing in Light.',
+    'comparison-dark': 'The same explicit candidate comparison in Dark, independent of current selected model.',
+    'comparison-narrow-light': 'Candidate review at 600 pixels and 200% zoom with reduced motion in Light.',
+    'comparison-narrow-dark': 'The same bounded candidate review and reachable Keep in Dark.'
+  } },
+  'image-regeneration-recovery': { title: 'Image replacement recovery and explicit cleanup', testFile: 'image-regeneration.spec.ts', screenshots: {
+    'candidate-save-recovery': 'Accepted candidate bytes retained after a real immutable-write failure, with storage-only Retry save.'
+  } },
+  'image-regeneration-barriers': { title: 'Image replacement accounting and actual-exit barriers', testFile: 'image-regeneration.spec.ts', screenshots: {} },
   'chapter-reader': { title: 'Offline illustrated chapter reading and restoration', testFile: 'chapter-reader.spec.ts', screenshots: {
     'chapter-light': 'Saved illustrated chapter with bounded local prose, TOC and exact objectives in Light.',
     'chapter-illustration-light': 'Useful native local raster, explanatory caption and surrounding reading in Light.',

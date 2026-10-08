@@ -1,0 +1,104 @@
+{
+  "flow": "image-regeneration",
+  "captures": [
+    {
+      "id": "prompt-light",
+      "caption": "Pinned image prompt, original educational raster and one-image quote in Light.",
+      "width": 1602,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "433a885853dccea594c8860ce693d548427b3fd05f58763096061573ff564182"
+    },
+    {
+      "id": "prompt-dark",
+      "caption": "The same editable prompt and current original in Dark.",
+      "width": 1602,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "58aeb3a4c8cf1a456ce8fb36bc13ec96571ac92109a3d9622e2273fb0e7e2ce7"
+    },
+    {
+      "id": "comparison-dark",
+      "caption": "The same explicit candidate comparison in Dark, independent of current selected model.",
+      "width": 1602,
+      "height": 1053,
+      "theme": "dark",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "10a0ed5116ffb7510bf9f3be524b94e9040a79d36fe582f05c9c884fcc076835"
+    },
+    {
+      "id": "comparison-light",
+      "caption": "Original and actual decoded candidate, retained model identity and native caption/alt editing in Light.",
+      "width": 1602,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "122214c4b02e04170e8f1709a003376041c01a1ddc574fb22e945e7f8d022a44"
+    },
+    {
+      "id": "comparison-narrow-light",
+      "caption": "Candidate review at 600 pixels and 200% zoom with reduced motion in Light.",
+      "width": 752,
+      "height": 877,
+      "theme": "light",
+      "viewport": {
+        "width": 301,
+        "height": 351
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "118e7aaa45677ff2d30f7a776ee1a6baf66c58d3108a22a963d1a4df1eeda7f8"
+    },
+    {
+      "id": "comparison-narrow-dark",
+      "caption": "The same bounded candidate review and reachable Keep in Dark.",
+      "width": 752,
+      "height": 877,
+      "theme": "dark",
+      "viewport": {
+        "width": 301,
+        "height": 351
+      },
+      "zoom": 2,
+      "method": "electron",
+      "maskedLocalPaths": false,
+      "sha256": "0f372c2ac7d1e40df9bc48f8d4050eb55b17fa1e3167e90a3c5975922b36c225"
+    }
+  ],
+  "capturedAt": "2026-10-08T00:13:03.434Z",
+  "testSha256": "bd63de4a98b69bdb5c4e6be95b097a9f2921e35f8ebd078c58315c5d6255fb8b",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/image-regeneration.spec.ts",
+  "testTitle": "one image candidate keeps the original until explicit Use and restores review after restart",
+  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

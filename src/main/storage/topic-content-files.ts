@@ -19,6 +19,7 @@ export function topicManifestPath(topicId: string): string { return `.edu/chapte
 export function topicJournalPath(topicId: string): string { return `.edu/content-publications/topic-${Buffer.from(identifier(topicId), 'utf8').toString('hex')}.json` }
 export function topicCheckpointPath(runId: string): string { return `.edu/content-runs/${identifier(runId)}.json` }
 export function topicCandidatePath(candidateId: string): string { return `.edu/content-candidates/${identifier(candidateId)}.json` }
+export function topicImageAttemptPath(candidateId: string): string { return `.edu/content-image-attempts/${identifier(candidateId)}.json` }
 export async function contentRootIdentity(root: string): Promise<ContentFileIdentity> {
   const stat = await lstat(root)
   if (!stat.isDirectory() || stat.isSymbolicLink() || relative(root, await realpath(root)) !== '') throw contentConflict('The project root changed. Reopen the original project before saving content.')

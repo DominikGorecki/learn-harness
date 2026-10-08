@@ -6,6 +6,8 @@ Two isolated saved projects contain validated seven-section chapters and distinc
 
 Keyboard TOC focus and Back/Forward restore the current chapter only after the held final page settles. Cross-project same-topic IDs and rapid traversal cannot reuse old prose or acknowledge a shorter initial plan. Provider updates preserve manual scroll. Missing assets retain explanations; restoring the exact version and explicitly reloading retries local media. Typed read-only presentation disables mutation while preserving prose. Both themes, reduced motion and 600 pixels at 200% zoom have actual captures. Restart and folder relocation retain account-free local reading, unchanged source/project bytes and zero inference/metadata HTTP.
 
+Saved illustration frames now include a muted accessible Regenerate control, disabled when mutation is unavailable or a review already owns the topic. Missing-raster frames retain that control for an otherwise authorized repair. The separate [image regeneration](../image-regeneration/index.md) and [recovery](../image-regeneration-recovery/index.md) journeys establish actual prompt/candidate/Use/Keep and storage-only behavior.
+
 ```powershell
 npm run test:desktop -- tests/desktop/chapter-reader.spec.ts --grep "@chapter-reader"
 ```
@@ -18,7 +20,7 @@ Native ACLs, screen readers, other platforms and live pedagogical quality remain
 
 ### windows
 
-Last successful run: 2026-10-07T23:18:39.499Z. Source revision: b0324d3bc9401083538c49b7cc5d53231f1677c2; source changes present: true.
+Last successful run: 2026-10-08T00:17:35.591Z. Source revision: ad32e087bfd3e4352d5d57d980ec95660921e75f; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

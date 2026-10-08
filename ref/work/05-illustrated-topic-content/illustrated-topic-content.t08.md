@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T08 — Regenerate individual images with editable prompts and safe acceptance
-Status: Open
+Status: Done — locally validated; cumulative/live qualification remains T09-owned
 
 ## Source
 
@@ -45,9 +45,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] Each image can generate one explicit candidate and only acceptance changes its current asset/prompt/provenance.
-- [ ] Keep original/cancel/failure/close/conflict preserve original; retry save issues no paid request and ledger retains completed candidate costs.
-- [ ] Keyboard/touch/focus, Light/Dark and zoom comparison/recovery are covered by real bridge/storage assertions and reviewed flows.
+- [x] Each image can generate one explicit candidate and only acceptance changes its current asset/prompt/provenance.
+- [x] Keep original/cancel/failure/close/conflict preserve original; retry save issues no paid request and ledger retains completed candidate costs.
+- [x] Keyboard/touch/focus, Light/Dark and zoom comparison/recovery are covered by real bridge/storage assertions and reviewed flows.
 
 ## Manual verification
 
@@ -55,7 +55,15 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: full-stack/image replacement; planned model: gpt-6.1-sol; reasoning: high. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+Accepted by the primary against T02/T04/T05/T07 commits and original `master` HEAD `ad32e087bfd3e4352d5d57d980ec95660921e75f`. Worker: full-stack/image replacement, `gpt-6.1-sol`, high reasoning; focused read-only backend/renderer reviews used medium reasoning. Primary inspected the actual contracts, service/storage/runtime/bridge/UI/tests and final captures, and owns maintained guidance, records and Git.
+
+- Final `npm.cmd run check` (41582): exit 0; 42 files, 486 passed / 3 skipped, lint, flow audit, both type scopes and build. Twelve replacement units include immutable attempt/candidate correlation, topic-scoped enumeration/removal, stale/read-only authority, exact save recovery, committed-publication restart, bounded page reservation and archive-before-discard crash recovery.
+- Guarded visual/recovery `npm.cmd run test:desktop -- tests/desktop/image-regeneration.spec.ts --grep "candidate keeps|replacement faults"` (16845): exit 0, two passed in 1.7 minutes. The preceding three-flow command (42359) exited 1 because recovery tested BUSY before actual held metadata ownership; its replacement barrier test passed in 38.1 seconds. The focused passing recovery now waits for the actual held request and proves both global/provider exclusion. Earlier assertion/capture failures are recorded in [validation](validation.md); they are not passing-command claims.
+- Affected `npm.cmd run test:desktop -- tests/desktop/topic-content.spec.ts tests/desktop/chapter-reader.spec.ts tests/desktop/topic-reading.spec.ts tests/desktop/reading.spec.ts tests/desktop/navigation.spec.ts` (98169): exit 0, all ten passed in 3.7 minutes.
+- Actual loopback calls and saved-byte assertions establish one image/no text request, original/candidate separation, account-free restart/Use, unchanged prose/sources/project/other images, retained originals/version pointers, independent exact candidate costs, hostile capability denial, cancellation, missing-original repair and zero-HTTP candidate/publication Retry save. Write/exit barriers hold admission until both durable billing and actual utility cleanup finish.
+- Primary reviewed six final dialog and one recovery capture plus changed reader/commands/navigation references. Final dialog pixel guards inspect each visible image inside the modal, selected-theme and enabled-action pixels, retaining the exact unmodified native frame. Independent PNG decoding confirms opaque RGB, manifest hashes and chart pixels in both themes/200% zoom. Fixtures establish local serving/layout and recovery, not live image quality or billing.
+
+All validation processes and owned fixture resources settled/cleaned. No paid live request/private credential access. T09's fresh cumulative code/desktop/package gates and required live/editorial/native qualifications remain open; no bundle closure is claimed.
 
 ## Notes
 

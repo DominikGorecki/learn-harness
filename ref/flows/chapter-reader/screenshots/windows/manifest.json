@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "d26597a9e34b013e20af79ca81f5cfa82813a447ecc9bbb69e9ae0bfc4690d0f"
+      "sha256": "410e18a3766b91045b4dd887fbde7a93992d99c950ebc46b5192315a0d029384"
     },
     {
       "id": "chapter-illustration-light",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "ccb61b21c46501e7ca3d35f3592d70c762a7e5d78df40eb52fe422bc7ed56b54"
+      "sha256": "30618899e381c273ca976387465daf9600194d0bd794deb8249f97e830e27b71"
     },
     {
       "id": "chapter-missing",
@@ -74,7 +74,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "45c4eb0ecec0612059f7d4b03f2be466d5150e0e75ef306d0359b9cf89cb7ad3"
+      "sha256": "f3d6668c7e4357d76f89e0dde57485686254cc5f03a3536584f770d9f8bb4891"
     },
     {
       "id": "chapter-readonly",
@@ -104,7 +104,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "b767eea107ba512d422e0663c93dee913f66c5ec7d31065ad55a50c7517b3cb9"
+      "sha256": "1716f7d694f3a3944f53c72be74f5e61ac6cf169afce74466856b7636dee9860"
     },
     {
       "id": "chapter-narrow-light",
@@ -119,16 +119,16 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "f197c38a5317787746303c31a4777cefff6db7d23a7de437b1024dfc5720264b"
+      "sha256": "d2db712cccc488c5b4ffb883b9d994f289a8a9c71953d0ad6f25aed0af23391b"
     }
   ],
-  "capturedAt": "2026-10-07T23:18:39.499Z",
-  "testSha256": "1811fce0fc480cf0e8bfabe459a6260f048e57034d5a8d9086aad36ba6697581",
+  "capturedAt": "2026-10-08T00:17:35.591Z",
+  "testSha256": "f51c7159cd0dd0759067b10a08c2fe9c636d1aa3054dea2afa6d983147555d4b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/chapter-reader.spec.ts",
   "testTitle": "illustrated chapters read offline through bounded pages, relocation and delayed current-content history",
-  "revision": "b0324d3bc9401083538c49b7cc5d53231f1677c2",
+  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -63,7 +63,15 @@ export interface TopicContentCheckpoint extends ChapterIdentity {
 }
 export interface TopicImageCandidate extends ChapterIdentity {
   schemaVersion: 1; candidateId: string; imageId: string; expectedRevisionId: string; expectedImageVersionId: string; expectedManifestDigest: string;
-  prompt: string; caption: string; alt: string; asset: ChapterImageAsset; createdAt: string
+  prompt: string; caption: string; alt: string; asset: ChapterImageAsset; createdAt: string;
+  /** Older unactivated records remain readable; every new replacement records actual settings. */
+  settings?: ImageGenerationSettings
+}
+export interface TopicImageReplacementAttempt extends ChapterIdentity {
+  outputDirectory: string; acceptedAsset?: ChapterImageAsset;
+  schemaVersion: 1; candidateId: string; imageId: string; expectedRevisionId: string; expectedImageVersionId: string; expectedManifestDigest: string;
+  sequence: number; status: 'planned' | 'requested' | 'interrupted' | 'complete'; callId: string | null;
+  prompt: string; caption: string; alt: string; settings: ImageGenerationSettings; modelId: OpenRouterImageModelId; createdAt: string
 }
 export interface TopicContentRequest extends TopicContentIdentity { sectionCursor?: string; sectionLimit?: number }
 export interface GenerateTopicContentRequest extends TopicContentIdentity { mode: TopicContentMode; replace: boolean; expectedRevisionId: string | null }
@@ -74,11 +82,13 @@ export interface RetryTopicContentImageRequest extends TopicContentRunRequest { 
 export interface GenerateTopicImageReplacementRequest extends ChapterIdentity { imageId: string; expectedImageVersionId: string; prompt: string }
 export interface TopicImageCandidateRequest extends ChapterIdentity { imageId: string; candidateId: string; expectedImageVersionId: string }
 export interface AcceptTopicImageReplacementRequest extends TopicImageCandidateRequest { caption: string; alt: string }
+export interface RetryTopicImageReplacementSaveRequest extends TopicImageCandidateRequest { pendingResultId: string }
 export interface TopicContentSnapshot {
   revision: number; projectId: string; topicId: string;
   published: { chapterId: string; revisionId: string; status: ChapterManifest['status']; runId?: string } | null;
   progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[]; pendingResultId?: string; imageSlots?: { imageId: string; status: ChapterImageProgress['status']; callId: string | null; settings?: ImageGenerationSettings }[] } | null;
   candidate: TopicImageCandidate | null;
+  replacement?: { candidateId: string; chapterId: string; revisionId: string; imageId: string; expectedImageVersionId: string; status: 'working' | 'interrupted' | 'unsaved' | 'published'; callId: string | null; prompt: string; modelId: OpenRouterImageModelId; pendingResultId?: string };
   stale: boolean; missingImageIds: string[]; errorCode: ErrorCode | null; message: string | null
 }
 /** Reader pages carry bounded section content; retained revisions never enter public snapshots. */
@@ -114,6 +124,7 @@ export interface TopicContentApi {
   generateTopicImageReplacement(request: GenerateTopicImageReplacementRequest): Promise<ApiResult<TopicContentSnapshot>>
   acceptTopicImageReplacement(request: AcceptTopicImageReplacementRequest): Promise<ApiResult<TopicContentSnapshot>>
   discardTopicImageReplacement(request: TopicImageCandidateRequest): Promise<ApiResult<TopicContentSnapshot>>
+  retryTopicImageReplacementSave(request: RetryTopicImageReplacementSaveRequest): Promise<ApiResult<TopicContentSnapshot>>
   onTopicContentChanged(listener: (snapshot: TopicContentSnapshot) => void): () => void
 }
 export function parseTopicContentPage(value: unknown): TopicContentPage {
@@ -137,7 +148,7 @@ export function parseTopicContentPage(value: unknown): TopicContentPage {
   return result
 }
 export function parseTopicContentSnapshot(value: unknown): TopicContentSnapshot {
-  const data = strictRecord(value, ['revision', 'projectId', 'topicId', 'published', 'progress', 'candidate', 'stale', 'missingImageIds', 'errorCode', 'message'])
+  const data = strictRecord(value, ['revision', 'projectId', 'topicId', 'published', 'progress', 'candidate', 'replacement', 'stale', 'missingImageIds', 'errorCode', 'message'])
   const published = data.published === null ? null : strictRecord(data.published, ['chapterId', 'revisionId', 'status', 'runId'])
   const progress = data.progress === null ? null : strictRecord(data.progress, ['chapterId', 'runId', 'checkpointRevision', 'status', 'mode', 'completedSectionIds', 'pendingImageIds', 'unresolvedImageIds', 'pendingResultId', 'imageSlots'])
   if (typeof data.stale !== 'boolean') invalid()
@@ -151,6 +162,10 @@ export function parseTopicContentSnapshot(value: unknown): TopicContentSnapshot 
     candidate: data.candidate === null ? null : parseTopicImageCandidate(data.candidate), stale: data.stale, missingImageIds: ids(data.missingImageIds, topicContentPolicy.maximumImages),
     errorCode: data.errorCode === null ? null : choice(data.errorCode, ['INVALID_INPUT', 'NOT_FOUND', 'FORBIDDEN', 'INTERNAL', 'AUTH_REQUIRED', 'PLAN_PERMISSION_REQUIRED', 'ACCESS_RESTRICTED', 'USAGE_LIMIT', 'NETWORK', 'CANCELLED', 'BUSY', 'UNAVAILABLE', 'STORAGE', 'CONFLICT'] as const),
     message: data.message === null ? null : boundedText(data.message, 'Content status', 2000) }
+  if (data.replacement !== undefined) {
+    const replacement = strictRecord(data.replacement, ['candidateId', 'chapterId', 'revisionId', 'imageId', 'expectedImageVersionId', 'status', 'callId', 'prompt', 'modelId', 'pendingResultId'])
+    result.replacement = { candidateId: identifier(replacement.candidateId), chapterId: identifier(replacement.chapterId), revisionId: identifier(replacement.revisionId), imageId: identifier(replacement.imageId), expectedImageVersionId: identifier(replacement.expectedImageVersionId), status: choice(replacement.status, ['working', 'interrupted', 'unsaved', 'published']), callId: replacement.callId === null ? null : identifier(replacement.callId), prompt: boundedText(replacement.prompt, 'Image prompt', openRouterPolicy.promptCharacters), modelId: parseOpenRouterImageModel(replacement.modelId), ...(replacement.pendingResultId !== undefined ? { pendingResultId: identifier(replacement.pendingResultId) } : {}) }
+  }
   // A public snapshot uses a registry handle; candidate portable project identity is checked by main.
   if (result.candidate && (result.candidate.topicId !== result.topicId || !result.published || result.candidate.chapterId !== result.published.chapterId || result.candidate.expectedRevisionId !== result.published.revisionId)) invalid()
   if (result.progress?.unresolvedImageIds.some(id => !result.progress!.pendingImageIds.includes(id)) || utf8Bytes(JSON.stringify(result)) > topicContentPolicy.readerFrameBytes) invalid()
@@ -313,14 +328,27 @@ export function parseTopicContentCheckpoint(value: unknown): TopicContentCheckpo
   return result
 }
 export function parseTopicImageCandidate(value: unknown): TopicImageCandidate {
-  const data = strictRecord(value, ['schemaVersion', 'projectId', 'topicId', 'chapterId', 'revisionId', 'candidateId', 'imageId', 'expectedRevisionId', 'expectedImageVersionId', 'expectedManifestDigest', 'prompt', 'caption', 'alt', 'asset', 'createdAt'])
+  const data = strictRecord(value, ['schemaVersion', 'projectId', 'topicId', 'chapterId', 'revisionId', 'candidateId', 'imageId', 'expectedRevisionId', 'expectedImageVersionId', 'expectedManifestDigest', 'prompt', 'caption', 'alt', 'asset', 'createdAt', 'settings'])
   if (data.schemaVersion !== 1) invalid()
   const identity = chapterIdentity(data), asset = parseChapterImageAsset(data.asset), imageId = identifier(data.imageId)
   if (asset.imageId !== imageId || asset.path.split('/').length !== 6 || asset.path.split('/').slice(1, 5).join('/') !== `content/${identity.chapterId}/${identity.revisionId}/images`) invalid()
   const expectedRevisionId = identifier(data.expectedRevisionId)
   if (expectedRevisionId === identity.revisionId || asset.previousVersionId !== data.expectedImageVersionId) invalid()
   return { schemaVersion: 1, ...identity, candidateId: identifier(data.candidateId), imageId, expectedRevisionId, expectedImageVersionId: identifier(data.expectedImageVersionId), expectedManifestDigest: parseContentDigest(data.expectedManifestDigest),
-    prompt: boundedText(data.prompt, 'Image prompt', openRouterPolicy.promptCharacters), caption: boundedText(data.caption, 'Caption', 2000), alt: boundedText(data.alt, 'Alternative text', 2000), asset, createdAt: timestamp(data.createdAt) }
+    prompt: boundedText(data.prompt, 'Image prompt', openRouterPolicy.promptCharacters), caption: boundedText(data.caption, 'Caption', 2000), alt: boundedText(data.alt, 'Alternative text', 2000), asset, createdAt: timestamp(data.createdAt), ...(data.settings === undefined ? {} : { settings: parseImageGenerationSettings(data.settings) }) }
+}
+export function parseTopicImageReplacementAttempt(value: unknown): TopicImageReplacementAttempt {
+  const data = strictRecord(value, ['schemaVersion', 'projectId', 'topicId', 'chapterId', 'revisionId', 'outputDirectory', 'acceptedAsset', 'candidateId', 'imageId', 'expectedRevisionId', 'expectedImageVersionId', 'expectedManifestDigest', 'sequence', 'status', 'callId', 'prompt', 'caption', 'alt', 'settings', 'modelId', 'createdAt'])
+  if (data.schemaVersion !== 1) invalid()
+  const status = choice(data.status, ['planned', 'requested', 'interrupted', 'complete']), callId = data.callId === null ? null : identifier(data.callId), identity = chapterIdentity(data)
+  if (status === 'planned' && callId !== null || status !== 'planned' && callId === null || identity.revisionId === data.expectedRevisionId) invalid()
+  const result: TopicImageReplacementAttempt = { schemaVersion: 1, ...identity, outputDirectory: outputDirectory(data.outputDirectory, identity), candidateId: identifier(data.candidateId), imageId: identifier(data.imageId), expectedRevisionId: identifier(data.expectedRevisionId), expectedImageVersionId: identifier(data.expectedImageVersionId), expectedManifestDigest: parseContentDigest(data.expectedManifestDigest), sequence: natural(data.sequence, Number.MAX_SAFE_INTEGER, 1), status, callId, prompt: boundedText(data.prompt, 'Image prompt', openRouterPolicy.promptCharacters), caption: boundedText(data.caption, 'Caption', 2000), alt: boundedText(data.alt, 'Alternative text', 2000), settings: parseImageGenerationSettings(data.settings), modelId: parseOpenRouterImageModel(data.modelId), createdAt: timestamp(data.createdAt) }
+  if (data.acceptedAsset !== undefined) {
+    result.acceptedAsset = parseChapterImageAsset(data.acceptedAsset)
+    if (result.acceptedAsset.imageId !== result.imageId || result.acceptedAsset.callId !== result.callId || result.acceptedAsset.modelId !== result.modelId || result.acceptedAsset.previousVersionId !== result.expectedImageVersionId || !result.acceptedAsset.path.startsWith(result.outputDirectory + '/images/')) invalid()
+  }
+  if (status === 'complete' && !result.acceptedAsset || status === 'planned' && result.acceptedAsset || utf8Bytes(JSON.stringify(result)) > 256 * 1024) invalid()
+  return result
 }
 function topicRequest(data: Record<string, unknown>): TopicContentIdentity { return { projectId: identifier(data.projectId), topicId: identifier(data.topicId) } }
 export function parseGetTopicContent(value: unknown): TopicContentRequest {
@@ -353,10 +381,10 @@ export function parseRetryTopicContentImage(value: unknown): RetryTopicContentIm
 }
 export const topicContentChannels = {
   state: 'topic-content:state', get: 'topic-content:get', generate: 'topic-content:generate', continue: 'topic-content:continue',
-  discard: 'topic-content:discard', retrySave: 'topic-content:retry-save', completeImages: 'topic-content:complete-images', retryImage: 'topic-content:retry-image', changed: 'topic-content:changed'
+  discard: 'topic-content:discard', retrySave: 'topic-content:retry-save', completeImages: 'topic-content:complete-images', retryImage: 'topic-content:retry-image', changed: 'topic-content:changed',
+  replacement: 'topic-content:image-replacement', acceptReplacement: 'topic-content:accept-image-replacement', discardReplacement: 'topic-content:discard-image-replacement', retryReplacementSave: 'topic-content:retry-image-replacement-save'
 } as const
-/** Individual replacement capabilities are activated by their own implementation ticket. */
-export type TopicChapterApi = Omit<TopicContentApi, 'generateTopicImageReplacement' | 'acceptTopicImageReplacement' | 'discardTopicImageReplacement'>
+export type TopicChapterApi = TopicContentApi
 export function parseGenerateTopicImageReplacement(value: unknown): GenerateTopicImageReplacementRequest {
   const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'revisionId', 'imageId', 'expectedImageVersionId', 'prompt'])
   return { ...chapterIdentity(data), imageId: identifier(data.imageId), expectedImageVersionId: identifier(data.expectedImageVersionId), prompt: boundedText(data.prompt, 'Image prompt', openRouterPolicy.promptCharacters) }
@@ -368,4 +396,8 @@ export function parseTopicImageCandidateRequest(value: unknown): TopicImageCandi
 export function parseAcceptTopicImageReplacement(value: unknown): AcceptTopicImageReplacementRequest {
   const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'revisionId', 'imageId', 'candidateId', 'expectedImageVersionId', 'caption', 'alt'])
   return { ...parseTopicImageCandidateRequest(Object.fromEntries(Object.entries(data).filter(([key]) => !['caption', 'alt'].includes(key)))), caption: boundedText(data.caption, 'Caption', 2000), alt: boundedText(data.alt, 'Alternative text', 2000) }
+}
+export function parseRetryTopicImageReplacementSave(value: unknown): RetryTopicImageReplacementSaveRequest {
+  const data = strictRecord(value, ['projectId', 'topicId', 'chapterId', 'revisionId', 'imageId', 'candidateId', 'expectedImageVersionId', 'pendingResultId'])
+  return { ...parseTopicImageCandidateRequest(Object.fromEntries(Object.entries(data).filter(([key]) => key !== 'pendingResultId'))), pendingResultId: identifier(data.pendingResultId) }
 }

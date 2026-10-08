@@ -9,6 +9,8 @@ import { ProjectSetup } from '../features/projects/ProjectSetup'
 import { ProjectModel } from '../features/projects/ProjectModel'
 import { TopicView } from '../features/projects/TopicView'
 import { useTopicContent } from '../features/projects/useTopicContent'
+import { ImageReplacementDialog } from '../features/projects/ImageReplacementDialog'
+import type { ImageReplacementTarget, ImageContentAction } from '../features/projects/ImageReplacementDialog'
 import { TopicContentControls } from '../features/projects/TopicContentControls'
 import type { ContentAction } from '../features/projects/TopicContentControls'
 import { OutlineView } from '../features/projects/OutlineView'
@@ -68,6 +70,9 @@ export function App() {
   const [settingsCategoryRequest, setSettingsCategoryRequest] = useState(0)
   const settingsReturn = useRef<HTMLElement | null>(null)
   const settingsTrigger = useRef<HTMLButtonElement>(null)
+  const [imageTarget, setImageTarget] = useState<ImageReplacementTarget | null>(null)
+  const imageReturn = useRef<HTMLElement | null>(null)
+  const imageFocus = useRef<{ revisionId: string; projectId: string; topicId: string } | null>(null)
   const account = useAccount()
   const workspace = useWorkspace()
   const generation = useGeneration()
@@ -229,15 +234,40 @@ export function App() {
   const currentModelUnavailable = Boolean(project?.selectedModel && account.snapshot?.modelsStatus === 'ready' && !account.snapshot.models.some(model => model.id === modelId))
   const handledFocus = useCallback(() => setFocusRequest(0), [])
   const acceptedStart = (heading: string, request: string, model: string, after: number, kind: AiOperationKind, projectId?: string) => { setAcceptedContext({ heading, request, model, after, kind, projectId }); setRecoveryPresentationId(null); setDismissedActivity(null); setFocusRequest(value => value + 1) }
-  const contentAction = async (action: ContentAction, inference: boolean, needsText: boolean) => {
-    if (!project || !readingTopic || !project.writable || workspace.busy || aiBusy || admissionPending.current || storagePending.current) return
-    if (inference && needsText && (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || currentModelUnavailable)) { openAccount(); return }
+  const contentAction: ImageContentAction = async (action: ContentAction, inference: boolean, needsText: boolean, imageModel?: string) => {
+    if (project && !project.writable) return { ok: false, error: { code: 'FORBIDDEN', message: 'This project is read-only. Restore folder access before saving.' } }
+    if (!project || !readingTopic || workspace.busy || latestAi.current?.active || admissionPending.current || storagePending.current) return { ok: false, error: { code: 'BUSY', message: 'Another action or save is still settling.' } }
+    if (inference && needsText && (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || currentModelUnavailable)) { openAccount(); return { ok: false, error: { code: 'AUTH_REQUIRED', message: 'Connect ChatGPT before authoring prose.' } } }
     if (inference) { admissionPending.current = true; setEducationPending(true) } else { storagePending.current = true; setEducationPending(true) }
     try {
-      const result = inference ? await ai.start(() => content.mutate(action)) : await content.mutate(action)
-      if (result && inference) acceptedStart(`Writing ${readingTopic.title}`, 'Create validated content for this saved topic.', project.selectedModel?.name ?? modelId, ai.snapshot?.revision ?? -1, 'generate-topic-content', project.id)
+      const result = inference ? await ai.start(() => content.mutateResult(action)) : await content.mutateResult(action)
+      if (result?.ok && inference) acceptedStart(imageModel ? 'Regenerating illustration' : `Writing ${readingTopic.title}`, imageModel ? 'Create one candidate for the selected illustration.' : 'Create validated content for this saved topic.', imageModel ?? project.selectedModel?.name ?? modelId, ai.snapshot?.revision ?? -1, imageModel ? 'regenerate-topic-image' : 'generate-topic-content', project.id)
+      return result ?? { ok: false, error: { code: 'BUSY', message: 'Another AI action is still running.' } }
     } finally { admissionPending.current = false; storagePending.current = false; setEducationPending(false) }
   }
+  const openImageReplacement = (imageId: string, trigger: HTMLElement) => {
+    if (content.state?.replacement) { reviewImageReplacement(); return }
+    const page = content.chapter, asset = page?.images.find(image => image.imageId === imageId)?.asset
+    if (!project || !readingTopic || !page || !asset) return
+    imageReturn.current = trigger
+    setImageTarget({ projectId: project.id, topicId: readingTopic.id, chapterId: page.identity.chapterId, revisionId: page.identity.revisionId, imageId, expectedImageVersionId: asset.versionId })
+  }
+  const reviewImageReplacement = () => {
+    const replacement = content.state?.replacement
+    if (!project || !readingTopic || !replacement) return
+    imageReturn.current = document.activeElement as HTMLElement
+    setImageTarget({ projectId: project.id, topicId: readingTopic.id, chapterId: replacement.chapterId, revisionId: replacement.revisionId, imageId: replacement.imageId, expectedImageVersionId: replacement.expectedImageVersionId })
+  }
+  const closeImageReplacement = (revisionId?: string) => {
+    setImageTarget(null)
+    if (revisionId && imageTarget && revisionId !== imageTarget.revisionId) imageFocus.current = { revisionId, projectId: imageTarget.projectId, topicId: imageTarget.topicId }
+    requestAnimationFrame(() => { const trigger = imageReturn.current; const element = trigger?.isConnected && !trigger.matches(':disabled') && trigger.getClientRects().length ? trigger : document.getElementById('topic-heading') ?? document.querySelector<HTMLElement>('main h1'); element?.focus({ preventScroll: true }) })
+  }
+  useEffect(() => {
+    const expected = imageFocus.current
+    if (expected && (expected.projectId !== project?.id || expected.topicId !== readingTopic?.id)) imageFocus.current = null
+    else if (expected && content.chapter?.identity.revisionId === expected.revisionId && content.ready) { document.getElementById('topic-heading')?.focus({ preventScroll: true }); imageFocus.current = null }
+  }, [content.chapter, content.ready, project?.id, readingTopic?.id])
   const createOutline = async (replace = false) => {
     if (!project || workspace.busy || anyGenerationBusy || aiBusy) return
     if (account.snapshot?.status !== 'connected' || account.snapshot.modelsStatus !== 'ready' || !modelId || account.snapshot.modelTestStatus === 'testing') { openAccount(); return }
@@ -376,7 +406,7 @@ export function App() {
               <WorkspaceAction disabled={workspace.busy} onClick={() => location.refresh(project.id)}>Try again</WorkspaceAction>
             </WorkspaceActions></WorkspacePage>{generatedUnsaved && <OutlineView key={project.id} saved={generatedUnsaved} unsaved />}</>
           : readingTopic && project.outline ? <>{project.issue && <WorkspaceMessage><Icon name="info" size={18} /><p>{project.issue}</p></WorkspaceMessage>}<TopicView key={`${project.id}:${readingTopic.id}`} topic={readingTopic} projectTitle={project.outline.document.title} onOverview={() => location.select(project.id)}
-            projectHandle={project.id} chapter={content.chapter} contentState={content.state} loading={!content.ready} contentError={content.error} onReload={() => void content.refresh()} mediaReload={content.mediaReload}
+            projectHandle={project.id} chapter={content.chapter} contentState={content.state} loading={!content.ready} contentError={content.error} onReload={() => void content.refresh()} mediaReload={content.mediaReload} onRegenerate={openImageReplacement} onReviewImage={reviewImageReplacement} regenerateDisabled={!project.writable || workspace.busy || aiBusy || educationPending || Boolean(generatedUnsaved) || Boolean(content.state?.replacement)} imageReviewDisabled={workspace.busy || aiBusy || educationPending || Boolean(generatedUnsaved)}
             controls={<TopicContentControls projectId={project.id} topicId={readingTopic.id} state={content.state} chapter={content.chapter} disabled={workspace.busy || aiBusy || anyGenerationBusy || educationPending || Boolean(generatedUnsaved)} writable={project.writable} textModel={project.selectedModel?.name ?? modelId} onAction={(action, inference, needsText) => void contentAction(action, inference, needsText)} onSetup={openImageSettings} onConnect={openAccount} />}
             onEdit={() => { generation.clearError(); setEditAccepted(false); setEditTopicId(readingTopic.id); setEditProjectId(project.id) }}
             editDisabled={!project.writable || workspace.busy || anyGenerationBusy || aiBusy || Boolean(generatedUnsaved) || submittingEdit} /></> : <>
@@ -399,6 +429,8 @@ export function App() {
               editDisabled={!project.writable || workspace.busy || anyGenerationBusy || aiBusy || Boolean(generatedUnsaved) || submittingEdit} />}
           </>}
       </main>
+      {imageTarget && <ImageReplacementDialog key={`${imageTarget.projectId}:${imageTarget.topicId}:${imageTarget.imageId}`} target={imageTarget} chapter={content.chapter} state={content.state} operation={ai.snapshot?.active ?? null}
+        writable={Boolean(project?.writable)} valid={project?.id === imageTarget.projectId && readingTopic?.id === imageTarget.topicId && project.availability === 'available'} onAction={contentAction} onClose={closeImageReplacement} onSetup={openImageSettings} />}
       {panelVisible && <AiActivityPanel operation={visibleOperation} recovery={panelRun} active={Boolean(ai.snapshot?.active)} heading={panelHeading} focusRequest={focusRequest} onFocusHandled={handledFocus}
         chapterState={content.state}
         awaiting={awaitingActivity ? acceptedContext : null}

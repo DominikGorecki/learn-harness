@@ -1,6 +1,6 @@
 import type { AiLease } from '../ai/coordinator'
 import type { LearningOutline, OutlineLesson } from '../../shared/outline'
-import type { ChapterBaseline, ChapterManifest, ChapterPlan, ChapterSection, ChapterSource, ChapterImageAsset, TopicContentCheckpoint, TopicContentIdentity, TopicImageCandidate, RetryTopicContentImageRequest } from '../../shared/topic-content'
+import type { ChapterBaseline, ChapterManifest, ChapterPlan, ChapterSection, ChapterSource, ChapterImageAsset, TopicContentCheckpoint, TopicContentIdentity, TopicImageCandidate, TopicImageReplacementAttempt, RetryTopicContentImageRequest } from '../../shared/topic-content'
 import type { OpenRouterCallIntent, OpenRouterCallTransition, OpenRouterImageModelId, OpenRouterSettings } from '../../shared/openrouter'
 
 /** Main resolves registry handle -> portable identity, owned root and authoritative learning context. */
@@ -17,6 +17,11 @@ export interface TopicContentRepository {
   saveCheckpoint(context: TopicContentContext, checkpoint: TopicContentCheckpoint): Promise<void>
   publish(context: TopicContentContext, manifest: ChapterManifest): Promise<void>
   saveCandidate(context: TopicContentContext, candidate: TopicImageCandidate): Promise<void>
+  loadCandidate(context: TopicContentContext, candidateId: string): Promise<TopicImageCandidate | null>
+  loadReplacementAttempt(context: TopicContentContext, candidateId: string): Promise<TopicImageReplacementAttempt | null>
+  saveReplacementAttempt(context: TopicContentContext, attempt: TopicImageReplacementAttempt): Promise<void>
+  archiveReplacement(context: TopicContentContext, candidateId: string): Promise<void>
+  discardReplacement(context: TopicContentContext, candidateId: string): Promise<void>
   discardProgress(context: TopicContentContext, runId: string, checkpointRevision: number): Promise<void>
   lock(context: TopicContentContext): () => void
   recordSources(context: TopicContentContext, evidence: readonly ChapterSource[]): Promise<void>
@@ -24,9 +29,17 @@ export interface TopicContentRepository {
   copyAcceptedImages(context: TopicContentContext, plan: ChapterPlan, revisionId: string): Promise<ChapterImageAsset[]>
   retryImage(context: TopicContentContext, checkpoint: TopicContentCheckpoint, request: RetryTopicContentImageRequest): Promise<void>
   readState(context: TopicContentContext): Promise<{ manifest: ChapterManifest | null; stale: boolean; missingImageIds: string[]; issues: string[]; recovery: { kind: 'none' | 'committed' } | { kind: 'pending'; manifest: ChapterManifest } | { kind: 'conflict'; message: string } }>
-  progressIds(context: TopicContentContext, kind: 'runs' | 'candidates'): Promise<string[]>
+  progressIds(context: TopicContentContext, kind: 'runs' | 'candidates' | 'image-attempts'): Promise<string[]>
   retryPublication(context: TopicContentContext): Promise<void>
+  recover(context: TopicContentContext): Promise<unknown>
   discardPublication(context: TopicContentContext, runId: string, revisionId: string): Promise<void>
+}
+export interface ReplacementImageSession {
+  modelId: OpenRouterImageModelId; settings: import('../../shared/openrouter').ImageGenerationSettings
+  generate(context: TopicContentContext, attempt: TopicImageReplacementAttempt, lease: AiLease,
+    requested: (callId: string) => Promise<void>, accepted: (asset: ChapterImageAsset, bytes: Uint8Array) => Promise<void>,
+    progress: (state: 'waiting' | 'receiving' | 'validating') => void): Promise<void>
+  dispose(): void
 }
 export interface ChapterImageSession {
   modelId: OpenRouterImageModelId; settings: import('../../shared/openrouter').ImageGenerationSettings

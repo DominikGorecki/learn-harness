@@ -77,16 +77,18 @@ export function useTopicContent(projectId: string | null, topicId: string | null
     const session = epoch.current
     void window.learning.getTopicContentState({ projectId, topicId }).then(reply => { if (reply.ok) accept(reply.data, key, session) }).catch(() => { /* Existing readable content is retained; explicit reload reports recovery. */ })
   }, [projectRevision, key, projectId, topicId, accept])
-  const mutate = useCallback(async (action: () => Promise<ApiResult<TopicContentSnapshot>>) => {
+  const mutateResult = useCallback(async (action: () => Promise<ApiResult<TopicContentSnapshot>>) => {
     const owner = key, session = epoch.current
     try {
       const reply = await action()
       if (owner && current.current === owner && epoch.current === session) {
-        if (reply.ok) { accept(reply.data, owner, session); setView(previous => ({ ...previous, error: null })); return reply.data }
+        if (reply.ok) { accept(reply.data, owner, session); setView(previous => ({ ...previous, error: null })); return reply }
         setView(previous => ({ ...previous, error: contentRecovery(reply.error.code) }))
+        return reply
       }
     } catch { if (current.current === owner && epoch.current === session) setView(previous => ({ ...previous, error: 'The content action could not finish. Review saved progress and try again.' })) }
-    return null
+    return { ok: false, error: { code: 'CANCELLED', message: 'The selected topic changed or the action could not finish.' } } as ApiResult<TopicContentSnapshot>
   }, [key, accept])
-  return { ...(view.key === key ? view : { ready: false, state: null, chapter: null, error: null }), refresh, mutate, mediaReload }
+  const mutate = useCallback(async (action: () => Promise<ApiResult<TopicContentSnapshot>>) => { const reply = await mutateResult(action); return reply.ok ? reply.data : null }, [mutateResult])
+  return { ...(view.key === key ? view : { ready: false, state: null, chapter: null, error: null }), refresh, mutate, mutateResult, mediaReload }
 }

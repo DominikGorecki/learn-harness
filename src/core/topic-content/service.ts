@@ -6,6 +6,9 @@ import type { ChapterManifest, TopicContentCheckpoint, TopicContentSnapshot, Top
 import type { AiCoordinator, AiLease } from '../ai/coordinator'
 import type { ChapterImageSession, ChapterSubmission, TopicContentContext, TopicContentEngine, TopicContentRepository } from './ports'
 import { observeNotification } from '../notifications'
+import { TopicImageReplacementService } from './image-replacement'
+import type { ReplacementImageSession } from './ports'
+import type { OpenRouterImageModelId } from '../../shared/openrouter'
 
 type StartRequest = GenerateTopicContentRequest | TopicContentRunRequest | CompleteTopicContentImagesRequest | RetryTopicContentImageRequest
 type Intent = 'generate' | 'continue' | 'complete' | 'retry-image'
@@ -18,9 +21,14 @@ export class TopicContentService {
   private readonly listeners = new Set<(state: TopicContentSnapshot) => void>()
   private readonly pending = new Map<string, Pending>()
   private readonly errors = new Map<string, { code: ErrorCode; message: string }>()
+  readonly replacement: TopicImageReplacementService | null
   constructor(private readonly options: { ai: AiCoordinator; repository: TopicContentRepository; engine: TopicContentEngine;
     images(context: TopicContentContext): Promise<ChapterImageSession | null>;
-    disposition?(callId: string, state: 'published' | 'discarded'): Promise<void>; createId(): string; now(): string }) {}
+    replacementImages?: { model(): OpenRouterImageModelId; prepare(): Promise<ReplacementImageSession | null> };
+    disposition?(callId: string, state: 'published' | 'discarded'): Promise<void>; createId(): string; now(): string }) {
+    this.replacement = options.replacementImages ? new TopicImageReplacementService({ ...options, model: options.replacementImages.model, images: options.replacementImages.prepare,
+      notify: identity => this.emit(identity), state: identity => this.getState(identity) }) : null
+  }
   private key(identity: TopicContentIdentity): string { return `${identity.projectId}/${identity.topicId}` }
   subscribe(listener: (state: TopicContentSnapshot) => void): () => void { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private async emit(identity: TopicContentIdentity): Promise<void> {
@@ -40,6 +48,7 @@ export class TopicContentService {
     const pending = this.pending.get(this.key(identity)), checkpoint = pending?.checkpoint ?? await this.progress(context, state.manifest)
     const recovery = state.recovery.kind === 'pending' ? state.recovery.manifest : null
     const error = this.errors.get(this.key(identity))
+    const { error: replacementError, ...replacement } = this.replacement ? await this.replacement.snapshot(context, state.manifest).catch(() => ({ candidate: null, error: { code: 'CONFLICT' as const, message: 'The retained image review is unreadable. Published content remains available; its recovery bytes have been preserved.' } })) : { candidate: null, error: undefined }
     const active = this.options.ai.get().active
     const ownsProgress = active?.projectId === identity.projectId && active.topicId === identity.topicId && active.runId === checkpoint?.runId
     return parseTopicContentSnapshot({ revision: ++this.revision, projectId: identity.projectId, topicId: identity.topicId,
@@ -49,9 +58,9 @@ export class TopicContentService {
         completedSectionIds: checkpoint.sections.map(section => section.id), pendingImageIds: checkpoint.images.filter(image => image.status !== 'complete').map(image => image.imageId),
         unresolvedImageIds: checkpoint.images.filter(image => image.status === 'requested' || image.status === 'unresolved').map(image => image.imageId),
         imageSlots: checkpoint.images.map(({ imageId, status, callId }) => ({ imageId, status, callId, settings: checkpoint.plan.images.find(image => image.id === imageId)!.settings })), ...(pending || recovery ? { pendingResultId: pending?.checkpoint.revisionId ?? recovery!.revisionId } : {}) } : null,
-      candidate: null, stale: state.stale, missingImageIds: state.missingImageIds,
-      errorCode: error?.code ?? (state.issues.length || state.recovery.kind === 'conflict' ? 'STORAGE' : null),
-      message: error?.message ?? state.issues[0] ?? (state.recovery.kind === 'conflict' ? state.recovery.message : null) })
+      ...replacement, stale: state.stale, missingImageIds: state.missingImageIds,
+      errorCode: replacementError?.code ?? error?.code ?? (state.issues.length || state.recovery.kind === 'conflict' ? 'STORAGE' : null),
+      message: replacementError?.message ?? error?.message ?? state.issues[0] ?? (state.recovery.kind === 'conflict' ? state.recovery.message : null) })
   }
   async getContent(request: TopicContentRequest) {
     const context = await this.options.repository.resolve(request.projectId, request.topicId), manifest = await this.options.repository.load(context)
@@ -70,6 +79,7 @@ export class TopicContentService {
     if (this.stopped) throw new ApplicationError('CANCELLED', 'Chapter work is closed.')
     if (this.storageTask) throw new ApplicationError('BUSY', 'Chapter storage is still settling.')
     if (this.pending.has(this.key(request))) throw new ApplicationError('CONFLICT', 'Retry saving or explicitly discard the pending result before another generation.')
+    if (this.replacement?.hasPending(request)) throw new ApplicationError('CONFLICT', 'Retry save or Keep original for the retained image review first.')
     const chapterId = intent === 'generate' ? this.options.createId() : (request as TopicContentRunRequest).chapterId
     const runId = intent === 'generate' || intent === 'complete' ? this.options.createId() : (request as TopicContentRunRequest).runId
     const revisionId = this.options.createId()
@@ -134,6 +144,7 @@ export class TopicContentService {
     try {
       if ((await repository.readState(context)).recovery.kind === 'conflict') throw new ApplicationError('CONFLICT', 'The chapter publication recovery record is unknown or changed. Preserve it and resolve the conflict before generating more content.')
       const published = await repository.load(context)
+      if (this.replacement && (await this.replacement.records(context)).attempt) throw new ApplicationError('CONFLICT', 'Keep or accept the retained image review before chapter work.')
       if (intent === 'generate') {
         const generation = request as GenerateTopicContentRequest
         if (generation.replace ? !published || generation.expectedRevisionId !== published.revisionId : published !== null) throw new ApplicationError('CONFLICT', 'The current chapter changed. Refresh before replacing it.')
@@ -282,6 +293,6 @@ export class TopicContentService {
       await this.emit(request); return this.getState(request)
     } finally { release() }
   }) }
-  async waitForIdle(): Promise<void> { await this.active?.task; await this.storageTask?.catch(() => {}) }
-  async dispose(): Promise<void> { this.stopped = true; await this.waitForIdle(); this.listeners.clear() }
+  async waitForIdle(): Promise<void> { await this.active?.task; await this.storageTask?.catch(() => {}); await this.replacement?.waitForIdle() }
+  async dispose(): Promise<void> { this.stopped = true; await this.replacement?.dispose(); await this.waitForIdle(); this.listeners.clear() }
 }

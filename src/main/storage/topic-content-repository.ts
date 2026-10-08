@@ -84,8 +84,12 @@ export function createTopicContentRepository(workspace: WorkspaceService, storag
     stageAsset: (context: TopicContentContext, plan: ChapterPlan, revisionId: string, asset: ChapterImageAsset, bytes: Uint8Array) => mutation(context, authority => storage.stageAsset(authority, plan, revisionId, asset, bytes)),
     copyAcceptedImages: (context: TopicContentContext, plan: ChapterPlan, revisionId: string) => mutation(context, authority => storage.copyAcceptedImages(authority, plan, revisionId)),
     loadCandidate: (context: TopicContentContext, candidateId: string) => storage.loadCandidate(owner(context).authority, candidateId),
+    loadReplacementAttempt: (context: TopicContentContext, candidateId: string) => storage.loadReplacementAttempt(owner(context).authority, candidateId),
+    saveReplacementAttempt: (context: TopicContentContext, attempt: import('../../shared/topic-content').TopicImageReplacementAttempt) => mutation(context, authority => storage.saveReplacementAttempt(authority, attempt)),
+    archiveReplacement: (context: TopicContentContext, candidateId: string) => mutation(context, authority => storage.archiveReplacement(authority, candidateId)),
+    discardReplacement: (context: TopicContentContext, candidateId: string) => mutation(context, authority => storage.discardReplacement(authority, candidateId)),
     discardCandidate: (context: TopicContentContext, candidateId: string, expectedRevisionId: string) => mutation(context, authority => storage.discardCandidate(authority, candidateId, expectedRevisionId)),
-    progressIds: (context: TopicContentContext, kind: 'runs' | 'candidates') => storage.progressIds(owner(context).authority, kind),
+    progressIds: (context: TopicContentContext, kind: 'runs' | 'candidates' | 'image-attempts') => storage.progressIds(owner(context).authority, kind),
     async resolveMedia(request: TopicMediaIdentity) {
       const identity = parseTopicMediaIdentity(request)
       const authority = await storage.prepare(await workspace.readTopicContent(identity.projectHandle, identity.topicId))

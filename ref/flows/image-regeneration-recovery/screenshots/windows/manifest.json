@@ -1,0 +1,29 @@
+{
+  "flow": "image-regeneration-recovery",
+  "captures": [
+    {
+      "id": "candidate-save-recovery",
+      "caption": "Accepted candidate bytes retained after a real immutable-write failure, with storage-only Retry save.",
+      "width": 1603,
+      "height": 1053,
+      "theme": "light",
+      "viewport": {
+        "width": 1282,
+        "height": 842
+      },
+      "zoom": 1,
+      "method": "playwright",
+      "maskedLocalPaths": false,
+      "sha256": "046412813badd5cbc3ead5eed2f6dad55d1d13daee71900465c827f2322ba9be"
+    }
+  ],
+  "capturedAt": "2026-10-08T00:14:26.845Z",
+  "testSha256": "bd63de4a98b69bdb5c4e6be95b097a9f2921e35f8ebd078c58315c5d6255fb8b",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/image-regeneration.spec.ts",
+  "testTitle": "replacement faults, cancellation and hostile capabilities preserve originals with zero automatic replay",
+  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

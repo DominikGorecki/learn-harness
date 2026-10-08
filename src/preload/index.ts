@@ -41,6 +41,10 @@ const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi & ApplicationM
   retryTopicContentSave: request => ipcRenderer.invoke(topicContentChannels.retrySave, request),
   completeTopicContentImages: request => ipcRenderer.invoke(topicContentChannels.completeImages, request),
   retryTopicContentImage: request => ipcRenderer.invoke(topicContentChannels.retryImage, request),
+  generateTopicImageReplacement: request => ipcRenderer.invoke(topicContentChannels.replacement, request),
+  acceptTopicImageReplacement: request => ipcRenderer.invoke(topicContentChannels.acceptReplacement, request),
+  discardTopicImageReplacement: request => ipcRenderer.invoke(topicContentChannels.discardReplacement, request),
+  retryTopicImageReplacementSave: request => ipcRenderer.invoke(topicContentChannels.retryReplacementSave, request),
   onTopicContentChanged: listener => {
     const receive = (_event: unknown, value: unknown) => { try { listener(parseTopicContentSnapshot(value)) } catch { /* Reject malformed public frames. */ } }
     ipcRenderer.on(topicContentChannels.changed, receive)
