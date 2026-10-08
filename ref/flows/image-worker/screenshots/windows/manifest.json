@@ -1,13 +1,13 @@
 {
   "flow": "image-worker",
   "captures": [],
-  "capturedAt": "2026-10-07T20:36:41.284Z",
+  "capturedAt": "2026-10-08T01:56:22.099Z",
   "testSha256": "dc4b86e1f50dcfc609031afc364535660713b883b10ea94f1049e735596cc1a6",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/image-worker.spec.ts",
   "testTitle": "image utility awaits durable authority, terminal billing, assets and actual exit across real buffered waits",
-  "revision": "c8eb934880f44bbfddd103f9c677a4e483533fb4",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

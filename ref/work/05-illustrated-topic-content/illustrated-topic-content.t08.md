@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T08 — Regenerate individual images with editable prompts and safe acceptance
-Status: Locally accepted — integrated Escape repair verified; cumulative and live qualification remain T09-owned
+Status: Locally accepted — integrated Escape repair and cumulative/package gates passed; live qualification remains T09-owned
 
 ## Source
 

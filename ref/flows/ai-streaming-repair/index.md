@@ -28,7 +28,7 @@ Actual Electron/Pi/bridge and storage behavior is exercised using synthetic loca
 
 ### windows
 
-Last successful run: 2026-10-07T22:16:25.795Z. Source revision: 2b8afb5920be070f6a3197eaf1c099e5000b1f67; source changes present: true.
+Last successful run: 2026-10-08T01:47:21.202Z. Source revision: d549f8b96365b020c2c477e9adb44bfd198d06f9; source changes present: false.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

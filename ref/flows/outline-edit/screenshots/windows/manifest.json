@@ -59,7 +59,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "e73c5c6e2712354f35acb63bc47a569f497c63f27b513350ec80faf5e4516fff"
+      "sha256": "e70372101822f52ff0a43ca8bbf77f4de501f5c176982c8f2f5aa32f64236790"
     },
     {
       "id": "saved-topic-saving-zoom",
@@ -74,7 +74,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "e9b3917082aee51e7ecedbc5a5061ff6c53441363c8f20538e403b31a81fa4b8"
+      "sha256": "f1b70e03746f31d039d9ab17a87911753efcc9f222c2d07acaeae809da3a0c62"
     },
     {
       "id": "outline-edit-rejected",
@@ -89,16 +89,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a8000682460dde06dae482f8cbd6d98be4cdbbeee184db96ae177d5f0eeafcee"
+      "sha256": "5cb37a87b4ae74c2d153fc95aebd22c9a1f0820209c00cba07c293aa3adb9bef"
     }
   ],
-  "capturedAt": "2026-10-07T22:17:22.880Z",
+  "capturedAt": "2026-10-08T01:58:24.309Z",
   "testSha256": "9113d7f40effdbe2060c42195713c48fb49aa01260dc7aa86baf6d5e5f32b356",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/outline-edit.spec.ts",
   "testTitle": "edit dialog rewrites the numbered path through Pi with the active model and persists it across restart",
-  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

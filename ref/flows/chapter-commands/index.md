@@ -16,7 +16,7 @@ HTTP/byte evidence is synthetic local protocol evidence, not live provider eligi
 
 ### windows
 
-Last successful run: 2026-10-08T01:36:59.712Z. Source revision: 5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7; source changes present: true.
+Last successful run: 2026-10-08T01:47:51.048Z. Source revision: d549f8b96365b020c2c477e9adb44bfd198d06f9; source changes present: false.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

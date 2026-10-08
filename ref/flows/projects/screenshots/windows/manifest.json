@@ -74,7 +74,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "55db729d3ad4b94254ad55edec6c571fc8e1e3951f4e64472942c3e844601490"
+      "sha256": "2694bf5abb1563a8972d0d6faa04f922cacb1d7c42267d13c1fef43c856d5f96"
     },
     {
       "id": "dashboard-populated-light",
@@ -137,13 +137,13 @@
       "sha256": "86cb34455bc12f1cfb538642b153b43f2d94fb6bce32403e2465f6ef005bf068"
     }
   ],
-  "capturedAt": "2026-10-07T22:19:34.898Z",
+  "capturedAt": "2026-10-08T01:58:39.877Z",
   "testSha256": "e120efc5e370f38be2ba152fbf1c79ed97aef169c31986cc1de6b56e9fa8d907",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/projects.spec.ts",
   "testTitle": "real folders, project preferences, restart, relink, and responsive navigation",
-  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

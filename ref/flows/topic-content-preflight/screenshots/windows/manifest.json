@@ -1,13 +1,13 @@
 {
   "flow": "topic-content-preflight",
   "captures": [],
-  "capturedAt": "2026-10-08T00:46:58.314Z",
+  "capturedAt": "2026-10-08T02:00:50.581Z",
   "testSha256": "b3c855d59f19a31397b0ca4b3d6145ef784176744f1ee8256ecb9b9ef29acd0d",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-content.spec.ts",
   "testTitle": "explicit image preflight recovers cold and stale caches without background HTTP or paid retries",
-  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

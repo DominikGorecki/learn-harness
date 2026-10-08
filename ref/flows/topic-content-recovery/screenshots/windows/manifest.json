@@ -1,13 +1,13 @@
 {
   "flow": "topic-content-recovery",
   "captures": [],
-  "capturedAt": "2026-10-08T00:47:19.235Z",
+  "capturedAt": "2026-10-08T02:01:16.778Z",
   "testSha256": "b3c855d59f19a31397b0ca4b3d6145ef784176744f1ee8256ecb9b9ef29acd0d",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-content.spec.ts",
   "testTitle": "text-only prose completes images without ChatGPT and requires explicit uncertainty retry lineage",
-  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

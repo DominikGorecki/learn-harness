@@ -17,13 +17,13 @@
       "sha256": "8e3fc82660f1bb206c49b77c5c002afa081bc9d5de614db7ae64f64b0051e6b6"
     }
   ],
-  "capturedAt": "2026-10-08T01:37:42.467Z",
+  "capturedAt": "2026-10-08T01:48:34.917Z",
   "testSha256": "85e4e612416ecd7ccfaae674c64d0f65d3fa89e4fd3201de622f356a9de08b98",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/image-regeneration.spec.ts",
   "testTitle": "replacement faults, cancellation and hostile capabilities preserve originals with zero automatic replay",
-  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

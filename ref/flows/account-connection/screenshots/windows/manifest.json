@@ -14,16 +14,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "73dec9ba412f724332712a6ee3546797d0821fb07718db6bc9d5f6678c8873e6"
+      "sha256": "0f44f7f45e4495d1529eb42f942bc8202fb2bb4a1bff480943a0e705bc7de133"
     }
   ],
-  "capturedAt": "2026-10-06T18:02:16.141Z",
+  "capturedAt": "2026-10-08T01:43:48.582Z",
   "testSha256": "4e282aacee566aa9683aa5c6ae60df730031c97ead8bbbcfcbb229d275ccea7b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/account.spec.ts",
   "testTitle": "account panel restores and renews its connection after restart and signs out durably",
-  "revision": "bcdea3fd7352ae198c6f4d75fea50f6a5959bbc0",
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
   "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

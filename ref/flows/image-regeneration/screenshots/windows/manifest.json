@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "710912e139b3a4f9a3f5b03f75691be963c72193cbc29e4c89e0c6cac9fbddd4"
+      "sha256": "221709daee73779197c01f35f76966f39bea2570299b586472c231f7201f8dda"
     },
     {
       "id": "comparison-dark",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "c92e5c526ce88cebf3023906ffd5e45abc8066c862124be4b5f55b832861acc5"
+      "sha256": "545036c3efc8c976199ccf4d03eeaeffde36c1971e778ae333fa62f7caf260d9"
     },
     {
       "id": "comparison-narrow-light",
@@ -92,13 +92,13 @@
       "sha256": "0f372c2ac7d1e40df9bc48f8d4050eb55b17fa1e3167e90a3c5975922b36c225"
     }
   ],
-  "capturedAt": "2026-10-08T01:37:09.657Z",
+  "capturedAt": "2026-10-08T01:48:01.180Z",
   "testSha256": "85e4e612416ecd7ccfaae674c64d0f65d3fa89e4fd3201de622f356a9de08b98",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/image-regeneration.spec.ts",
   "testTitle": "one image candidate keeps the original until explicit Use and restores review after restart",
-  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

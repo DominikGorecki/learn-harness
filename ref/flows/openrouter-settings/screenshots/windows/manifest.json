@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "a2bd23078dc32aa4015af1630e7c32672ccc6ee56dfa749acf6f3ca4f5f02237"
+      "sha256": "32a483fd07be1b405f8bf37ccf968157e334c51066180d42017b1b260620378b"
     },
     {
       "id": "settings-usage-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "fe18b1f2e802ebc5d925b832ed4c7c38139bb3deba3627113af1074cb0ff5248"
+      "sha256": "e100db0c58866747dd785bc5b7fe5ac5ca021b663ed0e2c896778f82b1467479"
     },
     {
       "id": "settings-history-light",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "268cdc1f4f94207cc43e09d13864f1e98dcbcba5f3ed11df995e21667151099f"
+      "sha256": "b639bf9d9a1679e2d6d479572cb9ef0efc69476538b24407e6025addd4268a84"
     },
     {
       "id": "settings-stale-dark",
@@ -92,13 +92,13 @@
       "sha256": "d10a514a9c17de5a3a74777b1456a85c1cb989ebcca8c72aaabc99ceb7aba9b1"
     }
   ],
-  "capturedAt": "2026-10-08T00:49:29.784Z",
+  "capturedAt": "2026-10-08T01:58:08.372Z",
   "testSha256": "e87ac457a2b8db3a3018551d0456f8e203149c8f39db28b5d1d7b79a857a9d61",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/openrouter-settings.spec.ts",
   "testTitle": "sectioned settings preserves secrets, exact costs and durable filtered request history without inference",
-  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "1b584bbd3a60e33115da8ad7fe42aeb476c50273a3c2446c69b4536d9e8b886a"
+      "sha256": "b78de98da2c6cb44da39f61244cd87b87f26291ebb548858506bf58b56163253"
     },
     {
       "id": "stream-structured-light",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "26db8f87ee362653401de9478f76b418f22143c9a183ef70f3fdfd728f644f5c"
+      "sha256": "5eefad1adad9674af62add184297819df0504cea95696f0a8b6deeeac88e95e6"
     },
     {
       "id": "stream-structured-dark",
@@ -104,16 +104,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "db5c517e0dc0c45541e94f62d32e5c39f9f25df8c30c2c999d5d1a2b570cd346"
+      "sha256": "2cf21de23b1a6f569016d7718c906ca2ecde5f8d92f95c44ae9a4c9f938ea40d"
     }
   ],
-  "capturedAt": "2026-10-07T22:16:21.772Z",
+  "capturedAt": "2026-10-08T01:47:16.847Z",
   "testSha256": "8eb913d58fd7232145da581ad2cf937fa3fd6ce81bc17ef94f395cf3b36243a7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "receiving for 200.5 real seconds keeps draft provisional before genuine checking and saving",
-  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

@@ -1,6 +1,6 @@
 # Illustrated topic content ticket map
 
-Status: In progress — T01–T09 implementation present; focus repairs verified locally; fresh cumulative/package and live qualification remain open
+Status: T01–T09 locally implemented and verified — mandatory live/provider/editorial qualification pending; bundle remains open
 
 Source: [spec](illustrated-topic-content.spec.md)
 

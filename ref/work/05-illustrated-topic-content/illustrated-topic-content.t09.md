@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T09 — Verify integrated chapter and provider delivery
-Status: Integration verification in progress — focus repairs verified locally; fresh cumulative/package and required live/editorial qualification pending
+Status: Locally verified — mandatory live/provider/editorial qualification pending; bundle remains open
 
 ## Source
 
@@ -46,9 +46,9 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 ## Acceptance criteria
 
-- [ ] All mandatory local integrated gates pass and each requirement maps to actual delivered implementation and evidence.
-- [ ] Assets/workers/skills load through packaged runtime; all changed flow links/captures are valid and reviewed.
-- [ ] Live/provider/pedagogical and native-platform limits are individually explicit; no fixture is labelled live or mastery.
+- [x] All mandatory local integrated gates pass and each requirement maps to actual delivered implementation and evidence.
+- [x] Assets/workers/skills load through packaged runtime; all changed flow links/captures are valid and reviewed.
+- [x] Live/provider/pedagogical and native-platform limits are individually explicit; no fixture is labelled live or mastery.
 
 ## Manual verification
 
@@ -67,6 +67,12 @@ The primary accepted the scoped local repairs after inspecting source/tests, act
 Primary owns the fresh full code/desktop/package/ASAR gates, final records, local commits and bundle closure. Those whole-spec checks and required live/editorial qualification remain unresolved at this implementation acceptance point.
 
 ## Notes
+
+### Primary whole-spec local verification
+
+Committed repairs: T08 `37aad2797ef98db3cf0c7e20204a431787b6a3dc`; T09 navigation `d549f8b96365b020c2c477e9adb44bfd198d06f9`. Workers idle; production/tests unchanged throughout fresh primary gates. `npm.cmd run check` (23906): exit 0, 42 unit files/492 passed/3 skipped, lint/flows/types/build passed. Full `npm.cmd run test:desktop` (3803): exit 0, 33 passed/one expected packaged skip in 18.5 minutes. Both original focus assertions and held-read regressions passed in the full suite; primary inspected their actual final DOM/native JSON.
+
+`npm.cmd run package` (2594) then immediately `npm.cmd run test:packaged`: both exit 0; one Windows x64 ASAR-worker journey passed in 3.9 seconds. It exercises actual packaged Pi profiles, educational-image guidance and native decoding through a development host without changing production fuses. Primary reviewed all new final PNG hashes, matched current manifests/test sources and audited requirement coverage and local Markdown links. No paid/live/private credential access. Mandatory three-model/live chapter/editorial/billing qualification remains open; native macOS/Linux, screen-reader and hardened startup/installer evidence remain separately unrun. See [validation](validation.md) for artifact digest, earlier failures and cleanup; this is local acceptance, not bundle closure.
 
 ### Pending-presentation recovery follow-up
 

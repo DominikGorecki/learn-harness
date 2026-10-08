@@ -77,13 +77,13 @@
       "sha256": "f0c58fc051f364fbfb071f36450c638b40f2b6e257eab0e95e6dab5bc6f36b46"
     }
   ],
-  "capturedAt": "2026-10-07T23:08:18.385Z",
+  "capturedAt": "2026-10-08T01:59:00.541Z",
   "testSha256": "e287a9e4349de71cea83bfcaf1483e8e7ea6383018862d39fc7b6a92d5dd2698",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/recovery.spec.ts",
   "testTitle": "save retry, model recovery, usage limits, and explicit cancellation before switching preserve work",
-  "revision": "b0324d3bc9401083538c49b7cc5d53231f1677c2",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

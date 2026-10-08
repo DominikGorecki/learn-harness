@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "17fe3c74c946436dcdcf39d0ddc751c582f43714f49ba957507e496baa9cc81e"
+      "sha256": "4fd6121f6d434cc27b403d4d0b01a6cfa698bf751a88bd264009d66f3109cf6e"
     },
     {
       "id": "repair-replacement",
@@ -47,13 +47,13 @@
       "sha256": "9bd5d4a4e7cce7c90ab70013c94f684ffa6f6b6a86aa9f7a187bc797d57a249a"
     }
   ],
-  "capturedAt": "2026-10-07T22:16:25.795Z",
+  "capturedAt": "2026-10-08T01:47:21.202Z",
   "testSha256": "8eb913d58fd7232145da581ad2cf937fa3fd6ce81bc17ef94f395cf3b36243a7",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/ai-streaming.spec.ts",
   "testTitle": "structured repair replaces the candidate and accepts only the independently valid second turn",
-  "revision": "2b8afb5920be070f6a3197eaf1c099e5000b1f67",
-  "sourceDirty": true,
+  "revision": "d549f8b96365b020c2c477e9adb44bfd198d06f9",
+  "sourceDirty": false,
   "evidence": "isolated-fixture"
 }

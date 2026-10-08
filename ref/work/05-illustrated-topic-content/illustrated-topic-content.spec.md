@@ -1,6 +1,6 @@
 # Spec: Illustrated topic content and OpenRouter image generation
 
-Status: Implementation in progress — ticket commits present; integrated recovery repairs, final gates and required live qualification remain open
+Status: Locally implemented and verified — required live/provider/editorial qualification pending; bundle remains open
 
 Date: 2026-10-07
 
@@ -292,13 +292,13 @@ Review captures for chapter composition, useful placement/captions, both setting
 ## Acceptance Criteria
 
 - [ ] A learner generates an objective-complete, readable chapter through multiple calls, with useful images, and reopens it offline without changing another topic/source/outline (R01–R10, R14–R17; unit, desktop, visual and live editorial evidence).
-- [ ] All new producers honor shared admission, truthful workbench progress, cancellation/cleanup and existing long-stream regressions (R11–R13, R34; unit and desktop evidence).
-- [ ] Interrupted/budget-limited work resumes explicitly; source conflicts preserve content; storage retry performs no inference; whole-content regeneration retains the old chapter until publication (R06, R14, R16, R35; fault injection and restart evidence).
-- [ ] OpenRouter and Appearance have usable sectioned Settings in both themes, with preserved preference/focus/history behavior and no raw-key readback (R21–R24, R31, R33; bridge tests and reviewed flows).
+- [x] All new producers honor shared admission, truthful workbench progress, cancellation/cleanup and existing long-stream regressions (R11–R13, R34; unit and desktop evidence).
+- [x] Interrupted/budget-limited work resumes explicitly; source conflicts preserve content; storage retry performs no inference; whole-content regeneration retains the old chapter until publication (R06, R14, R16, R35; fault injection and restart evidence).
+- [x] OpenRouter and Appearance have usable sectioned Settings in both themes, with preserved preference/focus/history behavior and no raw-key readback (R21–R24, R31, R33; bridge tests and reviewed flows).
 - [ ] Estimates show their basis/uncertainty; every app OpenRouter request has durable history; known costs and unknowns survive rejection, failures, key removal and restart without double counting (R25–R30, R34; gateway/ledger and live billing evidence).
-- [ ] Every image can be regenerated from an adjusted prompt; accepting/rejecting/cancelling/save failure/conflict behaves correctly and retains the original as specified (R18–R20; desktop/file assertions and visual evidence).
-- [ ] Safe chapter/media rendering, narrow serving and bounded contracts preserve Electron security, portability and offline reading (R02, R15, R17, R23, R31–R32; security and packaged-worker evidence).
-- [ ] Required commands pass, flow references are refreshed/reviewed and external qualifications remain honestly listed. Speech, Socratic runtime and OpenRouter text inference are absent.
+- [x] Every image can be regenerated from an adjusted prompt; accepting/rejecting/cancelling/save failure/conflict behaves correctly and retains the original as specified (R18–R20; desktop/file assertions and visual evidence).
+- [x] Safe chapter/media rendering, narrow serving and bounded contracts preserve Electron security, portability and offline reading (R02, R15, R17, R23, R31–R32; security and packaged-worker evidence).
+- [x] Required commands pass, flow references are refreshed/reviewed and external qualifications remain honestly listed. Speech, Socratic runtime and OpenRouter text inference are absent.
 
 ## Rollout / Migration Plan
 
@@ -349,6 +349,8 @@ Branch: original `master`; starting revision: `5c8ff9bb95a29373a5961f1194be3ba4c
 
 Requirement-level implementation and actual local evidence for R01–R35 are mapped in [acceptance](acceptance.md), with exact commands, failures, capture review and limits in [validation](validation.md). Delivered surfaces include bounded multi-call chapters, portable immutable media/checkpoints, protected OpenRouter settings and exact accounting, offline reading, explicit continuation/save recovery and candidate image replacement. ADR-0026 and maintained guidance describe the implemented process and trust boundaries.
 
-The first fresh primary code gate passed (492 unit tests/three Windows skips, lint/flows/types/build). The first full desktop command failed (31 passed/two Escape-focus failures/one packaged-test skip). Image modal close ordering and topic presentation/memento restoration are under focused repair; those failures are retained as evidence. Final cumulative checks, fresh consecutive package/ASAR validation and verified follow-up commits have not yet passed.
+The first full desktop command failed two focus assertions; [validation](validation.md) retains those failures and their diagnostics. Follow-ups `37aad2797ef98db3cf0c7e20204a431787b6a3dc` and `d549f8b96365b020c2c477e9adb44bfd198d06f9` repair native image modal closure and topic context/focus during pending presentation. Their frozen code gate and ten affected desktop journeys passed.
+
+The primary then ran fresh whole-project gates on committed production/test source at `d549f8b96365b020c2c477e9adb44bfd198d06f9`: `npm.cmd run check` passed (42 unit files, 492 passed/three Windows-specific skips, lint/flows/types/build); full `npm.cmd run test:desktop` passed (33 journeys/one expected packaged skip, 18.5 minutes); immediately consecutive `npm.cmd run package` and `npm.cmd run test:packaged` passed (one packaged-worker journey). The actual Windows x64 ASAR exercises Pi outline/diagnostic/image/chapter profiles, bundled educational-image guidance and native raster decoding through the development host. Production fuses remain configured; this does not qualify hardened startup or installers. Refreshed flow manifests and changed native PNGs were independently checked and reviewed. Requirement-level local acceptance and remaining live gates are recorded in [acceptance](acceptance.md).
 
 No paid live calls or private live credential access have occurred. The required three-model ordinary-key routing/returned-cost checks, real ChatGPT multi-call chapter and pedagogical image review need separate explicit execution authorization. Native macOS/Linux, screen-reader and hardened startup/installer qualification are separately unrun. This section records implementation progress and does not close the bundle.
