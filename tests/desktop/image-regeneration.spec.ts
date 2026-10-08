@@ -10,6 +10,7 @@ import { startChapterFixture } from '../fixtures/chapter-provider'
 import { imageWriteGate, releaseWriteGate, writeGateState } from '../fixtures/chapter-write-barriers'
 import { barrierState, holdImageExit, releaseBarrier } from '../fixtures/desktop-ai-barriers'
 import { workspaceSnapshot } from '../fixtures/desktop-navigation'
+import { desktopFocusDiagnostics } from '../fixtures/desktop-focus'
 import { contentDigest, topicCandidatePath, topicManifestPath } from '../../src/main/storage/topic-content-files'
 import type { TopicContentSnapshot, TopicImageCandidateRequest } from '../../src/shared/topic-content'
 
@@ -150,7 +151,7 @@ test('one image candidate keeps the original until explicit Use and restores rev
   } finally { await desktop?.close(); await fixture.images.close(); await fixture.text.close(); await rm(fixture.root, { recursive: true, force: true }) }
 })
 
-test('replacement faults, cancellation and hostile capabilities preserve originals with zero automatic replay', { tag: '@image-regeneration-recovery', annotation: { type: 'flow', description: 'image-regeneration-recovery' } }, async ({ playwright, flow }) => {
+test('replacement faults, cancellation and hostile capabilities preserve originals with zero automatic replay', { tag: '@image-regeneration-recovery', annotation: { type: 'flow', description: 'image-regeneration-recovery' } }, async ({ playwright, flow }, info) => {
   test.setTimeout(180_000)
   const fixture = await prepare(), originalMarker = await readFile(join(fixture.path, topicManifestPath('beliefs')))
   let desktop: ElectronApplication | undefined
@@ -239,14 +240,20 @@ test('replacement faults, cancellation and hostile capabilities preserve origina
     const currentAsset = current.data.images[0]!.asset!
     await page.evaluate(request => window.learning.generateTopicImageReplacement(request), { ...identity, chapterId: current.data.identity.chapterId, revisionId: current.data.identity.revisionId, imageId: currentAsset.imageId, expectedImageVersionId: currentAsset.versionId, prompt: 'A retained review before folder authority changes.' }); await settled(page)
     const retained = await state(page, identity), retainedBytes = await readFile(join(fixture.path, topicCandidatePath(retained.candidate!.candidateId)))
-    await page.getByRole('button', { name: 'Review retained image', exact: true }).click()
-    const readonly = await workspaceSnapshot(page); readonly.activeProject!.writable = false
-    await desktop.evaluate(({ BrowserWindow }, snapshot) => BrowserWindow.getAllWindows()[0]!.webContents.send('workspace:changed', snapshot), readonly)
-    await expect(page.getByRole('dialog', { name: 'Regenerate illustration' })).toContainText('read-only')
-    await expect(page.getByRole('button', { name: 'Use this image', exact: true })).toBeDisabled()
-    await page.keyboard.press('Escape'); await expect(page.getByRole('dialog', { name: 'Regenerate illustration' })).not.toBeVisible()
-    expect(await readFile(join(fixture.path, topicCandidatePath(retained.candidate!.candidateId)))).toEqual(retainedBytes)
-    await expect(page.getByRole('button', { name: 'Review retained image', exact: true })).toBeFocused()
+    const reviewTrigger = page.getByRole('button', { name: 'Review retained image', exact: true })
+    const focus = await desktopFocusDiagnostics(desktop, page, reviewTrigger, info)
+    try {
+      await focus.sample('before-review-click'); await reviewTrigger.click()
+      await focus.sample('after-review-click')
+      const readonly = await workspaceSnapshot(page); readonly.activeProject!.writable = false
+      await desktop.evaluate(({ BrowserWindow }, snapshot) => BrowserWindow.getAllWindows()[0]!.webContents.send('workspace:changed', snapshot), readonly)
+      await expect(page.getByRole('dialog', { name: 'Regenerate illustration' })).toContainText('read-only')
+      await expect(page.getByRole('button', { name: 'Use this image', exact: true })).toBeDisabled()
+      await focus.sample('readonly-dialog'); await page.keyboard.press('Escape')
+      await focus.sample('after-escape'); await expect(page.getByRole('dialog', { name: 'Regenerate illustration' })).not.toBeVisible()
+      expect(await readFile(join(fixture.path, topicCandidatePath(retained.candidate!.candidateId)))).toEqual(retainedBytes)
+      await expect(reviewTrigger).toBeFocused()
+    } finally { await focus.attach() }
     await desktop.evaluate(({ BrowserWindow }, snapshot) => BrowserWindow.getAllWindows()[0]!.webContents.send('workspace:changed', snapshot), await workspaceSnapshot(page))
     await page.getByRole('button', { name: 'Review retained image', exact: true }).click()
     const document = JSON.parse(await readFile(join(fixture.path, '.edu/project.json'), 'utf8'))

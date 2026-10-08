@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T08 — Regenerate individual images with editable prompts and safe acceptance
-Status: Done — locally validated; cumulative/live qualification remains T09-owned
+Status: Locally accepted — integrated Escape repair verified; cumulative and live qualification remain T09-owned
 
 ## Source
 
@@ -47,7 +47,7 @@ UI work must read design-system, UX, renderer, main-workspace and ADR-0007/0013/
 
 - [x] Each image can generate one explicit candidate and only acceptance changes its current asset/prompt/provenance.
 - [x] Keep original/cancel/failure/close/conflict preserve original; retry save issues no paid request and ledger retains completed candidate costs.
-- [x] Keyboard/touch/focus, Light/Dark and zoom comparison/recovery are covered by real bridge/storage assertions and reviewed flows.
+- [x] Keyboard/touch/focus, Light/Dark and zoom comparison/recovery are covered by real bridge/storage assertions and reviewed flows. Integrated Escape repair passes on frozen source; native touch/accessibility qualification remains separate.
 
 ## Manual verification
 
@@ -66,6 +66,12 @@ Accepted by the primary against T02/T04/T05/T07 commits and original `master` HE
 All validation processes and owned fixture resources settled/cleaned. No paid live request/private credential access. T09's fresh cumulative code/desktop/package gates and required live/editorial/native qualifications remain open; no bundle closure is claimed.
 
 ## Notes
+
+### Integrated focus follow-up
+
+The primary's full desktop command (41335) reopened focus acceptance. Actual diagnostics showed BODY retaining focus with the native window/document focused and the exact return trigger still connected, enabled and visible. The native image modal now closes synchronously before parent trigger restoration; owned cancellation and read-only candidate retention remain intact. Original focus/file assertions are unchanged, with bounded observation-only diagnostics added.
+
+High-reasoning `gpt-6.1-sol` repair worker; primary reviewed actual source, diagnostics and native captures. Frozen `npm.cmd run check` (77810): exit 0, 492 passed/3 skipped across 42 files. The combined affected desktop command (72959) covered image regeneration, topic reading, navigation, chapter reader and topic-content integration: exit 0, ten passed in 2.6 minutes. Exact Escape trigger/document/native-focus evidence passed. Image test SHA256: `85e4e612416ecd7ccfaae674c64d0f65d3fa89e4fd3201de622f356a9de08b98`. Fresh whole-suite and consecutive package checks remain T09-owned; no live paid request occurred.
 
 - Requirements covered: R11, R13, R18, R19, R20, R26, R27, R28, R31, R34.
 - Assumptions: the source spec's bounded defaults apply; no additional product blocker.

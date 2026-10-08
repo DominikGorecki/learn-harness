@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "58aeb3a4c8cf1a456ce8fb36bc13ec96571ac92109a3d9622e2273fb0e7e2ce7"
+      "sha256": "710912e139b3a4f9a3f5b03f75691be963c72193cbc29e4c89e0c6cac9fbddd4"
     },
     {
       "id": "comparison-dark",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "10a0ed5116ffb7510bf9f3be524b94e9040a79d36fe582f05c9c884fcc076835"
+      "sha256": "35d73521d6778c92aaaa14070279fa2a666962125d590b779d12c095061b1605"
     },
     {
       "id": "comparison-light",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "122214c4b02e04170e8f1709a003376041c01a1ddc574fb22e945e7f8d022a44"
+      "sha256": "c92e5c526ce88cebf3023906ffd5e45abc8066c862124be4b5f55b832861acc5"
     },
     {
       "id": "comparison-narrow-light",
@@ -92,13 +92,13 @@
       "sha256": "0f372c2ac7d1e40df9bc48f8d4050eb55b17fa1e3167e90a3c5975922b36c225"
     }
   ],
-  "capturedAt": "2026-10-08T00:13:03.434Z",
-  "testSha256": "bd63de4a98b69bdb5c4e6be95b097a9f2921e35f8ebd078c58315c5d6255fb8b",
+  "capturedAt": "2026-10-08T01:37:09.657Z",
+  "testSha256": "85e4e612416ecd7ccfaae674c64d0f65d3fa89e4fd3201de622f356a9de08b98",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/image-regeneration.spec.ts",
   "testTitle": "one image candidate keeps the original until explicit Use and restores review after restart",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

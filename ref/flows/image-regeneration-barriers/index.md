@@ -14,7 +14,7 @@ npm.cmd run test:desktop -- tests/desktop/image-regeneration.spec.ts --grep "@im
 
 ### windows
 
-Last successful run: 2026-10-08T00:09:09.479Z. Source revision: ad32e087bfd3e4352d5d57d980ec95660921e75f; source changes present: true.
+Last successful run: 2026-10-08T01:38:03.187Z. Source revision: 5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

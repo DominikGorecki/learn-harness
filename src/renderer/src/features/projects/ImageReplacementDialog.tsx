@@ -50,6 +50,12 @@ export function ImageReplacementDialog({ target, chapter, state, operation, vali
     const record = snapshot?.replacement
     return record && record.chapterId === target.chapterId && record.revisionId === target.revisionId && record.imageId === target.imageId && record.expectedImageVersionId === target.expectedImageVersionId ? { ...target, candidateId: record.candidateId } : null
   }
+  const dismiss = (revisionId?: string) => {
+    // Release the native modal's inert background before the parent restores focus.
+    // Passive unmount cleanup can run after that restoration attempt.
+    dialog.current?.close()
+    onClose(revisionId)
+  }
   const finish = async () => {
     if (saving || closing.current) return
     closing.current = true; setBusy('closing'); setError(null)
@@ -64,14 +70,14 @@ export function ImageReplacementDialog({ target, chapter, state, operation, vali
       const reply = admission.current ? await admission.current : null
       // Removed authority or another destination must not receive an old topic's mutation reply.
       // Its portable review remains retained; cleanup of the owned utility has already completed.
-      if (!currentDestination.current || !writable) { onClose(); return }
+      if (!currentDestination.current || !writable) { dismiss(); return }
       const fresh = await window.learning.getTopicContentState({ projectId: target.projectId, topicId: target.topicId })
       const discard = request(fresh.ok ? fresh.data : reply?.ok ? reply.data : state)
       if (discard) {
         const result = await onAction(() => window.learning.discardTopicImageReplacement(discard), false, false)
         if (!result.ok) throw new Error(result.error.message)
       }
-      onClose()
+      dismiss()
     } catch (failure) { setError(failure instanceof Error ? failure.message : 'The image action is still settling. Try again after cleanup.'); setBusy(null); closing.current = false }
   }
   useEffect(() => { if (!valid && !saving) void finish() })
@@ -93,7 +99,7 @@ export function ImageReplacementDialog({ target, chapter, state, operation, vali
       : window.learning.acceptTopicImageReplacement({ ...current, caption, alt }), false, false)
     setBusy(null)
     if (!result.ok) { setError(result.error.message); return }
-    if (result.data.published?.revisionId !== target.revisionId && !result.data.candidate) onClose(result.data.published?.revisionId)
+    if (result.data.published?.revisionId !== target.revisionId && !result.data.candidate) dismiss(result.data.published?.revisionId)
   }
   const modelName = openRouterImageModels.find(model => model.id === (candidate?.asset.modelId ?? replacement?.modelId ?? configuration?.modelId))?.name ?? configuration?.modelId ?? 'Image model unavailable'
   return <dialog ref={dialog} className="image-replacement-dialog" aria-labelledby="image-replacement-heading" onCancel={event => { event.preventDefault(); void finish() }}>

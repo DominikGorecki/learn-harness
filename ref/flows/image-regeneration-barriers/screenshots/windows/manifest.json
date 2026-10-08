@@ -1,13 +1,13 @@
 {
   "flow": "image-regeneration-barriers",
   "captures": [],
-  "capturedAt": "2026-10-08T00:09:09.479Z",
-  "testSha256": "04c2c173bb4d0fe11172b04e2f9cf097fd56eae5ca7f4173c4bb970af7e7ad9b",
+  "capturedAt": "2026-10-08T01:38:03.187Z",
+  "testSha256": "85e4e612416ecd7ccfaae674c64d0f65d3fa89e4fd3201de622f356a9de08b98",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/image-regeneration.spec.ts",
   "testTitle": "global replacement admission waits for actual utility exit and exact durable billing in both orders",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

@@ -6,6 +6,8 @@ Actual utility/ledger/checkpoint/candidate fault barriers prove pre-dispatch fai
 
 The recorded Electron assertions passed against isolated local fixtures. Screen readers, native ACLs and live pedagogical/provider quality remain separate qualifications.
 
+An actual retained review remains saved when typed workspace authority becomes read-only. Escape closes the native modal before restoring focus to the same connected, enabled Review retained image trigger. DOM/native-focus diagnostics observe the original assertion without activating the window or changing its target.
+
 ```powershell
 npm.cmd run test:desktop -- tests/desktop/image-regeneration.spec.ts --grep "@image-regeneration-recovery"
 ```
@@ -14,7 +16,7 @@ npm.cmd run test:desktop -- tests/desktop/image-regeneration.spec.ts --grep "@im
 
 ### windows
 
-Last successful run: 2026-10-08T00:14:26.845Z. Source revision: ad32e087bfd3e4352d5d57d980ec95660921e75f; source changes present: true.
+Last successful run: 2026-10-08T01:37:42.467Z. Source revision: 5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

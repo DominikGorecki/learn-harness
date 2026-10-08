@@ -14,16 +14,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "046412813badd5cbc3ead5eed2f6dad55d1d13daee71900465c827f2322ba9be"
+      "sha256": "8e3fc82660f1bb206c49b77c5c002afa081bc9d5de614db7ae64f64b0051e6b6"
     }
   ],
-  "capturedAt": "2026-10-08T00:14:26.845Z",
-  "testSha256": "bd63de4a98b69bdb5c4e6be95b097a9f2921e35f8ebd078c58315c5d6255fb8b",
+  "capturedAt": "2026-10-08T01:37:42.467Z",
+  "testSha256": "85e4e612416ecd7ccfaae674c64d0f65d3fa89e4fd3201de622f356a9de08b98",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/image-regeneration.spec.ts",
   "testTitle": "replacement faults, cancellation and hostile capabilities preserve originals with zero automatic replay",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5adc9e1e35ec9a398233ed3f74d17b5003b8f6e7",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }
