@@ -35,6 +35,9 @@ For behavior or UI work, choose the relevant journey below, read its `index.md`,
 | [Packaged worker](flows/packaged-worker/index.md) | Nonvisual ASAR worker/dependency verification after packaging |
 | [Buffered image worker](flows/image-worker/index.md) | Nonvisual private image acknowledgements, real buffered waiting and utility raster decoding |
 | [Topic content](flows/topic-content/index.md) | Nonvisual chapter admission, checkpointing, publication and explicit recovery |
+| [Chapter turn budgets and checkpoint recovery](flows/topic-content-budget/index.md) | Actual 48-turn Pi budget, recorded continuation model and independent progress-source staleness |
+| [Current chapter history and corruption recovery](flows/chapter-reader-recovery/index.md) | Stale reading, shorter current history and preserved corrupt marker recovery |
+| [Explicit reported cost reconciliation](flows/openrouter-reconciliation/index.md) | Named request-detail metadata checks retain exact cost and publication without inference |
 | [Topic content preflight](flows/topic-content-preflight/index.md) | Nonvisual explicit stale/cold provider refresh, fixed settings and HTTP-free reading/text-only paths |
 | [Topic content recovery](flows/topic-content-recovery/index.md) | Nonvisual text-only image completion, failed paid attempts and explicit retry lineage |
 | [Topic content barriers](flows/topic-content-barriers/index.md) | Nonvisual durable intent/checkpoint/billing failures and global admission through actual cleanup |

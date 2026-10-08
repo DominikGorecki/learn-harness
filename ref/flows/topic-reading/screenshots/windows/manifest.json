@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "92d4ff6c94a739607652b54da9cddc377c9c1dc72c7550903855d58f0baaf88a"
+      "sha256": "b396275685e68fcdcdc518c460563d833bdbb7b814887b8d0c12bd65da23fa4b"
     },
     {
       "id": "saved-topic-readonly",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "2e07713a48e022b9b25bf3085c8a80c77fd4717d1480c688ff069595a21cea2c"
+      "sha256": "d691574d6f4d357f643784819bb832dfbfe5716348d145e86f1340783b76f032"
     },
     {
       "id": "saved-topic-readonly-dark",
@@ -59,7 +59,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "fc1f1d8c2863afe0db0f7eae175f520c34705c238598759c68352c9fb9a49b0d"
+      "sha256": "ef18b01b03039a72745c5cd9f1af896900c247e1194851b327e0a4da793a19a8"
     },
     {
       "id": "saved-topic-dark",
@@ -74,7 +74,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "c832bb3406a6340720f50ee9f571e667ea983952e7431ead818a5a5517701421"
+      "sha256": "4c383bd0dbf634787f481d6be447ae51cf04f76cc7059b77ef6bf196fe6b475c"
     },
     {
       "id": "saved-overview-dark",
@@ -104,7 +104,7 @@
       "zoom": 2,
       "method": "electron",
       "maskedLocalPaths": false,
-      "sha256": "27a69ff2dcb1aade5f57b6b3672dd30e79479a194c46cb7b83e8d99ac2b65543"
+      "sha256": "14f2cc6c6e574b73fa73225abd44dec2f606ebd56e8bfbc14d5dbfd4bb1920fd"
     },
     {
       "id": "missing-topic-overview",
@@ -137,13 +137,13 @@
       "sha256": "994f01d3953538287ef15a03dfdccd89c8124d758c1e03d83875d2d6c9c12cc4"
     }
   ],
-  "capturedAt": "2026-10-08T00:21:01.657Z",
+  "capturedAt": "2026-10-08T00:50:31.435Z",
   "testSha256": "50b954c1eb73b007cc8d83d5be2d81efbd64ea6692848acc52dc4a690530db48",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-reading.spec.ts",
   "testTitle": "saved topics read offline through one current-content history with independent commands and restoration",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

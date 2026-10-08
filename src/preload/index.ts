@@ -57,6 +57,7 @@ const learning: AccountApi & WorkspaceApi & GenerationApi & AiApi & ApplicationM
   refreshOpenRouterMetadata: () => ipcRenderer.invoke(openRouterChannels.refresh),
   listOpenRouterCalls: request => ipcRenderer.invoke(openRouterChannels.list, request),
   getOpenRouterCall: request => ipcRenderer.invoke(openRouterChannels.call, request),
+  reconcileOpenRouterCall: request => ipcRenderer.invoke(openRouterChannels.reconcile, request),
   getTopicImageConfiguration: request => ipcRenderer.invoke(openRouterChannels.quote, request),
   onOpenRouterChanged: listener => {
     const receive = (_event: unknown, value: unknown) => { try { listener(parseOpenRouterSettings(value)) } catch { /* Reject malformed public frames. */ } }

@@ -22,6 +22,7 @@ export function createOpenRouterService(options: { store: OpenRouterSettingsStor
   let credential: OpenRouterCredential | null = null, revision = 0, connection: OpenRouterSettings['connection'] = 'absent', errorCode: OpenRouterSettings['errorCode'] = null
   let modelId = openRouterPolicy.defaultImageModel, models = unavailableModels(now()), keyUsage: OpenRouterKeyUsage | null = null, refreshFailed = false, disposed = false
   let queue: Promise<unknown> = Promise.resolve(), refreshing: Promise<OpenRouterSettings> | null = null, configurationMutation = false
+  const reconciling = new Map<string, Promise<void>>()
   const shutdown = new AbortController(), listeners = new Set<(value: OpenRouterSettings) => void>(), leases = new Map<ImageProviderLease, { credential: OpenRouterCredential; slots: Set<string>; live: boolean; budget: number | null; consumed: number | null }>(), authorizedCalls = new Set<string>()
   const serial = <T>(action: () => Promise<T>): Promise<T> => { const result = queue.then(action, action); queue = result.catch(() => {}); return result }
   const stale = () => refreshFailed || models.some(model => model.availability === 'unknown' || Date.parse(now()) - Date.parse(model.checkedAt) >= openRouterPolicy.metadataCacheMs)
@@ -131,23 +132,40 @@ export function createOpenRouterService(options: { store: OpenRouterSettingsStor
     /** Await after valid EOF, before decode/storage. Known billing survives independent result rejection. */
     async recordTerminal(callId: string, value: Omit<OpenRouterCallTransition, 'schemaVersion' | 'callId' | 'sequence' | 'recordedAt' | 'disposition'>): Promise<void> {
       if (!authorizedCalls.has(callId)) throw new ApplicationError('FORBIDDEN', 'No image intent owns this result.')
-      await ledger.transition(callId, { ...value, cost: parseReportedCallCost(value.cost), recordedAt: now(), disposition: ledger.get(callId).latest?.disposition ?? 'none' }); emit()
+      await serial(async () => { await ledger.transition(callId, { ...value, cost: parseReportedCallCost(value.cost), recordedAt: now(), disposition: ledger.get(callId).latest?.disposition ?? 'none' }); emit() })
     },
     async setDisposition(callId: string, disposition: OpenRouterCallTransition['disposition']): Promise<void> {
-      const call = ledger.get(callId), previous = call.latest
-      await ledger.transition(callId, { recordedAt: now(), status: previous?.status ?? 'intended', httpStatus: previous?.httpStatus ?? null, errorCode: previous?.errorCode ?? null, generationId: previous?.generationId ?? null, returnedModelId: previous?.returnedModelId ?? null, cost: previous?.cost ?? { kind: 'unknown' }, disposition }); emit()
+      await serial(async () => {
+        const call = ledger.get(callId), previous = call.latest
+        await ledger.transition(callId, { recordedAt: now(), status: previous?.status ?? 'intended', httpStatus: previous?.httpStatus ?? null, errorCode: previous?.errorCode ?? null, generationId: previous?.generationId ?? null, returnedModelId: previous?.returnedModelId ?? null, cost: previous?.cost ?? { kind: 'unknown' }, disposition }); emit()
+      })
     },
-    async reconcile(callId: string): Promise<void> {
-      available(); const call = ledger.get(callId)
-      if (!credential || credential.epoch !== call.intent.connectionEpoch) throw new ApplicationError('AUTH_REQUIRED', 'This request belongs to a different saved connection.')
-      if (call.intent.endpoint !== 'images' || !call.latest?.generationId) throw new ApplicationError('UNAVAILABLE', 'This image request has no provider generation ID to reconcile.')
-      const generationId = parseOpenRouterGenerationId(call.latest.generationId), raw = await gateway.request(credential, { endpoint: 'generation', purpose: 'cost-reconciliation', generationId }, shutdown.signal)
-      const data = raw && typeof raw === 'object' && 'data' in raw ? raw.data as Record<string, unknown> : null
-      if (!data || data.id !== generationId || data.model !== call.intent.modelId || typeof data.total_cost !== 'string') throw new ApplicationError('UNAVAILABLE', 'Generation metadata did not match this request.')
-      const previous = ledger.get(callId).latest!
-      await ledger.transition(callId, { ...previous, recordedAt: now(), cost: { kind: 'known', usd: decimalLiteral(data.total_cost), source: 'generation-metadata', recordedAt: now() } }); emit()
+    reconcile(callId: string): Promise<void> {
+      const existing = reconciling.get(callId)
+      if (existing) return existing
+      const task = (async () => {
+        available(); const call = ledger.get(callId)
+        if (!credential || credential.epoch !== call.intent.connectionEpoch) throw new ApplicationError('AUTH_REQUIRED', 'This request belongs to a different saved connection.')
+        if (call.intent.endpoint !== 'images' || !call.latest?.generationId) throw new ApplicationError('UNAVAILABLE', 'This image request has no provider generation ID to reconcile.')
+        const connection = credential
+        const generationId = parseOpenRouterGenerationId(call.latest.generationId), raw = await gateway.request(connection, { endpoint: 'generation', purpose: 'cost-reconciliation', generationId }, shutdown.signal)
+        available()
+        if (configurationMutation || credential?.epoch !== connection.epoch) throw new ApplicationError('AUTH_REQUIRED', 'The saved connection changed while checking this request.')
+        const data = raw && typeof raw === 'object' && 'data' in raw ? raw.data as Record<string, unknown> : null
+        if (!data || data.id !== generationId || data.model !== call.intent.modelId || typeof data.total_cost !== 'string') throw new ApplicationError('UNAVAILABLE', 'Generation metadata did not match this request.')
+        const usd = decimalLiteral(data.total_cost)
+        await serial(async () => {
+          available()
+          if (credential?.epoch !== connection.epoch) throw new ApplicationError('AUTH_REQUIRED', 'The saved connection changed while checking this request.')
+          const previous = ledger.get(callId).latest!
+          await ledger.transition(callId, { ...previous, recordedAt: now(), cost: { kind: 'known', usd, source: 'generation-metadata', recordedAt: now() } }); emit()
+        })
+      })()
+      reconciling.set(callId, task)
+      void task.finally(() => { if (reconciling.get(callId) === task) reconciling.delete(callId) }).catch(() => {})
+      return task
     },
-    async dispose(): Promise<void> { disposed = true; shutdown.abort(); await gateway.dispose(); for (const lease of leases.keys()) lease.release(); await refreshing?.catch(() => {}); await queue.catch(() => {}); await ledger.drain(); listeners.clear() }
+    async dispose(): Promise<void> { disposed = true; shutdown.abort(); await gateway.dispose(); for (const lease of leases.keys()) lease.release(); await refreshing?.catch(() => {}); await Promise.allSettled(reconciling.values()); await queue.catch(() => {}); await ledger.drain(); listeners.clear() }
   }
   return service
 }

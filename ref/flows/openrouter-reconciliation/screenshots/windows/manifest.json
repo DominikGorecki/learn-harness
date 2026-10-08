@@ -1,0 +1,13 @@
+{
+  "flow": "openrouter-reconciliation",
+  "captures": [],
+  "capturedAt": "2026-10-08T00:50:26.559Z",
+  "testSha256": "7e47ca90caa7f1425b5da74036a7f29b58daa47e913cfd7063a6d8dfd44d238d",
+  "schemaVersion": 1,
+  "platform": "windows",
+  "testFile": "tests/desktop/topic-content-integration.spec.ts",
+  "testTitle": "explicit request-detail cost recheck preserves exact ledger totals and publication without inference or replay",
+  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
+  "sourceDirty": true,
+  "evidence": "isolated-fixture"
+}

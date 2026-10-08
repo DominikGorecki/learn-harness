@@ -15,6 +15,32 @@ const setup = () => topicContentProject(root => roots.push(root))
 afterEach(async () => { await Promise.all(roots.splice(0).map(root => rm(root, { recursive: true, force: true }))) })
 
 describe('portable chapter publication and recovery', () => {
+  it('inspects marker, topic, learning context and source baselines without writing or adopting changed bytes', async () => {
+    const { storage, authority, path, document } = await setup()
+    await writeFile(join(path, 'source.md'), 'Exact source')
+    const baseline = await storage.captureBaseline(authority, ['source.md']), metadata = join(path, '.edu/project.json'), original = await readFile(metadata)
+    expect(await storage.inspectBaseline(authority, baseline)).toBe('current')
+    for (const change of ['other-topic', 'topic', 'brief', 'outline'] as const) {
+      const next = structuredClone(document)
+      if (change === 'other-topic') next.outline!.document.lessons[1]!.title = 'Unrelated title'
+      if (change === 'topic') next.outline!.document.lessons[0]!.title = 'Changed topic'
+      if (change === 'brief') next.brief = 'Changed learning brief'
+      if (change === 'outline') next.outline!.document.overview = 'Changed whole outline orientation'
+      const bytes = JSON.stringify(next); await writeFile(metadata, bytes)
+      expect(await storage.inspectBaseline(authority, baseline)).toBe(change === 'other-topic' ? 'current' : 'stale')
+      expect(await readFile(metadata, 'utf8')).toBe(bytes)
+    }
+    await writeFile(metadata, original)
+    await writeFile(join(path, 'source.md'), 'Changed exact source'); expect(await storage.inspectBaseline(authority, baseline)).toBe('stale')
+    await writeFile(join(path, 'source.md'), 'Exact source')
+    const source = join(path, 'source.md'), hidden = join(path, 'hidden.md'); await rename(source, hidden); await mkdir(source)
+    expect(await storage.inspectBaseline(authority, baseline)).toBe('unavailable'); await rmdir(source); await rename(hidden, source)
+    const manifest = await contentManifest(storage, authority); await storage.publish(authority, manifest)
+    const marker = await readFile(join(path, topicManifestPath('beliefs')))
+    expect(await storage.inspectBaseline(authority, baseline)).toBe('stale')
+    const current = await storage.captureBaseline(authority, ['source.md']); expect(await storage.inspectBaseline(authority, current)).toBe('current')
+    expect(await readFile(join(path, topicManifestPath('beliefs')))).toEqual(marker)
+  })
   it('explicitly discards only the proven uncommitted journal while preserving old and staged trees', async () => {
     const { path, storage, authority } = await setup(), first = await contentManifest(storage, authority)
     await storage.publish(authority, first)

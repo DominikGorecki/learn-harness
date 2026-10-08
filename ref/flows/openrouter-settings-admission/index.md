@@ -18,7 +18,7 @@ This nonvisual journey establishes renderer/main/provider admission and cancella
 
 ### windows
 
-Last successful run: 2026-10-07T22:19:27.894Z. Source revision: 2b8afb5920be070f6a3197eaf1c099e5000b1f67; source changes present: true.
+Last successful run: 2026-10-08T00:49:35.715Z. Source revision: 5a6e93481738b6bd61482c62903e1759a74ff573; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

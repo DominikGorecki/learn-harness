@@ -30,7 +30,7 @@ The injected BUSY/INTERNAL replies establish rejected-transition behavior at the
 
 ### windows
 
-Last successful run: 2026-10-08T00:18:24.747Z. Source revision: ad32e087bfd3e4352d5d57d980ec95660921e75f; source changes present: true.
+Last successful run: 2026-10-08T00:45:56.274Z. Source revision: 5a6e93481738b6bd61482c62903e1759a74ff573; source changes present: true.
 
 [Capture metadata](screenshots/windows/manifest.json) records the test digest, image dimensions, viewport, theme, zoom and capture method.
 

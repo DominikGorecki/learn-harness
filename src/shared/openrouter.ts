@@ -74,6 +74,7 @@ export interface OpenRouterApi {
   refreshOpenRouterMetadata(): Promise<ApiResult<OpenRouterSettings>>
   listOpenRouterCalls(request: ListOpenRouterCallsRequest): Promise<ApiResult<OpenRouterCallPage>>
   getOpenRouterCall(request: { callId: string }): Promise<ApiResult<OpenRouterCall>>
+  reconcileOpenRouterCall(request: { callId: string }): Promise<ApiResult<OpenRouterCall>>
   getTopicImageConfiguration(request: { imageCount: number; settings?: ImageGenerationSettings }): Promise<ApiResult<TopicImageConfiguration>>
   onOpenRouterChanged(listener: (settings: OpenRouterSettings) => void): () => void
 }
@@ -82,7 +83,7 @@ export function parseTopicImageConfigurationRequest(value: unknown): { imageCoun
   const data = strictRecord(value, ['imageCount', 'settings'])
   return { imageCount: natural(data.imageCount, 6, 1), ...(data.settings !== undefined ? { settings: parseImageGenerationSettings(data.settings) } : {}) }
 }
-export const openRouterChannels = { settings: 'openrouter:settings', saveKey: 'openrouter:save-key', removeKey: 'openrouter:remove-key', model: 'openrouter:model', refresh: 'openrouter:refresh', list: 'openrouter:list-calls', call: 'openrouter:get-call', quote: 'openrouter:image-configuration', changed: 'openrouter:changed' } as const
+export const openRouterChannels = { settings: 'openrouter:settings', saveKey: 'openrouter:save-key', removeKey: 'openrouter:remove-key', model: 'openrouter:model', refresh: 'openrouter:refresh', list: 'openrouter:list-calls', call: 'openrouter:get-call', reconcile: 'openrouter:reconcile-call', quote: 'openrouter:image-configuration', changed: 'openrouter:changed' } as const
 function invalid(): never { throw new ApplicationError('INVALID_INPUT', 'Invalid OpenRouter data.') }
 function choice<T extends string>(value: unknown, choices: readonly T[]): T { if (!choices.includes(value as T)) invalid(); return value as T }
 function natural(value: unknown, max = Number.MAX_SAFE_INTEGER, min = 0): number { if (typeof value !== 'number' || !Number.isSafeInteger(value) || value < min || value > max) invalid(); return value }

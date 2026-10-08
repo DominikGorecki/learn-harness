@@ -122,13 +122,13 @@
       "sha256": "d2db712cccc488c5b4ffb883b9d994f289a8a9c71953d0ad6f25aed0af23391b"
     }
   ],
-  "capturedAt": "2026-10-08T00:17:35.591Z",
+  "capturedAt": "2026-10-08T00:45:34.288Z",
   "testSha256": "f51c7159cd0dd0759067b10a08c2fe9c636d1aa3054dea2afa6d983147555d4b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/chapter-reader.spec.ts",
   "testTitle": "illustrated chapters read offline through bounded pages, relocation and delayed current-content history",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

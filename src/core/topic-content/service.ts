@@ -43,6 +43,16 @@ export class TopicContentService {
     }
     return entries.sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt))[0] ?? null
   }
+  private baseline(context: TopicContentContext, checkpoint: TopicContentCheckpoint, published: ChapterManifest | null) {
+    // A confirmed marker changes after publication; the source/context evidence must still be checked.
+    return published?.revisionId === checkpoint.revisionId && published.provenance.runId === checkpoint.runId
+      ? { ...checkpoint.baseline, expectedManifestDigest: context.baseline.expectedManifestDigest } : checkpoint.baseline
+  }
+  private async requireCurrentBaseline(context: TopicContentContext, checkpoint: TopicContentCheckpoint, published: ChapterManifest | null): Promise<void> {
+    const status = await this.options.repository.inspectBaseline(context, this.baseline(context, checkpoint, published))
+    if (status === 'stale') throw new ApplicationError('CONFLICT', 'Saved progress no longer matches its topic, learning context, sources or published revision. Discard it before generating fresh content.')
+    if (status === 'unavailable') throw new ApplicationError('UNAVAILABLE', 'The saved progress baseline cannot be verified. Restore project and source access, then reload before continuing or retrying its save.')
+  }
   async getState(identity: TopicContentIdentity): Promise<TopicContentSnapshot> {
     const context = await this.options.repository.resolve(identity.projectId, identity.topicId), state = await this.options.repository.readState(context)
     const pending = this.pending.get(this.key(identity)), checkpoint = pending?.checkpoint ?? await this.progress(context, state.manifest)
@@ -51,10 +61,11 @@ export class TopicContentService {
     const { error: replacementError, ...replacement } = this.replacement ? await this.replacement.snapshot(context, state.manifest).catch(() => ({ candidate: null, error: { code: 'CONFLICT' as const, message: 'The retained image review is unreadable. Published content remains available; its recovery bytes have been preserved.' } })) : { candidate: null, error: undefined }
     const active = this.options.ai.get().active
     const ownsProgress = active?.projectId === identity.projectId && active.topicId === identity.topicId && active.runId === checkpoint?.runId
+    const baselineStatus = checkpoint ? await this.options.repository.inspectBaseline(context, this.baseline(context, checkpoint, state.manifest)) : undefined
     return parseTopicContentSnapshot({ revision: ++this.revision, projectId: identity.projectId, topicId: identity.topicId,
       published: state.manifest ? { chapterId: state.manifest.chapterId, revisionId: state.manifest.revisionId, status: state.manifest.status, runId: state.manifest.provenance.runId } : null,
       progress: checkpoint ? { chapterId: checkpoint.chapterId, runId: checkpoint.runId, checkpointRevision: checkpoint.checkpointRevision,
-        status: pending || recovery ? 'unsaved' : checkpoint.status === 'working' && !ownsProgress ? 'interrupted' : checkpoint.status, mode: checkpoint.mode,
+        status: pending || recovery ? 'unsaved' : checkpoint.status === 'working' && !ownsProgress ? 'interrupted' : checkpoint.status, mode: checkpoint.mode, baselineStatus, textModelId: checkpoint.provenance.textModelId,
         completedSectionIds: checkpoint.sections.map(section => section.id), pendingImageIds: checkpoint.images.filter(image => image.status !== 'complete').map(image => image.imageId),
         unresolvedImageIds: checkpoint.images.filter(image => image.status === 'requested' || image.status === 'unresolved').map(image => image.imageId),
         imageSlots: checkpoint.images.map(({ imageId, status, callId }) => ({ imageId, status, callId, settings: checkpoint.plan.images.find(image => image.id === imageId)!.settings })), ...(pending || recovery ? { pendingResultId: pending?.checkpoint.revisionId ?? recovery!.revisionId } : {}) } : null,
@@ -169,7 +180,8 @@ export class TopicContentService {
       } else {
         const continuation = request as TopicContentRunRequest
         checkpoint = await repository.loadCheckpoint(context, runId)
-        if (!checkpoint || checkpoint.chapterId !== chapterId || checkpoint.checkpointRevision !== continuation.checkpointRevision || checkpoint.revisionId === published?.revisionId) throw new ApplicationError('CONFLICT', 'The saved chapter progress changed. Refresh before continuing.')
+        if (!checkpoint || checkpoint.chapterId !== chapterId || checkpoint.checkpointRevision !== continuation.checkpointRevision || [published?.revisionId, ...(published?.previousRevisionIds ?? [])].includes(checkpoint.revisionId)) throw new ApplicationError('CONFLICT', 'The saved chapter progress changed. Refresh before continuing.')
+        await this.requireCurrentBaseline(context, checkpoint, published)
         context.baseline = checkpoint.baseline
         context.textModelId = checkpoint.provenance.textModelId
         if (intent === 'retry-image') {
@@ -219,8 +231,9 @@ export class TopicContentService {
       }
       const result = !checkpoint || !complete(checkpoint) ? await this.options.engine.execute(context, checkpoint, chapterId, lease, accept) : null
       lease.signal.throwIfAborted()
-      if (result?.paused || !checkpoint || !complete(checkpoint)) {
-        if (checkpoint) await save({ ...checkpoint, status: 'paused' })
+      if (!checkpoint) throw new ApplicationError('UNAVAILABLE', 'The chapter turn budget ended without a validated plan. No resumable progress was saved. Try a fresh generation.')
+      if (result?.paused || !complete(checkpoint)) {
+        await save({ ...checkpoint, status: 'paused' })
         return 'paused'
       }
       if (mode === 'illustrated' && images) for (const slot of checkpoint.images.filter(image => image.status === 'planned' && (intent !== 'retry-image' || image.imageId === (request as RetryTopicContentImageRequest).imageId))) await generateImage(slot.imageId)
@@ -284,6 +297,7 @@ export class TopicContentService {
       const manifest = pending?.manifest ?? (state.recovery.kind === 'pending' ? state.recovery.manifest : null)
       const checkpoint = pending?.checkpoint ?? await this.options.repository.loadCheckpoint(context, request.runId)
       if (!checkpoint || !pending && !manifest || (pending?.checkpoint.revisionId ?? manifest!.revisionId) !== request.pendingResultId || checkpoint.runId !== request.runId || checkpoint.chapterId !== request.chapterId || checkpoint.checkpointRevision !== request.checkpointRevision) throw new ApplicationError('CONFLICT', 'The pending save changed.')
+      await this.requireCurrentBaseline(context, checkpoint, state.manifest)
       if (pending?.asset) await this.options.repository.stageAsset(context, checkpoint.plan, checkpoint.revisionId, pending.asset.metadata, pending.asset.bytes)
       if (pending?.manifest) await this.options.repository.publish(context, pending.manifest)
       else if (pending) await this.options.repository.saveCheckpoint(context, checkpoint)

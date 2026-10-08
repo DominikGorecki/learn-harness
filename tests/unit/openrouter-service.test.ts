@@ -202,6 +202,47 @@ describe('capability routing, cache and authorization', () => {
     await service.reconcile(authorization.callId); await service.reconcile(authorization.callId); expect(ledger.spend().allTimeUsd).toBe('0.123456789123456789')
     await service.saveKey({ key: 'same-key-new-epoch' }); await expect(service.reconcile(authorization.callId)).rejects.toMatchObject({ code: 'AUTH_REQUIRED' })
   })
+  it('deduplicates held cost rechecks, preserves publication and rejects an old epoch after removal', async () => {
+    const { service, gateway, ledger } = await setup(); await service.saveKey({ key: 'key' })
+    const lease = service.acquireImageLease(), authorization = await service.prepareImageCall(lease, imageRequest())
+    await service.recordTerminal(authorization.callId, { status: 'succeeded', httpStatus: 200, errorCode: null, generationId: 'gen-known', returnedModelId: 'openai/gpt-image-2', cost: { kind: 'unknown' } }); lease.release()
+    await service.setDisposition(authorization.callId, 'published')
+    const request = gateway.request.bind(gateway), gate = deferred(); let checks = 0
+    vi.spyOn(gateway, 'request').mockImplementation(async (credential, input, signal) => {
+      if (input.endpoint !== 'generation') return request(credential, input, signal)
+      checks++; await gate.promise; return parseProviderJson('{"data":{"id":"gen-known","model":"openai/gpt-image-2","total_cost":0.123456789123456789}}')
+    })
+    const first = service.reconcile(authorization.callId), second = service.reconcile(authorization.callId)
+    expect(second).toBe(first); expect(checks).toBe(1)
+    await service.removeKey(); gate.resolve(); await expect(first).rejects.toMatchObject({ code: 'AUTH_REQUIRED' })
+    expect(ledger.get(authorization.callId).latest).toMatchObject({ disposition: 'published', cost: { kind: 'unknown' } })
+    await expect(service.reconcile(authorization.callId)).rejects.toMatchObject({ code: 'AUTH_REQUIRED' }); expect(checks).toBe(1)
+  })
+  it('serializes a held reconciliation append with publication disposition and retains both', async () => {
+    const { service, gateway, ledger } = await setup(); await service.saveKey({ key: 'key' })
+    const lease = service.acquireImageLease(), authorization = await service.prepareImageCall(lease, imageRequest())
+    await service.recordTerminal(authorization.callId, { status: 'succeeded', httpStatus: 200, errorCode: null, generationId: 'gen-known', returnedModelId: 'openai/gpt-image-2', cost: { kind: 'unknown' } }); lease.release()
+    vi.spyOn(gateway, 'request').mockResolvedValue(parseProviderJson('{"data":{"id":"gen-known","model":"openai/gpt-image-2","total_cost":0.123456789123456789}}'))
+    const transition = ledger.transition.bind(ledger), entered = deferred(), gate = deferred(); let writes = 0
+    vi.spyOn(ledger, 'transition').mockImplementation(async (id, next) => { writes++; if (writes === 1) { entered.resolve(); await gate.promise }; return transition(id, next) })
+    const recheck = service.reconcile(authorization.callId); await entered.promise
+    const published = service.setDisposition(authorization.callId, 'published'); await Promise.resolve(); expect(writes).toBe(1)
+    gate.resolve(); await recheck; await published
+    expect(ledger.get(authorization.callId).latest).toMatchObject({ disposition: 'published', cost: { kind: 'known', usd: '0.123456789123456789' } })
+    expect(ledger.spend().allTimeUsd).toBe('0.123456789123456789')
+  })
+  it('keeps prior exact cost when generation metadata is unsupported, mismatched or fails', async () => {
+    const { service, gateway, ledger } = await setup(); await service.saveKey({ key: 'key' })
+    const lease = service.acquireImageLease(), authorization = await service.prepareImageCall(lease, imageRequest())
+    await service.recordTerminal(authorization.callId, { status: 'succeeded', httpStatus: 200, errorCode: null, generationId: 'gen-known', returnedModelId: 'openai/gpt-image-2', cost: { kind: 'known', usd: '0.045', source: 'response', recordedAt: routerAt } }); lease.release()
+    for (const response of [{}, { data: { id: 'gen-other', model: 'openai/gpt-image-2', total_cost: '1' } }, { data: { id: 'gen-known', model: 'google/gemini-3.1-flash-image', total_cost: '1' } }]) {
+      vi.spyOn(gateway, 'request').mockResolvedValue(response)
+      await expect(service.reconcile(authorization.callId)).rejects.toMatchObject({ code: 'UNAVAILABLE' })
+      expect(ledger.spend().allTimeUsd).toBe('0.045')
+    }
+    vi.spyOn(gateway, 'request').mockRejectedValue(new ApplicationError('NETWORK', 'Unavailable'))
+    await expect(service.reconcile(authorization.callId)).rejects.toMatchObject({ code: 'NETWORK' }); expect(ledger.spend().allTimeUsd).toBe('0.045')
+  })
   it('rejects unpageable pricing-rich intents before storage while reserving terminal frame space', async () => {
     const { service, ledger, root } = await setup(); await service.saveKey({ key: 'key' }); const lease = service.acquireImageLease(), authorization = await service.prepareImageCall(lease, imageRequest()), original = ledger.get(authorization.callId).intent
     const endpoint = original.pricing!.endpoints[0]!, line = { ...endpoint.lines[0]!, variant: 'v'.repeat(128), billable: 'b'.repeat(64) }

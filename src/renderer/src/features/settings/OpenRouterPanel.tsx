@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ListOpenRouterCallsRequest, OpenRouterCall, OpenRouterCallPurpose, OpenRouterCallStatus, OpenRouterImageModelId } from '../../../../shared/openrouter'
 import { openRouterImageModels } from '../../../../shared/openrouter'
 import { connectionLabels, estimateLabel, purposeLabels, routerRecovery, usd, utcDateBounds } from './openrouter-presentation'
@@ -37,7 +37,14 @@ export function OpenRouterPanel({ router, active, keyDraft, onKeyDraft, onSaved 
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined])
   const [pageIndex, setPageIndex] = useState(0)
   const cursor = cursors[pageIndex]
-  useEffect(() => { if (active) void list({ ...filters, ...(cursor ? { cursor } : {}) }) }, [active, filters, cursor, snapshot?.revision, list])
+  const listedQuery = useRef<string | null>(null)
+  useEffect(() => {
+    if (!active) { listedQuery.current = null; return }
+    const request = { ...filters, ...(cursor ? { cursor } : {}) }, query = JSON.stringify(request)
+    const preserveDetail = listedQuery.current === query
+    listedQuery.current = query
+    void list(request, preserveDetail)
+  }, [active, filters, cursor, snapshot?.revision, list])
   const save = () => router.mutate(api => api.saveOpenRouterKey({ key: keyDraft }), onSaved)
   return <div className="router-settings">
     <p className="settings-description">Generate educational images with your own OpenRouter inference key. Image prompts are sent to OpenRouter and its serving provider.</p>
@@ -81,6 +88,7 @@ export function OpenRouterPanel({ router, active, keyDraft, onKeyDraft, onSaved 
       <div className="settings-pagination"><button className="button secondary" disabled={pageIndex === 0 || router.historyBusy} onClick={() => setPageIndex(value => value - 1)}>Previous requests</button><span>Page {pageIndex + 1}</span><button className="button secondary" disabled={!router.history?.nextCursor || router.historyBusy} onClick={() => { const next = router.history?.nextCursor; if (next) { setCursors(values => [...values.slice(0, pageIndex + 1), next]); setPageIndex(value => value + 1) } }}>Next requests</button></div>
       {router.historyError && <button className="button secondary" disabled={router.historyBusy} onClick={() => void list({ ...filters, ...(cursor ? { cursor } : {}) })}>Retry history</button>}
       {router.detailBusy && <p role="status">Loading request details…</p>}{router.detailError && <p className="settings-feedback" role="alert">{router.detailError}</p>}{router.detail && <CallDetail call={router.detail} />}
+      {router.detail?.intent.endpoint === 'images' && <div className="button-row"><button className="button secondary" disabled={router.detailBusy || !router.detail.latest?.generationId || !snapshot?.protection} onClick={() => void router.reconcile(router.detail!.intent.id)}>Recheck cost</button><p className="settings-note">{router.detail.latest?.generationId ? 'Checks provider metadata for this recorded request. It does not generate an image.' : 'This request has no provider generation ID. Its cost cannot be rechecked.'}</p></div>}
     </section>
   </div>
 }

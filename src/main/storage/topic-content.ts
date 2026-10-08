@@ -60,7 +60,7 @@ function chapterFiles(manifest: ChapterManifest): Map<string, string> {
   return files
 }
 
-/** Unactivated main adapter. All public-facing writes must enter WorkspaceService's mutation queue. */
+/** Main storage adapter. All public-facing writes enter WorkspaceService's mutation queue. */
 export function createTopicContentStorage(options: { projectStorage?: ProjectStorage; write?: typeof atomicWrite; fault?: (point: TopicStorageFault) => void | Promise<void> } = {}) {
   const projectStorage = options.projectStorage ?? createProjectStorage(), write = options.write ?? atomicWrite
   const fault = async (point: TopicStorageFault) => { await options.fault?.(point) }
@@ -296,6 +296,10 @@ export function createTopicContentStorage(options: { projectStorage?: ProjectSto
     await removeJournal(authority).catch(() => {})
   }
   return {
+    async inspectBaseline(authority: TopicContentAuthority, baseline: ChapterBaseline): Promise<'current' | 'stale' | 'unavailable'> {
+      try { await validateBaseline(authority, baseline, true, false); return 'current' }
+      catch (error) { return error instanceof ApplicationError && error.code === 'CONFLICT' ? 'stale' : 'unavailable' }
+    },
     async excludedSources(authority: TopicContentAuthority, paths: readonly string[]): Promise<string[]> {
       if (paths.length > 1000) throw new ApplicationError('UNAVAILABLE', 'Too many source paths.')
       const excluded: string[] = []

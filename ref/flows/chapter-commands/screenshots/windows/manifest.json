@@ -14,7 +14,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "1690c92514c00f9459386e298518c70125dd319422be63dae1a5db34dbd4edaa"
+      "sha256": "62d5f2b53eb253be2f8f58e4ccf924665b3edef357b2f0d554243c95835ac34c"
     },
     {
       "id": "chapter-unsaved",
@@ -29,7 +29,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "b95a4176c4a0869a5f8fa43c7a9a69adbc921362fe00cbca73536804a0e73072"
+      "sha256": "cf095d228bf4b20b3b05816eb39f4ebc7654f94ce098a55dc7164d18a8541c63"
     },
     {
       "id": "chapter-progress",
@@ -44,7 +44,7 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "10291798548cae80738a9f10ec9e014ae7ed7165a9cc14753926d81fecab00cb"
+      "sha256": "daa4102948d5243c04291d9927d5d7ac281e906ce26852ad27d68041553e9d9d"
     },
     {
       "id": "chapter-generated",
@@ -59,16 +59,16 @@
       "zoom": 1,
       "method": "playwright",
       "maskedLocalPaths": false,
-      "sha256": "8889bb8c1dd57df963de3046443560754e10991dcc951332819d67e532a82772"
+      "sha256": "9f91321cc865d505570becfba605f0e6fb550f7a91eb9d1b71dc1d59b499e8bc"
     }
   ],
-  "capturedAt": "2026-10-08T00:18:18.980Z",
+  "capturedAt": "2026-10-08T00:45:51.371Z",
   "testSha256": "f51c7159cd0dd0759067b10a08c2fe9c636d1aa3054dea2afa6d983147555d4b",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/chapter-reader.spec.ts",
   "testTitle": "chapter commands preserve saved prose, retry storage without inference and explicitly recover uncertain images",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }

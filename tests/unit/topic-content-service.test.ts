@@ -8,7 +8,7 @@ import { createTopicContentRepository } from '../../src/main/storage/topic-conte
 import { ApplicationError } from '../../src/shared/contracts'
 import { collectMaterials } from '../../src/main/generation/material-snapshot'
 import { contentDigest, topicJournalPath } from '../../src/main/storage/topic-content-files'
-import { contentPlan, contentCheckpoint, topicContentProject, topicPng } from '../fixtures/topic-content'
+import { contentPlan, contentManifest, contentCheckpoint, topicContentProject, topicPng } from '../fixtures/topic-content'
 
 const roots: string[] = []
 const services: TopicContentService[] = []
@@ -32,6 +32,40 @@ async function setup(configuration: { images?: () => Promise<ChapterImageSession
   return { ...project, repository, ai, engine, service, identity: { projectId: project.handle, topicId: 'beliefs' } }
 }
 describe('chapter admission, durable acceptance and recovery', () => {
+  it('fails without a durable plan but pauses a validated partial plan at the activation budget', async () => {
+    for (const planned of [false, true]) {
+      const fixture = await setup(), { service, engine, identity, storage, authority, path } = fixture
+      const published = await contentManifest(storage, authority); await storage.publish(authority, published)
+      const old = await readFile(join(path, published.outputDirectory, 'chapter.md'))
+      engine.execute = async (_context, _checkpoint, chapterId, _lease, accept) => {
+        for (let turn = 0; turn < 48; turn++) {
+          await accept({ kind: 'turn' })
+          if (planned && turn === 0) { const plan = { ...contentPlan(authority, true), chapterId }; plan.images[0]!.skillVersion = 'educational-images-v1'; await accept({ kind: 'plan', plan }) }
+        }
+        return { paused: true }
+      }
+      await service.generate({ ...identity, mode: 'text-only', replace: true, expectedRevisionId: published.revisionId }); await service.waitForIdle()
+      const state = await service.getState(identity)
+      expect(fixture.ai.get().settled?.outcome).toBe(planned ? 'paused' : 'failed')
+      if (planned) expect(state.progress).toMatchObject({ status: 'paused', baselineStatus: 'current', textModelId: 'offline-model' })
+      else { expect(state.progress).toBeNull(); expect(state.errorCode).toBe('UNAVAILABLE'); expect(state.message).toContain('No resumable progress') }
+      expect((await storage.read(authority)).manifest).toEqual(published); expect(await readFile(join(path, published.outputDirectory, 'chapter.md'))).toEqual(old)
+    }
+  }, 20_000)
+  it('checks the progress source baseline independently from published prose before any continuation writes or provider preparation', async () => {
+    let prepared = 0
+    const fixture = await setup({ images: async () => { prepared++; return null } }), { storage, authority, path, identity, service } = fixture
+    const published = await contentManifest(storage, authority); await storage.publish(authority, published)
+    await writeFile(join(path, 'extra.md'), 'Earlier source')
+    const checkpoint = await contentCheckpoint(storage, authority); checkpoint.baseline = await storage.captureBaseline(authority, ['extra.md'])
+    await storage.saveCheckpoint(authority, checkpoint)
+    await writeFile(join(path, 'extra.md'), 'Edited source')
+    expect(await service.getState(identity)).toMatchObject({ stale: false, progress: { baselineStatus: 'stale' } })
+    const saving = vi.spyOn(fixture.repository, 'saveCheckpoint')
+    await expect(service.continue({ ...identity, chapterId: checkpoint.chapterId, runId: checkpoint.runId, checkpointRevision: 1 })).rejects.toMatchObject({ code: 'CONFLICT' })
+    await service.waitForIdle(); expect(saving).not.toHaveBeenCalled(); expect(prepared).toBe(0)
+    expect((await service.getContent(identity))?.identity.revisionId).toBe(published.revisionId)
+  })
   it('retries only the acknowledged image slot and leaves other planned images for explicit Continue', async () => {
     const calls: string[] = []
     const prepared = await setup({ images: async () => ({ modelId: 'openai/gpt-image-2', settings: { n: 1, aspectRatio: '1:1' }, dispose() {}, async generate(_context, checkpoint, imageId, _lease, requested, accepted) {

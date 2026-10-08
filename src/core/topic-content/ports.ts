@@ -13,6 +13,7 @@ export interface TopicContentContext {
 export interface TopicContentRepository {
   resolve(handle: string, topicId: string): Promise<TopicContentContext>
   load(context: TopicContentContext): Promise<ChapterManifest | null>
+  inspectBaseline(context: TopicContentContext, baseline: ChapterBaseline): Promise<'current' | 'stale' | 'unavailable'>
   loadCheckpoint(context: TopicContentContext, runId: string): Promise<TopicContentCheckpoint | null>
   saveCheckpoint(context: TopicContentContext, checkpoint: TopicContentCheckpoint): Promise<void>
   publish(context: TopicContentContext, manifest: ChapterManifest): Promise<void>

@@ -86,7 +86,7 @@ export interface RetryTopicImageReplacementSaveRequest extends TopicImageCandida
 export interface TopicContentSnapshot {
   revision: number; projectId: string; topicId: string;
   published: { chapterId: string; revisionId: string; status: ChapterManifest['status']; runId?: string } | null;
-  progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[]; pendingResultId?: string; imageSlots?: { imageId: string; status: ChapterImageProgress['status']; callId: string | null; settings?: ImageGenerationSettings }[] } | null;
+  progress: { chapterId: string; runId: string; checkpointRevision: number; status: TopicContentCheckpoint['status']; mode: TopicContentMode; baselineStatus?: 'current' | 'stale' | 'unavailable'; textModelId?: string; completedSectionIds: string[]; pendingImageIds: string[]; unresolvedImageIds: string[]; pendingResultId?: string; imageSlots?: { imageId: string; status: ChapterImageProgress['status']; callId: string | null; settings?: ImageGenerationSettings }[] } | null;
   candidate: TopicImageCandidate | null;
   replacement?: { candidateId: string; chapterId: string; revisionId: string; imageId: string; expectedImageVersionId: string; status: 'working' | 'interrupted' | 'unsaved' | 'published'; callId: string | null; prompt: string; modelId: OpenRouterImageModelId; pendingResultId?: string };
   stale: boolean; missingImageIds: string[]; errorCode: ErrorCode | null; message: string | null
@@ -150,12 +150,14 @@ export function parseTopicContentPage(value: unknown): TopicContentPage {
 export function parseTopicContentSnapshot(value: unknown): TopicContentSnapshot {
   const data = strictRecord(value, ['revision', 'projectId', 'topicId', 'published', 'progress', 'candidate', 'replacement', 'stale', 'missingImageIds', 'errorCode', 'message'])
   const published = data.published === null ? null : strictRecord(data.published, ['chapterId', 'revisionId', 'status', 'runId'])
-  const progress = data.progress === null ? null : strictRecord(data.progress, ['chapterId', 'runId', 'checkpointRevision', 'status', 'mode', 'completedSectionIds', 'pendingImageIds', 'unresolvedImageIds', 'pendingResultId', 'imageSlots'])
+  const progress = data.progress === null ? null : strictRecord(data.progress, ['chapterId', 'runId', 'checkpointRevision', 'status', 'mode', 'baselineStatus', 'textModelId', 'completedSectionIds', 'pendingImageIds', 'unresolvedImageIds', 'pendingResultId', 'imageSlots'])
   if (typeof data.stale !== 'boolean') invalid()
   const ids = (value: unknown, max: number) => { const result = list(value, max, identifier); distinct(result); return result }
   const result: TopicContentSnapshot = { revision: natural(data.revision), ...topicRequest(data),
     published: published && { chapterId: identifier(published.chapterId), revisionId: identifier(published.revisionId), status: choice(published.status, ['illustrated', 'text-only', 'needs-images']), ...(published.runId !== undefined ? { runId: identifier(published.runId) } : {}) },
     progress: progress && { chapterId: identifier(progress.chapterId), runId: identifier(progress.runId), checkpointRevision: natural(progress.checkpointRevision, Number.MAX_SAFE_INTEGER, 1), status: choice(progress.status, ['paused', 'cancelled', 'interrupted', 'working', 'unsaved']), mode: choice(progress.mode, ['illustrated', 'text-only']),
+      ...(progress.baselineStatus !== undefined ? { baselineStatus: choice(progress.baselineStatus, ['current', 'stale', 'unavailable'] as const) } : {}),
+      ...(progress.textModelId !== undefined ? { textModelId: boundedText(progress.textModelId, 'Continuation model', 128) } : {}),
       completedSectionIds: ids(progress.completedSectionIds, topicContentPolicy.maximumSections), pendingImageIds: ids(progress.pendingImageIds, topicContentPolicy.maximumImages), unresolvedImageIds: ids(progress.unresolvedImageIds, topicContentPolicy.maximumImages),
       ...(progress.pendingResultId !== undefined ? { pendingResultId: identifier(progress.pendingResultId) } : {}),
       ...(progress.imageSlots !== undefined ? { imageSlots: list(progress.imageSlots, topicContentPolicy.maximumImages, value => { const slot = strictRecord(value, ['imageId', 'status', 'callId', 'settings']); return { imageId: identifier(slot.imageId), status: choice(slot.status, ['planned', 'requested', 'complete', 'failed', 'unresolved']), callId: slot.callId === null ? null : identifier(slot.callId), ...(slot.settings !== undefined ? { settings: parseImageGenerationSettings(slot.settings) } : {}) } }) } : {}) },

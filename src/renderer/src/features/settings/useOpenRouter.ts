@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { ApiResult } from '../../../../shared/contracts'
+import type { ApiResult, ErrorCode } from '../../../../shared/contracts'
 import type { ListOpenRouterCallsRequest, OpenRouterApi, OpenRouterCall, OpenRouterCallPage, OpenRouterSettings, TopicImageConfiguration } from '../../../../shared/openrouter'
 import { SettingsRequestScope, routerRecovery } from './openrouter-presentation'
+
+const costRecovery = (code: ErrorCode) => code === 'AUTH_REQUIRED' ? 'This request requires its original saved connection. The previous recorded cost is unchanged.' : code === 'NETWORK' ? 'Provider cost metadata could not be reached. Retry this check when connected; the previous recorded cost is unchanged.' : code === 'UNAVAILABLE' ? 'Matching provider cost metadata is unavailable. The previous recorded cost is unchanged.' : routerRecovery(code)
 
 export function useOpenRouter(open: boolean) {
   const [scope] = useState(() => new SettingsRequestScope())
@@ -55,8 +57,9 @@ export function useOpenRouter(open: boolean) {
     } catch { if (scope.accepts(token)) setError(routerRecovery('INTERNAL')); return false }
     finally { if (scope.accepts(token)) { pending.current = null; setBusy(false) } }
   }, [scope, accept])
-  const list = useCallback(async (request: ListOpenRouterCallsRequest) => {
-    const token = scope.request('history'); scope.request('detail'); setHistory(null); setHistoryBusy(true); setHistoryError(null); setDetail(null); setDetailError(null); setDetailBusy(false)
+  const list = useCallback(async (request: ListOpenRouterCallsRequest, preserveDetail = false) => {
+    const token = scope.request('history'); setHistory(null); setHistoryBusy(true); setHistoryError(null)
+    if (!preserveDetail) { scope.request('detail'); setDetail(null); setDetailError(null); setDetailBusy(false) }
     try { const reply = await window.learning.listOpenRouterCalls(request); if (scope.accepts(token)) { if (reply.ok) setHistory(reply.data); else setHistoryError(routerRecovery(reply.error.code)) } }
     catch { if (scope.accepts(token)) setHistoryError(routerRecovery('INTERNAL')) }
     finally { if (scope.accepts(token)) setHistoryBusy(false) }
@@ -67,6 +70,12 @@ export function useOpenRouter(open: boolean) {
     catch { if (scope.accepts(token)) setDetailError(routerRecovery('INTERNAL')) }
     finally { if (scope.accepts(token)) setDetailBusy(false) }
   }, [scope])
-  return { snapshot, quote: quote && snapshot && quote.revision === snapshot.revision && quote.value.modelId === snapshot.imageModelId ? quote.value : null, quoteError: quoteFailure?.revision === snapshot?.revision ? quoteFailure?.message ?? null : null, error, busy, mutate, close, list, history, historyBusy, historyError, detail, detailBusy, detailError, inspect }
+  const reconcile = useCallback(async (callId: string) => {
+    const token = scope.request('detail'); setDetailBusy(true); setDetailError(null)
+    try { const reply = await window.learning.reconcileOpenRouterCall({ callId }); if (scope.accepts(token)) { if (reply.ok) setDetail(reply.data); else setDetailError(costRecovery(reply.error.code)) } }
+    catch { if (scope.accepts(token)) setDetailError(costRecovery('INTERNAL')) }
+    finally { if (scope.accepts(token)) setDetailBusy(false) }
+  }, [scope])
+  return { snapshot, quote: quote && snapshot && quote.revision === snapshot.revision && quote.value.modelId === snapshot.imageModelId ? quote.value : null, quoteError: quoteFailure?.revision === snapshot?.revision ? quoteFailure?.message ?? null : null, error, busy, mutate, close, list, history, historyBusy, historyError, detail, detailBusy, detailError, inspect, reconcile }
 }
 export type OpenRouterController = ReturnType<typeof useOpenRouter>

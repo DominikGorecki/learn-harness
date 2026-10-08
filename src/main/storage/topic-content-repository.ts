@@ -64,6 +64,7 @@ export function createTopicContentRepository(workspace: WorkspaceService, storag
       return storage.read(authority)
     },
     readState: (context: TopicContentContext) => storage.read(owner(context).authority),
+    inspectBaseline: (context: TopicContentContext, baseline: import('../../shared/topic-content').ChapterBaseline) => storage.inspectBaseline(owner(context).authority, baseline),
     recover: (context: TopicContentContext) => mutation(context, authority => storage.recover(authority)),
     retryPublication: (context: TopicContentContext) => mutation(context, authority => storage.retryPublication(authority)),
     discardPublication: (context: TopicContentContext, runId: string, revisionId: string) => mutation(context, authority => storage.discardPublication(authority, runId, revisionId)),

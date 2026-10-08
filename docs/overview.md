@@ -42,6 +42,8 @@ The exact organization of future lesson documents, notes, and other learner arti
 
 Illustrated topic chapters now have an independent portable manifest and immutable text/media revisions, with explicit generation, checkpoint recovery and offline reading. Each illustration supports editable-prompt generation of one candidate, original/candidate comparison and explicit Use/Keep; storage retry preserves accepted bytes without another image request. The chapter reader provides explanations and useful visual context alongside the saved plan; it does not run Socratic activities or assess mastery. OpenRouter image settings and call accounting remain device-owned separately from the ChatGPT text connection. [Bundle 05](../ref/work/05-illustrated-topic-content/illustrated-topic-content.spec.md) tracks cumulative/live qualification; local protocol diagrams are not evidence of live educational quality.
 
+Resumable progress independently checks its context/source/publication baseline and retains the recorded text model when the project preference changes. Changed or unreadable progress preserves published reading while disabling continuation. OpenRouter request details provide an explicit supported metadata cost recheck without generating an image; exact billing remains separate from image acceptance or discard.
+
 The [progressive discovery and interactive module proposal](progressive-learning-workspace.md) records a future design for evolving knowledge files, compact JSON indexes, and application-rendered Socratic activities. It does not change the current single-document storage contract.
 
 ## Learning hierarchy

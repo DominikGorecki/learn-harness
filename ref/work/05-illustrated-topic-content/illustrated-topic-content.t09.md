@@ -1,5 +1,5 @@
 # Ticket: illustrated-topic-content.T09 — Verify integrated chapter and provider delivery
-Status: Open
+Status: Local integration repairs accepted — fresh primary cumulative gates and required live/editorial qualification pending
 
 ## Source
 
@@ -26,6 +26,7 @@ Out of scope: unrelated work, TTS, Socratic runtime, OpenRouter text inference, 
 ## Implementation plan
 
 - Audit every requirement against cumulative delivered code, safe contracts and real process behavior; repair identified integration gaps without weakening gates.
+- Repair truthful no-plan turn-budget settlement, independently verified checkpoint baseline status and recorded continuation-model labels. Add actual reader stale/corrupt/removed-anchor evidence and activate narrow supported non-inference cost reconciliation from request details.
 - Run fresh npm run check, full test:desktop, package and test:packaged; review changed registered captures and packaged skills/worker assets.
 - Record exact coverage and remaining live/native gates, update maintained implemented guidance; do not claim closed bundle until all mandatory acceptance evidence is satisfied.
 
@@ -55,7 +56,15 @@ Review the delivered behavior against acceptance using actual output and affecte
 
 ## Completion evidence
 
-Pending coordinator acceptance. Worker role: integration/review; planned model: gpt-6.1-sol; reasoning: high. Primary owns statuses, staging, commits and bundle closure. No nested agents unless the primary assigns them.
+The primary accepted the scoped local repairs after inspecting source/tests, actual flow manifests and refreshed visual references. Worker role: integration/review; model: gpt-6.1-sol; reasoning: high. Two read-only medium reviewers checked renderer ownership and backend baseline/ledger/lifecycle boundaries. Prerequisites T06/T07/T08 are accepted and committed; release HEAD was `5a6e93481738b6bd61482c62903e1759a74ff573` on original `master`. No nested agents were used.
+
+- Implemented no-plan budget failure versus durable pause, independent read-only checkpoint baseline status/guards, recorded continuation-model labels and reachable strict non-inference cost reconciliation. Serialized paid-call billing/disposition updates preserve both through a held append; epoch checks reject removed/replaced connections. Exhausted image allowance does not prohibit a saved key's metadata check.
+- Focused three-file tests: 71 passed. Final frozen `npm.cmd run check` (63640): exit 0; 42 unit files, 492 passed/3 skipped, lint/flow audit/types/build passed.
+- Final `npm.cmd run test:desktop -- tests/desktop/topic-content-integration.spec.ts tests/desktop/openrouter-settings.spec.ts tests/desktop/topic-reading.spec.ts` (26018): exit 0; six passed in 1.2 minutes. Actual counts: no-plan 48+0, resume 48+2 using the recorded model, stale 48+0 text calls; zero image requests. Cost checks make six explicit generation-metadata GETs, zero image POSTs, and retain exact spend `0.123456789123456789` once, including a limited saved key. Reader history and corrupt-marker recovery preserve immutable originals with no inference.
+- Earlier broader affected command (81107): exit 1; ten passed and one editor Escape focus assertion failed. Final topic-reading rerun passed with focus product code and expected-trigger assertion unchanged. This failure is retained in validation and must be covered again by the primary's full suite.
+- Primary reviewed all 14 changed existing PNGs and the three actual nonvisual manifests; final integration test SHA256 is `7e47ca90caa7f1425b5da74036a7f29b58daa47e913cfd7063a6d8dfd44d238d`. Temporary fixture roots/providers were cleaned; sessions ended and Electron process count was zero. No paid/live/private credential access.
+
+Primary owns the fresh full code/desktop/package/ASAR gates, final records, local commits and bundle closure. Those whole-spec checks and required live/editorial qualification remain unresolved at this implementation acceptance point.
 
 ## Notes
 

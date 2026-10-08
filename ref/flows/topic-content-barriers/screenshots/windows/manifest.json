@@ -1,13 +1,13 @@
 {
   "flow": "topic-content-barriers",
   "captures": [],
-  "capturedAt": "2026-10-08T00:20:55.739Z",
+  "capturedAt": "2026-10-08T00:47:59.138Z",
   "testSha256": "b3c855d59f19a31397b0ca4b3d6145ef784176744f1ee8256ecb9b9ef29acd0d",
   "schemaVersion": 1,
   "platform": "windows",
   "testFile": "tests/desktop/topic-content.spec.ts",
   "testTitle": "chapter image dispatch and global cleanup wait for exact durable writes and genuine exits",
-  "revision": "ad32e087bfd3e4352d5d57d980ec95660921e75f",
+  "revision": "5a6e93481738b6bd61482c62903e1759a74ff573",
   "sourceDirty": true,
   "evidence": "isolated-fixture"
 }
